@@ -5,6 +5,7 @@ import { NgCircleProgressModule } from 'ng-circle-progress';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { FormsModule } from '@angular/forms';
 import { MeetingDashboardComponent } from './meeting-dashboard.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 
@@ -12,6 +13,7 @@ import { MeetingDashboardComponent } from './meeting-dashboard.component';
   declarations: [MeetingDashboardComponent],
   imports: [
     NgxChartsModule,
+    MatTooltipModule,
         CommonModule,
         FormsModule,
         RouterModule.forChild([

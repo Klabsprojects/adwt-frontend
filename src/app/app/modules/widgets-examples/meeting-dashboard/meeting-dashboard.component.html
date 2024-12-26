@@ -43,10 +43,14 @@
             
           </div>
 
+          <div class="divider-div">
+            State Level - SLVMC
+          </div>
+
           <div class="row text-center">
             <div class="col-md-2" style="flex: 2.5;" *ngFor="let card of headerCards3">
               <div class="card text-center mb-3">
-                <div style="padding: 0.5rem;"
+                <div style="padding: 0.5rem;border: 0.1px solid #f7f5f5;border-radius: 9px;"
                   class="card-body d-flex align-items-center justify-content-between">
                   <!-- <img src="assets/icons/v1/totalCases.png" alt="Case Icon" class="img-fluid" style="max-width: 120px"/> -->
                   <div class="text-center" style="margin: auto">
@@ -63,11 +67,15 @@
           &nbsp;
           &nbsp;
           &nbsp;
+
+          <div class="divider-div">
+            DLVMC and SDLVMC
+          </div>
   
       <div class="row text-center">
         <div class="col-md-2" style="flex: 2.5;" *ngFor="let card of headerCards">
           <div class="card text-center mb-3">
-            <div style="padding: 0.5rem;"
+            <div style="padding: 0.5rem;border: 0.1px solid #f7f5f5;border-radius: 9px;"
               class="card-body d-flex align-items-center justify-content-between">
               <!-- <img src="assets/icons/v1/totalCases.png" alt="Case Icon" class="img-fluid" style="max-width: 120px"/> -->
               <div class="text-center" style="margin: auto">
@@ -85,7 +93,7 @@
       <div class="row text-center">
         <div class="col-md-2" style="flex: 2.5;" *ngFor="let card of headerCards">
           <div class="card text-center mb-3">
-            <div style="padding: 0.5rem;"
+            <div style="padding: 0.5rem;border: 0.1px solid #f7f5f5;border-radius: 9px;"
               class="card-body d-flex align-items-center justify-content-between">
               <!-- <img src="assets/icons/v1/totalCases.png" alt="Case Icon" class="img-fluid" style="max-width: 120px"/> -->
               <div class="text-center" style="margin: auto">
@@ -96,163 +104,142 @@
           </div>
         </div>
       </div>
-      
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="card-title" style="font-size: 1.275rem; font-weight: 500">Redzone Cases Details</h5>
-            <div>
-              <input type="text" class="form-control" placeholder="Search cases" style="width: 300px"/>
+
+      <div style="padding: 13px;"></div>
+
+      <div style="display: flex;">
+        <div class="card shadow-sm col-md-6">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="card-title" style="font-size: 1.275rem; font-weight: 500">District Level Meeting Details</h5>
             </div>
-          </div>
-          <div class="table-responsive">
-            <table class="table table-bordered align-middle">
-              <thead class="bg-light">
-                <tr>
-                  <th style="font-size: 1.275rem; font-weight: 500">FIR No.</th>
-                  <th style="font-size: 1.275rem; font-weight: 500">District</th>
-                  <th style="font-size: 1.275rem; font-weight: 500">Pending Days</th>
-                  <th style="font-size: 1.275rem; font-weight: 500">Status</th>
-                  <th style="font-size: 1.275rem; font-weight: 500">1st Relief Given</th>
-                  <th style="font-size: 1.275rem; font-weight: 500">2nd Relief Given</th>
-                  <th style="font-size: 1.275rem; font-weight: 500">3rd Relief Given</th>
-                  <th style="font-size: 1.275rem; font-weight: 500">Priority</th>
-                  <th style="font-size: 1.275rem; font-weight: 500">Next Action Due</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let caseItem of redZoneCases">
-                  <td>{{ caseItem.firNo }}</td>
-                  <td>{{ caseItem.district }}</td>
-                  <td>{{ caseItem.pendingDays }}</td>
-                  <td>{{ caseItem.status }}</td>
-                  <td>{{ caseItem.firstReliefGiven ? "Yes" : "No" }}</td>
-                  <td>{{ caseItem.firstReliefGiven ? "Yes" : "No" }}</td>
-                  <td>{{ caseItem.firstReliefGiven ? "Yes" : "No" }}</td>
-                  <td>
-                    <span class="badge"
-                      [ngClass]="{
-                        'badge-critical': caseItem.priority === 'Critical',
-                        'badge-high': caseItem.priority === 'High',
-                        'badge-medium': caseItem.priority === 'Medium',
-                        'badge-low': caseItem.priority === 'Low'
-                      }">
-                      {{ caseItem.priority }}
-                    </span>
-                  </td>
-                  <td>{{ caseItem.nextActionDue }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="row mt-4">
-        <div class="col-12 col-sm-6 col-md-3" *ngFor="let card of cards">
-          <div class="card text-center">
-            <div class="card-body" style="padding: 1rem;">
-              <h5 class="card-title" style="font-size: 1.275rem; font-weight: 500">{{ card.title }}</h5>
-              <div class="semi-circle-wrapper">
-                <svg viewBox="0 0 100 50" class="semi-circle">
-                  <path
-                    d="M 10,50 A 40,40 0 0,1 90,50"
-                    [attr.stroke]="
-                      card.status === 'given' ? '#e0f3e8' : '#ffe8d4'
-                    "
-                    stroke-width="12"
-                    fill="none"
-                  ></path>
-                  <path
-                    d="M 10,50 A 40,40 0 0,1 90,50"
-                    [attr.stroke]="
-                      card.status === 'given' ? '#28a745' : '#fd7e14'
-                    "
-                    stroke-width="12"
-                    fill="none"
-                    [attr.stroke-dasharray]="getStrokeDashArray(card.percentage)"
-                    stroke-dashoffset="0"
-                  ></path>
-                </svg>
-                <div class="percentage-text">
-                  <strong>{{ card.percentage }}%</strong>
-                </div>
-              </div>
-              <strong>{{ card.total | number }}</strong>
+            <div class="table-responsive">
+              <table class="table table-bordered align-middle">
+                <thead class="bg-light">
+                  <tr>
+                    <th style="font-size: 1.275rem; font-weight: 500">District</th>
+                    <th style="font-size: 1.275rem; font-weight: 500">Q1</th>
+                    <th style="font-size: 1.275rem; font-weight: 500">Q2</th>
+                    <th style="font-size: 1.275rem; font-weight: 500">Q3</th>
+                    <th style="font-size: 1.275rem; font-weight: 500">Q4</th>
+                    <th style="font-size: 1.275rem; font-weight: 500">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let caseItem of redZoneCases">
+                    <td>{{ caseItem.District }}</td>
+                    <td>{{ caseItem.Q1 }}</td>
+                    <td>{{ caseItem.Q2 }}</td>    
+                    <td>{{ caseItem.Q3 }}</td>
+                    <td>{{ caseItem.Q4 }}</td>
+                    <td>{{ caseItem.Total }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
-      </div>
-      <div class="row mt-4">  
-  
-        <div class="col-md-12">
-          <div class="card shadow-sm">
-            <div class="card-header">
-              <h5 class="card-title" style="font-size: 1.275rem; font-weight: 500; margin: auto">
-                Total Cases where&nbsp;
-                <select [(ngModel)]="selectedFilter" class="styled-select" (change)="updateFilter()">
-                  <option value="Job">Job</option>
-                  <option value="Pension">Pension</option>
-                  <option value="Patta">Patta</option>
-                  <option value="Education">Education</option>
-                </select>
-                &nbsp;
-                is Given at Districts
-              </h5>
-            </div>
-            <div class="card-body">
-              <div class="scroller">
-                  <canvas id="districtBarChart"></canvas>
-              </div>
-            </div>
-          
-          </div>
-        </div>
-  
-      </div>
-  
-      <div class="row mt-4">
-  
-        <div class="col-md-12">
-          <div class="card shadow-sm">
-            <div class="card-header">
-              <h5 style="font-size: 1.275rem; font-weight: 500; margin: auto">
-                Total Cases where&nbsp;
-                <select [(ngModel)]="selectedFilter1" class="styled-select" (change)="updateFilter1()">
-                  <option value="Job">Job</option>
-                  <option value="Pension">Pension</option>
-                  <option value="Patta">Patta</option>
-                  <option value="Education">Education</option>
-                </select>
-                &nbsp;
-                is Pending at Districts
-              </h5>
-            </div>
-            <div class="card-body">
-              <div class="scroller1">
-                <canvas id="districtBarChart1"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
+
+        <div style="flex: 0.5;"></div>
   
         <div class="col-md-6">
-          <div class="card shadow-sm">
+          <div class="card">
+         <div class="card-header">
+          <h5 class="card-title" style="font-size: 18px;font-weight: 500;">District Wise Meeting Distribution</h5>
+        </div>
+        <div class="card-body d-flex align-items-start">
+          <!-- SVG -->
+          <div class="svg-container">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1591.1 1975.3" height="300px" width="500px">
+            <ng-container *ngFor="let district of districtData">
+              <path
+              class="st0"
+              [attr.id]="district.id"
+              [attr.d]="getPath(district.id)"
+              [attr.fill]="getDistrictColor(district.data.count)"
+              matTooltip="{{ district.name }} - Count: {{ district.data.count }}"
+              matTooltipPosition="above"
+              (click)="onDistrictClick(district)"
+              (mouseover)="onHover(district)"
+              (mouseout)="onHoverOut()"
+              ></path>
+            </ng-container>
+            </svg>
+          </div>
+  
+          <!-- Legend -->
+          <div class="legend">
+            <div class="legenditem">
+            <span class="dot" style="background-color: green;"></span> Normal
+            </div>
+            <div class="legenditem">
+            <span class="dot" style="background-color: yellow;"></span> Mild
+            </div>
+            <div class="legenditem">
+            <span class="dot" style="background-color: red;"></span> Critical
+            </div>
+          </div>
+          </div>
+  
+          </div>
+        </div>
+      </div>
+
+      <div class="divider-div">
+        District Level
+      </div>
+
+      <div style="display: flex;">
+
+        <div class="col-md-6">
+          <div class="card">
             <div class="card-header">
-              <h5 class="card-title" style="font-size: 1.275rem; font-weight: 500">Status of Relief</h5>
+              <div class="card-title">
+                <h5 class="card-title" style="font-size: 18px;font-weight: 500;">Quarter Wise SDLVMC Meeting Status</h5>
+              </div>
             </div>
             <div class="card-body">
-              <div class="d-flex justify-content-center">
-                <canvas id="pieChart" style="max-width: 300px; max-height: 300px; width: 100%; height: auto;"></canvas>
-                <div class="chart-legend p-4">
-                  <span class="legend-item"><span class="dot blue"></span> Relief Pending</span>
-                  <span class="legend-item"><span class="dot light-blue"></span> Relief Given</span>
-                </div>
-              </div>
+              <canvas id="barChart1" style="max-height: 300px; width: 100%;"></canvas>
             </div>
           </div>
         </div>
-  
+
+        <div class="card shadow-sm col-md-6">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="card-title" style="font-size: 1.275rem; font-weight: 500">Sub Division Level Meeting Details</h5>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-bordered align-middle">
+                <thead class="bg-light">
+                  <tr>
+                    <th style="font-size: 1.275rem; font-weight: 500">Sub Division</th>
+                    <th style="font-size: 1.275rem; font-weight: 500">Q1</th>
+                    <th style="font-size: 1.275rem; font-weight: 500">Q2</th>
+                    <th style="font-size: 1.275rem; font-weight: 500">Q3</th>
+                    <th style="font-size: 1.275rem; font-weight: 500">Q4</th>
+                    <th style="font-size: 1.275rem; font-weight: 500">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let caseItem of redZoneCases2">
+                    <td>{{ caseItem.District }}</td>
+                    <td>{{ caseItem.Q1 }}</td>
+                    <td>{{ caseItem.Q2 }}</td>    
+                    <td>{{ caseItem.Q3 }}</td>
+                    <td>{{ caseItem.Q4 }}</td>
+                    <td>{{ caseItem.Total }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </div>
+      
+
+     
     </div>
   </div>
   
