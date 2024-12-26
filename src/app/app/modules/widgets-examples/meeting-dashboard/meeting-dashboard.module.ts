@@ -10,7 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 @NgModule({
-  declarations: [MeetingDashboardComponent],
+  declarations: [],
   imports: [
     NgxChartsModule,
     MatTooltipModule,

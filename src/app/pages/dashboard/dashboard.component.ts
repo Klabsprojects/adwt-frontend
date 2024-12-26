@@ -115,7 +115,7 @@ export class DashboardComponent implements AfterViewInit  {
   chartInstance: any;
   chartInstance1: any;
   barChart: Chart | null = null;
-  barChart1: Chart | null = null;
+  barChart13: Chart | null = null;
   chartInstance2: Chart | null = null;
 
   caseCounts1 = {
@@ -138,7 +138,7 @@ export class DashboardComponent implements AfterViewInit  {
   map2:  string[];
 
 
-  lineChart: LineChartData = { labels: [], datasets: [] };
+  lineChart77: LineChartData = { labels: [], datasets: [] };
 
 
   constructor(private dashboardService: DashboardService,private cdRef: ChangeDetectorRef) {}
@@ -359,11 +359,11 @@ export class DashboardComponent implements AfterViewInit  {
   createBarChart1(): void {
     const uiBar = this.uiBar;
 
-    if (this.barChart1) {
-      this.barChart1.destroy();
+    if (this.barChart13) {
+      this.barChart13.destroy();
     }
 
-    this.barChart1 = new Chart('barChart1', {
+    this.barChart13 = new Chart('barChart13', {
       type: 'bar',
       data: {
         labels: ['< 2 Mos', '2-4 Mos', '4-6 Mos', '6-12 Mos', '> 1 Yrs'],
@@ -388,16 +388,16 @@ export class DashboardComponent implements AfterViewInit  {
         },
         animation: {
           onComplete: () => {
-            const ctx = this.barChart1!.ctx;
+            const ctx = this.barChart13!.ctx;
             ctx.font = 'bold 13px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'bottom';
 
-            this.barChart1!.data.datasets.forEach((dataset, datasetIndex) => {
-              const meta = this.barChart1!.getDatasetMeta(datasetIndex);
+            this.barChart13!.data.datasets.forEach((dataset, datasetIndex) => {
+              const meta = this.barChart13!.getDatasetMeta(datasetIndex);
               meta.data.forEach((bar, dataIndex) => {
                 const value = dataset.data[dataIndex];
-                const label = this.barChart1!.data.labels?.[dataIndex];
+                const label = this.barChart13!.data.labels?.[dataIndex];
                 if (label && value !== undefined) {
                   const text = `${label}: ${value}`;
                   const x = bar.x;
@@ -419,15 +419,15 @@ export class DashboardComponent implements AfterViewInit  {
       this.chartInstance2.destroy();
     }
 
-      const ctx = document.getElementById('lineChart') as HTMLCanvasElement;
+      const ctx = document.getElementById('lineChart77') as HTMLCanvasElement;
       this.chartInstance2 = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: this.lineChart.labels,
+          labels: this.lineChart77.labels,
           datasets: [
             {
-              label: this.lineChart.datasets[0].label,
-              data: this.lineChart.datasets[0].data,
+              label: this.lineChart77.datasets[0].label,
+              data: this.lineChart77.datasets[0].data,
               backgroundColor: 'rgba(0, 123, 255, 0.3)',
               borderColor: '#007bff',
               borderWidth: 2,
@@ -449,7 +449,7 @@ export class DashboardComponent implements AfterViewInit  {
             },
             y: {
               min: 0,
-              max: Math.max(...this.lineChart.datasets[0].data) + 10,
+              max: Math.max(...this.lineChart77.datasets[0].data) + 10,
               ticks: {
                 stepSize: 10,
               },
@@ -499,7 +499,7 @@ export class DashboardComponent implements AfterViewInit  {
       this.uiBar = data.uiBar;
       this.ptBar = data.ptBar;
 
-      this.lineChart = data.linechartcases;
+      this.lineChart77 = data.linechartcases;
 
       this.map1 = data.map1;
       this.map2 = data.map2;
@@ -631,7 +631,7 @@ export class DashboardComponent implements AfterViewInit  {
         this.uiBar = response.uiBar;
         this.ptBar = response.ptBar;
 
-        this.lineChart = response.linechartcases;
+        this.lineChart77 = response.linechartcases;
 
         this.map1 = response.map1;
         this.map2 = response.map2;

@@ -33,7 +33,7 @@ export class MeetingDashboardComponent implements AfterViewInit {
     toDate: ''
   };
   selectedDistrict: string | null = null;
-  barChart1: Chart | null = null;
+  barChart32: Chart | null = null;
   uiBar: number[] = [];
 
   onDateRangeChange() {
@@ -68,7 +68,7 @@ export class MeetingDashboardComponent implements AfterViewInit {
     Chart.register(...registerables);
 
     // Create the chart
-    const ctx = document.getElementById('barChart1') as HTMLCanvasElement;
+    const ctx = document.getElementById('barChart32') as HTMLCanvasElement;
     new Chart(ctx, {
       type: 'bar',
       data: {

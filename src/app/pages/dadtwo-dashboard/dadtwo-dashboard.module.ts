@@ -8,7 +8,7 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { FormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [DadtwoDashboardComponent],
+  declarations: [],
   imports: [
     NgxChartsModule,
     CommonModule,

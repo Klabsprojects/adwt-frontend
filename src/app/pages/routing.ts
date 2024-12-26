@@ -25,6 +25,12 @@ export const Routing: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'com-dashboard',
+    loadChildren: () =>
+      import('../app/modules/widgets-examples/com-dashboard/com-dashboard.module').then((m) => m.ComDashboardModule),
+    canActivate: [AuthGuard],
+  },
+  {
     path: 'builder',
     loadChildren: () => import('./builder/builder.module').then((m) => m.BuilderModule),
   },
