@@ -1,0 +1,88 @@
+<div>
+    <h2>Progress of the UI cases registered</h2>
+    <table class="Progresstable-top">
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Pending UI in the <br> beginning of the year</th>
+                <th>Reported for the year</th>
+                <th>Charge sheeted</th>
+                <th>Reffered / DLVMC</th>
+                <th>Pending UI at end of the Period</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of tabletop">
+                <td>{{item.year}}</td>
+                <td>{{item.UIB}}</td>
+                <td>{{item.report}}</td>
+                <td>{{item.charge}}</td>
+                <td>{{item.refer}}</td>
+                <td>{{item.UIE}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="Progresstable-bottom">
+        <thead>
+            <tr>
+                <th>Nature</th>
+                <th><p>UI Cases<br>as on 07.31.24</p></th>
+                <th><p>Reported From<br>01.08.24 on 31.08.24</p></th>
+                <th><p>Total Cases<br>up to 31.08.24</p></th>
+                <th><p>Progress From<br>01.08.24 on 31.08.24<br>(Charge sheet / MF)</p></th>
+
+                <th><p>UI Cases<br>as on 08.31.24</p></th>
+                <th><p>Reported From<br>01.09.24 on 31.09.24</p></th>
+                <th><p>Total Cases<br>up to 31.09.24</p></th>
+                <th><p>Progress From<br>01.09.24 on 31.09.24<br>(Charge sheet / MF)</p></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of tablebottom">
+                <td><b>{{item.Nature}}</b></td>
+                <td>{{item.UIL}}</td>
+                <td>{{item.RFL}}</td>
+                <td>{{item.TCL}}</td>
+                <td>{{item.PFL}}</td>
+                <td>{{item.UIC}}</td>
+                <td>{{item.RFC}}</td>
+                <td>{{item.TCC}}</td>
+                <td>{{item.PFC}}</td>
+            </tr>
+            <tr class="subtotal">
+                <td><b>Sub Total</b></td>
+                <td>98</td>
+                <td>77</td>
+                <td>56</td>
+                <td>84</td>
+                <td>92</td>
+                <td>63</td>
+                <td>75</td>
+                <td>45</td>
+            </tr>
+            <tr>
+                <td><b>Non Gcr Cases</b></td>
+                <td>{{gcr.UIL}}</td>
+                <td>{{gcr.RFL}}</td>
+                <td>{{gcr.TCL}}</td>
+                <td>{{gcr.PFL}}</td>
+                <td>{{gcr.UIC}}</td>
+                <td>{{gcr.RFC}}</td>
+                <td>{{gcr.TCC}}</td>
+                <td>{{gcr.PFC}}</td>
+            </tr>
+            <tr class="total">
+                <td><b>Total</b></td>
+                <td>873</td>
+                <td>956</td>
+                <td>482</td>
+                <td>739</td>
+                <td>601</td>
+                <td>815</td>
+                <td>984</td>
+                <td>726</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

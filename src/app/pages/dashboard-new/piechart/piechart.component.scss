@@ -1,0 +1,35 @@
+.pie-div,h2{
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+h2{
+    color: #00008B;
+}
+
+.pie-div{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border: 1px solid black;
+    padding: 3rem;
+}
+.Legends{
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: sans-serif;
+
+}
+.num-case{
+    background-color: orangered;
+    color: #fff;
+    padding: 5px;
+}
+.pie{
+    /* width: 90%; */
+    height: 200px;
+}

@@ -1,0 +1,31 @@
+<div id="chart">
+    <h2>Zone wise pending UI</h2>
+    <apx-chart
+      [series]="chartOptions.series"
+      [chart]="chartOptions.chart"
+      [dataLabels]="chartOptions.dataLabels"
+      [plotOptions]="chartOptions.plotOptions"
+      [xaxis]="chartOptions.xaxis"
+      [stroke]="chartOptions.stroke"
+    ></apx-chart>
+    <table>
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>West Zone</th>
+          <th>North Zone</th>
+          <th>Central Zone</th>
+          <th>South Zone</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let series of chartOptions.series">
+          <td>{{ series.name }}</td>
+          <td>{{ series.data[0] }}</td> <!-- West Zone -->
+          <td>{{ series.data[1] }}</td> <!-- North Zone -->
+          <td>{{ series.data[2] }}</td> <!-- Central Zone -->
+          <td>{{ series.data[3] }}</td> <!-- South Zone -->
+        </tr>
+      </tbody>
+    </table>
+  </div>

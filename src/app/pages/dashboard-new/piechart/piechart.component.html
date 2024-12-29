@@ -1,0 +1,14 @@
+<h2>Reason for pending UI cases</h2>
+  
+<div class="pie-div">
+    <ul class="Legends">
+        <h5><b>Legends</b></h5>
+        <li *ngFor="let title of pieChartLabels;index as i" class="list-item">
+            {{ title }}
+            <span class="num-case" [ngStyle]="{'background-color': pieChartDatasets[0].backgroundColor[i]}">{{pieChartDatasets[0].data[i]}}</span>
+        </li>
+    </ul>
+    <canvas baseChart [type]="'pie'" [datasets]="pieChartDatasets" [labels]="pieChartLabels" [options]="pieChartOptions"
+        [plugins]="pieChartPlugins" [legend]="pieChartLegend" class="pie">
+    </canvas>
+</div>

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from '../modules/auth/services/auth.guard';
+import { DashboardNewComponent } from './dashboard-new/dashboard-new.component';
 
 
 
@@ -17,6 +18,11 @@ export const Routing: Routes = [
     loadChildren: () =>
       import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
     canActivate: [AuthGuard],
+  },
+  {
+    path: 'dashboard-new',
+    component:DashboardNewComponent,
+    canActivate:[AuthGuard]
   },
   {
     path: 'meeting-dashboard',
