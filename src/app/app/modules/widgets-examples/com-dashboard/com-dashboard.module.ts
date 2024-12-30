@@ -11,7 +11,7 @@ import { MeetingDashboardModule } from '../meeting-dashboard/meeting-dashboard.m
 import { DashboardComponent } from 'src/app/pages/dashboard/dashboard.component';
 import { DashboardModule } from 'src/app/pages/dashboard/dashboard.module';
 import { DadtwoDashboardComponent } from 'src/app/pages/dadtwo-dashboard/dadtwo-dashboard.component';
-
+import { DashboardNewComponent } from 'src/app/pages/dashboard-new/dashboard-new.component';
 
 
 
@@ -22,6 +22,7 @@ import { DadtwoDashboardComponent } from 'src/app/pages/dadtwo-dashboard/dadtwo-
         MatTooltipModule,
             CommonModule,
             FormsModule,
+            DashboardNewComponent,
             RouterModule.forChild([
               {
                 path: '',
