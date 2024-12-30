@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from 'src/environments/environment.prod';
 @Injectable({
   providedIn: 'root',
 })
 export class AlteredCaseService {
 
-  private baseUrl = 'http://104.254.244.178/api'; // Adjust the base URL as per your Node.js server
+  private baseUrl = environment.apiUrl; // Adjust the base URL as per your Node.js server
 
   constructor(private http: HttpClient) {}
 

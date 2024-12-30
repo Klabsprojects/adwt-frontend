@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from 'src/environments/environment.prod';
 @Injectable({
   providedIn: 'root'
 })
 export class PoliceDivisionService {
-  private baseUrl = 'http://104.254.244.178/api/police-division';  // Update to match the route definition
+  private baseUrl = environment.apiUrl+'police-division';  // Update to match the route definition
 
   constructor(private http: HttpClient) {}
 

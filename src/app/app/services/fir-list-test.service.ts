@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from 'src/environments/environment.prod';
 @Injectable({
   providedIn: 'root'
 })
 export class FirListTestService {
-  private baseUrl = 'http://104.254.244.178/api/fir_list'; // Your backend URL
+  private baseUrl = environment.apiUrl+'fir_list'; // Your backend URL
 
   constructor(private http: HttpClient) {}
 

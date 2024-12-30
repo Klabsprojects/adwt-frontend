@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
-
+import { environment } from 'src/environments/environment.prod';
 @Injectable({
   providedIn: 'root'
 })
 export class RolePermissionsService {
 
-  private apiUrl = 'http://104.254.244.178/api/rolepermissions'; // Replace with your backend API URL
+  private apiUrl = environment.apiUrl+'rolepermissions'; // Replace with your backend API URL
   private permissionsSubject: BehaviorSubject<{ [key: string]: number }> = new BehaviorSubject<{ [key: string]: number }>({});
   public permissions$: Observable<{ [key: string]: number }> = this.permissionsSubject.asObservable(); // Public observable
 

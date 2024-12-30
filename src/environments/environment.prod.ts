@@ -7,7 +7,7 @@ export const environment = {
   appVersion: 'v8.2.4',
   USERDATA_KEY: 'authf649fc9a5f55',
   isMockEnabled: true,
-  apiUrl: 'http://104.254.244.178/api/', // Update this line
+  apiUrl: 'https://adwatrocity.onlinetn.com/api/v1/', // Update this line
   appThemeName: 'ADWT',
   appPurchaseUrl: 'https://1.envato.market/EA4JP',
   appHTMLIntegration: 'https://preview.keenthemes.com/metronic8/demo1/documentation/base/helpers/flex-layouts.html',

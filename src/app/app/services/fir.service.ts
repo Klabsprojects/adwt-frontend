@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from 'src/environments/environment.prod';
 @Injectable({
   providedIn: 'root'
 })
@@ -9,7 +9,7 @@ export class FirService {
   getVictimDetailsByFirId(firId: string) {
     throw new Error('Method not implemented.');
   }
-  private baseUrl = 'http://104.254.244.178/api/fir'; // Adjust this to your actual API base URL
+  private baseUrl = environment.apiUrl+'fir'; // Adjust this to your actual API base URL
 
   constructor(private http: HttpClient) {}
 

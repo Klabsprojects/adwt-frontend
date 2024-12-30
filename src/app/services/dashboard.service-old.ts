@@ -1,32 +1,32 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from 'src/environments/environment.prod';
 @Injectable({
   providedIn: 'root',
 })
 export class DashboardService {
-  private baseUrl = 'http://104.254.244.178/api';
+  private baseUrl = environment.apiUrl;
 
-  private filterapiUrl = 'http://104.254.244.178/api/filter-options';
+  private filterapiUrl = environment.apiUrl+'filter-options';
 
-  private backendUrl = 'http://104.254.244.178/api';
+  private backendUrl = environment.apiUrl;
 
-  private apiUrl = 'http://104.254.244.178/api/dashboard-data';
+  private apiUrl = environment.apiUrl+'dashboard-data';
 
-  private apiUrl1 = 'http://104.254.244.178/api/getPTCases';
+  private apiUrl1 = environment.apiUrl+'getPTCases';
 
-  private apiUrl2 = 'http://104.254.244.178/api/getUICases';
+  private apiUrl2 = environment.apiUrl+'getUICases';
 
-  private apiUrl3 = 'http://104.254.244.178/api/getCaseStatusCounts';
+  private apiUrl3 = environment.apiUrl+'getCaseStatusCounts';
 
-  private apiUrl4 = 'http://104.254.244.178/api/getCaseStatus1Counts';
+  private apiUrl4 = environment.apiUrl+'getCaseStatus1Counts';
 
-  private apiUrl5 = 'http://104.254.244.178/api/chart-bar-data';
+  private apiUrl5 = environment.apiUrl+'chart-bar-data';
 
-  private apiUrl6 = 'http://104.254.244.178/api/chart-line-data';
+  private apiUrl6 = environment.apiUrl+'chart-line-data';
 
-  private apiUrl7 = 'http://104.254.244.178/api/districtsmap';
+  private apiUrl7 = environment.apiUrl+'districtsmap';
 
   constructor(private http: HttpClient) {}
 

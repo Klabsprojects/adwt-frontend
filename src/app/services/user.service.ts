@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 //import { environment } from '../../environments/environment'; // Import the environment
-
+import { environment } from 'src/environments/environment.prod';
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private baseUrl = `http://104.254.244.178/api/apps/users_new`; // Use environment variable
+  private baseUrl = environment.apiUrl+`/apps/users_new`; // Use environment variable
 
 
 
@@ -40,6 +40,6 @@ export class UserService {
 
   // Get all roles
   getAllRoles(): Observable<any> {
-    return this.http.get(`http://104.254.244.178/api/apps/roles`); // Use environment variable
+    return this.http.get(environment.apiUrl+`/apps/roles`); // Use environment variable
   }
 }

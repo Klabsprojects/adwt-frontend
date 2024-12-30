@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from 'src/environments/environment.prod';
 @Injectable({
   providedIn: 'root'
 })
 export class CityService {
-  private baseUrl = 'http://104.254.244.178/api/'; // Update base URL as per server configuration
+  private baseUrl = environment.apiUrl; // Update base URL as per server configuration
 
   constructor(private http: HttpClient) {}
 

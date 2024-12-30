@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from 'src/environments/environment.prod';
 @Injectable({
   providedIn: 'root',
 })
 export class DashboardService {
-  private baseUrl = 'http://104.254.244.178/api';
+  private baseUrl = environment.apiUrl;
 
-  private filterapiUrl = 'http://104.254.244.178/api/filter-options';
+  private filterapiUrl = environment.apiUrl+'filter-options';
 
-  private backendUrl = 'http://104.254.244.178/api';
+  private backendUrl = environment.apiUrl;
 
-  private apiUrl = 'http://104.254.244.178/api/dashboard-data';
-  private dadtwoapiUrl = 'http://104.254.244.178/api/dadtwo-dashboard-data';
+  private apiUrl = environment.apiUrl+'dashboard-data';
+  private dadtwoapiUrl = environment.apiUrl+'dadtwo-dashboard-data';
 
   // private apiUrl1 = 'http://localhost:3000/getPTCases';
 

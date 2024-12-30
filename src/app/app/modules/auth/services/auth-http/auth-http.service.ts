@@ -3,9 +3,9 @@ import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { UserModel } from '../../models/user.model';
 import { AuthModel } from '../../models/auth.model';
-
+import { environment } from 'src/environments/environment.prod';
 // Use direct API URL for server
-const API_USERS_URL = 'http://104.254.244.178/api/auth';
+const API_USERS_URL = environment.apiUrl+'auth';
 
 @Injectable({
   providedIn: 'root',

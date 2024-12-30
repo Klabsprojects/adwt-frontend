@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from 'src/environments/environment.prod';
 @Injectable({
   providedIn: 'root',
 })
 export class VmcMeetingService {
-  private baseUrl = 'http://104.254.244.178/api/vmcmeeting';
+  private baseUrl = environment.apiUrl+'vmcmeeting';
 
   constructor(private http: HttpClient) {}
 
