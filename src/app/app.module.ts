@@ -15,6 +15,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 // #fake-start#
 import { FakeAPIService } from './_fake/fake-api.service';
@@ -57,6 +58,7 @@ function appInitializer(authService: AuthService) {
       multi: true,
       deps: [AuthService],
     },
+    [{provide: LocationStrategy, useClass: HashLocationStrategy},AuthService]
   ],
   bootstrap: [AppComponent],
 })
