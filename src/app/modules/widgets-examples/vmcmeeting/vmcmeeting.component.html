@@ -54,7 +54,7 @@
           id="subdivision"
           class="form-select"
           [(ngModel)]="formState[selectedMeeting].meetingDetails.subdivision"
-          (change)="fetchAttendees()"
+          (change)="fetchAttendees();selectedSudivision()"
         >
           <option value="" disabled>Select Subdivision</option>
           <option *ngFor="let subdivision of formState[selectedMeeting].subdivisions" [value]="subdivision">
@@ -131,9 +131,9 @@
       <th>Attendee Type</th>
       <th>Name</th>
       <th>Designation</th>
-      <th>Date of Appointment</th>
+      <!-- <th>Date of Appointment</th> -->
       <th>Attendance</th>
-      <th>Status</th>
+      <!-- <th>Status</th> -->
     </tr>
   </thead>
   <tbody>
@@ -142,8 +142,8 @@
       <td>{{ attendee.member_type }}</td>
       <td>{{ attendee.name }}</td>
       <td>{{ attendee.designation }}</td>
-      <td>{{ attendee.meeting_date | date: 'dd-MM-yyyy' }}</td>
-      <td>
+      <!-- <td>{{ attendee.meeting_date | date: 'dd-MM-yyyy' }}</td> -->
+      <td *ngIf="!exisiting_record">
         <select
           class="form-select"
           [(ngModel)]="attendee.attended"
@@ -154,9 +154,12 @@
           <option [value]="false">Absent</option>
         </select>
       </td>
-      <td>
-        {{ attendee.meeting_status }}
+      <td *ngIf="exisiting_record">
+        {{ attendee.Attendance ? 'Present' : 'Absent' }}
       </td>
+      <!-- <td>
+        {{ attendee.meeting_status }}
+      </td> -->
     </tr>
   </tbody>
 </table>
@@ -164,7 +167,7 @@
 
 
       <!-- File Upload -->
-      <div class="row g-3 mt-4">
+      <div *ngIf="!exisiting_record" class="row g-3 mt-4">
         <div class="col-md-6">
           <label for="minutesUpload" class="form-label">Upload the Minutes</label>
           <input
@@ -178,7 +181,7 @@
       </div>
 
       <!-- Submit Button -->
-      <div class="row mt-4">
+      <div *ngIf="!exisiting_record" class="row mt-4">
         <div class="col-md-12 text-right">
           <button class="btn btn-primary btn-lg" (click)="submitForm()">Submit</button>
         </div>

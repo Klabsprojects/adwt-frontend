@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment.prod';
+
 @Injectable({
   providedIn: 'root',
 })
 export class VmcMeetingService {
-  private baseUrl = environment.apiUrl+'vmcmeeting';
+  private baseUrl = 'https://adwatrocity.onlinetn.com/api/v1/vmcmeeting';
 
   constructor(private http: HttpClient) {}
 
@@ -29,7 +29,7 @@ export class VmcMeetingService {
       .set('committee', committee)
       .set('year', year); // Include the selected year in the request
     //console.log(params);
-    return this.http.get(`${this.baseUrl}/attendees`, { params });
+    return this.http.get(`http://localhost:3000/vmcmeeting/attendees`, { params });
   }
   
 
@@ -57,7 +57,11 @@ export class VmcMeetingService {
     formData.append("meetingTime", meetingData.meetingTime);
   
     // Append attendees array as a single JSON string
-    formData.append("attendees", JSON.stringify(meetingData.attendees));
+    // if(meetingData.attendees.length > 0){
+      formData.append("attendees", JSON.stringify(meetingData.attendees));
+    // } else {
+    //   formData.append("attendees", JSON.stringify([]));
+    // }
   
     // Append the file
     if (meetingData.uploadedFile) {
@@ -65,7 +69,14 @@ export class VmcMeetingService {
     }
   
     // Post the FormData to the backend
-    return this.http.post(`${this.baseUrl}/submit-meeting`, formData);
+    return this.http.post(`http://localhost:3000/vmcmeeting/submit-meeting`, formData);
+  }
+
+
+
+  getAttendeesByDistrictbysk(Data: any): Observable<any> {
+    let body = Data;
+    return this.http.post(`http://localhost:3000/vmcmeeting/getAttendeesByDistrictbysk`, body);
   }
   
 }
