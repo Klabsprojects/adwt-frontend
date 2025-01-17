@@ -6,14 +6,14 @@ import { environment } from 'src/environments/environment.prod';
   providedIn: 'root',
 })
 export class Vmcservice {
-  // private baseUrl = environment.apiUrl+'vmc';
-  private baseUrl = 'http://localhost:3000'+'/vmc';
+  private baseUrl = environment.apiUrl+'vmc';
+  // private baseUrl = 'http://localhost:3000'+'/vmc';
   //private baseUrl1 = 'http://localhost:3000/vmcadd';
 
   constructor(private http: HttpClient) {}
 
   getAllMembers(): Observable<any> {
-    return this.http.get(`http://localhost:3000/vmc/`);
+    return this.http.get(this.baseUrl);
   }
 
   addMember(memberData: any): Observable<any> {

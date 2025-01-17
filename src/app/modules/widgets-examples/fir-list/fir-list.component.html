@@ -13,6 +13,7 @@
       </div>
     </div>
     <div class="card-toolbar d-flex align-items-center gap-3">
+      <!-- Visible Columns with Drag-and-Drop -->
       <mat-form-field appearance="outline" class="w-250px">
         <mat-label>Selected Columns</mat-label>
         <mat-select>
@@ -32,121 +33,70 @@
         </mat-select>
       </mat-form-field>
     </div>
+
   </div>
 
   <div class="card-body pt-0">
     <!-- Filters -->
     <div class="d-flex gap-3 mb-3">
-      <!-- District Filter -->
       <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
-        <option value="" selected>All Districts</option>
+        <option value="" selected disabled>Select One</option>
         <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
       </select>
 
-      <!-- Status of Case Filter -->
-      <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
-        <option value="" selected>All Statuses of the Case</option>
-        <option [value]="5">UI Stage</option>
-        <option [value]="6">PT Stage</option>
-        <option [value]="7">Trial Stage</option>
+      <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
+        <option value="" selected disabled>Select One</option>
+        <option *ngFor="let nature of naturesOfOffence" [value]="nature">{{ nature }}</option>
       </select>
 
-      <!-- Status of Relief Filter -->
-      <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
-        <option value="" selected>All Statuses of Relief</option>
-        <option [value]="11">FIR Stage</option>
-        <option [value]="12">ChargeSheet Stage</option>
-        <option [value]="13">Trial Stage</option>
+      <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
+        <option value="" selected disabled>Select One</option>
+        <option *ngFor="let status of statusesOfCase" [value]="status">{{ status }}</option>
       </select>
+
+      <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
+        <option value="" selected disabled>Select One</option>
+        <option *ngFor="let reliefStatus of statusesOfRelief" [value]="reliefStatus">
+          {{ reliefStatus }}
+        </option>
+      </select>
+
+      <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
     </div>
 
-
     <!-- Show message if FIR list is empty -->
-    <div *ngIf="filteredList.length === 0" class="alert alert-warning">
+    <div *ngIf="filteredFirList().length === 0" class="alert alert-warning">
       No FIR data available.
     </div>
 
-    <!-- Responsive Table -->
-    <div class="table-responsive">
-      <table *ngIf="filteredList.length > 0" class="table table-striped table-bordered table-hover">
-        <thead>
-          <tr>
-            <th *ngFor="let column of displayedColumns" [hidden]="!column.visible">
-              {{ column.label }}
-              <i
-                *ngIf="column.sortable"
-                class="fas"
-                [ngClass]="getSortIcon(column.field)"
-                (click)="sortTable(column.field)"
-              ></i>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let fir of paginatedFirList(); let i = index">
-            <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
-              <ng-container [ngSwitch]="column.field">
+    <!-- Updated Table -->
+    <table *ngIf="filteredFirList().length > 0" class="table table-striped table-bordered table-hover">
+      <thead>
+        <tr>
+          <th *ngFor="let column of displayedColumns" [hidden]="!column.visible">
+            {{ column.label }}
+            <i
+              *ngIf="column.sortable"
+              class="fas"
+              [ngClass]="getSortIcon(column.field)"
+              (click)="sortTable(column.field)"
+            ></i>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fir of paginatedFirList(); let i = index">
+          <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
+            <ng-container [ngSwitch]="column.field">
               <span *ngSwitchCase="'sl_no'">{{ (page - 1) * itemsPerPage + i + 1 }}</span>
               <span *ngSwitchCase="'fir_id'">{{ fir.fir_id }}</span>
               <span *ngSwitchCase="'police_city'">{{ fir.police_city }}</span>
               <span *ngSwitchCase="'police_station'">{{ fir.police_station }}</span>
-
-              <span *ngSwitchCase="'police_zone'">{{ fir.police_zone }}</span>
-              <span *ngSwitchCase="'police_range'">{{ fir.police_range }}</span>
-              <span *ngSwitchCase="'revenue_district'">{{ fir.revenue_district }}</span>
-
-              <span *ngSwitchCase="'name_of_io'">{{ fir.officer_name }}</span>
-              <span *ngSwitchCase="'designation_of_io'">{{ fir.officer_designation }}</span>
-              <span *ngSwitchCase="'phone_no_of_io'">{{ fir.officer_phone }}</span>
-
-              <span *ngSwitchCase="'fir_no'">{{ fir.fir_number }}-{{ fir.fir_number_suffix }}</span>
-              <span *ngSwitchCase="'date_of_occ'">{{ fir.date_of_occurrence }}</span>
-              <span *ngSwitchCase="'time_of_occ'">{{ fir.time_of_occurrence }}</span>
-              <span *ngSwitchCase="'place_of_occ'">{{ fir.place_of_occurrence }}</span>
-              <span *ngSwitchCase="'date_of_case_reg'">{{ fir.date_of_registration }}</span>
-              <span *ngSwitchCase="'time_of_case_reg'">{{ fir.time_of_registration }}</span>
-
-              <span *ngSwitchCase="'name_comp'">{{ fir.name_of_complainant }}</span>
-              <span *ngSwitchCase="'mobile_comp'">{{ fir.mobile_number_of_complainant }}</span>
-              <span *ngSwitchCase="'victim_same_as_comp'">{{ fir.is_victim_same_as_complainant }}</span>
-              <span *ngSwitchCase="'num_of_victims'">{{ fir.number_of_victim }}</span>
-              <span *ngSwitchCase="'is_deceased'">{{ fir.is_deceased }}</span>
-              <span *ngSwitchCase="'deceased_person'">{{ fir.deceased_person_names }}</span>
-
-              <span *ngSwitchCase="'num_of_accussed'">{{ fir.number_of_accused }}</span>
-
-              <span *ngSwitchCase="'total_amt_1st'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'proceeding_file_no'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'proceeding_file_date'">{{ fir.number_of_accused }}</span>
-
-              <span *ngSwitchCase="'charge_sheet_court'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'court_division'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'court_range'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'case_type'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'special_sc_no'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'rcs_file_no'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'rcs_file_date'">{{ fir.number_of_accused }}</span>
-
-              <span *ngSwitchCase="'total_amt_2nd'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'cs_proceeding_file_no'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'cs_proceeding_file_date'">{{ fir.number_of_accused }}</span>
-
-              <span *ngSwitchCase="'special_court'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'court_present'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'ts_special_sc_no'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'public_prosecutor_name'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'public_prosecutor_phno'">{{ fir.number_of_accused }}</span>
-
-              <span *ngSwitchCase="'total_amt_3rd'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'ts_proceeding_file_no'">{{ fir.number_of_accused }}</span>
-              <span *ngSwitchCase="'ts_proceeding_file_date'">{{ fir.number_of_accused }}</span>
-
-
               <span *ngSwitchCase="'created_by'">{{ fir.created_by || 'Super User' }}</span>
               <span *ngSwitchCase="'created_at'">{{ fir.created_at | date: 'dd-MM-yyyy' }}</span>
               <span *ngSwitchCase="'status'">
                 <span class="badge" [ngClass]="getStatusBadgeClass(fir.status)">
-                  {{ getStatusWithNature(fir.status, fir.nature_of_judgement) }}
+                  {{ getStatusText(fir.status) }}
                 </span>
               </span>
               <span *ngSwitchCase="'actions'">
@@ -160,7 +110,7 @@
                   <div ngbDropdownMenu>
                     <!-- For status 0 to 7 -->
                     <ng-container *ngIf="fir.status >= 0 && fir.status <= 8">
-                      <button ngbDropdownItem (click)="openModal()">View</button>
+                      <button ngbDropdownItem (click)="openModal(fir.fir_id)">View</button>
                       <button ngbDropdownItem (click)="openEditPage(fir.fir_id)">Edit</button>
                       <button ngbDropdownItem (click)="navigateToAlteredCase(fir.fir_id)">Altered Case</button>
                       <button ngbDropdownItem (click)="deleteFIR(i, fir.fir_id)">Delete</button>
@@ -181,17 +131,30 @@
         </tr>
       </tbody>
     </table>
-  </div>
+
 
     <!-- Pagination Controls -->
-    <nav
-    *ngIf="filteredFirList().length > itemsPerPage"
-    class="d-flex justify-content-end mt-3"
-  >
+    <!-- <nav *ngIf="filteredFirList().length > itemsPerPage" class="d-flex justify-content-end mt-3">
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="page === 1">
+          <button class="page-link" (click)="previousPage()">Previous</button>
+        </li>
+        <li class="page-item" *ngFor="let pageNum of totalPagesArray()">
+          <button class="page-link" (click)="goToPage(pageNum)" [class.active]="page === pageNum">
+            {{ pageNum }}
+          </button>
+        </li>
+        <li class="page-item" [class.disabled]="!hasNextPage()">
+          <button class="page-link" (click)="nextPage()">Next</button>
+        </li>
+      </ul>
+    </nav> -->
+
     <ul class="pagination">
       <li class="page-item" [class.disabled]="page === 1">
         <button class="page-link" (click)="previousPage()">Previous</button>
       </li>
+      
       <li class="page-item" *ngFor="let pageNum of totalPagesArray()">
         <button
           class="page-link"
@@ -201,16 +164,22 @@
           {{ pageNum }}
         </button>
       </li>
+    
       <li class="page-item" [class.disabled]="!hasNextPage()">
         <button class="page-link" (click)="nextPage()">Next</button>
       </li>
     </ul>
-  </nav>
-  </div>
 
+  </div>
 </div>
 
 
+
+
+<!-- Button to Open Modal -->
+
+
+<!-- Modal Template -->
 <ng-template #firDetailsModal let-modal>
   <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center py-3 rounded-top">
     <h5 class="modal-title fw-bold mb-0 text-uppercase">
@@ -283,47 +252,52 @@
             <div class="row">
               <div class="col-md-6 col-lg-3 mb-3">
                 <label for="policeCity" class="form-label">1. Police City / District</label>
-                <input
-                  id="policeCity"
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter Police City / District"
+                <input readonly
+                name="policeCity" id="policeCity"
+                type="text"
+                class="form-control"
+                placeholder="Enter Police City / District"
+                [value]="policeCity"
                 />
               </div>
               <div class="col-md-6 col-lg-3 mb-3">
                 <label for="policeZone" class="form-label">2. Police Zone</label>
-                <input
-                  id="policeZone"
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter Police Zone"
+                <input readonly
+                name="policeZone" id="policeZone"
+                type="text"
+                class="form-control"
+                placeholder="Enter Police Zone"
+                [value]="policeZone"
                 />
               </div>
               <div class="col-md-6 col-lg-3 mb-3">
                 <label for="policeRange" class="form-label">3. Police Range</label>
-                <input
-                  id="policeRange"
+                <input readonly
+                  name="policeRange" id="policeRange"
                   type="text"
                   class="form-control"
                   placeholder="Enter Police Range"
+                  [value]="policeRange"
                 />
               </div>
               <div class="col-md-6 col-lg-3 mb-3">
                 <label for="revenueDistrict" class="form-label">4. Revenue District</label>
-                <input
-                  id="revenueDistrict"
+                <input readonly
+                  name="revenueDistrict" id="revenueDistrict"
                   type="text"
                   class="form-control"
                   placeholder="Enter Revenue District"
+                  [value]="revenueDistrict"
                 />
               </div>
               <div class="col-md-6 col-lg-3 mb-3">
                 <label for="stationName" class="form-label">5. Police Station Name</label>
-                <input
-                  id="stationName"
+                <input readonly
+                  name="stationName" id="stationName"
                   type="text"
                   class="form-control"
                   placeholder="Enter Police Station Name"
+                  [value]="stationName"
                 />
               </div>
             </div>
@@ -334,31 +308,41 @@
               <div class="col-md-6 col-lg-4 mb-3">
                 <label for="officerName" class="form-label">6. Name of the Investigating Officer (IO)</label>
                 <input
+                  readonly
+                  name="officerName"
                   id="officerName"
                   type="text"
                   class="form-control"
                   placeholder="Enter Officer Name"
+                  [value]="officerName"
                 />
               </div>
               <div class="col-md-6 col-lg-4 mb-3">
                 <label for="officerDesignation" class="form-label">7. Designation of the Investigating Officer</label>
                 <input
+                  readonly
+                  name="officerDesignation"
                   id="officerDesignation"
                   type="text"
                   class="form-control"
                   placeholder="Enter Designation"
+                  [value]="officerDesignation"
                 />
               </div>
               <div class="col-md-6 col-lg-4 mb-3">
                 <label for="officerPhone" class="form-label">8. Phone Number of the Investigating Officer</label>
                 <input
+                  readonly
+                  name="officerPhone"
                   id="officerPhone"
                   type="text"
                   class="form-control"
                   placeholder="Enter Phone Number"
+                  [value]="officerPhone"
                 />
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -376,10 +360,13 @@
               <div class="col-md-6 mb-3">
                 <label for="firNumber" class="form-label">9. FIR Number</label>
                 <input
+                  readonly
                   type="text"
+                  name="firNumber"
                   id="firNumber"
                   class="form-control"
                   placeholder="Enter FIR Number"
+                  [value]="firNumber"
                 />
               </div>
 
@@ -387,10 +374,13 @@
               <div class="col-md-6 mb-3">
                 <label for="dateOfOccurrence" class="form-label">10. Date of Occurrence</label>
                 <input
+                  readonly
                   type="text"
+                  name="dateOfOccurrence"
                   id="dateOfOccurrence"
                   class="form-control"
                   placeholder="Enter Date"
+                  [value]="dateOfOccurrence"
                 />
               </div>
 
@@ -398,10 +388,13 @@
               <div class="col-md-6 mb-3">
                 <label for="timeOfOccurrence" class="form-label">11. Time of Occurrence</label>
                 <input
+                  readonly
                   type="text"
+                  name="timeOfOccurrence"
                   id="timeOfOccurrence"
                   class="form-control"
                   placeholder="Enter Time"
+                  [value]="timeOfOccurrence"
                 />
               </div>
 
@@ -409,10 +402,13 @@
               <div class="col-md-6 mb-3">
                 <label for="placeOfOccurrence" class="form-label">12. Place of Occurrence</label>
                 <input
+                  readonly
                   type="text"
+                  name="placeOfOccurrence"
                   id="placeOfOccurrence"
                   class="form-control"
                   placeholder="Enter Place"
+                  [value]="placeOfOccurrence"
                 />
               </div>
 
@@ -420,10 +416,13 @@
               <div class="col-md-6 mb-3">
                 <label for="dateOfRegistration" class="form-label">13. Date of Case Registration</label>
                 <input
+                  readonly
                   type="text"
+                  name="dateOfRegistration"
                   id="dateOfRegistration"
                   class="form-control"
                   placeholder="Enter Date"
+                  [value]="dateOfRegistration"
                 />
               </div>
 
@@ -431,15 +430,17 @@
               <div class="col-md-6 mb-3">
                 <label for="timeOfRegistration" class="form-label">14. Time of Case Registration</label>
                 <input
+                  readonly
                   type="text"
+                  name="timeOfRegistration"
                   id="timeOfRegistration"
                   class="form-control"
                   placeholder="Enter Time"
+                  [value]="timeOfRegistration"
                 />
               </div>
-
-
             </div>
+
           </div>
         </div>
       </div>
@@ -458,187 +459,271 @@
             <div class="col-md-4 mb-3">
               <label for="nameOfComplainant" class="form-label">15. Name of Complainant *</label>
               <input
+                readonly
                 type="text"
+                name="nameOfComplainant"
                 id="nameOfComplainant"
                 class="form-control"
                 placeholder="Enter Name of Complainant"
+                [value]="nameOfComplainant"
               />
             </div>
 
             <div class="col-md-4 mb-3">
               <label for="mobileNumberOfComplainant" class="form-label">16. Mobile Number of Complainant *</label>
               <input
+                readonly
                 type="text"
+                name="mobileNumberOfComplainant"
                 id="mobileNumberOfComplainant"
                 class="form-control"
                 placeholder="Enter Mobile Number"
+                [value]="mobileNumberOfComplainant"
               />
             </div>
 
             <div class="col-md-4 mb-3">
               <label for="isVictimSameAsComplainant" class="form-label">17. Is the victim same as complainant? *</label>
               <input
+                readonly
                 type="text"
+                name="isVictimSameAsComplainant"
                 id="isVictimSameAsComplainant"
                 class="form-control"
                 placeholder="Enter Yes or No"
+                [value]="isVictimSameAsComplainant"
               />
             </div>
 
             <div class="col-md-2 mb-3">
               <label for="numberOfVictims" class="form-label">18. Number of Victims *</label>
               <input
+                readonly
                 type="text"
+                name="numberOfVictims"
                 id="numberOfVictims"
                 class="form-control"
                 placeholder="Enter Number of Victims"
+                [value]="numberOfVictims"
               />
             </div>
           </div>
 
+
           <!-- Victim Details Section -->
           <div class="victim-details mb-4">
-            <h5>Victim Details</h5>
-            <div class="row">
-              <div class="col-md-4 mb-3">
-                <label for="victimAge" class="form-label">19. Age of the Victim *</label>
-                <input
-                  type="text"
-                  id="victimAge"
-                  class="form-control"
-                  placeholder="Enter Victim's Age"
-                />
-              </div>
+            <div *ngFor="let victim of victimsdata; let i = index" class="victim-row"
+            style="border: 1px solid #007bff; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+              <h5>Victim Details {{ i + 1 }}</h5>
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label for="victimAge" class="form-label">19. Age of the Victim *</label>
+                  <input
+                    readonly
+                    type="text"
+                    name="victimAge{{ i }}"
+                    id="victimAge{{ i }}"
+                    class="form-control"
+                    placeholder="Enter Victim's Age"
+                    [value]="victim.victim_age"
+                  />
+                </div>
 
-              <div class="col-md-4 mb-3">
-                <label for="victimName" class="form-label">20. Name of the Victim *</label>
-                <input
-                  type="text"
-                  id="victimName"
-                  class="form-control"
-                  placeholder="Enter Victim's Name"
-                />
-              </div>
+                <div class="col-md-4 mb-3">
+                  <label for="victimName" class="form-label">20. Name of the Victim *</label>
+                  <input
+                    readonly
+                    type="text"
+                    name="victimName{{ i }}"
+                    id="victimName{{ i }}"
+                    class="form-control"
+                    placeholder="Enter Victim's Name"
+                    [value]="victim.victim_name"
+                  />
+                </div>
 
-              <div class="col-md-4 mb-3">
-                <label for="victimGender" class="form-label">21. Gender of the Victim *</label>
-                <input
-                  type="text"
-                  id="victimGender"
-                  class="form-control"
-                  placeholder="Enter Gender"
-                />
-              </div>
+                <div class="col-md-4 mb-3">
+                  <label for="victimGender{{ i }}" class="form-label">21. Gender of the Victim *</label>
+                  <input
+                    readonly
+                    type="text"
+                    name="victimGender{{ i }}"
+                    id="victimGender{{ i }}"
+                    class="form-control"
+                    placeholder="Enter Gender"
+                    [value]="victim.victim_gender"
+                  />
+                </div>
 
-              <div class="col-md-4 mb-3">
-                <label for="victimMobile" class="form-label">22. Mobile Number of the Victim</label>
-                <input
-                  type="text"
-                  id="victimMobile"
-                  class="form-control"
-                  placeholder="Enter Mobile Number"
-                />
-              </div>
+                <div class="col-md-4 mb-3">
+                  <label for="victimMobile{{ i }}" class="form-label">22. Mobile Number of the Victim</label>
+                  <input
+                    readonly
+                    type="text"
+                    name="victimMobile{{ i }}"
+                    id="victimMobile{{ i }}"
+                    class="form-control"
+                    placeholder="Enter Mobile Number"
+                    [value]="victim.mobile_number"
+                  />
+                </div>
 
-              <div class="col-md-4 mb-3">
-                <label for="victimAddress" class="form-label">23. Address of the Victim</label>
-                <input
-                  type="text"
-                  id="victimAddress"
-                  class="form-control"
-                  placeholder="Enter Address"
-                />
-              </div>
+                <div class="col-md-4 mb-3">
+                  <label for="victimAddress{{ i }}" class="form-label">23. Address of the Victim</label>
+                  <input
+                    readonly
+                    type="text"
+                    name="victimAddress{{ i }}"
+                    id="victimAddress{{ i }}"
+                    class="form-control"
+                    placeholder="Enter Address"
+                    [value]="victim.address"
+                  />
+                </div>
 
-              <div class="col-md-4 mb-3">
-                <label for="victimPincode" class="form-label">24. Pincode</label>
-                <input
-                  type="text"
-                  id="victimPincode"
-                  class="form-control"
-                  placeholder="Enter Pincode"
-                />
-              </div>
+                <div class="col-md-4 mb-3">
+                  <label for="victimPincode{{ i }}" class="form-label">24. Pincode</label>
+                  <input
+                    readonly
+                    type="text"
+                    name="victimPincode{{ i }}"
+                    id="victimPincode{{ i }}"
+                    class="form-control"
+                    placeholder="Enter Pincode"
+                    [value]="victim.victim_pincode"
+                  />
+                </div>
 
-              <div class="col-md-3 mb-3">
-                <label for="victimCommunity" class="form-label">25. Community of the Victim *</label>
-                <input
-                  type="text"
-                  id="victimCommunity"
-                  class="form-control"
-                  placeholder="Enter Community"
-                />
-              </div>
+                <div class="col-md-3 mb-3">
+                  <label for="victimCommunity{{ i }}" class="form-label">25. Community of the Victim *</label>
+                  <input
+                    readonly
+                    type="text"
+                    name="victimCommunity{{ i }}"
+                    id="victimCommunity{{ i }}"
+                    class="form-control"
+                    placeholder="Enter Community"
+                    [value]="victim.community"
+                  />
+                </div>
 
-              <div class="col-md-4 mb-3">
-                <label for="victimCaste" class="form-label">26. Caste of the Victim *</label>
-                <input
-                  type="text"
-                  id="victimCaste"
-                  class="form-control"
-                  placeholder="Enter Caste"
-                />
-              </div>
+                <div class="col-md-4 mb-3">
+                  <label for="victimCaste{{ i }}" class="form-label">26. Caste of the Victim *</label>
+                  <input
+                    readonly
+                    type="text"
+                    name="victimCaste{{ i }}"
+                    id="victimCaste{{ i }}"
+                    class="form-control"
+                    placeholder="Enter Caste"
+                    [value]="victim.caste"
+                  />
+                </div>
 
-              <div class="col-md-5 mb-3">
-                <label for="victimGuardian" class="form-label">27. Name of Victim’s Father/ Mother/ Spouse/ Guardian *</label>
-                <input
-                  type="text"
-                  id="victimGuardian"
-                  class="form-control"
-                  placeholder="Enter Guardian's Name"
-                />
-              </div>
+                <div class="col-md-5 mb-3">
+                  <label for="victimGuardian{{ i }}" class="form-label">27. Name of Victim’s Father/ Mother/ Spouse/ Guardian *</label>
+                  <input
+                    readonly
+                    type="text"
+                    name="victimGuardian{{ i }}"
+                    id="victimGuardian{{ i }}"
+                    class="form-control"
+                    placeholder="Enter Guardian's Name"
+                    [value]="victim.guardian_name"
+                  />
+                </div>
 
-              <div class="col-md-6 mb-3">
-                <label for="isNativeDistrictSame" class="form-label">28. Is the victim’s native district the same as the scene of crime occurrence? *</label>
-                <input
-                  type="text"
-                  id="isNativeDistrictSame"
-                  class="form-control"
-                  placeholder="Enter Yes or No"
-                />
-              </div>
+                <div class="col-md-6 mb-3">
+                  <label for="isNativeDistrictSame{{ i }}" class="form-label">28. Is the victim’s native district the same as the scene of crime occurrence? *</label>
+                  <input
+                    readonly
+                    type="text"
+                    name="isNativeDistrictSame{{ i }}"
+                    id="isNativeDistrictSame{{ i }}"
+                    class="form-control"
+                    placeholder="Enter Yes or No"
+                    [value]="victim.is_native_district_same"
+                  />
+                </div>
 
-              <div class="col-md-6 mb-3">
-                <label for="victimOffence" class="form-label">29. Nature of offence committed against the victim *</label>
-                <textarea
-                  id="victimOffence"
-                  class="form-control"
-                  placeholder="Describe the Offence"
-                ></textarea>
-              </div>
+                <div class="col-md-6 mb-3">
+                  <label for="nativeDistrict{{ i }}" class="form-label">29. Victim's Native District *</label>
+                  <input
+                    readonly
+                    type="text"
+                    name="nativeDistrict{{ i }}"
+                    id="nativeDistrict{{ i }}"
+                    class="form-control"
+                    placeholder="Native District"
+                    [value]="victim.native_district"
+                  />
+                </div>
 
-              <div class="col-md-6 mb-3">
-                <label for="sectionsIPC" class="form-label">30. Section Invoked Under IPC/POCSO/etc. *</label>
-                <textarea
-                  id="sectionsIPC"
-                  class="form-control"
-                  placeholder="Enter Sections, separated by commas"
-                ></textarea>
-              </div>
+                <div class="col-md-6 mb-3">
+                  <label for="victimOffence{{ i }}" class="form-label">30. Nature of offence committed against the victim *</label>
+                  <textarea
+                    readonly
+                    name="victimOffence{{ i }}"
+                    id="victimOffence{{ i }}"
+                    class="form-control"
+                    placeholder="Describe the Offence"
+                  >{{ victim.offence_committed }}</textarea>
+                </div>
 
+                <div class="col-md-6 mb-3">
+                  <label for="invokedAct{{ i }}" class="form-label">31. Section invoked under Acts other than PoA (IPC/ POCSO/ etc.)*</label>
+                  <textarea
+                    readonly
+                    name="invokedAct{{ i }}"
+                    id="invokedAct{{ i }}"
+                    class="form-control"
+                    placeholder="Describe the Offence"
+                  >{{ victim.scst_sections }}</textarea>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="sectionsIPC{{ i }}" class="form-label">32. Section Invoked Under IPC/POCSO/etc. *</label>
+                  <textarea
+                    readonly
+                    name="sectionsIPC{{ i }}"
+                    id="sectionsIPC{{ i }}"
+                    class="form-control"
+                    placeholder="Enter Sections, separated by commas"
+                  >{{ victim.sectionsIPC }}</textarea>
+                </div>
+
+              </div>
+            </div>
+
+
+          </div>
+          <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="isDeceased" class="form-label">33. Has the victim deceased due to the offence? *</label>
                 <input
+                  readonly
                   type="text"
+                  name="isDeceased"
                   id="isDeceased"
                   class="form-control"
                   placeholder="Enter Yes or No"
+                  [value]="isDeceased"
                 />
               </div>
 
               <div class="col-md-6 mb-3">
-                          <label for="deceasedPersonNames" class="form-label">34. Name(s) of the deceased person *</label>
+                <label for="deceasedPersonNames" class="form-label">34. Name(s) of the deceased person *</label>
                 <input
+                  readonly
                   type="text"
-                  id="isDeceased"
+                  name="isDeceasedName"
+                  id="isDeceasedName"
                   class="form-control"
                   placeholder="Enter Yes or No"
+                  [value]="deceasedPersonNames"
                 />
               </div>
             </div>
-          </div>
       </div>
       </div>
       </div>
@@ -655,193 +740,264 @@
             <div class="col-md-3 mb-3">
               <label for="numberOfAccused" class="form-label">35. Number of Accused *</label>
               <input
+                readonly
                 type="text"
+                name="numberOfAccused"
                 id="numberOfAccused"
                 class="form-control"
                 placeholder="Enter Number of Accused"
+                [value]="numberOfAccused"
               />
             </div>
 
             <!-- Accused Details Section -->
             <div class="accused-details mb-4">
-              <h5>Accused Details</h5>
-              <div class="row">
-                <div class="col-md-4 mb-3">
-                  <label for="accusedAge" class="form-label">36. Age of the Accused *</label>
-                  <input
-                    type="text"
-                    id="accusedAge"
-                    class="form-control"
-                    placeholder="Enter Accused Age"
-                  />
-                </div>
+              <div *ngFor="let accused of accusedsdata; let i = index" class="accused-row"
+                style="border: 1px solid #007bff; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+                <h5>Accused Details {{ i + 1 }}</h5>
+                <div  class="row">
+                  <div class="col-md-4 mb-3">
+                    <label for="accusedAge{{i}}" class="form-label">36. Age of the Accused *</label>
+                    <input
+                      readonly
+                      type="text"
+                      name="accusedAge{{ i }}"
+                      id="accusedAge{{ i }}"
+                      class="form-control"
+                      placeholder="Enter Accused Age"
+                      [value]="accused.age"
+                    />
+                  </div>
 
-                <div class="col-md-4 mb-3">
-                  <label for="accusedName" class="form-label">37. Name of the Accused *</label>
-                  <input
-                    type="text"
-                    id="accusedName"
-                    class="form-control"
-                    placeholder="Enter Accused Name"
-                  />
-                </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="accusedName{{i}}" class="form-label">37. Name of the Accused *</label>
+                    <input
+                      readonly
+                      type="text"
+                      name="accusedName{{ i }}"
+                      id="accusedName{{ i }}"
+                      class="form-control"
+                      placeholder="Enter Accused Name"
+                      [value]="accused.name"
+                    />
+                  </div>
 
-                <div class="col-md-4 mb-3">
-                  <label for="accusedGender" class="form-label">38. Gender of the Accused *</label>
-                  <input
-                    type="text"
-                    id="accusedGender"
-                    class="form-control"
-                    placeholder="Enter Gender"
-                  />
-                </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="accusedGender{{i}}" class="form-label">38. Gender of the Accused *</label>
+                    <input
+                      readonly
+                      type="text"
+                      name="accusedGender{{ i }}"
+                      id="accusedGender{{ i }}"
+                      class="form-control"
+                      placeholder="Enter Gender"
+                      [value]="accused.gender"
+                    />
+                  </div>
 
-                <!-- Address and Pincode -->
-                <div class="col-md-6 mb-3">
-                  <label for="accusedAddress" class="form-label">39. Address of the Accused</label>
-                  <input
-                    type="text"
-                    id="accusedAddress"
-                    class="form-control"
-                    placeholder="Enter Address"
-                  />
-                </div>
 
-                <div class="col-md-6 mb-3">
-                  <label for="accusedPincode" class="form-label">40. Pincode</label>
-                  <input
-                    type="text"
-                    id="accusedPincode"
-                    class="form-control"
-                    placeholder="Enter Pincode"
-                  />
-                </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="specifyGender{{i}}" class="form-label">Specify Gender</label>
+                    <input
+                      readonly
+                      type="text"
+                      name="specifyGender{{ i }}"
+                      id="specifyGender{{ i }}"
+                      class="form-control"
+                      placeholder="Enter Gender"
+                      [value]="accused.custom_gender"
+                    />
+                  </div>
 
-                <!-- Community and Caste -->
-                <div class="col-md-3 mb-3">
-                  <label for="accusedCommunity" class="form-label">41. Community of the Accused *</label>
-                  <input
-                    type="text"
-                    id="accusedCommunity"
-                    class="form-control"
-                    placeholder="Enter Community"
-                  />
-                </div>
+                  <!-- Address and Pincode -->
+                  <div class="col-md-6 mb-3">
+                    <label for="accusedAddress{{i}}" class="form-label">39. Address of the Accused</label>
+                    <input
+                      readonly
+                      type="text"
+                      name="accusedAddress{{ i }}"
+                      id="accusedAddress{{ i }}"
+                      class="form-control"
+                      placeholder="Enter Address"
+                      [value]="accused.address"
+                    />
+                  </div>
 
-                <div class="col-md-4 mb-3">
-                  <label for="accusedCaste" class="form-label">42. Caste of the Accused *</label>
-                  <input
-                    type="text"
-                    id="accusedCaste"
-                    class="form-control"
-                    placeholder="Enter Caste"
-                  />
-                </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="accusedPincode{{i}}" class="form-label">40. Pincode</label>
+                    <input
+                      readonly
+                      type="text"
+                      name="accusedPincode{{i}}"
+                      id="accusedPincode{{i}}"
+                      class="form-control"
+                      placeholder="Enter Pincode"
+                      [value]="accused.pincode"
+                    />
+                  </div>
 
-                <!-- Father/Spouse Name -->
-                <div class="col-md-5 mb-3">
-                  <label for="accusedGuardian" class="form-label">
-                    43. Name of Accused person’s Father/ Mother/ Spouse/ Guardian *
-                  </label>
-                  <input
-                    type="text"
-                    id="accusedGuardian"
-                    class="form-control"
-                    placeholder="Enter Guardian's Name"
-                  />
-                </div>
+                  <!-- Community and Caste -->
+                  <div class="col-md-3 mb-3">
+                    <label for="accusedCommunity{{i}}" class="form-label">41. Community of the Accused *</label>
+                    <input
+                      readonly
+                      type="text"
+                      name="accusedCommunity{{i}}"
+                      id="accusedCommunity{{i}}"
+                      class="form-control"
+                      placeholder="Enter Community"
+                      [value]="accused.community"
+                    />
+                  </div>
 
-                <!-- Previous Incidents Against Same Victim -->
-                <div class="col-md-6 mb-3">
-                  <label for="previousIncident" class="form-label">
-                    44. Whether the accused person been involved in any previous incident/s against the same victim/ victim’s family? *
-                  </label>
-                  <input
-                    type="text"
-                    id="previousIncident"
-                    class="form-control"
-                    placeholder="Enter Yes or No"
-                  />
-                </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="accusedCaste{{i}}" class="form-label">42. Caste of the Accused *</label>
+                    <input
+                      readonly
+                      type="text"
+                      name="accusedCaste{{i}}"
+                      id="accusedCaste{{i}}"
+                      class="form-control"
+                      placeholder="Enter Caste"
+                      [value]="accused.caste"
+                    />
+                  </div>
 
-                <!-- Previous FIR Number -->
-                <div class="col-md-6 mb-3">
-                  <label for="previousFIRNumber" class="form-label">45. FIR number of previous cases *</label>
-                  <input
-                    type="text"
-                    id="previousFIRNumber"
-                    class="form-control"
-                    placeholder="Enter Previous FIR Number"
-                  />
-                </div>
+                  <!-- Father/Spouse Name -->
+                  <div class="col-md-5 mb-3">
+                    <label for="accusedGuardian{{i}}" class="form-label">
+                      43. Name of Accused person’s Father/ Mother/ Spouse/ Guardian *
+                    </label>
+                    <input
+                      readonly
+                      type="text"
+                      name="accusedGuardian{{ i }}"
+                      id="accusedGuardian{{ i }}"
+                      class="form-control"
+                      placeholder="Enter Guardian's Name"
+                      [value]="accused.guardian_name"
+                    />
+                  </div>
 
-                <!-- SC/ST Offences -->
-                <div class="col-md-6 mb-3">
-                  <label for="scstOffence" class="form-label">
-                    46. Whether the accused person has committed any offence against members of the SC/ ST community? *
-                  </label>
-                  <input
-                    type="text"
-                    id="scstOffence"
-                    class="form-control"
-                    placeholder="Enter Yes or No"
-                  />
-                </div>
+                  <!-- Previous Incidents Against Same Victim -->
+                  <div class="col-md-6 mb-3">
+                    <label for="previousIncident{{i}}" class="form-label">
+                      44. Whether the accused person been involved in any previous incident/s against the same victim/ victim’s family? *
+                    </label>
+                    <input
+                      readonly
+                      type="text"
+                      name="previousIncident{{i}}"
+                      id="previousIncident{{i}}"
+                      class="form-control"
+                      placeholder="Enter Yes or No"
+                      [value]="accused.previous_incident"
+                    />
+                  </div>
 
-                <div class="col-md-6 mb-3">
-                  <label for="scstFIRNumber" class="form-label">47. FIR number of previous cases *</label>
-                  <input
-                    type="text"
-                    id="scstFIRNumber"
-                    class="form-control"
-                    placeholder="Enter SC/ST FIR Number"
-                  />
-                </div>
+                  <!-- Previous FIR Number -->
+                  <div class="col-md-6 mb-3">
+                    <label for="previousFIRNumber{{i}}" class="form-label">45. FIR number of previous cases *</label>
+                    <input
+                      readonly
+                      type="text"
+                      name="previousFIRNumber{{i}}"
+                      id="previousFIRNumber{{i}}"
+                      class="form-control"
+                      placeholder="Enter Previous FIR Number"
+                      [value]="accused.previous_fir_number + accused.previous_fir_number_suffix"
+                    />
+                  </div>
 
-                <!-- Antecedents of the Accused -->
-                <div class="col-md-6 mb-3">
-                  <label for="antecedents" class="form-label">
-                    48. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *
-                  </label>
-                  <input
-                    type="text"
-                    id="antecedents"
-                    class="form-control"
-                    placeholder="Enter Antecedents"
-                  />
-                </div>
+                  <!-- SC/ST Offences -->
+                  <div class="col-md-6 mb-3">
+                    <label for="scstOffence" class="form-label">
+                      46. Whether the accused person has committed any offence against members of the SC/ ST community? *
+                    </label>
+                    <input
+                      readonly
+                      type="text"
+                      name="scstOffence{{ i }}"
+                      id="scstOffence{{ i }}"
+                      class="form-control"
+                      placeholder="Enter Yes or No"
+                      [value]="accused.scst_offence"
+                    />
+                  </div>
 
-                <!-- L&O Issues -->
-                <div class="col-md-6 mb-3">
-                  <label for="landOIssues" class="form-label">
-                    49. L&O Issues (Pickets, Bandoust, etc.) *
-                  </label>
-                  <input
-                    type="text"
-                    id="landOIssues"
-                    class="form-control"
-                    placeholder="Enter L&O Issues"
-                  />
-                </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="scstFIRNumber" class="form-label">47. FIR number of previous cases *</label>
+                    <input
+                      readonly
+                      type="text"
+                      name="scstFIRNumber{{ i }}"
+                      id="scstFIRNumber{{ i }}"
+                      class="form-control"
+                      placeholder="Enter SC/ST FIR Number"
+                      [value]="accused.scst_fir_number + accused.scst_fir_number_suffix"
+                    />
+                  </div>
 
-                <!-- Gist of the Current Case -->
+                  <!-- Antecedents of the Accused -->
+                  <div class="col-md-6 mb-3">
+                    <label for="antecedents{{i}}" class="form-label">
+                      48. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *
+                    </label>
+                    <input
+                      readonly
+                      type="text"
+                      name="antecedents{{ i }}"
+                      id="antecedents{{ i }}"
+                      class="form-control"
+                      placeholder="Enter Antecedents"
+                      [value]="accused.antecedents"
+                    />
+                  </div>
+
+                  <!-- L&O Issues -->
+                  <div class="col-md-6 mb-3">
+                    <label for="landOIssues{{i}}" class="form-label">
+                      49. L&O Issues (Pickets, Bandoust, etc.) *
+                    </label>
+                    <input
+                      readonly
+                      type="text"
+                      name="landOIssues{{ i }}"
+                      id="landOIssues{{ i }}"
+                      class="form-control"
+                      placeholder="Enter L&O Issues"
+                      [value]="accused.land_o_issues"
+                    />
+                  </div>
+
+                  <!-- Gist of the Current Case -->
                 <div class="col-md-12 mb-3">
-                  <label for="gistOfCurrentCase" class="form-label">50. Gist of the Current Case *</label>
+                  <label for="gistOfCurrentCase{{i}}" class="form-label">50. Gist of the Current Case *</label>
                   <textarea
-                    id="gistOfCurrentCase"
+                    readonly
+                    name="gistOfCurrentCase{{i}}"
+                    id="gistOfCurrentCase{{i}}"
                     class="form-control"
                     rows="4"
                     placeholder="Enter Gist of the Current Case"
+                    [value]="accused.gistOfCurrentCase"
                   ></textarea>
                 </div>
+                </div>
+              </div>
+              <div>
+
 
                 <!-- FIR Copy Upload -->
                 <div class="col-md-6 mb-3">
                   <label for="uploadFIRCopy" class="form-label">51. Upload FIR Copy *</label>
                   <input
+                    readonly
                     type="text"
+                    name="uploadFIRCopy"
                     id="uploadFIRCopy"
                     class="form-control"
+                    [value]="uploadFIRCopy"
                   />
                 </div>
               </div>
@@ -858,93 +1014,139 @@
           <div class="relief-details">
             <h3 class="mb-4">Step 5: Victim Relief</h3>
 
-            <!-- Community Certificate Verification -->
-            <div class="mb-4 col-md-4">
-              <label class="form-label">
-                52. Has the Community Certificate of the Victim(s) been Verified and Obtained? *
-              </label>
-              <input
-                type="text"
-                class="form-control"
-                id="communityCertificate"
-                placeholder="Enter Yes or No"
-              />
+            <div *ngFor="let relief of reliefsdata; let i = index" class="relief-section"
+     style="border: 1px solid #007bff; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+  <h5>Relief and Community Certificate Details for Victim {{ i + 1 }}</h5>
+  <div class="row">
+
+    <!-- Community Certificate Verification -->
+    <div class=" d-flex align-items-center">
+      <div class="col-md-7 mb-3">
+        <label for="communityCertificate{{ i }}" class="form-label">52. Has the Community Certificate of the Victim(s) been Verified and Obtained? *</label>
+      </div>
+      <div class="col-md-3 mb-3">
+        <input
+        readonly
+        type="text"
+        class="form-control col-md-2"
+        name="communityCertificate{{ i }}"
+        id="communityCertificate{{ i }}"
+        [value]="relief.community_certificate"
+        placeholder="Enter Yes or No"
+      />
+      </div>
+
+
+    </div>
+
+    <!-- Victim Name -->
+    <div class="d-flex align-items-center">
+      <div class="col-md-7 mb-3">
+        <label for="victimName{{ i }}" class="form-label">53. Name of the Victim *</label>
+      </div>
+      <div class="col-md-3 mb-3">
+        <input
+          readonly
+          type="text"
+          class="form-control"
+          name="victimName{{ i }}"
+          id="victimName{{ i }}"
+          [value]="relief.victim_name"
+          placeholder="Enter Victim Name"
+        />
+      </div>
+    </div>
+
+    <!-- Eligible Relief Amount SC/ST -->
+    <div class="d-flex align-items-center">
+      <div class="col-md-7 mb-3">
+        <label for="reliefAmountScst{{ i }}" class="form-label">54. Eligible relief amount for the victim as per SC/ST Act *</label>
+      </div>
+      <div class="col-md-3 mb-3">
+        <input
+          readonly
+          type="text"
+          class="form-control text-start"
+          name="reliefAmountScst{{ i }}"
+          id="reliefAmountScst{{ i }}"
+          [value]="relief.relief_amount_scst"
+          placeholder="Enter Relief Amount"
+        />
+      </div>
+    </div>
+
+    <!-- Eligible Relief Amount Ex-Gratia -->
+    <div class="d-flex align-items-center">
+      <div class="col-md-7 mb-3">
+        <label for="reliefAmountExGratia{{ i }}" class="form-label">55. Eligible relief amount for the victim (ex-gratia) by Govt. of Tamil Nadu *</label>
+      </div>
+      <div class="col-md-3 mb-3">
+        <input
+          readonly
+          type="text"
+          class="form-control text-start"
+          name="reliefAmountExGratia{{ i }}"
+          id="reliefAmountExGratia{{ i }}"
+          [value]="relief.relief_amount_exgratia"
+          placeholder="Enter Relief Amount"
+        />
+      </div>
+    </div>
+
+    <!-- Eligible Relief Amount First Stage -->
+    <div class="d-flex align-items-center">
+      <div class="col-md-7 mb-3">
+      <label for="reliefAmountFirstStage{{ i }}" class="form-label">56. Eligible amount for the 1st Stage of Relief *</label>
+      </div>
+      <div class="col-md-3 mb-3">
+      <input
+        readonly
+        type="text"
+        class="form-control text-start"
+        name="reliefAmountFirstStage{{ i }}"
+        id="reliefAmountFirstStage{{ i }}"
+        [value]="relief.relief_amount_first_stage"
+        placeholder="Enter Relief Amount"
+      />
+      </div>
+    </div>
+
+    <!-- Eligible Additional Relief -->
+    <div class="d-flex align-items-center">
+      <div class="col-md-7 mb-3">
+        <label for="additionalRelief{{ i }}" class="form-label">57. Eligible additional relief for the legal heir of the person died *</label>
+      </div>
+      <div class="col-md-5 mb-3">
+        <input
+          readonly
+          type="text"
+          class="form-control text-start"
+          name="additionalRelief{{ i }}"
+          id="additionalRelief{{ i }}"
+          [value]="relief.additional_relief"
+          placeholder="additionalRelief"
+        />
+      </div>
+    </div>
+
+  </div>
             </div>
 
-            <!-- Victim Name -->
-            <div class="mb-4 col-lg-4">
-              <label class="form-label">53. Name of the Victim *</label>
-              <input
-                type="text"
-                class="form-control"
-                id="victimName"
-                placeholder="Enter Victim Name"
-              />
-            </div>
 
-            <!-- Relief Amount Fields -->
-            <div class="row mb-3">
-              <div class="col-8">
-                <label class="form-label">54. Eligible relief amount for the victim as per SC/ST Act *</label>
-              </div>
-              <div class="col-4">
-                <input
-                  type="text"
-                  class="form-control text-end"
-                  id="reliefAmountScst"
-                  placeholder="Enter Relief Amount"
-                />
-              </div>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-8">
-                <label class="form-label">55. Eligible relief amount for the victim (ex-gratia) by Govt. of Tamil Nadu *</label>
-              </div>
-              <div class="col-4">
-                <input
-                  type="text"
-                  class="form-control text-end"
-                  id="reliefAmountExGratia"
-                  placeholder="Enter Relief Amount"
-                />
-              </div>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-8">
-                <label class="form-label">56. Eligible amount for the 1st Stage of Relief *</label>
-              </div>
-              <div class="col-4">
-                <input
-                  type="text"
-                  class="form-control text-end"
-                  id="reliefAmountFirstStage"
-                  placeholder="Enter Relief Amount"
-                />
-              </div>
-            </div>
-
-            <!-- Additional Relief Options -->
-            <div class="mb-4">
-              <label class="form-label d-block mb-2">57. Eligible additional relief for the legal heir of the person died *</label>
-              <textarea
-                class="form-control"
-                id="additionalRelief"
-                placeholder="Enter Additional Relief Details"
-              ></textarea>
-            </div>
 
             <!-- Total Compensation Amount -->
             <div class="row mb-4">
-              <div class="col-8">
+              <div class="col-6" >
                 <label class="form-label">58. Total Amount for 1st Stage of Compensation (Total across all victims) *</label>
               </div>
-              <div class="col-4">
+              <div class="col-3 "style="padding-left: 0px">
                 <input
+                  readonly
                   type="text"
                   class="form-control text-end"
+                  name="totalCompensation"
                   id="totalCompensation"
+                  [value]="totalCompensation"
                   placeholder="Enter Total Amount"
                 />
               </div>
@@ -955,9 +1157,12 @@
               <div class="mb-4 col-6">
                 <label class="form-label">59. Proceedings File No. *</label>
                 <input
+                  readonly
                   type="text"
                   class="form-control"
+                  name="proceedingsFileNo"
                   id="proceedingsFileNo"
+                  [value]="proceedingsFileNo"
                   placeholder="Enter File No."
                 />
               </div>
@@ -965,9 +1170,12 @@
               <div class="mb-4 col-6">
                 <label class="form-label">60. Proceedings Date *</label>
                 <input
+                  readonly
                   type="text"
                   class="form-control"
+                  name="proceedingsDate"
                   id="proceedingsDate"
+                  [value]="proceedingsDate"
                 />
               </div>
             </div>
@@ -976,8 +1184,11 @@
             <div class="mb-4">
               <label class="form-label">61. Upload Commissionerate / S.P. Office Proceedings *</label>
               <textarea
+                readonly
                 class="form-control"
+                name="proceedingsFile"
                 id="proceedingsFile"
+                [value]="proceedingsFile"
                 rows="2"
                 placeholder="Enter details for Commissionerate / S.P. Office Proceedings"
               ></textarea>
@@ -987,8 +1198,11 @@
             <div class="mb-4">
               <label class="form-label">62. Upload key Attachments *</label>
               <textarea
+                readonly
                 class="form-control"
+                name="attachments"
                 id="attachments"
+                [value]="attachments"
                 rows="2"
                 placeholder="Enter details or references for key attachments"
               ></textarea>
@@ -1003,53 +1217,116 @@
         <!-- Charge Sheet Filed Details -->
         <div class="card border-primary mb-4">
           <div class="card-body">
-            <h5>Charge Sheet Filed Details</h5>
-            <div class="row mb-3">
-              <!-- Charge Sheet Filed -->
-              <div class="col-md-4">
-                <label for="chargeSheetFiled" class="form-label">63. Charge Sheet filed with the Court?</label>
-                <input type="text" id="chargeSheetFiled" class="form-control" placeholder="Yes/No" />
-              </div>
-              <!-- Court Division -->
-              <div class="col-md-4">
-                <label for="courtDistrict" class="form-label">64. Court Division</label>
-                <input type="text" id="courtDistrict" class="form-control" placeholder="Enter Court Division" />
-              </div>
-              <!-- Court Range -->
-              <div class="col-md-4">
-                <label for="courtName" class="form-label">65. Court Range</label>
-                <input type="text" id="courtName" class="form-control" placeholder="Enter Court Range" />
-              </div>
-            </div>
+  <h5>Charge Sheet Filed Details</h5>
+  <div class="row mb-3">
+    <!-- Charge Sheet Filed -->
+    <div class="col-md-4">
+      <label for="chargeSheetFiled" class="form-label">63. Charge Sheet filed with the Court?</label>
+      <input
+        readonly
+        type="text"
+        name="chargeSheetFiled"
+        id="chargeSheetFiled"
+        class="form-control"
+        [value]="chargeSheetFiled"
+        placeholder="Yes/No"
+      />
+    </div>
+    <!-- Court Division -->
+    <div class="col-md-4">
+      <label for="courtDistrict" class="form-label">64. Court Division</label>
+      <input
+        readonly
+        type="text"
+        name="courtDistrict"
+        id="courtDistrict"
+        class="form-control"
+        [value]="courtDistrict"
+        placeholder="Enter Court Division"
+      />
+    </div>
+    <!-- Court Range -->
+    <div class="col-md-4">
+      <label for="courtName" class="form-label">65. Court Range</label>
+      <input
+        readonly
+        type="text"
+        name="courtName"
+        id="courtName"
+        class="form-control"
+        [value]="courtName"
+        placeholder="Enter Court Range"
+      />
+    </div>
+  </div>
 
-            <div class="row mb-3">
-              <!-- Case Type -->
-              <div class="col-md-4">
-                <label for="caseType" class="form-label">66. Select Case Type</label>
-                <input type="text" id="caseType" class="form-control" placeholder="Enter Case Type" />
-              </div>
-              <!-- Case Number -->
-              <div class="col-md-6">
-                <label for="caseNumber" class="form-label">67. Case Number Report (CNR) / Special SC Number</label>
-                <input type="text" id="caseNumber" class="form-control" placeholder="Enter Case Number" />
-              </div>
-              <!-- RCS File Number -->
-              <div class="col-md-6">
-                <label for="rcsFileNumber" class="form-label">68. RCS File Number</label>
-                <input type="text" id="rcsFileNumber" class="form-control" placeholder="Enter RCS File Number" />
-              </div>
-              <!-- RCS Filing Date -->
-              <div class="col-md-6">
-                <label for="rcsFilingDate" class="form-label">69. RCS Filing Date</label>
-                <input type="text" id="rcsFilingDate" class="form-control" />
-              </div>
-              <!-- Upload MF Copy -->
-              <div class="col-md-6">
-                <label for="mfCopy" class="form-label">70. Upload MF Copy</label>
-                <input type="text" id="mfCopy" class="form-control" />
-              </div>
-            </div>
-          </div>
+  <div class="row mb-3">
+    <!-- Case Type -->
+    <div class="col-md-4">
+      <label for="caseType" class="form-label">66. Select Case Type</label>
+      <input
+        readonly
+        type="text"
+        name="caseType"
+        id="caseType"
+        class="form-control"
+        [value]="caseType"
+        placeholder="Enter Case Type"
+      />
+    </div>
+    <!-- Case Number -->
+    <div class="col-md-6">
+      <label for="caseNumber" class="form-label">67. Case Number Report (CNR) / Special SC Number</label>
+      <input
+        readonly
+        type="text"
+        name="caseNumber"
+        id="caseNumber"
+        class="form-control"
+        [value]="caseNumber"
+        placeholder="Enter Case Number"
+      />
+    </div>
+    <!-- RCS File Number -->
+    <div class="col-md-6">
+      <label for="rcsFileNumber" class="form-label">68. RCS File Number</label>
+      <input
+        readonly
+        type="text"
+        name="rcsFileNumber"
+        id="rcsFileNumber"
+        class="form-control"
+        [value]="rcsFileNumber"
+        placeholder="Enter RCS File Number"
+      />
+    </div>
+    <!-- RCS Filing Date -->
+    <div class="col-md-6">
+      <label for="rcsFilingDate" class="form-label">69. RCS Filing Date</label>
+      <input
+        readonly
+        type="text"
+        name="rcsFilingDate"
+        id="rcsFilingDate"
+        class="form-control"
+        [value]="rcsFilingDate"
+      />
+    </div>
+    <!-- Upload MF Copy -->
+    <div class="col-md-6">
+      <label for="mfCopy" class="form-label">70. Upload MF Copy</label>
+      <input
+        readonly
+        type="text"
+        name="mfCopy"
+        id="mfCopy"
+        class="form-control"
+        [value]="mfCopy"
+      />
+    </div>
+  </div>
+</div>
+
         </div>
 
         <!-- Victim Relief Details -->
@@ -1057,24 +1334,60 @@
           <div class="card-body">
             <h5>Victim Relief Details</h5>
             <div class="row mb-3">
+              <!-- Name of the Victim -->
               <div class="col-md-6">
-                <label for="reliefAmountScst" class="form-label">71. Name of the Victim *</label>
-                <input type="text" id="victimName" class="form-control" placeholder="Enter Victim Name" />
+                <label for="victimName2" class="form-label">71. Name of the Victim *</label>
+                <input
+                  readonly
+                  type="text"
+                  name="victimName2"
+                  id="victimName2"
+                  class="form-control"
+                  [value]="victimName2"
+                  placeholder="Enter Victim Name"
+                />
               </div>
+              <!-- Relief Amount (SC/ST Act) -->
               <div class="col-md-6">
-                <label for="reliefAmountScst" class="form-label">72. Relief Amount (SC/ST Act)</label>
-                <input type="text" id="reliefAmountScst" class="form-control" placeholder="Enter Relief Amount" />
+                <label for="reliefAmountScst1" class="form-label">72. Relief Amount (SC/ST Act)</label>
+                <input
+                  readonly
+                  type="text"
+                  name="reliefAmountScst1"
+                  id="reliefAmountScst1"
+                  class="form-control"
+                  [value]="reliefAmountScst1"
+                  placeholder="Enter Relief Amount"
+                />
               </div>
+              <!-- Relief Amount (Ex-Gratia) -->
               <div class="col-md-6">
-                <label for="reliefAmountExGratia" class="form-label">73. Relief Amount (Ex-Gratia)</label>
-                <input type="text" id="reliefAmountExGratia" class="form-control" placeholder="Enter Relief Amount" />
+                <label for="reliefAmountExGratia1" class="form-label">73. Relief Amount (Ex-Gratia)</label>
+                <input
+                  readonly
+                  type="text"
+                  name="reliefAmountExGratia1"
+                  id="reliefAmountExGratia1"
+                  class="form-control"
+                  [value]="reliefAmountExGratia1"
+                  placeholder="Enter Relief Amount"
+                />
               </div>
+              <!-- Total Eligible Amount for the Second Stage of Relief -->
               <div class="col-md-6">
-                <label for="totalCompensation" class="form-label">74. Total eligible amount for the victim for the second stage of relief *</label>
-                <input type="text" id="totalCompensation" class="form-control" readonly />
+                <label for="totalCompensation1" class="form-label">74. Total eligible amount for the victim for the second stage of relief *</label>
+                <input
+                  readonly
+                  type="text"
+                  name="totalCompensation1"
+                  id="totalCompensation1"
+                  class="form-control"
+                  [value]="totalCompensation1"
+                />
               </div>
             </div>
           </div>
+
         </div>
 
         <!-- Compensation and Attachments -->
@@ -1082,32 +1395,70 @@
           <div class="card-body">
             <h5>Compensation Details</h5>
             <div class="row mb-3">
+              <!-- Total amount for second stage of compensation -->
               <div class="col-md-8">
-                <label for="totalCompensation" class="form-label">75. Total amount for second stage of compensation (total of relief across all victims) *</label>
-                <input type="text" id="totalCompensation" class="form-control" readonly />
+                <label for="totalCompensation2" class="form-label">75. Total amount for second stage of compensation (total of relief across all victims) *</label>
+                <input
+                  readonly
+                  type="text"
+                  name="totalCompensation2"
+                  id="totalCompensation2"
+                  class="form-control"
+                  [value]="totalCompensation2"
+                />
               </div>
               <!-- Proceedings File No -->
               <div class="col-md-6">
-                <label for="proceedingsFileNo" class="form-label">76. Proceedings File No.</label>
-                <input type="text" id="proceedingsFileNo" class="form-control" placeholder="Enter File No." />
+                <label for="proceedingsFileNo1" class="form-label">76. Proceedings File No.</label>
+                <input
+                  readonly
+                  type="text"
+                  name="proceedingsFileNo1"
+                  id="proceedingsFileNo1"
+                  class="form-control"
+                  [value]="proceedingsFileNo1"
+                  placeholder="Enter File No."
+                />
               </div>
               <!-- Proceedings Date -->
               <div class="col-md-6">
-                <label for="proceedingsDate" class="form-label">77. Proceedings Date</label>
-                <input type="text" id="proceedingsDate" class="form-control" />
+                <label for="proceedingsDate1" class="form-label">77. Proceedings Date</label>
+                <input
+                  readonly
+                  type="text"
+                  name="proceedingsDate1"
+                  id="proceedingsDate1"
+                  class="form-control"
+                  [value]="proceedingsDate1"
+                />
               </div>
             </div>
 
             <!-- Upload Commissionerate/SP Office Proceedings -->
             <div class="mb-3">
               <label for="uploadProceedings" class="form-label">78. Upload Commissionerate/SP Office Proceedings</label>
-              <input type="text" id="uploadProceedings" class="form-control" />
+              <input
+                readonly
+                type="text"
+                name="uploadProceedings"
+                id="uploadProceedings"
+                class="form-control"
+                [value]="uploadProceedings"
+              />
             </div>
 
             <!-- Other Attachments -->
             <div class="mb-3">
-              <label for="attachments" class="form-label">79. Upload Other Attachments</label>
-              <textarea id="attachments" class="form-control" rows="2" placeholder="Enter details or descriptions for other attachments"></textarea>
+              <label for="attachments1" class="form-label">79. Upload Other Attachments</label>
+              <textarea
+                readonly
+                name="attachments1"
+                id="attachments1"
+                class="form-control"
+                rows="2"
+                [value]="attachments1"
+                placeholder="Enter details or descriptions for other attachments"
+              ></textarea>
             </div>
           </div>
         </div>
@@ -1120,297 +1471,357 @@
         <div class="card border-primary mb-4">
           <div class="card-body">
             <h4 class="mb-4">Case Trial and Court Details</h4>
-            <div class="row">
-              <!-- Item 74 -->
+            <div *ngFor="let casedetails of casedetailsdata; let i = index" class="row">
+              <!-- Item 80: Name of the Designated / Special Court -->
               <div class="col-md-6 mb-3">
-                <label class="form-label">80. Name of the Designated / Special court *</label>
-                <input type="text" class="form-control" placeholder="Enter Name" />
+                <label for="designated{{ i }}" class="form-label">80. Name of the Designated / Special court *</label>
+                <input
+                  readonly
+                  name="designated{{ i }}"
+                  id="designated{{ i }}"
+                  type="text"
+                  class="form-control"
+                  [value]="casedetails.court_name"
+                  placeholder="Enter Name"
+                />
               </div>
-              <!-- Item 75 -->
+
+              <!-- Item 81: District in which court is present -->
               <div class="col-md-6 mb-3">
-                <label class="form-label">81. District in which court is present *</label>
-                <input type="text" class="form-control" placeholder="Enter District" />
+                <label for="presentCourt{{ i }}" class="form-label">81. District in which court is present *</label>
+                <input
+                  readonly
+                  name="presentCourt{{ i }}"
+                  id="presentCourt{{ i }}"
+                  type="text"
+                  class="form-control"
+                  [value]="casedetails.court_district"
+                  placeholder="Enter District"
+                />
               </div>
-              <!-- Item 76 -->
+
+              <!-- Item 82: Case Number Report (CNR) / Special SC number -->
               <div class="col-md-6 mb-3">
-                <label class="form-label">82. Case Number Report (CNR) / Special SC number *</label>
-                <input type="text" class="form-control" placeholder="Enter Case Number" />
+                <label for="scNumber{{ i }}" class="form-label">82. Case Number Report (CNR) / Special SC number *</label>
+                <input
+                  readonly
+                  name="scNumber{{ i }}"
+                  id="scNumber{{ i }}"
+                  type="text"
+                  class="form-control"
+                  [value]="casedetails.trial_case_number"
+                  placeholder="Enter Case Number"
+                />
               </div>
-              <!-- Item 77 -->
+
+              <!-- Item 83: Special Public Prosecutor's Name -->
               <div class="col-md-6 mb-3">
-                <label class="form-label">83. Special Public Prosecutor's Name *</label>
-                <input type="text" class="form-control" placeholder="Enter Name" />
+                <label for="prosecutorName{{ i }}" class="form-label">83. Special Public Prosecutor's Name *</label>
+                <input
+                  readonly
+                  name="prosecutorName{{ i }}"
+                  id="prosecutorName{{ i }}"
+                  type="text"
+                  class="form-control"
+                  [value]="casedetails.public_prosecutor"
+                  placeholder="Enter Name"
+                />
               </div>
-              <!-- Item 78 -->
+
+              <!-- Item 84: Special Public Prosecutor's Phone Number -->
               <div class="col-md-6 mb-3">
-                <label class="form-label">84. Special Public Prosecutor's Phone Number *</label>
-                <input type="text" class="form-control" placeholder="Enter Phone Number" maxlength="10" />
+                <label for="prosecutorPhoneNumber{{ i }}" class="form-label">84. Special Public Prosecutor's Phone Number *</label>
+                <input
+                  readonly
+                  name="prosecutorPhoneNumber{{ i }}"
+                  id="prosecutorPhoneNumber{{ i }}"
+                  type="text"
+                  class="form-control"
+                  [value]="casedetails.prosecutor_phone"
+                  placeholder="Enter Phone Number"
+                  maxlength="10"
+                />
               </div>
+
             </div>
           </div>
+
         </div>
 
-        <div class="card border-primary mb-4">
+        <div *ngFor="let hearingdetail of hearingdetaildata; let i = index" class="card border-primary mb-4">
           <div class="card-body">
             <h4 class="mb-4">Select Hearing Date</h4>
-            <div class="row">
-              <!-- First Hearing Date -->
+            <div  class="row">
+              <!-- Item 85: First Hearing Date -->
               <div class="col-md-4 mb-3">
-                <label class="form-label">85. First Hearing Date *</label>
-                <input type="text" class="form-control" placeholder="Select Hearing Date" />
+                <label for="hearingDate{{i}}" class="form-label">85. First Hearing Date *</label>
+                <input
+                  readonly
+                  name="hearingDate{{i}}"
+                  id="hearingDate{{i}}"
+                  type="text"
+                  class="form-control"
+                  [value]="hearingdetail.first_hearing_date  | date:'dd/MM/yyyy'"
+                  placeholder="Select Hearing Date"
+                />
               </div>
-
-              <!-- Has a Judgement been awarded in the case? -->
+              <!-- Item 86: Has a Judgement been awarded in the case? -->
               <div class="col-md-6">
-                <label class="form-label">86. Has a Judgement been awarded in the case? *</label>
-                <input type="text" class="form-control" placeholder="Enter Yes or No" />
+                <label for="judgementAwarded{{i}}" class="form-label">86. Has a Judgement been awarded in the case? *</label>
+                <input
+                  readonly
+                  name="judgementAwarded{{i}}"
+                  id="judgementAwarded{{i}}"
+                  type="text"
+                  class="form-control"
+                  [value]="hearingdetail.judgement_awarded"
+                  placeholder="Enter Yes or No"
+                />
               </div>
             </div>
           </div>
+
         </div>
 
-        <div>
-          <div class="card border-primary mb-4">
+
+
+
+
+        <ng-container *ngIf="hearingdetaildata[0]?.judgement_awarded?.toLowerCase() === 'no'">
+          <!-- Loop through `Judgementdata` -->
+          <div  class="card border-primary mb-4">
             <div class="card-body">
-              <div>
-                <div class="row mb-3">
-                  <!-- Next Hearing Date -->
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label">87. Next Hearing Date *</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Select Next Hearing Date"
-                    />
+
+              <h5>Judgement Details</h5>
+              <div class="row align-items-center">
+                <!-- Item 90: Nature of Judgement -->
+                <div *ngFor="let hearingdetail1 of hearingdetailsdata; let i = index">
+                  <div class="row">
+                    <div class="col-md-4 mb-3">
+                      <label for="nextHearingDate{{i}}" class="form-label">87. Next Hearing Date *</label>
+                      <input
+                        readonly
+                        name="nextHearingDate{{i}}"
+                        id="nextHearingDate{{i}}"
+                        type="text"
+                        class="form-control"
+                        [value]="hearingdetail1.next_hearing_date | date:'dd/MM/yyyy'"
+                        placeholder="Next Hearing Date"
+                      />
+                    </div>
+
+                    <!-- Item 91: Upload Judgement Copy -->
+                    <div class="col-md-4 mb-3">
+                      <label for="reasonNextHearing{{i}}" class="form-label">88. Reason for Next Hearing *</label>
+                      <input
+                        readonly
+                        name="reasonNextHearing{{i}}"
+                        id="reasonNextHearing{{i}}"
+                        type="text"
+                        class="form-control"
+                        [value]="hearingdetail1.reason_next_hearing"
+                        placeholder="Reason for Next Hearing"
+                      />
+                    </div>
                   </div>
 
-                  <!-- Reason for Next Hearing -->
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label">88. Reason for Next Hearing *</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Enter Reason"
-                    />
-                  </div>
                 </div>
-              </div>
-              <div class="row align-items-center">
-                <div class="col-md-6">
-                  <label class="form-label">89. Has a Judgement been awarded in the case? *</label>
-                </div>
+
+
                 <div class="col-md-4">
+                  <label for="judgementBeenAwardednxt" class="form-label">89. Has a Judgement been awarded in the case? *</label>
                   <input
+                    readonly
+                    name="judgementBeenAwardednxt"
+                    id="judgementBeenAwardednxt"
                     type="text"
                     class="form-control"
-                    placeholder="Enter Yes or No"
+                    [value]="judgementBeenAwardednxt "
+                    placeholder="Has a Judgement been awarded in the case"
                   />
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </ng-container>
+
+        <ng-container *ngIf="hearingdetaildata[0]?.judgement_awarded?.toLowerCase() === 'yes' ||  judgementBeenAwardednxt?.toLowerCase() === 'yes'">
+          <!-- Loop through `Judgementdata` -->
+          <div *ngFor="let Judgement of Judgementdata; let i = index" class="card border-primary mb-4">
+            <div class="card-body">
+
+              <h5>Judgement Details</h5>
+              <div class="row align-items-center">
+                <!-- Item 90: Nature of Judgement -->
+                <div class="col-md-6">
+                  <label for="natureOfJudgemen_1stConvicted{{i}}" class="form-label">90. Nature of Judgement *</label>
+                  <input
+                    readonly
+                    name="natureOfJudgemen_1stConvicted{{i}}"
+                    id="natureOfJudgemen_1stConvicted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="Judgement.nature_of_judgement"
+                    placeholder="Enter Nature of Judgement"
+                  />
+                </div>
+
+                <!-- Item 91: Upload Judgement Copy -->
+                <div class="col-md-6">
+                  <label for="judgementCopy_1stConvicted{{i}}" class="form-label">91. Upload Judgement Copy *</label>
+                  <input
+                    readonly
+                    name="judgementCopy_1stConvicted{{i}}"
+                    id="judgementCopy_1stConvicted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="Judgement.judgement_copy"
+                    placeholder="Enter Judgement Copy Details"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
 
 
-        <!-- Judgement Details -->
-        <div>
-          <!-- Nature of Judgement and Upload Judgement Copy Section -->
+
+
+
+
+        <!--1st accquitted -->
+        <!-- Appeal Details Section -->
+        <div *ngIf="Judgementdata[0]?.nature_of_judgement === 'Acquitted'" class="card border-primary mb-4">
           <div class="card border-primary mb-4">
             <div class="card-body">
-            <h5 >Judgement Details</h5>
-            <div class="row align-items-center">
-              <!-- Nature of Judgement -->
-              <div class="col-md-6">
-                <label class="form-label">90. Nature of Judgement *</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter Nature of Judgement"
-                />
-              </div>
-
-              <!-- Upload Judgement Copy -->
-              <div class="col-md-6">
-                <label class="form-label">91. Upload Judgement Copy *</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter Judgement Copy Details"
-                />
-              </div>
-            </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="card border-primary mb-4">
-              <div class="card-body">
-                <h5 >Victim Relief Details</h5>
-
-                <!-- Victim Name -->
-                <div class="mb-4 col-lg-4">
-                  <label class="form-label">92. Name of the Victim *</label>
-                  <input type="text" class="form-control mb-3" placeholder="Enter Name of the Victim" />
+              <h5>1st Acquitted</h5>
+              <h5>Appeal Details</h5>
+              <div *ngFor="let appeal of appealdata; let i = index" class="row align-items-center">
+                <!-- Has legal opinion obtained -->
+                <div class="col-md-6">
+                  <label for="opinionObtained_1stAccquitted{{i}}" class="form-label">101. Has legal opinion obtained?</label>
+                  <input
+                    readonly
+                    id="opinionObtained_1stAccquitted{{i}}"
+                    name="opinionObtained_1stAccquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="appeal.legal_opinion_obtained"
+                    placeholder="Enter Yes or No"
+                  />
                 </div>
 
-                <!-- Relief Amount Fields -->
-                <div class="row mb-3">
-                  <div class="col-8">
-                    <label class="form-label">93. Eligible third stage relief amount for the victim as per the SC and ST Prevention of Atrocities Act *</label>
-                  </div>
-                  <div class="col-4 text-end">
-                    <input type="text" class="form-control text-end" placeholder="Enter Amount" />
-                  </div>
+                <!-- Is the case fit for appeal -->
+                <div class="col-md-6 mt-3">
+                  <label for="caseFit_1stAccquitted{{i}}" class="form-label">102. Is the case fit for appeal?</label>
+                  <input
+                    readonly
+                    id="caseFit_1stAccquitted{{i}}"
+                    name="caseFit_1stAccquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="appeal.case_fit_for_appeal"
+                    placeholder="Enter Yes or No"
+                  />
                 </div>
 
-                <div class="row mb-3">
-                  <div class="col-8">
-                    <label class="form-label">94. Eligible third stage relief amount for the victim (ex-gratia) by the Govt. of Tamil Nadu *</label>
-                  </div>
-                  <div class="col-4 text-end">
-                    <input type="text" class="form-control text-end" placeholder="Enter Amount" />
-                  </div>
+                <!-- Has the government approved for appeal -->
+                <div class="col-md-6 mt-3">
+                  <label for="governmentApproved_1stAccquitted{{i}}" class="form-label">103. Has the government approved for appeal?</label>
+                  <input
+                    readonly
+                    id="governmentApproved_1stAccquitted{{i}}"
+                    name="governmentApproved_1stAccquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="appeal.government_approval_for_appeal"
+                    placeholder="Enter Yes or No"
+                  />
                 </div>
 
-                <div class="row mb-3">
-                  <div class="col-8">
-                    <label class="form-label">95. Total Eligible amount for the victim for the Third stage of relief *</label>
-                  </div>
-                  <div class="col-4 text-end">
-                    <input type="text" class="form-control text-end" placeholder="Enter Total Amount" readonly />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Items 89 to 93 with blue border -->
-            <div class="card border-primary mb-4">
-              <div class="card-body">
-                <!-- Total Compensation Amount -->
-                <div class="row mb-4">
-                  <div class="col-8">
-                    <label class="form-label">96. Total amount for third stage of compensation (total of relief across all victims) *</label>
-                  </div>
-                  <div class="col-4">
-                    <input type="text" class="form-control text-end" placeholder="Enter Total Amount" readonly />
-                  </div>
+                <!-- Who has filed the appeal -->
+                <div class="col-md-6 mt-3">
+                  <label for="filedAppeal_1stAccquitted{{i}}" class="form-label">104. Who has filed the appeal?</label>
+                  <input
+                    readonly
+                    id="filedAppeal_1stAccquitted{{i}}"
+                    name="filedAppeal_1stAccquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="appeal.filed_by"
+                    placeholder="Enter Victim or Government"
+                  />
                 </div>
 
-                <!-- Commissionerate / SP Office Proceedings -->
-                <div class="row mb-4">
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">97. Proceedings File No. *</label>
-                    <input type="text" class="form-control" placeholder="Enter File No." />
-                  </div>
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">98. Proceedings Date *</label>
-                    <input type="text" class="form-control" />
-                  </div>
-                  <div class="col-md-12 mb-3">
-                    <label class="form-label">99. Upload Commissionerate / S.P. Office Proceedings *</label>
-                    <input type="text" class="form-control" placeholder="Enter Proceedings Details" />
-                  </div>
-                </div>
-
-                <!-- Additional Attachments -->
-                <div class="mb-4">
-                  <label class="form-label">100. Upload Other Attachments (If any)</label>
-                  <div class="input-group mb-2">
-                    <!-- File Input -->
-                    <input type="text" class="form-control" placeholder="Enter Attachment Details" />
-                  </div>
+                <!-- Name of the Designated/ Special court -->
+                <div class="col-md-6 mt-3">
+                  <label for="specialCourtName_1stAccquitted{{i}}" class="form-label">105. Name of the Designated/ Special court</label>
+                  <input
+                    readonly
+                    name="specialCourtName_1stAccquitted{{i}}"
+                    id="specialCourtName_1stAccquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="appeal.designated_court"
+                    placeholder="Enter Court Name"
+                  />
                 </div>
               </div>
             </div>
           </div>
 
-
-          <!-- Appeal Details Section -->
-          <div class="card border-primary mb-4">
-            <div class="card-body">
-            <h5 >Appeal Details</h5>
-            <div class="row align-items-center">
-              <!-- Has legal opinion obtained -->
-              <div class="col-md-6">
-                <label class="form-label">101. Has legal opinion obtained?</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter Yes or No"
-                />
-              </div>
-
-              <!-- Is the case fit for appeal -->
-              <div class="col-md-6 mt-3">
-                <label class="form-label">102. Is the case fit for appeal?</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter Yes or No"
-                />
-              </div>
-
-              <!-- Has the government approved for appeal -->
-              <div class="col-md-6 mt-3">
-                <label class="form-label">103. Has the government approved for appeal?</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter Yes or No"
-                />
-              </div>
-
-              <!-- Who has filed the appeal -->
-              <div class="col-md-6 mt-3">
-                <label class="form-label">104. Who has filed the appeal?</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter Victim or Government"
-                />
-              </div>
-
-              <!-- Name of the Designated/ Special court -->
-              <div class="col-md-6 mt-3">
-                <label class="form-label">105. Name of the Designated/ Special court</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter Court Name"
-                />
-              </div>
-            </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Acquitred -->
-      <div>
-        <div>
           <div class="card border-primary">
             <div class="card-body">
               <h4 class="mb-4">Case Trial and Court Details</h4>
-              <div class="row">
+              <div *ngFor="let casedetailsone of casedetailsonedata; let i = index" class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">1. Name of the Designated / Special court *</label>
-                  <input type="text" class="form-control" placeholder="Enter Name" />
+                  <label for="districtOfCourt_1stAccquitted{{i}}" class="form-label">2. District in which court is present *</label>
+                  <input
+                    readonly
+                    name="districtOfCourt_1stAccquitted{{i}}"
+                    id="districtOfCourt_1stAccquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="casedetailsone.court_district"
+                    placeholder="Enter District Name"
+                  />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">2. District in which court is present *</label>
-                  <input type="text" class="form-control" placeholder="Enter District Name" />
+                  <label for="scNumber1_1stAccquitted{{i}}" class="form-label">3. Case Number Report (CNR) / Special SC number *</label>
+                  <input
+                    readonly
+                    name="scNumber1_1stAccquitted{{i}}"
+                    id="scNumber1_1stAccquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="casedetailsone.case_number"
+                    placeholder="Enter Case Number"
+                  />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">3. Case Number Report (CNR) / Special SC number *</label>
-                  <input type="text" class="form-control" placeholder="Enter Case Number" />
+                  <label for="prosecutorName1_1stAccquitted{{i}}" class="form-label">4. Special Public Prosecutor's Name *</label>
+                  <input
+                    readonly
+                    name="prosecutorName1_1stAccquitted{{i}}"
+                    id="prosecutorName1_1stAccquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="casedetailsone.public_prosecutor	"
+                    placeholder="Enter Name"
+                  />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">4. Special Public Prosecutor's Name *</label>
-                  <input type="text" class="form-control" placeholder="Enter Name" />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">5. Special Public Prosecutor's Phone Number *</label>
-                  <input type="text" class="form-control" placeholder="Enter Phone Number" maxlength="10" />
+                  <label for="phoneNumber1_1stAccquitted{{i}}" class="form-label">5. Special Public Prosecutor's Phone Number *</label>
+                  <input
+                    readonly
+                    name="phoneNumber1_1stAccquitted{{i}}"
+                    id="phoneNumber1_1stAccquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="casedetailsone.prosecutor_phone"
+                    placeholder="Enter Phone Number"
+                    maxlength="10"
+                  />
                 </div>
               </div>
             </div>
@@ -1419,40 +1830,171 @@
           <div class="card border-primary mb-4 mt-3">
             <div class="card-body">
               <h4 class="mb-4">Select Hearing Date</h4>
-              <div class="row">
+              <div *ngFor="let hearingdetailone of hearingdetailonedata; let i = index" class="row">
                 <div class="col-md-4 mb-3">
-                  <label class="form-label">6. First Hearing Date *</label>
-                  <input type="text" class="form-control" />
+                  <label for="hearingDate1_1stAccquitted{{i}}" class="form-label">6. First Hearing Date *</label>
+                  <input
+                    readonly
+                    name="hearingDate1_1stAccquitted{{i}}"
+                    id="hearingDate1_1stAccquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="hearingdetailone.first_hearing_date | date:'dd/MM/yyyy'"
+                    placeholder="Enter Date"
+                  />
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">7. Has a Judgement been awarded in the case? *</label>
-                  <input type="text" class="form-control" placeholder="Enter Yes or No" />
+                  <label for="judgementAwarded1_1stAccquitted{{i}}" class="form-label">7. Has a Judgement been awarded in the case? *</label>
+                  <input
+                    readonly
+                    name="judgementAwarded1_1stAccquitted{{i}}"
+                    id="judgementAwarded1_1stAccquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="hearingdetailone.judgement_awarded  "
+                    placeholder="Enter Yes or No"
+                  />
                 </div>
               </div>
             </div>
           </div>
 
-          <div>
-            <div class="card border-primary mb-4">
+
+
+
+          <ng-container *ngIf="hearingdetailonedata[0]?.judgement_awarded?.toLowerCase() === 'no'">
+            <!-- Loop through `Judgementdata` -->
+            <div  class="card border-primary mb-4">
               <div class="card-body">
-              <div class="row mb-3">
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">8. Next Hearing Date *</label>
-                  <input type="text" class="form-control" placeholder="Select Next Hearing Date" />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">9. Reason for Next Hearing *</label>
-                  <input type="text" class="form-control" placeholder="Enter Reason" />
+
+                <h5>Judgement Details</h5>
+                <div class="row align-items-center">
+                  <!-- Item 90: Nature of Judgement -->
+                  <div *ngFor="let hearingdetailstwo of hearingdetailstwodata; let i = index">
+                    <div class="row">
+                      <div class="col-md-4 mb-3">
+                        <label for="nextHearingDate1{{i}}" class="form-label">87. Next Hearing Date *</label>
+                        <input
+                          readonly
+                          name="nextHearingDate1{{i}}"
+                          id="nextHearingDate1{{i}}"
+                          type="text"
+                          class="form-control"
+                          [value]="hearingdetailstwo.next_hearing_date | date:'dd/MM/yyyy'"
+                          placeholder="Next Hearing Date"
+                        />
+                      </div>
+
+                      <!-- Item 91: Upload Judgement Copy -->
+                      <div class="col-md-4 mb-3">
+                        <label for="reasonNextHearing1{{i}}" class="form-label">88. Reason for Next Hearing *</label>
+                        <input
+                          readonly
+                          name="reasonNextHearing1{{i}}"
+                          id="reasonNextHearing1{{i}}"
+                          type="text"
+                          class="form-control"
+                          [value]="hearingdetailstwo.reason_next_hearing"
+                          placeholder="Reason for Next Hearing"
+                        />
+                      </div>
+                    </div>
+
+                  </div>
+
+
+                  <div class="col-md-4">
+                    <label for="judgementBeenAwardednxt1" class="form-label">89. Has a Judgement been awarded in the case? *</label>
+                    <input
+                      readonly
+                      name="judgementBeenAwardednxt1"
+                      id="judgementBeenAwardednxt1"
+                      type="text"
+                      class="form-control"
+                      [value]="judgementBeenAwardednxt1"
+                      placeholder="Has a Judgement been awarded in the case"
+                    />
+                  </div>
                 </div>
               </div>
+            </div>
+          </ng-container>
+
+          <div *ngIf="hearingdetailonedata[0]?.judgement_awarded?.toLowerCase() === 'yes'|| judgementBeenAwardednxt1?.toLowerCase() === 'yes'"
+           class="card border-primary mb-4">
+            <div *ngFor="let hearingdetailone of hearingdetailonedata; let i = index" class="card border-primary mb-4">
+              <div class="card-body">
+                <h5>Judgement Details</h5>
+                <div class="row align-items-center">
+                  <!-- Item 90: Nature of Judgement -->
+                  <div class="col-md-6">
+                    <label for="judgementNature_1stAccquitted{{i}}" class="form-label">11. Nature of Judgement *</label>
+                    <input
+                      readonly
+                      name="judgementNature_1stAccquitted{{i}}"
+                      id="judgementNature_1stAccquitted{{i}}"
+                      type="text"
+                      class="form-control"
+                      [value]="hearingdetailone.nature_of_judgement"
+                      placeholder="Enter Nature of Judgement"
+                    />
+                  </div>
+
+                  <!-- Item 91: Upload Judgement Copy -->
+                  <div class="col-md-6">
+                    <label for="judgementNature_1stAccquitted{{i}}" class="form-label">12. Upload Judgement Copy *</label>
+                    <input
+                      readonly
+                      name="judgementNature_1stAccquitted{{i}}"
+                      id="judgementNature_1stAccquitted{{i}}"
+                      type="text"
+                      class="form-control"
+                      [value]="hearingdetailone.judgement_copy"
+                      placeholder="Enter Judgement Copy Details"
+                    />
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+
+
+        <!--2nd convicted -->
+        <!-- <div class="card border-primary mb-4">
+          <div class="card border-primary mb-4">
+            <div class="card-body">
+              <h5>2nd convicted</h5>
+              <h5>Judgement Details</h5>
               <div class="row align-items-center">
-                <div class="col-lg-6">
-                  <label class="form-label">10. Has a Judgement been awarded in the case? *</label>
+                <div class="col-md-6">
+                  <label class="form-label">90. Nature of Judgement *</label>
+                  <input
+                    readonly
+                    name="natureOfJudgemen_2ndConvicted"
+                    id="natureOfJudgemen_2ndConvicted"
+                    type="text"
+                    class="form-control"
+                    [value]="natureOfJudgemen_2ndConvicted"
+                    placeholder="Enter Nature of Judgement"
+                  />
                 </div>
-                <div class="col-md-3">
-                  <input type="text" class="form-control" placeholder="Enter Yes or No" />
+
+
+                <div class="col-md-6">
+                  <label class="form-label">91. Upload Judgement Copy *</label>
+                  <input
+                    readonly
+                    name="judgementCopy_2ndConvicted"
+                    id="judgementCopy_2ndConvicted"
+                    type="text"
+                    class="form-control"
+                    [value]="judgementCopy_2ndConvicted"
+                    placeholder="Enter Judgement Copy Details"
+                  />
                 </div>
-              </div>
               </div>
             </div>
           </div>
@@ -1460,61 +2002,850 @@
           <div>
             <div class="card border-primary mb-4">
               <div class="card-body">
+                <h5>Victim Relief Details</h5>
+
+                <div class="mb-4 col-lg-4">
+                  <label class="form-label">92. Name of the Victim *</label>
+                  <input
+                    readonly
+                    name="victimName4_2ndConvicted"
+                    id="victimName4_2ndConvicted"
+                    type="text"
+                    class="form-control mb-3"
+                    [value]="victimName4_2ndConvicted"
+                    placeholder="Enter Name of the Victim"
+                  />
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-8">
+                    <label class="form-label">
+                      93. Eligible third stage relief amount for the victim as per the SC and ST Prevention of Atrocities Act *
+                    </label>
+                  </div>
+                  <div class="col-4 text-end">
+                    <input
+                      readonly
+                      name="reliefAmount_2ndConvicted"
+                      id="reliefAmount_2ndConvicted"
+                      type="text"
+                      class="form-control text-end"
+                      [value]="reliefAmount_2ndConvicted"
+                      placeholder="Enter Amount"
+                    />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-8">
+                    <label class="form-label">
+                      94. Eligible third stage relief amount for the victim (ex-gratia) by the Govt. of Tamil Nadu *
+                    </label>
+                  </div>
+                  <div class="col-4 text-end">
+                    <input
+                      readonly
+                      name="reliefAmount2_2ndConvicted"
+                      id="reliefAmount2_2ndConvicted"
+                      type="text"
+                      class="form-control text-end"
+                      [value]="reliefAmount2_2ndConvicted"
+                      placeholder="Enter Amount"
+                    />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-8">
+                    <label class="form-label">95. Total Eligible amount for the victim for the Third stage of relief *</label>
+                  </div>
+                  <div class="col-4 text-end">
+                    <input
+                      readonly
+                      name="eligibleAmount_2ndConvicted"
+                      id="eligibleAmount_2ndConvicted"
+                      type="text"
+                      class="form-control text-end"
+                      [value]="eligibleAmount_2ndConvicted"
+                      placeholder="Enter Total Amount"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card border-primary mb-4">
+              <div class="card-body">
+                <div class="row mb-4">
+                  <div class="col-8">
+                    <label class="form-label">
+                      96. Total amount for third stage of compensation (total of relief across all victims) *
+                    </label>
+                  </div>
+                  <div class="col-4">
+                    <input
+                      readonly
+                      name="totalAmount_2ndConvicted"
+                      id="totalAmount_2ndConvicted"
+                      type="text"
+                      class="form-control text-end"
+                      [value]="totalAmount_2ndConvicted"
+                      placeholder="Enter Total Amount"
+                    />
+                  </div>
+                </div>
+
+                <div class="row mb-4">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">97. Proceedings File No. *</label>
+                    <input
+                      readonly
+                      name="proceedingsNo_2ndConvicted"
+                      id="proceedingsNo_2ndConvicted"
+                      type="text"
+                      class="form-control"
+                      [value]="proceedingsNo_2ndConvicted"
+                      placeholder="Enter File No."
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">98. Proceedings Date *</label>
+                    <input
+                      readonly
+                      name="proceedingsDate2_2ndConvicted"
+                      id="proceedingsDate2_2ndConvicted"
+                      type="text"
+                      class="form-control"
+                      [value]="proceedingsDate2_2ndConvicted"
+                    />
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label class="form-label">99. Upload Commissionerate / S.P. Office Proceedings *</label>
+                    <input
+                      readonly
+                      name="officeProceedings_2ndConvicted"
+                      id="officeProceedings_2ndConvicted"
+                      type="text"
+                      class="form-control"
+                      [value]="officeProceedings_2ndConvicted"
+                      placeholder="Enter Proceedings Details"
+                    />
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label">100. Upload Other Attachments (If any)</label>
+                  <div class="input-group mb-2">
+                    <input
+                      readonly
+                      name="otherAttachments_2ndConvicted"
+                      id="otherAttachments_2ndConvicted"
+                      type="text"
+                      class="form-control"
+                      [value]="otherAttachments_2ndConvicted"
+                      placeholder="Enter Attachment Details"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> -->
+
+
+        <!--2nd accquitted -->
+        <!-- Appeal Details Section -->
+        <div *ngIf="hearingdetailonedata[0]?.nature_of_judgement === 'Acquitted'" class="card border-primary mb-4">
+          <div class="card border-primary mb-4">
+            <div class="card-body">
+              <h5>2nd Acquitted</h5>
+              <h5>Appeal Details</h5>
+              <div *ngFor="let appealone of appealonedata; let i = index" class="row align-items-center">
+                <!-- Has legal opinion obtained -->
+                <div class="col-md-6">
+                  <label for="opinionObtained_2nd_Accquitted{{i}}" class="form-label">101. Has legal opinion obtained?</label>
+                  <input
+                    readonly
+                    id="opinionObtained_2nd_Accquitted{{i}}"
+                    name="opinionObtained_2nd_Accquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="appealone.legal_opinion_obtained"
+                    placeholder="Enter Yes or No"
+                  />
+                </div>
+
+                <!-- Is the case fit for appeal -->
+                <div class="col-md-6 mt-3">
+                  <label for="caseFit_2nd_Accquitted{{i}}" class="form-label">102. Is the case fit for appeal?</label>
+                  <input
+                    readonly
+                    id="caseFit_2nd_Accquitted{{i}}"
+                    name="caseFit_2nd_Accquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="appealone.case_fit_for_appeal"
+                    placeholder="Enter Yes or No"
+                  />
+                </div>
+
+                <!-- Has the government approved for appeal -->
+                <div class="col-md-6 mt-3">
+                  <label for="governmentApproved_2nd_Accquitted{{i}}" class="form-label">103. Has the government approved for appeal?</label>
+                  <input
+                    readonly
+                    id="governmentApproved_2nd_Accquitted{{i}}"
+                    name="governmentApproved_2nd_Accquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="appealone.government_approval_for_appeal"
+                    placeholder="Enter Yes or No"
+                  />
+                </div>
+
+                <!-- Who has filed the appeal -->
+                <div class="col-md-6 mt-3">
+                  <label for="filedAppeal_2nd_Accquitted{{i}}" class="form-label">104. Who has filed the appeal?</label>
+                  <input
+                    readonly
+                    id="filedAppeal_2nd_Accquitted{{i}}"
+                    name="filedAppeal_2nd_Accquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="appealone.filed_by"
+                    placeholder="Enter Victim or Government"
+                  />
+                </div>
+
+                <!-- Name of the Designated/ Special court -->
+                <div class="col-md-6 mt-3">
+                  <label for="specialCourtName_2nd_Accquitted{{i}}" class="form-label">105. Name of the Designated/ Special court</label>
+                  <input
+                    readonly
+                    name="specialCourtName_2nd_Accquitted{{i}}"
+                    id="specialCourtName_2nd_Accquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="appealone.designated_court"
+                    placeholder="Enter Court Name"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-primary">
+            <div class="card-body">
+              <h4 class="mb-4">Case Trial and Court Details</h4>
+              <div *ngFor="let casedetailstwo of casedetailstwodata; let i = index" class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="scNumber1_2nd_Accquitted{{i}}" class="form-label">3. Case Number Report (CNR) / Special SC number *</label>
+                  <input
+                    readonly
+                    name="scNumber1_2nd_Accquitted{{i}}"
+                    id="scNumber1_2nd_Accquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="casedetailstwo.case_number"
+                    placeholder="Enter Case Number"
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="prosecutorName1_2nd_Accquitted{{i}}" class="form-label">4. Special Public Prosecutor's Name *</label>
+                  <input
+                    readonly
+                    name="prosecutorName1_2nd_Accquitted{{i}}"
+                    id="prosecutorName1_2nd_Accquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="casedetailstwo.public_prosecutor	"
+                    placeholder="Enter Name"
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="phoneNumber1_2nd_Accquitted{{i}}" class="form-label">5. Special Public Prosecutor's Phone Number *</label>
+                  <input
+                    readonly
+                    name="phoneNumber1_2nd_Accquitted{{i}}"
+                    id="phoneNumber1_2nd_Accquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="casedetailstwo.prosecutor_phone"
+                    placeholder="Enter Phone Number"
+                    maxlength="10"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-primary mb-4 mt-3">
+            <div class="card-body">
+              <h4 class="mb-4">Select Hearing Date</h4>
+              <div *ngFor="let courtdetailstwo of courtdetailstwodata; let i = index" class="row">
+                <div class="col-md-4 mb-3">
+                  <label for="hearingDate1_2nd_Accquitted{{i}}" class="form-label">6. First Hearing Date *</label>
+                  <input
+                    readonly
+                    name="hearingDate1_2nd_Accquitted{{i}}"
+                    id="hearingDate1_2nd_Accquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="courtdetailstwo.first_hearing_date | date:'dd/MM/yyyy'
+                    "
+                    placeholder="Enter Date"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="judgementAwarded1_2nd_Accquitted{{i}}" class="form-label">7. Has a Judgement been awarded in the case? *</label>
+                  <input
+                    readonly
+                    name="judgementAwarded1_2nd_Accquitted{{i}}"
+                    id="judgementAwarded1_2nd_Accquitted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="courtdetailstwo.judgement_awarded"
+                    placeholder="Enter Yes or No"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ng-container *ngIf="hearingdetailonedata[0]?.judgement_awarded?.toLowerCase() === 'no'">
+            <!-- Loop through `Judgementdata` -->
+            <div  class="card border-primary mb-4">
+              <div class="card-body">
+
+                <h5>Judgement Details</h5>
+                <div class="row align-items-center">
+                  <!-- Item 90: Nature of Judgement -->
+                  <div *ngFor="let hearingdetailsthree of hearingdetailsthreedata; let i = index">
+                    <div class="row">
+                      <div class="col-md-4 mb-3">
+                        <label for="nextHearingDate2{{i}}" class="form-label">87. Next Hearing Date *</label>
+                        <input
+                          readonly
+                          name="nextHearingDate2{{i}}"
+                          id="nextHearingDate1{{i}}"
+                          type="text"
+                          class="form-control"
+                          [value]="hearingdetailsthree.next_hearing_date | date:'dd/MM/yyyy'"
+                          placeholder="Next Hearing Date"
+                        />
+                      </div>
+
+                      <!-- Item 91: Upload Judgement Copy -->
+                      <div class="col-md-4 mb-3">
+                        <label for="reasonNextHearing1{{i}}" class="form-label">88. Reason for Next Hearing *</label>
+                        <input
+                          readonly
+                          name="reasonNextHearing1{{i}}"
+                          id="reasonNextHearing1{{i}}"
+                          type="text"
+                          class="form-control"
+                          [value]="hearingdetailsthree.reason_next_hearing"
+                          placeholder="Reason for Next Hearing"
+                        />
+                      </div>
+                    </div>
+
+                  </div>
+
+
+                  <div class="col-md-4">
+                    <label for="judgementBeenAwardednxt2" class="form-label">89. Has a Judgement been awarded in the case? *</label>
+                    <input
+                      readonly
+                      name="judgementBeenAwardednxt2"
+                      id="judgementBeenAwardednxt2"
+                      type="text"
+                      class="form-control"
+                      [value]="judgementBeenAwardednxt2"
+                      placeholder="Has a Judgement been awarded in the case"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <div *ngIf="courtdetailstwodata[0]?.judgement_awarded?.toLowerCase() === 'yes'"
+            class="card border-primary mb-4">
+            <div *ngFor="let hearingdetailtwo of hearingdetailtwodata; let i = index" class="card-body">
               <h5>Judgement Details</h5>
               <div class="row align-items-center">
                 <div class="col-md-6">
                   <label class="form-label">11. Nature of Judgement *</label>
-                  <input type="text" class="form-control" placeholder="Enter Nature of Judgement" />
+                  <input
+                    readonly
+                    id="judgementNature_2nd_Accquitted"
+                    name="judgementNature_2nd_Accquitted"
+                    type="text"
+                    class="form-control"
+                    [value]="hearingdetailtwo.nature_of_judgement"
+                    placeholder="Enter Nature of Judgement"
+                  />
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">12. Upload Judgement Copy *</label>
-                  <input type="text" class="form-control" />
-                </div>
-              </div>
-              </div>
-            </div>
-            <div class="card border-primary mb-4">
-              <div class="card-body">
-              <h5 >Appeal Details</h5>
-              <div class="row align-items-center">
-                <div class="col-md-6">
-                  <label class="form-label">13. Has legal opinion obtained?</label>
                   <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter Yes or No"/>
+                    readonly
+                    id="judgementCopy1_2nd_Accquitted"
+                    name="judgementCopy1_2nd_Accquitted"
+                    type="text"
+                    class="form-control"
+                    [value]="judgementCopy1_2nd_Accquitted"
+                  />
                 </div>
-                <div class="col-md-6">
-                  <label class="form-label">15. Is the case fit for appeal?</label>
-                  <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter Yes or No"/>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">16. Has the government approved for appeal?</label>
-                  <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter Yes or No"/>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">17. Who has filed the appeal?</label>
-                  <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter Yes or No"/>
-                </div>
-              </div>
               </div>
             </div>
           </div>
         </div>
+
+
+        <!-- 3rd convicted -->
+        <!-- <div class="card border-primary mb-4">
+          <div class="card border-primary mb-4">
+            <div class="card-body">
+              <h5>3rd Convicted</h5>
+              <h5>Judgement Details</h5>
+              <div class="row align-items-center">
+                <div class="col-md-6">
+                  <label class="form-label">90. Nature of Judgement *</label>
+                  <input
+                    readonly
+                    name="natureOfJudgemen_3rdConvicted"
+                    id="natureOfJudgemen_3rdConvicted"
+                    type="text"
+                    class="form-control"
+                    [value]="natureOfJudgemen_3rdConvicted"
+                    placeholder="Enter Nature of Judgement"
+                  />
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">91. Upload Judgement Copy *</label>
+                  <input
+                    readonly
+                    name="judgementCopy_3rdConvicted"
+                    id="judgementCopy_3rdConvicted"
+                    type="text"
+                    class="form-control"
+                    [value]="judgementCopy_3rdConvicted"
+                    placeholder="Enter Judgement Copy Details"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card border-primary mb-4">
+              <div class="card-body">
+                <h5>Victim Relief Details</h5>
+
+                <div class="mb-4 col-lg-4">
+                  <label class="form-label">92. Name of the Victim *</label>
+                  <input
+                    readonly
+                    name="victimName4_3rdConvicted"
+                    id="victimName4_3rdConvicted"
+                    type="text"
+                    class="form-control mb-3"
+                    [value]="victimName4_3rdConvicted"
+                    placeholder="Enter Name of the Victim"
+                  />
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-8">
+                    <label class="form-label">
+                      93. Eligible third stage relief amount for the victim as per the SC and ST Prevention of Atrocities Act *
+                    </label>
+                  </div>
+                  <div class="col-4 text-end">
+                    <input
+                      readonly
+                      name="reliefAmount_3rdConvicted"
+                      id="reliefAmount_3rdConvicted"
+                      type="text"
+                      class="form-control text-end"
+                      [value]="reliefAmount_3rdConvicted"
+                      placeholder="Enter Amount"
+                    />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-8">
+                    <label class="form-label">
+                      94. Eligible third stage relief amount for the victim (ex-gratia) by the Govt. of Tamil Nadu *
+                    </label>
+                  </div>
+                  <div class="col-4 text-end">
+                    <input
+                      readonly
+                      name="reliefAmount2_3rdConvicted"
+                      id="reliefAmount2_3rdConvicted"
+                      type="text"
+                      class="form-control text-end"
+                      [value]="reliefAmount2_3rdConvicted"
+                      placeholder="Enter Amount"
+                    />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-8">
+                    <label class="form-label">95. Total Eligible amount for the victim for the Third stage of relief *</label>
+                  </div>
+                  <div class="col-4 text-end">
+                    <input
+                      readonly
+                      name="eligibleAmount_3rdConvicted"
+                      id="eligibleAmount_3rdConvicted"
+                      type="text"
+                      class="form-control text-end"
+                      [value]="eligibleAmount_3rdConvicted"
+                      placeholder="Enter Total Amount"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card border-primary mb-4">
+              <div class="card-body">
+                <div class="row mb-4">
+                  <div class="col-8">
+                    <label class="form-label">
+                      96. Total amount for third stage of compensation (total of relief across all victims) *
+                    </label>
+                  </div>
+                  <div class="col-4">
+                    <input
+                      readonly
+                      name="totalAmount_3rdConvicted"
+                      id="totalAmount_3rdConvicted"
+                      type="text"
+                      class="form-control text-end"
+                      [value]="totalAmount_3rdConvicted"
+                      placeholder="Enter Total Amount"
+                    />
+                  </div>
+                </div>
+
+                <div class="row mb-4">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">97. Proceedings File No. *</label>
+                    <input
+                      readonly
+                      name="proceedingsNo_3rdConvicted"
+                      id="proceedingsNo_3rdConvicted"
+                      type="text"
+                      class="form-control"
+                      [value]="proceedingsNo_3rdConvicted"
+                      placeholder="Enter File No."
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">98. Proceedings Date *</label>
+                    <input
+                      readonly
+                      name="proceedingsDate2_3rdConvicted"
+                      id="proceedingsDate2_3rdConvicted"
+                      type="text"
+                      class="form-control"
+                      [value]="proceedingsDate2_3rdConvicted"
+                    />
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label class="form-label">99. Upload Commissionerate / S.P. Office Proceedings *</label>
+                    <input
+                      readonly
+                      name="officeProceedings_3rdConvicted"
+                      id="officeProceedings_3rdConvicted"
+                      type="text"
+                      class="form-control"
+                      [value]="officeProceedings_3rdConvicted"
+                      placeholder="Enter Proceedings Details"
+                    />
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label">100. Upload Other Attachments (If any)</label>
+                  <div class="input-group mb-2">
+                    <input
+                      readonly
+                      name="otherAttachments_3rdConvicted"
+                      id="otherAttachments_3rdConvicted"
+                      type="text"
+                      class="form-control"
+                      [value]="otherAttachments_3rdConvicted"
+                      placeholder="Enter Attachment Details"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> -->
+
+
+         <!--1st convicted -->
+       <ng-container
+       *ngIf="
+         Judgementdata[0]?.nature_of_judgement === 'Convicted' ||
+         hearingdetailonedata[0]?.nature_of_judgement === 'Convicted' ||
+         hearingdetailtwodata[0]?.nature_of_judgement === 'Convicted'
+       "
+     >
+       <div class="card border-primary mb-4">
+         <div>
+           <div class="card border-primary mb-4">
+             <div *ngFor="let trialrelief of trialreliefdata; let i = index" class="card-body card border-primary mb-4">
+               <h5>1st Convicted</h5>
+               <h5>Victim Relief Details #{{ i + 1 }}</h5>
+
+               <!-- Item 92: Victim Name -->
+               <div class="mb-4 col-lg-4">
+                 <label for="victimName_1stConvicted{{i}}" class="form-label">92. Name of the Victim *</label>
+                 <input
+                   readonly
+                   name="victimName_1stConvicted{{i}}"
+                   id="victimName_1stConvicted{{i}}"
+                   type="text"
+                   class="form-control mb-3"
+                   [value]="trialrelief.victim_name"
+                   placeholder="Enter Name of the Victim"
+                 />
+               </div>
+
+               <!-- Item 93: Relief Amount as per SC/ST Act -->
+               <div class="row mb-3">
+                 <div class="col-8">
+                   <label for="reliefAmount_1stConvicted{{i}}" class="form-label">
+                     93. Eligible third stage relief amount for the victim as per the SC and ST Prevention of Atrocities Act *
+                   </label>
+                 </div>
+                 <div class="col-4 text-end">
+                   <input
+                     readonly
+                     name="reliefAmount_1stConvicted{{i}}"
+                     id="reliefAmount_1stConvicted{{i}}"
+                     type="text"
+                     class="form-control text-end"
+                     [value]="trialrelief.relief_amount_act"
+                     placeholder="Enter Amount"
+                   />
+                 </div>
+               </div>
+
+               <!-- Item 94: Relief Amount (Ex-Gratia) -->
+               <div class="row mb-3">
+                 <div class="col-8">
+                   <label for="reliefAmount_1stConvicted{{i}}" class="form-label">
+                     94. Eligible third stage relief amount for the victim (ex-gratia) by the Govt. of Tamil Nadu *
+                   </label>
+                 </div>
+                 <div class="col-4 text-end">
+                   <input
+                     readonly
+                     name="reliefAmount_1stConvicted{{i}}"
+                     id="reliefAmount_1stConvicted{{i}}"
+                     type="text"
+                     class="form-control text-end"
+                     [value]="trialrelief.relief_amount_government"
+                     placeholder="Enter Amount"
+                   />
+                 </div>
+               </div>
+
+               <!-- Item 95: Total Eligible Amount -->
+               <div class="row mb-3">
+                 <div class="col-8">
+                   <label for="eligibleAmount_1stConvicted{{i}}" class="form-label">
+                     95. Total Eligible amount for the victim for the Third stage of relief *
+                   </label>
+                 </div>
+                 <div class="col-4 text-end">
+                   <input
+                     readonly
+                     name="eligibleAmount_1stConvicted{{i}}"
+                     id="eligibleAmount_1stConvicted{{i}}"
+                     type="text"
+                     class="form-control text-end"
+                     [value]="trialrelief.relief_amount_final_stage"
+                     placeholder="Enter Total Amount"
+                   />
+                 </div>
+               </div>
+             </div>
+           </div>
+
+           <!-- Items 96 to 100 -->
+           <div class="card border-primary mb-4">
+             <div class="card-body">
+               <div *ngFor="let firtrail of firtraildata; let i = index" class="row mb-4">
+                 <!-- Total Compensation Amount -->
+                 <div class="row mb-4">
+                   <div class="col-8">
+                     <label for="totalAmount_1stConvicted{{i}}" class="form-label">
+                       96. Total amount for third stage of compensation (total of relief across all victims) *
+                     </label>
+                   </div>
+                   <div class="col-4">
+                     <input
+                       readonly
+                       name="totalAmount_1stConvicted{{i}}"
+                       id="totalAmount_1stConvicted{{i}}"
+                       type="text"
+                       class="form-control text-end"
+                       [value]="firtrail.total_amount_third_stage"
+                       placeholder="Enter Total Amount"
+                     />
+                   </div>
+                 </div>
+                 <div class="col-md-6 mb-3">
+                   <label for="proceedingsNo_1stConvicted{{i}}" class="form-label">97. Proceedings File No. *</label>
+                   <input
+                     readonly
+                     name="proceedingsNo_1stConvicted{{i}}"
+                     id="proceedingsNo_1stConvicted{{i}}"
+                     type="text"
+                     class="form-control"
+                     [value]="firtrail.total_amount_third_stage"
+                     placeholder="Enter File No."
+                   />
+                 </div>
+                 <div class="col-md-6 mb-3">
+                   <label for="proceedingsDate2_1stConvicted{{i}}" class="form-label">98. Proceedings Date *</label>
+                   <input
+                     readonly
+                     name="proceedingsDate2_1stConvicted{{i}}"
+                     id="proceedingsDate2_1stConvicted{{i}}"
+                     type="text"
+                     class="form-control"
+                     [value]="firtrail.proceedings_date"
+                   />
+                 </div>
+                 <div class="col-md-12 mb-3">
+                   <label for="officeProceedings_1stConvicted{{i}}" class="form-label">
+                     99. Upload Commissionerate / S.P. Office Proceedings *
+                   </label>
+                   <input
+                     readonly
+                     name="officeProceedings_1stConvicted{{i}}"
+                     id="officeProceedings_1stConvicted{{i}}"
+                     type="text"
+                     class="form-control"
+                     [value]="firtrail.Commissionerate_file"
+                     placeholder="Enter Proceedings Details"
+                   />
+                 </div>
+               </div>
+
+               <!-- Additional Attachments -->
+               <div class="mb-4">
+                 <label class="form-label">100. Upload Other Attachments (If any)</label>
+                 <div class="input-group mb-2">
+                   <input
+                     readonly
+                     name="otherAttachments_1stConvicted"
+                     id="otherAttachments_1stConvicted"
+                     type="text"
+                     class="form-control"
+                     [value]="otherAttachments_1stConvicted"
+                     placeholder="Enter Attachment Details"
+                   />
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+     </ng-container>
+
+
+
+        <!-- 3rd accquitted -->
+        <div *ngIf="hearingdetailtwodata[0]?.nature_of_judgement === 'Acquitted'"  class="card border-primary mb-4">
+          <div class="card-body">
+            <h5>3rd Acquitted</h5>
+            <h5>Appeal Details</h5>
+            <div *ngFor="let caseappealdetailstwo of caseappealdetailstwodata; let i = index" class="row align-items-center">
+              <!-- Has legal opinion obtained -->
+              <div class="col-md-6">
+                <label class="form-label">101. Has legal opinion obtained?</label>
+                <input
+                  readonly
+                  id="opinionObtained_3rdAccquitted"
+                  name="opinionObtained_3rdAccquitted"
+                  type="text"
+                  class="form-control"
+                  [value]="caseappealdetailstwo.legal_opinion_obtained"
+                  placeholder="Enter Yes or No"
+                />
+              </div>
+
+              <!-- Is the case fit for appeal -->
+              <div class="col-md-6 mt-3">
+                <label class="form-label">102. Is the case fit for appeal?</label>
+                <input
+                  readonly
+                  id="caseFit_3rdAccquitted"
+                  name="caseFit_3rdAccquitted"
+                  type="text"
+                  class="form-control"
+                  [value]="caseappealdetailstwo.case_fit_for_appeal"
+                  placeholder="Enter Yes or No"
+                />
+              </div>
+
+              <!-- Has the government approved for appeal -->
+              <div class="col-md-6 mt-3">
+                <label class="form-label">103. Has the government approved for appeal?</label>
+                <input
+                  readonly
+                  id="governmentApproved_3rdAccquitted"
+                  name="governmentApproved_3rdAccquitted"
+                  type="text"
+                  class="form-control"
+                  [value]="caseappealdetailstwo.government_approval_for_appeal"
+                  placeholder="Enter Yes or No"
+                />
+              </div>
+
+              <!-- Who has filed the appeal -->
+              <div class="col-md-6 mt-3">
+                <label class="form-label">104. Who has filed the appeal?</label>
+                <input
+                  readonly
+                  id="filedAppeal_3rdAccquitted"
+                  name="filedAppeal_3rdAccquitted"
+                  type="text"
+                  class="form-control"
+                  [value]="caseappealdetailstwo.filed_by"
+                  placeholder="Enter Victim or Government"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+
+
+
+
       </div>
 
 
     </div>
-    </div>
+  </div>
 
 
 
@@ -1539,3 +2870,6 @@
     <button type="button" class="btn btn-secondary me-2" (click)="modal.dismiss()">Close</button>
   </div>
 </ng-template>
+
+
+

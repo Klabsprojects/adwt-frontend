@@ -368,6 +368,7 @@ export class VmcmeetingComponent implements OnInit {
           text: `Form for ${this.selectedMeeting} submitted successfully.`,
           confirmButtonColor: '#3085d6',
         });
+        this.resetForm()
       },
       (error: any) => {
         console.error('Form submission failed:', error);
@@ -375,4 +376,19 @@ export class VmcmeetingComponent implements OnInit {
       }
     );
   }
+
+
+  resetForm(): void {
+    this.selectedCommittee = null;
+    this.selectedYear = '';
+    this.selectedMeeting = '';
+    
+    this.filteredAttendees = [];
+    const fileInput = document.getElementById('minutesUpload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+    this.ngOnInit();
+  }
+
 }

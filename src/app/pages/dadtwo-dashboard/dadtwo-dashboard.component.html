@@ -1,4 +1,4 @@
-<div class="card">
+<!-- <div class="card">
   <div class="card-header mt-0 p-4">
     <h2 class="card-title" style="font-size: 1.8rem; font-weight: 700">Relife DashBoard</h2>
   </div>
@@ -14,7 +14,7 @@
 			  </select>
 			</div>
 		  
-			<!-- Districts -->
+			
 			<div class="filter-item">
 			  <select class="filter-select" [(ngModel)]="selectedFilters.district" (change)="applyFilters()">
 				<option value="" disabled selected>Districts</option>
@@ -24,7 +24,7 @@
 			  </select>
 			</div>
 		  
-			<!-- Caste -->
+		
 			<div class="filter-item">
 			  <select class="filter-select" [(ngModel)]="selectedFilters.caste" (change)="applyFilters()">
 				<option value="" disabled selected>Caste</option>
@@ -34,7 +34,7 @@
 			  </select>
 			</div>
 		  
-			<!-- Subcaste -->
+		
 			<div class="filter-item">
 			  <select class="filter-select" [(ngModel)]="selectedFilters.subcaste" (change)="applyFilters()">
 				<option value="" disabled selected>Subcaste</option>
@@ -44,7 +44,7 @@
 			  </select>
 			</div>
 		  
-			<!-- Gender -->
+			
 			<div class="filter-item">
 			  <select class="filter-select" [(ngModel)]="selectedFilters.gender" (change)="applyFilters()">
 				<option value="" disabled selected>Gender</option>
@@ -54,7 +54,7 @@
 			  </select>
 			</div>
 		  
-			<!-- Date Filter -->
+
 			<div class="filter-item">
 			  <select class="filter-select" [(ngModel)]="selectedFilters.dateRange" (change)="onDateRangeChange()">
 				<option value="" disabled selected>Date</option>
@@ -62,16 +62,9 @@
 				<option value="week">This Week</option>
 				<option value="month">This Month</option>
 				<option value="year">This Year</option>
-				<!-- <option value="custom">Custom Range</option> -->
 			  </select>
 			</div>
 		  
-			<!-- Custom Date Range -->
-			<!-- <div class="filter-item" *ngIf="selectedFilters.dateRange === 'custom'">
-			  <input type="date" class="filter-input" [(ngModel)]="selectedFilters.customFromDate" placeholder="From Date" />
-			  <input type="date" class="filter-input" [(ngModel)]="selectedFilters.customToDate" placeholder="To Date" />
-			  <button class="apply-button" (click)="applyCustomDateRange()">Apply</button>
-			</div> -->
 		</div>
 
     <div class="row text-center">
@@ -189,19 +182,6 @@
       </div>
     </div>
     <div class="row mt-4">
-      <!-- <div class="col-md-6">
-        <div *ngFor="let stat of statistics" class="card mb-3 shadow-sm d-flex flex-row align-items-center">
-          <div class="p-3">
-            <img src="assets/icons/pendingCases.png" alt="Icon description" class="img-fluid" style="max-width: 120px"/>
-          </div>
-          <div class="p-3">
-            <h5 class="card-title" style="font-size: 1.275rem; font-weight: 500">{{ stat.description }}</h5>
-            <strong>{{ stat.value | number }}</strong>
-          </div>
-        </div>
-      </div> -->
-
-      
 
       <div class="col-md-12">
         <div class="card shadow-sm">
@@ -273,4 +253,7 @@
 
     </div>
   </div>
-</div>
+</div> -->
+
+
+<iframe title="attrocities" width="1200" height="800" src="https://app.powerbi.com/view?r=eyJrIjoiYzdhNzVmZmEtNTlmZi00MDExLTkxMjMtY2EyN2M2MmViODE2IiwidCI6ImI1OTZjYmNlLTBmNDktNDcyZi1iODgyLTAwZjFiZjNhMjI2MSJ9" frameborder="0" allowFullScreen="true"></iframe>

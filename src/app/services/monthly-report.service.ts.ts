@@ -5,9 +5,9 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class VmcMeetingService {
-  private baseUrl = 'https://adwatrocity.onlinetn.com/api/v1/vmcmeeting';
-  // private baseUrl = 'http://localhost:3010/vmcmeeting';
+export class MonthlyReportService {
+  private baseUrl = 'https://adwatrocity.onlinetn.com/api/v1/monthlyreport';
+  // private baseUrl = 'http://localhost:3010/monthlyreport';
 
   constructor(private http: HttpClient) {}
 
@@ -21,8 +21,7 @@ export class VmcMeetingService {
     district: string,
     subdivision: string,
     committee: string,
-    year: string
-  ): Observable<any> {
+    year: string): Observable<any> {
 
     const params = new HttpParams()
       .set('district', district)
@@ -79,5 +78,11 @@ export class VmcMeetingService {
     let body = Data;
     return this.http.post(`${this.baseUrl}/getAttendeesByDistrictbysk`, body);
   }
+
+
+  getReportdata(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/getmonthlyreportdetail`);
+  }
+
   
 }

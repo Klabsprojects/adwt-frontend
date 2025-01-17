@@ -278,7 +278,7 @@ export class FirListComponent implements OnInit {
   governmentApproved_3rdAccquitted: string = ''; // Default: Has the government approved for appeal
   filedAppeal_3rdAccquitted: string = ''; // Default: Who has filed the appeal
 
-  filteredList: any[] = [];
+
 
 
 
@@ -718,7 +718,6 @@ export class FirListComponent implements OnInit {
     this.firService.getFirList().subscribe(
       (data: any[]) => {
         this.firList = data;
-        this.filteredList = [...this.firList];
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -733,7 +732,6 @@ export class FirListComponent implements OnInit {
   applyFilters() {
     this.page = 1; // Reset to the first page
     this.cdr.detectChanges();
-    this.filteredFirList();
   }
 
   // Filtered FIR list based on search and filter criteria
@@ -769,14 +767,6 @@ export class FirListComponent implements OnInit {
         matchesStatusOfRelief
       );
     });
-  }
-
-  clearfilter(){
-    this.selectedDistrict = '';
-    this.selectedNatureOfOffence = '';
-    this.selectedStatusOfCase = '';
-    this.selectedStatusOfRelief = '';
-    this.applyFilters();
   }
 
 
@@ -856,11 +846,11 @@ getStatusBadgeClass(status: number): string {
   }
 
   // Pagination controls
-  // totalPagesArray(): number[] {
-  //   return Array(Math.ceil(this.filteredFirList().length / this.itemsPerPage))
-  //     .fill(0)
-  //     .map((_, i) => i + 1);
-  // }
+  totalPagesArray(): number[] {
+    return Array(Math.ceil(this.filteredFirList().length / this.itemsPerPage))
+      .fill(0)
+      .map((_, i) => i + 1);
+  }
 
   nextPage() {
     if (this.hasNextPage()) this.page++;
@@ -909,7 +899,7 @@ getStatusBadgeClass(status: number): string {
   // }
 
   openEditPage(firId: number) {
-    this.router.navigate(['/fir-edit-module'], { queryParams: { fir_id: firId } });
+    this.router.navigate(['/widgets-examples/fir-edit-module'], { queryParams: { fir_id: firId } });
   }
 
   navigateToMistakeOfFact(firId: number) {
@@ -920,29 +910,6 @@ getStatusBadgeClass(status: number): string {
     this.router.navigate(['/widgets-examples/altered-case'], { queryParams: { fir_id: firId } });
   }
 
-  totalPagesArray(): number[] {
-    const totalPages = Math.ceil(this.filteredFirList().length / this.itemsPerPage);
-    const pageNumbers = [];
-  
-    // Define how many pages to show before and after the current page
-    const delta = 2; // Number of pages to show before and after the current page
-  
-    // Calculate start and end page numbers
-    let startPage = Math.max(1, this.page - delta);
-    let endPage = Math.min(totalPages, this.page + delta);
-  
-    // Adjust start and end if there are not enough pages before or after
-    if (this.page <= delta) {
-      endPage = Math.min(totalPages, startPage + delta * 2);
-    } else if (this.page + delta >= totalPages) {
-      startPage = Math.max(1, endPage - delta * 2);
-    }
-  
-    for (let i = startPage; i <= endPage; i++) {
-      pageNumbers.push(i);
-    }
-  
-    return pageNumbers;
-  }
+
 
 }

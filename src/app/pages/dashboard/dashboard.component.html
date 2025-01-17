@@ -1,4 +1,4 @@
-<div class="card bg-secondary" >
+<!-- <div class="card bg-secondary" >
 	<div class="card-header mt-0 p-4">
 		<h2 class="card-title" style="font-size: 1.8rem;font-weight: 700;">Atrocity Case Dashboard</h2>
 	</div>
@@ -6,7 +6,6 @@
 	<div class="mt-2">
 
 		<div class="filter-bar-container">
-			<!-- Status of the Case -->
 			<div class="filter-item">
 			  <select class="filter-select" [(ngModel)]="selectedFilters.status" (change)="applyFilters()">
 				<option value="" disabled selected>Status of the Case</option>
@@ -16,7 +15,6 @@
 			  </select>
 			</div>
 
-			<!-- Districts -->
 			<div class="filter-item">
 			  <select class="filter-select" [(ngModel)]="selectedFilters.district" (change)="applyFilters()">
 				<option value="" disabled selected>Districts</option>
@@ -26,7 +24,6 @@
 			  </select>
 			</div>
 
-			<!-- Caste -->
 			<div class="filter-item">
 			  <select class="filter-select" [(ngModel)]="selectedFilters.caste" (change)="applyFilters()">
 				<option value="" disabled selected>Caste</option>
@@ -36,7 +33,6 @@
 			  </select>
 			</div>
 
-			<!-- Subcaste -->
 			<div class="filter-item">
 			  <select class="filter-select" [(ngModel)]="selectedFilters.subcaste" (change)="applyFilters()">
 				<option value="" disabled selected>Subcaste</option>
@@ -46,7 +42,6 @@
 			  </select>
 			</div>
 
-			<!-- Gender -->
 			<div class="filter-item">
 			  <select class="filter-select" [(ngModel)]="selectedFilters.gender" (change)="applyFilters()">
 				<option value="" disabled selected>Gender</option>
@@ -56,7 +51,6 @@
 			  </select>
 			</div>
 
-			<!-- Date Filter -->
 			<div class="filter-item">
 			  <select class="filter-select" [(ngModel)]="selectedFilters.dateRange" (change)="onDateRangeChange()">
 				<option value="" disabled selected>Date</option>
@@ -74,11 +68,9 @@
 
       </div>
 
-      <!-- Clear Filters Button -->
       <div class="filter-item">
         <button class="clear-button" (click)="clearFilters()">Clear Filters</button>
       </div>
-			<!-- Custom Date Range -->
 		</div>
 
   		<div class="row mt-4">
@@ -297,7 +289,6 @@
 							<h5 class="card-title" style="font-size: 18px;font-weight: 500;">District-Wise Case Pendency Map PT</h5>
 						</div>
 						<div class="card-body d-flex align-items-start">
-							<!-- SVG -->
 							<div class="svg-container">
 							  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1591.1 1975.3" width="500px">
 								<ng-container *ngFor="let district of districtData">
@@ -316,7 +307,6 @@
 							  </svg>
 							</div>
 
-							<!-- Legend -->
 							<div class="legend">
 							  <div class="legenditem">
 								<span class="dot" style="background-color: green;"></span> Normal
@@ -379,4 +369,8 @@
 </div>
 
 
-
+ -->
+ <!-- <iframe title="attrocities" width="1200" height="800" src="https://app.powerbi.com/view?r=eyJrIjoiNjRjNjc1M2UtMGNmNy00YjU0LTk4ZGYtYTVlNjBlODM0NzBmIiwidCI6ImI1OTZjYmNlLTBmNDktNDcyZi1iODgyLTAwZjFiZjNhMjI2MSJ9" frameborder="0" allowFullScreen="true"></iframe> -->
+ <iframe title="attrocities" width="1200" height="800"  src="https://app.powerbi.com/view?r=eyJrIjoiNzQzOTI0ODAtODhhOC00YjMyLTlhN2YtYWMyYTRiNjliMDdmIiwidCI6ImI1OTZjYmNlLTBmNDktNDcyZi1iODgyLTAwZjFiZjNhMjI2MSJ9" frameborder="0" allowFullScreen="true"></iframe>
+ <iframe title="attrocities" width="1200" height="800"  src="https://app.powerbi.com/view?r=eyJrIjoiYzdhNzVmZmEtNTlmZi00MDExLTkxMjMtY2EyN2M2MmViODE2IiwidCI6ImI1OTZjYmNlLTBmNDktNDcyZi1iODgyLTAwZjFiZjNhMjI2MSJ9" frameborder="0" allowFullScreen="true"></iframe>
+ <iframe title="attrocities" width="1200" height="1200" src="https://app.powerbi.com/view?r=eyJrIjoiNDljMmU3OWEtZDhiYy00NGFkLWE0MDktZmNjNGFmNGRhYTliIiwidCI6ImI1OTZjYmNlLTBmNDktNDcyZi1iODgyLTAwZjFiZjNhMjI2MSJ9" frameborder="0" allowFullScreen="true"></iframe>

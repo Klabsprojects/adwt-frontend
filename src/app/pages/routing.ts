@@ -78,6 +78,10 @@ export const Routing: Routes = [
     loadChildren: () => import('./permission/permission.module').then((m) => m.PermissionModule),
   },
   {
+    path: 'fir-edit-module',
+    loadChildren: () => import('../modules/widgets-examples/edit//edit-fir.module').then((m) => m.EditFirModule),
+  },
+  {
     path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full',

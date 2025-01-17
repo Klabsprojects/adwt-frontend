@@ -1,4 +1,4 @@
-<div class="card">
+<!-- <div class="card">
     <div class="card-header mt-0 p-4">
       <h2 class="card-title" style="font-size: 1.8rem; font-weight: 700">Meeting Dashboard</h2>
     </div>
@@ -8,36 +8,24 @@
               <div class="filter-item">
                 <select class="filter-select" [(ngModel)]="selectedFilters.status" (change)="applyFilters()">
                   <option value="" disabled selected>Financial Year</option>
-                  <!-- <option *ngFor="let option of filterOptions.status" [value]="option.key">
-                    {{ option.value }}
-                  </option> -->
                 </select>
               </div>
             
               <div class="filter-item">
                 <select class="filter-select" [(ngModel)]="selectedFilters.district" (change)="applyFilters()">
                   <option value="" disabled selected>Quarter</option>
-                  <!-- <option *ngFor="let option of filterOptions.district" [value]="option">
-                    {{ option }}
-                  </option> -->
                 </select>
               </div>
 
               <div class="filter-item">
                 <select class="filter-select" [(ngModel)]="selectedFilters.district" (change)="applyFilters()">
                   <option value="" disabled selected>District</option>
-                  <!-- <option *ngFor="let option of filterOptions.district" [value]="option">
-                    {{ option }}
-                  </option> -->
                 </select>
               </div>
             
               <div class="filter-item">
                 <select class="filter-select" [(ngModel)]="selectedFilters.caste" (change)="applyFilters()">
                   <option value="" disabled selected>Sub Division</option>
-                  <!-- <option *ngFor="let option of filterOptions.caste" [value]="option">
-                    {{ option }}
-                  </option> -->
                 </select>
               </div>
             
@@ -52,7 +40,6 @@
               <div class="card text-center mb-3">
                 <div style="padding: 0.5rem;border: 0.1px solid #f7f5f5;border-radius: 9px;"
                   class="card-body d-flex align-items-center justify-content-between">
-                  <!-- <img src="assets/icons/v1/totalCases.png" alt="Case Icon" class="img-fluid" style="max-width: 120px"/> -->
                   <div class="text-center" style="margin: auto">
                     <h5 class="card-title" style="font-size: 1.275rem; font-weight: 500">{{ card.title }}</h5>
                     <strong>{{ card.value }}</strong>
@@ -77,7 +64,6 @@
           <div class="card text-center mb-3">
             <div style="padding: 0.5rem;border: 0.1px solid #f7f5f5;border-radius: 9px;"
               class="card-body d-flex align-items-center justify-content-between">
-              <!-- <img src="assets/icons/v1/totalCases.png" alt="Case Icon" class="img-fluid" style="max-width: 120px"/> -->
               <div class="text-center" style="margin: auto">
                 <h5 class="card-title" style="font-size: 1.275rem; font-weight: 500">{{ card.title }}</h5>
                 <strong>{{ card.value }}</strong>
@@ -95,7 +81,6 @@
           <div class="card text-center mb-3">
             <div style="padding: 0.5rem;border: 0.1px solid #f7f5f5;border-radius: 9px;"
               class="card-body d-flex align-items-center justify-content-between">
-              <!-- <img src="assets/icons/v1/totalCases.png" alt="Case Icon" class="img-fluid" style="max-width: 120px"/> -->
               <div class="text-center" style="margin: auto">
                 <h5 class="card-title" style="font-size: 1.275rem; font-weight: 500">{{ card.title }}</h5>
                 <strong>{{ card.value }}</strong>
@@ -148,7 +133,7 @@
           <h5 class="card-title" style="font-size: 18px;font-weight: 500;">District Wise Meeting Distribution</h5>
         </div>
         <div class="card-body d-flex align-items-start">
-          <!-- SVG -->
+          
           <div class="svg-container">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1591.1 1975.3" height="300px" width="500px">
             <ng-container *ngFor="let district of districtData">
@@ -167,7 +152,7 @@
             </svg>
           </div>
   
-          <!-- Legend -->
+         
           <div class="legend">
             <div class="legenditem">
             <span class="dot" style="background-color: green;"></span> Normal
@@ -242,4 +227,6 @@
      
     </div>
   </div>
-  
+   -->
+
+   <iframe title="attrocities" width="1200" height="800" src="https://app.powerbi.com/view?r=eyJrIjoiNDljMmU3OWEtZDhiYy00NGFkLWE0MDktZmNjNGFmNGRhYTliIiwidCI6ImI1OTZjYmNlLTBmNDktNDcyZi1iODgyLTAwZjFiZjNhMjI2MSJ9" frameborder="0" allowFullScreen="true"></iframe>

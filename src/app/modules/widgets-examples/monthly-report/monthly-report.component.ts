@@ -6,6 +6,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import * as FileSaver from "file-saver";
+import * as moment from "moment";
+import * as xlsx from 'xlsx';
+import { MonthlyReportService } from 'src/app/services/monthly-report.service.ts';
 
 @Component({
   selector: 'app-monthly-report',
@@ -78,7 +82,14 @@ export class MonthlyReportComponent implements OnInit {
     { field: 'reasonCurrentMonth', label: 'Reason for Status (Current Month)', visible: true, sortable: false, sortDirection: null },
   ];
 
+  loading = false
+
   caseStatusOptions: string[] = ['Under Investigation', 'Pending Trial'];
+
+
+   constructor(private service: MonthlyReportService) {
+    this. getReportdata()
+   }
 
   ngOnInit(): void {
     this.generateDummyData();
@@ -222,4 +233,89 @@ export class MonthlyReportComponent implements OnInit {
     const startIndex = (this.page - 1) * this.itemsPerPage;
     return this.filteredData.slice(startIndex, startIndex + this.itemsPerPage);
   }
+
+  getReportdata(){
+    
+    this.service.getReportdata().subscribe(
+        (data) => {
+          console.log('Fetched report data data:', data); // Debug fetched data
+        },
+        (error) => {
+          console.error('Error fetching attendees:', error);
+          // Swal.fire('Error', 'Failed to fetch meeting data.', 'error');
+        }
+      );
+  }
+
+
+async onBtnExport(): Promise<void> {
+  try {
+    if (this.filteredData.length === 0) {
+      alert('No Data Found');
+      return;
+    }
+
+    this.loading = true;
+
+    // Filter columns based on visibility
+    const visibleColumns = this.displayedColumns.filter((column) => column.visible);
+
+    // Prepare data for export
+    const exportData = this.filteredData.map((item, index) => {
+      const exportedItem: any = { "S.No": index + 1 };
+
+      visibleColumns.forEach((column) => {
+        const key = column.field; // The key in the item to export
+        const label = column.label; // The label for the exported column
+
+        if (key in item) {
+          // Format specific fields if necessary
+          if (key === "uiPendingDays" || key === "ptPendingDays") {
+            exportedItem[label] = this.formatPendingDays(item[key]); // Corrected method name
+          } else {
+            exportedItem[label] = item[key];
+          }
+        }
+      });
+
+      return exportedItem;
+    });
+
+    // Export data to Excel
+    await this.exportExcel(exportData);
+  } catch (error) {
+    console.error('Export failed:', error);
+  } finally {
+    this.loading = false;
+  }
 }
+
+
+
+
+private async exportExcel(list: any[]): Promise<void> {
+  const xlsx = await import("xlsx");
+  const worksheet = xlsx.utils.json_to_sheet(list);
+  const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
+  const excelBuffer: any = xlsx.write(workbook, {
+    bookType: "xlsx",
+    type: "array",
+  });
+  this.saveAsExcelFile(excelBuffer, "All-Forms");
+}
+
+private saveAsExcelFile(buffer: any, fileName: string): void {
+  const EXCEL_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const EXCEL_EXTENSION = ".xlsx";
+  const data: Blob = new Blob([buffer], { type: EXCEL_TYPE });
+  FileSaver.saveAs(
+    data,
+    fileName + "_" + EXCEL_EXTENSION
+  );
+}
+
+
+}
+
+
+

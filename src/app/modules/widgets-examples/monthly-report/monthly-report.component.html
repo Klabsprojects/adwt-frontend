@@ -99,6 +99,7 @@
       </tbody>
     </table>
     <button class="btn btn-primary mt-3" (click)="saveData()">Save Changes</button>
+    <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()" >Download as Excel</button>
 
     <nav *ngIf="filteredData.length > itemsPerPage" class="d-flex justify-content-end mt-3">
       <ul class="pagination">
