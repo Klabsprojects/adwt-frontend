@@ -33,4 +33,8 @@ export class FirListTestService {
   getFirView(firId: number): Observable<any> {
     return this.http.get<any[]>(`${this.baseUrl1}/view?fir_id=${firId}`);
   }
+
+  getReportdata(): Observable<any> {
+    return this.http.get('http://localhost:3010/additionalreport/getadditionalreportdetail');
+  }
 }

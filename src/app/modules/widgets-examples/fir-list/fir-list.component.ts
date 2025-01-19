@@ -414,7 +414,8 @@ export class FirListComponent implements OnInit {
   ];
 
   statusesOfCase: string[] = ['Just Starting', 'Pending', 'Completed'];
-  statusesOfRelief: string[] = ['FIR Stage', 'ChargeSheet Stage', 'Trial Stage'];
+  // statusesOfRelief: string[] = ['FIR Stage', 'ChargeSheet Stage', 'Trial Stage'];
+  statusesOfRelief: any[] = [{value : 0 , label : 'FIR Stage'}, {value : 6 , label :'ChargeSheet Stage'} , {value : 7 , label : 'Trial Stage'}];
 
   // Visible Columns Management
 
@@ -596,15 +597,15 @@ export class FirListComponent implements OnInit {
           // need to know 79
           this.attachments1=data.queryResults[0].victim_name;
 
-          // this.designated=data.queryResults[0].court_name;
-          // this.presentCourt=data.queryResults[0].court_district;
-          // this.scNumber=data.queryResults[0].	trial_case_number;
-          // this.prosecutorName=data.queryResults[0].public_prosecutor;
-          // this.prosecutorPhoneNumber=data.queryResults[0].prosecutor_phone;
+          this.designated=data.queryResults[0].court_name;
+          this.presentCourt=data.queryResults[0].court_district;
+          this.scNumber=data.queryResults[0].trial_case_number;
+          this.prosecutorName=data.queryResults[0].public_prosecutor;
+          this.prosecutorPhoneNumber=data.queryResults[0].prosecutor_phone;
 
-          // this.hearingDate=data.queryResults[0].first_hearing_date;
-          // this.judgementAwarded=data.queryResults[0].judgement_awarded;
-          // this.nextHearingDate=data.queryResults[0].first_hearing_date;
+          this.hearingDate=data.queryResults[0].first_hearing_date;
+          this.judgementAwarded=data.queryResults[0].judgement_awarded;
+          this.nextHearingDate=data.queryResults[0].first_hearing_date;
 
 
 
@@ -740,6 +741,11 @@ export class FirListComponent implements OnInit {
   filteredFirList() {
     const searchLower = this.searchText.toLowerCase();
 
+    console.log(this.selectedDistrict,'this.selectedDistrict')
+    console.log(this.selectedNatureOfOffence,'this.selectedNatureOfOffence')
+    console.log(this.selectedStatusOfCase,'this.selectedStatusOfCase')
+    console.log(this.selectedStatusOfRelief,'this.selectedStatusOfRelief')
+
     return this.firList.filter((fir) => {
       // Apply search filter
       const matchesSearch =
@@ -748,18 +754,10 @@ export class FirListComponent implements OnInit {
         (fir.police_station || '').toLowerCase().includes(searchLower);
 
       // Apply dropdown filters
-      const matchesDistrict =
-        this.selectedDistrict ? fir.district === this.selectedDistrict : true;
-      const matchesNatureOfOffence =
-        this.selectedNatureOfOffence
-          ? fir.nature_of_offence === this.selectedNatureOfOffence
-          : true;
-      const matchesStatusOfCase =
-        this.selectedStatusOfCase ? fir.status_of_case === this.selectedStatusOfCase : true;
-      const matchesStatusOfRelief =
-        this.selectedStatusOfRelief
-          ? fir.status_of_relief === this.selectedStatusOfRelief
-          : true;
+      const matchesDistrict = this.selectedDistrict ? fir.police_city === this.selectedDistrict : true;
+      const matchesNatureOfOffence = this.selectedNatureOfOffence? fir.nature_of_offence === this.selectedNatureOfOffence: true;
+      const matchesStatusOfCase = this.selectedStatusOfCase ? fir.relief_status == this.selectedStatusOfCase : true;
+      const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status == this.selectedStatusOfRelief : true;
 
       return (
         matchesSearch &&
@@ -805,6 +803,7 @@ export class FirListComponent implements OnInit {
         : 'fa-sort-down'
       : 'fa-sort';
   }
+
 
   // Get status text based on status value
   getStatusText(status: number): string {

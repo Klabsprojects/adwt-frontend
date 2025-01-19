@@ -81,7 +81,7 @@ export class MonthlyReportService {
 
 
   getReportdata(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/getmonthlyreportdetail`);
+    return this.http.get(`${this.baseUrl}/getadditionalreportdetail`);
   }
 
   

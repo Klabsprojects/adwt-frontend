@@ -40,11 +40,11 @@
     <!-- Filters -->
     <div class="d-flex gap-3 mb-3">
       <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
-        <option value="" selected disabled>Select One</option>
+        <option value="" selected disabled>Police City</option>
         <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
       </select>
 
-      <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
+      <!-- <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
         <option value="" selected disabled>Select One</option>
         <option *ngFor="let nature of naturesOfOffence" [value]="nature">{{ nature }}</option>
       </select>
@@ -52,16 +52,16 @@
       <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
         <option value="" selected disabled>Select One</option>
         <option *ngFor="let status of statusesOfCase" [value]="status">{{ status }}</option>
-      </select>
+      </select> -->
 
       <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
-        <option value="" selected disabled>Select One</option>
-        <option *ngFor="let reliefStatus of statusesOfRelief" [value]="reliefStatus">
-          {{ reliefStatus }}
+        <option value="" selected disabled>Status</option>
+        <option *ngFor="let reliefStatus of statusesOfRelief" [value]="reliefStatus.value">
+          {{ reliefStatus.label }}
         </option>
       </select>
 
-      <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
+      <button style="width: 40% !important;" (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
     </div>
 
     <!-- Show message if FIR list is empty -->

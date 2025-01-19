@@ -88,7 +88,7 @@ export class MonthlyReportComponent implements OnInit {
 
 
    constructor(private service: MonthlyReportService) {
-    this. getReportdata()
+    this.getReportdata()
    }
 
   ngOnInit(): void {

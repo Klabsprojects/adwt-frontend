@@ -88,11 +88,11 @@ export class ReliefListComponent implements OnInit {
     this.updateDisplayedList();
   }
 
-  totalPagesArray(): number[] {
-    return Array(this.totalPages)
-      .fill(0)
-      .map((_, i) => i + 1);
-  }
+  // totalPagesArray(): number[] {
+  //   return Array(this.totalPages)
+  //     .fill(0)
+  //     .map((_, i) => i + 1);
+  // }
 
   // Get badge classes for the status
  // Get badge classes for the status
@@ -396,6 +396,31 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
     return this.page * this.itemsPerPage < this.filteredFirList().length;
   }
 
+
+  totalPagesArray(): number[] {
+    const totalPages = Math.ceil(this.filteredFirList().length / this.itemsPerPage);
+    const pageNumbers = [];
+  
+    // Define how many pages to show before and after the current page
+    const delta = 2; // Number of pages to show before and after the current page
+  
+    // Calculate start and end page numbers
+    let startPage = Math.max(1, this.page - delta);
+    let endPage = Math.min(totalPages, this.page + delta);
+  
+    // Adjust start and end if there are not enough pages before or after
+    if (this.page <= delta) {
+      endPage = Math.min(totalPages, startPage + delta * 2);
+    } else if (this.page + delta >= totalPages) {
+      startPage = Math.max(1, endPage - delta * 2);
+    }
+  
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+  
+    return pageNumbers;
+  }
 
 
 }

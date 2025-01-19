@@ -169,11 +169,13 @@ export class AdditionalReliefReportComponent implements OnInit{
     private firService: FirListTestService,
     private cdr: ChangeDetectorRef,
     private router: Router
-  ) {}
+  ) {
+    this.getReportdata()
+  }
 
   ngOnInit(): void {
     this.displayedColumns = [...this.defaultColumns];// Initialize default columns
-    this.loadDummyData(); // Load dummy data for testing
+    // this.loadDummyData(); // Load dummy data for testing
     this.loadFirList();
     this.updateSelectedColumns();
   }
@@ -350,5 +352,21 @@ export class AdditionalReliefReportComponent implements OnInit{
     const endIndex = this.page * this.itemsPerPage;
     return this.firList.slice(startIndex, endIndex); // Returns the items for the current page
   }
+
+
+  getReportdata(){
+    
+    this.firService.getReportdata().subscribe(
+        (data : any) => {
+          console.log('Fetched report data data:', data);
+          this.filteredData = data.Data;
+        },
+        (error : any) => {
+          console.error('Error fetching attendees:', error);
+          // Swal.fire('Error', 'Failed to fetch meeting data.', 'error');
+        }
+      );
+  }
+
 }
 
