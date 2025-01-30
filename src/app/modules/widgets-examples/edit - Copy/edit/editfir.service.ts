@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,8 @@ export class FirServiceAPI {
   getVictimDetailsByFirId(firId: string) {
     throw new Error('Method not implemented.');
   }
-  private baseUrl = 'http://localhost:3000/fir';
+  private baseUrl = 'http://localhost:3010/fir';
+  // private baseUrl = 'https://adwatrocity.onlinetn.com/api/v1/fir';
   // Adjust this to your actual API base URL
 
   constructor(private http: HttpClient) {}
@@ -80,7 +82,7 @@ export class FirServiceAPI {
 
 
   getAllCommunities(): Observable<string[]> {
-    return this.http.get<string[]>('http://localhost:3000/fir/communities');
+    return this.http.get<string[]>(`${this.baseUrl}/communities`);
   }
 
   getCastesByCommunity(community: string): Observable<string[]> {

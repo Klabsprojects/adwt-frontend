@@ -18,7 +18,6 @@ import { FirService } from 'src/app/services/fir.service';
 import Swal from 'sweetalert2';
 import { MatRadioModule } from '@angular/material/radio';
 import Tagify from '@yaireo/tagify';
-import { FirServiceAPI } from './editfir.service'
 declare var $: any;
 
 interface HearingDetail {
@@ -88,6 +87,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   step: number = 1;
   firForm: FormGroup;
   firId: string | null = null;
+  chargesheet_id: string | null = null;
 
 
   case_id: string | undefined = '';
@@ -175,8 +175,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
     private firService: FirService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
-    private router: Router,
-    private APIservice: FirServiceAPI,
+    private router: Router
   ) {}
 
   onDrop1(event: DragEvent): void {
@@ -285,21 +284,21 @@ export class EditFirComponent implements OnInit, OnDestroy {
     this.removeAttachmentFromBackend1(attachmentIdToDelete);
   }
   removeAttachmentFromBackend1(id: number): void {
-    this.APIservice.removeAttachmentFromBackend1(id).subscribe(
-      (response : any) => {
+    this.firService.removeAttachmentFromBackend1(id).subscribe(
+      response => {
         console.log('Attachment removed successfully:', response);
       },
-      (error : any) => {
+      error => {
         console.error('Error removing attachment:', error);
       }
     );
   }
   removeAttachmentFromBackend(id: number): void {
-    this.APIservice.removeAttachmentFromBackend(id).subscribe(
-      (response : any) => {
+    this.firService.removeAttachmentFromBackend(id).subscribe(
+      response => {
         console.log('Attachment removed successfully:', response);
       },
-      (error : any) => {
+      error => {
         console.error('Error removing attachment:', error);
       }
     );
@@ -614,10 +613,10 @@ export class EditFirComponent implements OnInit, OnDestroy {
     const caseType = this.firForm.get('caseType')?.value;
 
     if (caseType === 'chargeSheet') {
-      this.firForm.get('proceedingsFileNo_1')?.setValidators([Validators.required]);
-      this.firForm.get('proceedingsDate_1')?.setValidators([Validators.required]);
-      this.firForm.get('uploadProceedings_1')?.setValidators([Validators.required]);
-      this.firForm.get('attachments_1')?.setValidators([Validators.required]);
+      // this.firForm.get('proceedingsFileNo_1')?.setValidators([Validators.required]);
+      // this.firForm.get('proceedingsDate_1')?.setValidators([Validators.required]);
+      // this.firForm.get('uploadProceedings_1')?.setValidators([Validators.required]);
+      // this.firForm.get('attachments_1')?.setValidators([Validators.required]);
 
       // Disable RCS specific fields if it's a chargeSheet
       this.firForm.get('rcsFileNumber')?.clearValidators();
@@ -631,9 +630,9 @@ export class EditFirComponent implements OnInit, OnDestroy {
       this.firForm.get('attachments_1')?.clearValidators();
 
       // Add required validators for RCS fields
-      this.firForm.get('rcsFileNumber')?.setValidators([Validators.required]);
-      this.firForm.get('rcsFilingDate')?.setValidators([Validators.required]);
-      this.firForm.get('mfCopy')?.setValidators([Validators.required]);
+      // this.firForm.get('rcsFileNumber')?.setValidators([Validators.required]);
+      // this.firForm.get('rcsFilingDate')?.setValidators([Validators.required]);
+      // this.firForm.get('mfCopy')?.setValidators([Validators.required]);
     }
 
     // Update the form controls after changing validators
@@ -699,7 +698,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   }
   loadFirDetails(firId: string): void {
 
-    this.APIservice.getFirDetails(firId).subscribe(
+    this.firService.getFirDetails(firId).subscribe(
       (response) => {
 
         console.log("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",response);
@@ -876,7 +875,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
 
 
 
-        if (response.data4.all_attachments) {
+        if (response && response.data4 && response.data4.all_attachments) {
           try {
             // Split the concatenated string by commas to get each attachment's id and file path
             const allFilesArray: { chargesheet_attachment_id: number, file_path: string }[] = response.data4.all_attachments.split(',').map((attachment: string) => {
@@ -891,7 +890,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
           }
         }
         
-        if (response.data3.all_attachments) {
+        if (response && response.data3 && response.data3.all_attachments) {
           try {
             // Split the concatenated string by commas to get each attachment's id and file path
             const allFilesArray: { chargesheet_attachment_id: number, file_path: string }[] = response.data3.all_attachments.split(',').map((attachment: string) => {
@@ -922,10 +921,10 @@ export class EditFirComponent implements OnInit, OnDestroy {
         //   }
         // }
 
-        if(response.data.number_of_victim){ 
+        if(response && response.data && response.data.number_of_victim){ 
           this.firForm.get('complainantDetails.numberOfVictims')?.setValue(response.data.number_of_victim); 
         }
-        if(response.data.is_deceased){ 
+        if(response && response.data && response.data.is_deceased){ 
           if(response.data.is_deceased == 1){
             this.firForm.get('isDeceased')?.setValue("yes");
           }
@@ -934,7 +933,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
           }
         }
 
-        if (response.data.deceased_person_names) {
+        if (response && response.data && response.data.deceased_person_names) {
           let deceased_person_names: any[] = [];
           if (typeof response.data.deceased_person_names === 'string') {
             try {
@@ -950,35 +949,35 @@ export class EditFirComponent implements OnInit, OnDestroy {
           this.firForm.get('deceasedPersonNames')?.setValue(deceased_person_names);
         }
 
-        if (response.data.number_of_accused) {
+        if (response && response.data && response.data.number_of_accused) {
           this.firForm.get('numberOfAccused')?.setValue(response.data.number_of_accused);
         }
 
           // 1. Total Compensation
-          if (response.data3.total_compensation) {
+          if (response && response.data3 && response.data3.total_compensation) {
             this.firForm.get('totalCompensation')?.setValue(response.data3.total_compensation);
           }
 
           // 2. Proceedings File No.
-          if (response.data3.proceedings_file_no) {
+          if (response && response.data3 && response.data3.proceedings_file_no) {
             this.firForm.get('proceedingsFileNo')?.setValue(response.data3.proceedings_file_no);
           }
 
           // 3. Proceeding File (judgement file URL)
-          if (response.data3.proceedings_file) {
+          if (response && response.data3 && response.data3.proceedings_file) {
             this.firForm.get('proceedingsFile')?.setValue(response.data3.proceedings_file);
           }
 
           // 4. Proceedings Date
-          if (response.data3.proceedings_date) {
+          if (response && response.data3 && response.data3.proceedings_date) {
             const dateObj = new Date(response.data3.proceedings_date);
             const formattedDate = dateObj.toISOString().split('T')[0]; // Format to 'yyyy-mm-dd'
             this.firForm.get('proceedingsDate')?.setValue(formattedDate);
           }
+
           const chargesheetDetails = response.data4;
-          console.log(chargesheetDetails);
-          if (chargesheetDetails.charge_sheet_filed) {
-            if(chargesheetDetails.charge_sheet_filed == "yes")
+          if (chargesheetDetails && chargesheetDetails.charge_sheet_filed) {
+            if(chargesheetDetails && chargesheetDetails.charge_sheet_filed == "yes")
             {
               this.firForm.get('chargeSheetFiled')?.setValue("yes");
             }
@@ -987,59 +986,63 @@ export class EditFirComponent implements OnInit, OnDestroy {
             }
             
           }
-        // Set the court district, name, case type, and case number if they exist
-        if (chargesheetDetails.court_district) {
+
+          if(chargesheetDetails && chargesheetDetails.chargesheet_id){
+            this.chargesheet_id = chargesheetDetails.chargesheet_id;
+          }
+
+        if (chargesheetDetails && chargesheetDetails.court_district) {
           this.firForm.get('courtDivision')?.setValue(chargesheetDetails.court_district);
           this.onCourtDivisionChange1(chargesheetDetails.court_district);
         }
-        if (chargesheetDetails.court_name) { 
+        if (chargesheetDetails && chargesheetDetails.court_name) { 
           this.firForm.get('courtName')?.setValue(chargesheetDetails.court_name);
         }
-        if (chargesheetDetails.case_type) {
+        if (chargesheetDetails && chargesheetDetails.case_type) {
           this.firForm.get('caseType')?.setValue(chargesheetDetails.case_type);
         }
-        if (chargesheetDetails.case_number) {
+        if (chargesheetDetails && chargesheetDetails.case_number) {
           this.firForm.get('caseNumber')?.setValue(chargesheetDetails.case_number);
         }
 
         // Set RCS file number and filing date
-        if (chargesheetDetails.rcs_file_number) {
+        if (chargesheetDetails && chargesheetDetails.rcs_file_number) {
           this.firForm.get('rcsFileNumber')?.setValue(chargesheetDetails.rcs_file_number);
         }
-        if (chargesheetDetails.rcs_filing_date) {
+        if (chargesheetDetails && chargesheetDetails.rcs_filing_date) {
           const rcsFilingDate = new Date(chargesheetDetails.rcs_filing_date);
           const formattedDate = rcsFilingDate.toISOString().split('T')[0];
           this.firForm.get('rcsFilingDate')?.setValue(formattedDate);
         }
 
-        if (response.data4.total_compensation_1) {
+        if (response && response.data4 && response.data4.total_compensation_1) {
           this.firForm.get('totalCompensation_1')?.setValue(response.data4.total_compensation_1);
         } 
-        if (response.data4.proceedings_file_no) {
+        if (response && response.data4 && response.data4.proceedings_file_no) {
           console.log(response.data4.proceedings_file_no);
           console.log("response.data4.proceedings_file_no");
           this.firForm.get('proceedingsFileNo_1')?.setValue(response.data4.proceedings_file_no);
         }
 
         // 3. Proceeding File (judgement file URL)
-        if (response.data4.upload_proceedings_path) { 
+        if (response && response.data4 && response.data4.upload_proceedings_path) { 
           this.firForm.get('uploadProceedings_1')?.setValue(response.data4.upload_proceedings_path);
         }
 
           // 4. Proceedings Date
-          if (response.data4.proceedings_date) {
+          if (response && response.data4 && response.data4.proceedings_date) {
             const dateObj = new Date(response.data4.proceedings_date);
             const formattedDate = dateObj.toISOString().split('T')[0]; // Format to 'yyyy-mm-dd'
             this.firForm.get('proceedingsDate_1')?.setValue(formattedDate);
           }
           
           
-        if (response.data1 && response.data1.length > 0) {
+        if (response && response.data1 && response.data1 && response.data1.length > 0) {
           // Resetting the victims array in case of a previous value
           const victimsFormArray = this.firForm.get('victims') as FormArray;
           victimsFormArray.clear(); // Clear any existing victims data
 
-          response.data1.forEach((victim: any) => {
+          response.data1.forEach((victim: any, index: number) => {
             const victimGroup = this.createVictimGroup();
             let offence_committed_data: any[] = [];
             let scst_sections_data: any[] = [];
@@ -1066,14 +1069,16 @@ export class EditFirComponent implements OnInit, OnDestroy {
               nativeDistrict: victim.native_district,
               offenceCommitted: offence_committed_data,
               scstSections: scst_sections_data,
-              sectionsIPC: victim.sections_ipc
+              sectionsIPC: victim.sectionsIPC
             });
         
             victimsFormArray.push(victimGroup);
+
+            this.onVictimAgeChange(index)
           });       
         }
 
-        if (response.data2 && response.data2.length > 0) {
+        if (response && response.data2 && response.data2.length > 0) {
           const accusedFormArray = this.firForm.get('accuseds') as FormArray;
           accusedFormArray.clear(); 
           response.data2.forEach((accused: any) => {
@@ -1442,7 +1447,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
       // alphabetSelection: ['', Validators.required],
       // stationNumber: ['', Validators.required],
       stationName: ['', Validators.required],
-      uploadProceedings_1: ['', Validators.required],
+      uploadProceedings_1: [''],
       proceedingsFile: ['', Validators.required],
       officerName: ['', [Validators.required, Validators.pattern('^[A-Za-z\\s]*$')]], // Name validation
       officerDesignation: ['', Validators.required], // Dropdown selection
@@ -1485,7 +1490,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
       reliefAmountScst: ['', Validators.required],
       reliefAmountExGratia: ['', Validators.required],
       reliefAmountFirstStage: ['', Validators.required],
-      reliefAmountSecondStage: ['', Validators.required],
+      reliefAmountSecondStage: [''],
       totalCompensation: ['', Validators.required],
       additionalRelief: [[], Validators.required],
 
@@ -2212,7 +2217,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   }
 
   loadScstSections() {
-    this.APIservice.getCastes().subscribe(
+    this.firService.getCastes().subscribe(
       (sections: any) => {
         this.scstSectionsOptions = sections.map((section: any) => section.caste_name);
       },
@@ -2238,7 +2243,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   // }
 
   loadPoliceDivisionDetails() {
-    this.APIservice.getPoliceDivisionedit().subscribe(
+    this.firService.getPoliceDivisionedit().subscribe(
       (data: any) => {
         
         this.policeCities = data.district_division_name || [];
@@ -2367,63 +2372,107 @@ export class EditFirComponent implements OnInit, OnDestroy {
   }
 
 
-  isStep6Valid(): boolean { 
+  // isStep6Valid(): boolean { 
 
+  //   const controls = [
+  //     'chargeSheetFiled',
+  //     'courtDivision',
+  //     'courtName',
+  //     'caseType',
+  //     'caseNumber',
+  //     'reliefAmountScst_1',
+  //     'reliefAmountExGratia_1',
+  //     'reliefAmountSecondStage',
+  //     'totalCompensation_1',
+  //     'proceedingsFileNo_1',   // Added fields for chargeSheet
+  //     'proceedingsDate_1',      // Added fields for chargeSheet
+  //     'uploadProceedings_1',    // Added fields for chargeSheet
+  //     'file_1',                 // Added fields for chargeSheet
+  //   ];
+
+  //   let caseType = this.firForm.get('caseType')?.value;  // Get the selected case type 
+
+  //   // Add conditional validation logic based on caseType
+  //   if (caseType === 'chargeSheet') {
+  //     // Add fields specific to chargeSheet case type
+  //     controls.push(
+  //       'chargeSheetFiled',
+  //       'courtDivision',
+  //       'courtName',
+  //       'reliefAmountScst_1',
+  //       'reliefAmountExGratia_1',
+  //       'reliefAmountSecondStage',
+  //       'totalCompensation_1',
+  //       'proceedingsFileNo_1',
+  //       'proceedingsDate_1',
+  //       'uploadProceedings_1',
+  //       'file_1'
+  //     );
+  //   } else if (caseType === 'referredChargeSheet') {
+  //     // Add fields specific to referredChargeSheet case type
+  //     controls.push('rcsFileNumber', 'rcsFilingDate', 'mfCopy');
+  //   }
+
+  //   // Perform validation for all fields based on the controls array
+  //   let allValid = controls.every((controlName) => {
+  //     const control = this.firForm.get(controlName);
+  //     if (control) {
+  //       // Mark control as touched to trigger validation
+  //       control.markAsTouched();
+
+  //       if (!control.valid) {
+  //         // console.log(`${controlName} is invalid`, control.errors);  // Log specific errors for each control
+  //       }
+  //     }
+  //     return control ? control.valid : true;
+  //   });
+
+  //   return allValid;
+  // }
+
+  isStep6Valid(): boolean { 
     const controls = [
       'chargeSheetFiled',
       'courtDivision',
       'courtName',
       'caseType',
-      'caseNumber',
-      'reliefAmountScst_1',
-      'reliefAmountExGratia_1',
-      'reliefAmountSecondStage',
-      'totalCompensation_1',
-      'proceedingsFileNo_1',   // Added fields for chargeSheet
-      'proceedingsDate_1',      // Added fields for chargeSheet
-      'uploadProceedings_1',    // Added fields for chargeSheet
-      'file_1',                 // Added fields for chargeSheet
+      'caseNumber',               
     ];
-
+  
     let caseType = this.firForm.get('caseType')?.value;  // Get the selected case type 
-
+  
     // Add conditional validation logic based on caseType
     if (caseType === 'chargeSheet') {
-      // Add fields specific to chargeSheet case type
       controls.push(
         'chargeSheetFiled',
         'courtDivision',
         'courtName',
-        'reliefAmountScst_1',
-        'reliefAmountExGratia_1',
-        'reliefAmountSecondStage',
-        'totalCompensation_1',
-        'proceedingsFileNo_1',
-        'proceedingsDate_1',
-        'uploadProceedings_1',
-        'file_1'
       );
     } else if (caseType === 'referredChargeSheet') {
-      // Add fields specific to referredChargeSheet case type
       controls.push('rcsFileNumber', 'rcsFilingDate', 'mfCopy');
     }
-
-    // Perform validation for all fields based on the controls array
-    let allValid = controls.every((controlName) => {
+  
+    let allValid = true;
+  
+    // Validate each field in the controls array
+    controls.forEach((controlName) => {
       const control = this.firForm.get(controlName);
       if (control) {
-        // Mark control as touched to trigger validation
-        control.markAsTouched();
-
+        control.markAsTouched(); // Mark field as touched to trigger validation
+  
         if (!control.valid) {
-          // console.log(`${controlName} is invalid`, control.errors);  // Log specific errors for each control
+          console.log(`Invalid Field: ${controlName}`, control.errors); // Log errors for invalid fields
+          allValid = false;
         }
+      } else {
+        console.log(`Missing control in form: ${controlName}`); // Log if a control is not found
+        allValid = false;
       }
-      return control ? control.valid : true;
     });
-
+  
     return allValid;
   }
+  
 
   removeAttachment_1(index: number): void {
     if (this.attachments_1.length > 1) {
@@ -2844,10 +2893,6 @@ export class EditFirComponent implements OnInit, OnDestroy {
       status: isSubmit ? 7 : undefined,
     };
 
-
-
-    console.log("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",formFields);
-
     
 
     // const formData = new FormData(); 
@@ -2876,8 +2921,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
     // }
     // const formDataObject = this.formDataToObject(formData);  
 
-    this.APIservice.editStepSevenAsDraft(formFields).subscribe({
-      next: (response : any) => {
+    this.firService.editStepSevenAsDraft(formFields).subscribe({
+      next: (response) => {
         if (isSubmit) {
           Swal.fire({
             title: 'Success',
@@ -2891,7 +2936,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
           Swal.fire('Success', 'Step 5 data saved as draft successfully', 'success');
         }
       },
-      error: (error : any) => {
+      error: (error) => {
         console.error('Error saving Step 5 data:', error);
         Swal.fire('Error', 'Failed to save Step 5 data', 'error');
       }
@@ -2928,37 +2973,45 @@ export class EditFirComponent implements OnInit, OnDestroy {
     });
     // Prepare data to be sent to the backend
     const chargesheetData = {
-      firId: this.firId, 
-        chargeSheetFiled: this.firForm.get('chargeSheetFiled')?.value || '',
-        courtDivision: this.firForm.get('courtDivision')?.value || '',
-        courtName: this.firForm.get('courtName')?.value || '',
-        caseType: this.firForm.get('caseType')?.value || '',
-        caseNumber: this.firForm.get('caseType')?.value === 'chargeSheet'
-          ? this.firForm.get('caseNumber')?.value || ''
-          : null,
-        rcsFileNumber: this.firForm.get('caseType')?.value === 'referredChargeSheet'
-          ? this.firForm.get('rcsFileNumber')?.value || ''
-          : null,
-        rcsFilingDate: this.firForm.get('caseType')?.value === 'referredChargeSheet'
-          ? this.firForm.get('rcsFilingDate')?.value || null
-          : null,
-        mfCopyPath: this.firForm.get('mfCopy')?.value || '',
-        totalCompensation: parseFloat(this.firForm.get('totalCompensation_1')?.value || '0.00').toFixed(2),
-        proceedingsFileNo: this.firForm.get('proceedingsFileNo_1')?.value || '',
-        proceedingsDate: this.firForm.get('proceedingsDate_1')?.value || null,
-        // uploadProceedingsPath: this.firForm.get('uploadProceedings_1')?.value || '',
-      victimsRelief: this.victimsRelief.value.map((relief: any, index: number) => ({
-        victimId: relief.victimId || null,
-        victimName: this.victimNames[index] || '',
-        reliefAmountScst: parseFloat(relief.reliefAmountScst_1 || '0.00').toFixed(2),
-        reliefAmountExGratia: parseFloat(relief.reliefAmountExGratia_1 || '0.00').toFixed(2),
-        reliefAmountSecondStage: parseFloat(relief.reliefAmountSecondStage || '0.00').toFixed(2),
-      })),
-      attachments: this.attachments_1.value.map((attachment: any) => ({
-        fileName: attachment.fileName_1 || null,
-        filePath: attachment.file_1 || null,
-      })),
-      status: 6, // Update status to 6 for the FIR
+        firId: this.firId, 
+
+        chargesheetDetails: {
+          chargesheet_id: this.chargesheet_id, 
+          chargeSheetFiled: this.firForm.get('chargeSheetFiled')?.value || '',
+          courtDivision: this.firForm.get('courtDivision')?.value || '',
+          courtName: this.firForm.get('courtName')?.value || '',
+          caseType: this.firForm.get('caseType')?.value || '',
+          caseNumber: this.firForm.get('caseType')?.value === 'chargeSheet'
+            ? this.firForm.get('caseNumber')?.value || ''
+            : null,
+          rcsFileNumber: this.firForm.get('caseType')?.value === 'referredChargeSheet'
+            ? this.firForm.get('rcsFileNumber')?.value || ''
+            : null,
+          rcsFilingDate: this.firForm.get('caseType')?.value === 'referredChargeSheet'
+            ? this.firForm.get('rcsFilingDate')?.value || null
+            : null,
+          mfCopyPath: this.firForm.get('mfCopy')?.value || '',
+          totalCompensation: parseFloat(this.firForm.get('totalCompensation_1')?.value || '0.00').toFixed(2),
+          proceedingsFileNo: this.firForm.get('proceedingsFileNo_1')?.value || '',
+          proceedingsDate: this.firForm.get('proceedingsDate_1')?.value || null,
+          // uploadProceedingsPath: this.firForm.get('uploadProceedings_1')?.value || '',
+        },
+
+        victimsRelief: this.victimsRelief.value.map((relief: any, index: number) => ({
+          victimId: relief.victimId || null,
+          victimName: this.victimNames[index] || '',
+          reliefAmountScst: parseFloat(relief.reliefAmountScst_1 || '0.00').toFixed(2),
+          reliefAmountExGratia: parseFloat(relief.reliefAmountExGratia_1 || '0.00').toFixed(2),
+          reliefAmountSecondStage: parseFloat(relief.reliefAmountSecondStage || '0.00').toFixed(2),
+        })),
+
+        attachments: this.attachments_1.value.map((attachment: any) => ({
+          fileName: attachment.fileName_1 || null,
+          filePath: attachment.file_1 || null,
+        })),
+        
+        status: 6, // Update status to 6 for the FIR
+      
     };
 
     // const formData = new FormData(); 
@@ -2979,6 +3032,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
     // }
 
     // Call the service to send data to the backend
+
+    console.log("rrrrrrrrrrrrrrrr",chargesheetData);
 
     
     this.firService.saveStepSixAsDraft(chargesheetData).subscribe(
@@ -3172,7 +3227,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
     // Check if the 'isDeceased' and 'deceasedPersonNames' fields are valid
     const isDeceased = this.firForm.get('isDeceased')?.value;
     const isDeceasedValid = isDeceased !== '' &&
-                            (isDeceased === 'no' || (this.firForm.get('deceasedPersonNames')?.valid === true));
+      (isDeceased === 'no' || (this.firForm.get('deceasedPersonNames')?.valid === true));
 
     // Ensure all conditions return a boolean
     return Boolean(isComplainantValid && victimsValid && isDeceasedValid);
@@ -3238,16 +3293,54 @@ export class EditFirComponent implements OnInit, OnDestroy {
 
 
 
+  // isStep4Valid(): boolean {
+  //   const numberOfAccusedValid = !!this.firForm.get('numberOfAccused')?.valid;
+  //   const accusedsArray = this.firForm.get('accuseds') as FormArray;
+
+  //   // Check if all accused form groups are valid
+  //   const accusedsValid = accusedsArray.controls.every((accusedGroup) => !!accusedGroup.valid);
+
+  //   // Return true only if both conditions are satisfied
+  //   return numberOfAccusedValid && accusedsValid;
+  // }
+
   isStep4Valid(): boolean {
-    const numberOfAccusedValid = !!this.firForm.get('numberOfAccused')?.valid;
+    const numberOfAccusedControl = this.firForm.get('numberOfAccused');
     const accusedsArray = this.firForm.get('accuseds') as FormArray;
-
-    // Check if all accused form groups are valid
-    const accusedsValid = accusedsArray.controls.every((accusedGroup) => !!accusedGroup.valid);
-
-    // Return true only if both conditions are satisfied
-    return numberOfAccusedValid && accusedsValid;
+  
+    let isValid = true;
+  
+    // Check if 'numberOfAccused' control exists and is valid
+    if (!numberOfAccusedControl || !numberOfAccusedControl.valid) {
+      console.log('Invalid Field: numberOfAccused', numberOfAccusedControl?.errors);
+      isValid = false;
+    }
+  
+    // Ensure 'accuseds' is a FormArray before proceeding
+    if (accusedsArray instanceof FormArray) {
+      accusedsArray.controls.forEach((accusedControl, index) => {
+        const accusedGroup = accusedControl as FormGroup; // Explicitly cast to FormGroup
+        if (!accusedGroup.valid) {
+          console.log(`Invalid Field in accuseds[${index}]:`, accusedGroup.errors);
+          
+          Object.keys(accusedGroup.controls).forEach((field) => {
+            const fieldControl = accusedGroup.get(field);
+            if (fieldControl && !fieldControl.valid) {
+              console.log(`Invalid accuseds[${index}].${field}:`, fieldControl.errors);
+            }
+          });
+  
+          isValid = false;
+        }
+      });
+    } else {
+      console.log('accuseds is not a FormArray');
+      isValid = false;
+    }
+  
+    return isValid;
   }
+  
 
   isStep5Valid(): boolean {
     const victimsReliefArray = this.victimsRelief as FormArray;
@@ -3323,8 +3416,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
 
     if (previousIncident) {
       // If "Yes", make the previous FIR fields required
-      accused.get('previousFIRNumber')?.setValidators(Validators.required);
-      accused.get('previousFIRNumberSuffix')?.setValidators(Validators.required);
+      // accused.get('previousFIRNumber')?.setValidators(Validators.required);
+      // accused.get('previousFIRNumberSuffix')?.setValidators(Validators.required);
     } else {
       // If "No", reset and clear validators for the previous FIR fields
       accused.get('previousFIRNumber')?.reset();
@@ -3343,8 +3436,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
 
     if (scstOffence) {
       // If "Yes", make the SC/ST FIR fields required
-      accused.get('scstFIRNumber')?.setValidators(Validators.required);
-      accused.get('scstFIRNumberSuffix')?.setValidators(Validators.required);
+      // accused.get('scstFIRNumber')?.setValidators(Validators.required);
+      // accused.get('scstFIRNumberSuffix')?.setValidators(Validators.required);
     } else {
       // If "No", reset and clear validators for the SC/ST FIR fields
       accused.get('scstFIRNumber')?.reset();

@@ -706,7 +706,7 @@
                   name="isDeceased"
                   id="isDeceased"
                   class="form-control"
-                  placeholder="Enter Yes or No"
+                  placeholder=""
                   [value]="isDeceased"
                 />
               </div>
@@ -719,7 +719,7 @@
                   name="isDeceasedName"
                   id="isDeceasedName"
                   class="form-control"
-                  placeholder="Enter Yes or No"
+                  placeholder=""
                   [value]="deceasedPersonNames"
                 />
               </div>
@@ -796,7 +796,7 @@
                   </div>
 
 
-                  <div class="col-md-4 mb-3">
+                  <!-- <div class="col-md-4 mb-3">
                     <label for="specifyGender{{i}}" class="form-label">Specify Gender</label>
                     <input
                       readonly
@@ -807,7 +807,7 @@
                       placeholder="Enter Gender"
                       [value]="accused.custom_gender"
                     />
-                  </div>
+                  </div> -->
 
                   <!-- Address and Pincode -->
                   <div class="col-md-6 mb-3">
@@ -972,15 +972,15 @@
 
                   <!-- Gist of the Current Case -->
                 <div class="col-md-12 mb-3">
-                  <label for="gistOfCurrentCase{{i}}" class="form-label">50. Gist of the Current Case *</label>
+                  <label for="gist_of_current_case{{i}}" class="form-label">50. Gist of the Current Case *</label>
                   <textarea
                     readonly
-                    name="gistOfCurrentCase{{i}}"
-                    id="gistOfCurrentCase{{i}}"
+                    name="gist_of_current_case{{i}}"
+                    id="gist_of_current_case{{i}}"
                     class="form-control"
                     rows="4"
                     placeholder="Enter Gist of the Current Case"
-                    [value]="accused.gistOfCurrentCase"
+                    [value]="accused.gist_of_current_case"
                   ></textarea>
                 </div>
                 </div>

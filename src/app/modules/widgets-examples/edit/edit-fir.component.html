@@ -418,7 +418,7 @@
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="previousIncident{{ i }}" class="form-label">42. Involved in Previous Incidents Against the Same Victim or Family? *</label>
-                  <select [id]="'previousIncident' + i" class="form-select" formControlName="previousIncident" (change)="onPreviousIncidentsChange(i)" required>
+                  <select [id]="'previousIncident' + i" class="form-select" formControlName="previousIncident" (change)="onPreviousIncidentsChange(i)">
                     <option value="" disabled>Select</option>
                     <option value="true">Yes</option>
                     <option value="false">No</option>
@@ -427,12 +427,12 @@
                 <div class="col-md-6 mb-3" *ngIf="accused.get('previousIncident')?.value === 'true'">
                   <label for="previousFIRNumber{{ i }}" class="form-label">43. Previous FIR Number *</label>
                   <div class="input-group">
-                    <select [id]="'previousFIRNumber' + i" class="form-select" formControlName="previousFIRNumber" required>
+                    <select [id]="'previousFIRNumber' + i" class="form-select" formControlName="previousFIRNumber">
                       <option value="" disabled>Select FIR Number</option>
                       <option *ngFor="let num of firNumberOptions" [value]="num">{{ num }}</option>
                     </select>
                     <span class="input-group-text">/</span>
-                    <select [id]="'previousFIRNumberSuffix' + i" class="form-select" formControlName="previousFIRNumberSuffix" required>
+                    <select [id]="'previousFIRNumberSuffix' + i" class="form-select" formControlName="previousFIRNumberSuffix">
                       <option value="" disabled>Select Year</option>
                       <option *ngFor="let year of yearOptions" [value]="year">{{ year }}</option>
                     </select>
@@ -441,7 +441,7 @@
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="scstOffence{{ i }}" class="form-label">43. Previously Committed Offence Against SC/ST Community? *</label>
-                  <select [id]="'scstOffence' + i" class="form-select" formControlName="scstOffence" (change)="onScstOffencesChange(i)" required>
+                  <select [id]="'scstOffence' + i" class="form-select" formControlName="scstOffence" (change)="onScstOffencesChange(i)">
                     <option value="" disabled>Select</option>
                     <option value="true">Yes</option>
                     <option value="false">No</option>
@@ -750,7 +750,7 @@
         <div class="mt-4">
           <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft_6()">Save as Draft</button>
           <!-- <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button> -->
-          <button type="button" class="btn btn-primary" (click)="submitStepSix()" [disabled]="!isStep6Valid()">Submit</button>
+          <button type="button" class="btn btn-primary" (click)="submitStepSix();saveAsDraft_6()" [disabled]="!isStep6Valid()">Submit</button>
         </div>
       </div>
       <div *ngIf="mainStep === 3 && step === 1" class="form-step">
@@ -1268,7 +1268,7 @@
         <div class="mt-4">
           <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft_7()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-          <button type="submit" class="btn btn-primary" (click)="submitStepSeven()">Submit</button>
+          <button type="submit" class="btn btn-primary" (click)="submitStepSeven();saveAsDraft_7()">Submit</button>
         </div>
       </div>
     </form>

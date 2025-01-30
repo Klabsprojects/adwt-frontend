@@ -42,6 +42,8 @@ export class FirListComponent implements OnInit {
 
   judgementBeenAwardednxt: string = '';
 
+
+
   victimsdata: any[] = [];
   victimAge: string = '';
   victimName: string = '';
@@ -461,6 +463,11 @@ export class FirListComponent implements OnInit {
         } else {
           console.log(data.queryResults);
           this.victimsdata =data.queryResults1;
+          this.victimsdata = this.victimsdata.map((victim) => ({
+            ...victim, // Keep all existing properties
+            scst_sections: victim.scst_sections ? this.formatedata(victim.scst_sections) : victim.scst_sections ,
+            offence_committed: victim.offence_committed ? this.formatedata(victim.offence_committed) : victim.offence_committed
+          }));
           this.accusedsdata =data.queryResults2;
           this.reliefsdata =data.queryResults3;
           this.casedetailsdata =data.queryResults4;
@@ -499,10 +506,10 @@ export class FirListComponent implements OnInit {
           this.officerPhone=data.queryResults[0].officer_phone;
 
           this.firNumber=data.queryResults[0].fir_number+'/'+data.queryResults[0].fir_number_suffix;
-          this.dateOfOccurrence=data.queryResults[0].date_of_occurrence;
+          this.dateOfOccurrence= data.queryResults[0].date_of_occurrence ? this.convertToNormalDate(data.queryResults[0].date_of_occurrence) : data.queryResults[0].date_of_occurrence;
           this.timeOfOccurrence=data.queryResults[0].time_of_occurrence;
           this.placeOfOccurrence=data.queryResults[0].place_of_occurrence;
-          this.dateOfRegistration=data.queryResults[0].date_of_registration;
+          this.dateOfRegistration= data.queryResults[0].date_of_registration ? this.convertToNormalDate(data.queryResults[0].date_of_registration) : data.queryResults[0].date_of_registration;
           this.timeOfRegistration=data.queryResults[0].time_of_registration;
 
           this.nameOfComplainant=data.queryResults[0].name_of_complainant;
@@ -532,7 +539,7 @@ export class FirListComponent implements OnInit {
 
 
           this.isDeceased=data.queryResults[0].is_deceased;
-          this.deceasedPersonNames=data.queryResults[0].deceased_person_names;
+          this.deceasedPersonNames= data.queryResults[0].deceased_person_names ? this.formatedata(data.queryResults[0].deceased_person_names) : data.queryResults[0].deceased_person_names;
 
           this.numberOfAccused=data.queryResults[0].number_of_accused;
 
@@ -568,7 +575,7 @@ export class FirListComponent implements OnInit {
           // this.additionalRelief=data.queryResults[0].additional_relief;
           this.totalCompensation=data.queryResults[0].total_amount_third_stage;
           this.proceedingsFileNo=data.queryResults[0].proceedings_file_no;
-          this.proceedingsDate=data.queryResults[0].proceedings_date;
+          this.proceedingsDate= data.queryResults[0].proceedings_date ? this.convertToNormalDate(data.queryResults[0].proceedings_date) : data.queryResults[0].proceedings_date;
           //need to check
           this.proceedingsFile=data.queryResults[0].Commissionerate_file;
           this.attachments=data.queryResults[0].file_name;
@@ -592,20 +599,21 @@ export class FirListComponent implements OnInit {
 
           this.totalCompensation2=data.queryResults[0].total_compensation_1;
           this.proceedingsFileNo1=data.queryResults[0].proceedings_file_no;
-          this.proceedingsDate1=data.queryResults[0].proceedings_date;
+          // this.proceedingsDate1=data.queryResults[0].proceedings_date;
+          this.proceedingsDate1= data.queryResults[0].proceedings_date ? this.convertToNormalDate(data.queryResults[0].proceedings_date) : data.queryResults[0].proceedings_date;
           this.uploadProceedings=data.queryResults[0].upload_proceedings_path;
           // need to know 79
-          this.attachments1=data.queryResults[0].victim_name;
+          // this.attachments1=data.queryResults[0].victim_name;
 
-          this.designated=data.queryResults[0].court_name;
-          this.presentCourt=data.queryResults[0].court_district;
-          this.scNumber=data.queryResults[0].trial_case_number;
-          this.prosecutorName=data.queryResults[0].public_prosecutor;
-          this.prosecutorPhoneNumber=data.queryResults[0].prosecutor_phone;
+          // this.designated=data.queryResults[0].court_name;
+          // this.presentCourt=data.queryResults[0].court_district;
+          // this.scNumber=data.queryResults[0].trial_case_number;
+          // this.prosecutorName=data.queryResults[0].public_prosecutor;
+          // this.prosecutorPhoneNumber=data.queryResults[0].prosecutor_phone;
 
-          this.hearingDate=data.queryResults[0].first_hearing_date;
-          this.judgementAwarded=data.queryResults[0].judgement_awarded;
-          this.nextHearingDate=data.queryResults[0].first_hearing_date;
+          // this.hearingDate=data.queryResults[0].first_hearing_date;
+          // this.judgementAwarded=data.queryResults[0].judgement_awarded;
+          // this.nextHearingDate=data.queryResults[0].first_hearing_date;
 
 
 
@@ -741,10 +749,10 @@ export class FirListComponent implements OnInit {
   filteredFirList() {
     const searchLower = this.searchText.toLowerCase();
 
-    console.log(this.selectedDistrict,'this.selectedDistrict')
-    console.log(this.selectedNatureOfOffence,'this.selectedNatureOfOffence')
-    console.log(this.selectedStatusOfCase,'this.selectedStatusOfCase')
-    console.log(this.selectedStatusOfRelief,'this.selectedStatusOfRelief')
+    // console.log(this.selectedDistrict,'this.selectedDistrict')
+    // console.log(this.selectedNatureOfOffence,'this.selectedNatureOfOffence')
+    // console.log(this.selectedStatusOfCase,'this.selectedStatusOfCase')
+    // console.log(this.selectedStatusOfRelief,'this.selectedStatusOfRelief')
 
     return this.firList.filter((fir) => {
       // Apply search filter
@@ -942,6 +950,27 @@ getStatusBadgeClass(status: number): string {
     }
   
     return pageNumbers;
+  }
+
+
+  convertToNormalDate(isoDate: string): string {
+    if (!isoDate) return '';
+  
+    const date = new Date(isoDate);
+    const day = date.getDate().toString().padStart(2, '0'); // Ensure two digits
+    const month = date.toLocaleString('en-US', { month: 'short' }); // Get short month (Jan, Feb, etc.)
+    const year = date.getFullYear();
+  
+    return `${day}-${month}-${year}`; // Format as DD-MMM-YYYY
+  }
+
+  formatedata(value : any){
+    if(value == '[]'){
+      return ''
+    }
+    var data2 = JSON.parse(value)
+    var data3 = data2.join(',')
+    return data3;
   }
 
 }
