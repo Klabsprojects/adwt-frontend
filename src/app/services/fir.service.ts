@@ -47,9 +47,9 @@ export class FirService {
   }
 
   // Get SC/ST sections
-  // getCastes(): Observable<any> {
-  //   return this.http.get(`${this.baseUrl}/scst-sections`);
-  // }
+  getCastes(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/scst-sections`);
+  }
 
 
   getAllAccusedCommunities(): Observable<string[]> {
@@ -98,25 +98,27 @@ saveStepThreeAsDraft(firData: any): Observable<any> {
   return this.http.post(`${this.baseUrl}/handle-step-three`, firData);
 }
 
+
+// step 4 has been changed api payload
 saveStepFourAsDraft(firData: any): Observable<any> {
   const formData = new FormData();
 
-  // Append other fields to FormData
   formData.append('firId', firData.firId);
-  formData.append('numberOfAccused', firData.numberOfAccused);
+  formData.append('numberOfAccused', firData.numberOfAccused.toString()); 
 
-  // Append accuseds array as a single JSON string
-  formData.append('accuseds', JSON.stringify(firData.accuseds));
 
-  // Append the file
-  if (firData.uploadFIRCopy) {
-    formData.append('uploadFIRCopy', firData.uploadFIRCopy);
-  }
+  formData.append('accuseds', JSON.stringify(firData.accuseds || []));
 
+
+  firData.accuseds.forEach((accused: any, index: number) => {
+    if (accused.uploadFIRCopy && accused.uploadFIRCopy.length > 0) {
+      accused.uploadFIRCopy.forEach((file: File) => {
+        formData.append(`uploadFIRCopy[]`, file, file.name);
+      });
+    }
+  });
   return this.http.post(`${this.baseUrl}/handle-step-four`, formData);
 }
-
-
 
 
   // Save Step 5 as draft

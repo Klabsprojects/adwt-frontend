@@ -1,23 +1,31 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy, HostListener } from '@angular/core';
-import { ActivatedRoute, Router, NavigationStart, Event as RouterEvent } from '@angular/router';
-import { FormControl, AbstractControl } from '@angular/forms';
+// import { ActivatedRoute, Router, NavigationStart, Event as RouterEvent } from '@angular/router';
+// import { FormControl, AbstractControl } from '@angular/forms';
 import { NgxDropzoneModule } from 'ngx-dropzone';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  Validators,
-  FormArray,
-} from '@angular/forms';
+// import {
+//   FormsModule,
+//   ReactiveFormsModule,
+//   FormBuilder,
+//   FormGroup,
+//   Validators,
+//   FormArray,
+// } from '@angular/forms';
 import { CommonModule,formatDate  } from '@angular/common';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
+// import { MatSelectModule } from '@angular/material/select';
+// import { MatFormFieldModule } from '@angular/material/form-field';
 import { FirService } from 'src/app/services/fir.service';
+import { Router, ActivatedRoute, RouterEvent, NavigationStart} from '@angular/router';
+
 
 import Swal from 'sweetalert2';
-import { MatRadioModule } from '@angular/material/radio';
+// import { MatRadioModule } from '@angular/material/radio';
 import Tagify from '@yaireo/tagify';
+import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatRadioModule } from '@angular/material/radio';
+import { FirServiceAPI } from './editfir.service';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 declare var $: any;
 
 interface HearingDetail {
@@ -161,7 +169,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
 
   offenceOptions: string[] = [];
   offenceActsOptions: string[] = [];
-  scstSectionsOptions: string[] = [];
+  scstSectionsOptions: any;
   // alphabetList: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   // stationNumbers: number[] = Array.from({ length: 99 }, (_, k) => k + 1);
   firNumberOptions: number[] = Array.from({ length: 99 }, (_, k) => k + 1);
@@ -170,13 +178,17 @@ export class EditFirComponent implements OnInit, OnDestroy {
   victimCountArray: number[] = [];
   i: number;
   specialCourtname: string[] = [];
+  firCopyValue: any;
+  uploadedFIRCopy: any;
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
-    private router: Router
-  ) {}
+    private router: Router,
+    private firServiceAPI : FirServiceAPI,
+    private sanitizer: DomSanitizer
+   ) {}
 
   onDrop1(event: DragEvent): void {
     if (event.dataTransfer?.files) {
@@ -284,7 +296,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
     this.removeAttachmentFromBackend1(attachmentIdToDelete);
   }
   removeAttachmentFromBackend1(id: number): void {
-    this.firService.removeAttachmentFromBackend1(id).subscribe(
+    this.firServiceAPI.removeAttachmentFromBackend1(id).subscribe(
       response => {
         console.log('Attachment removed successfully:', response);
       },
@@ -294,7 +306,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
     );
   }
   removeAttachmentFromBackend(id: number): void {
-    this.firService.removeAttachmentFromBackend(id).subscribe(
+    this.firServiceAPI.removeAttachmentFromBackend(id).subscribe(
       response => {
         console.log('Attachment removed successfully:', response);
       },
@@ -535,7 +547,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
     } 
     this.loadOptions();
     this.loadOffenceActs();
-    this.loadScstSections();
+    // this.loadScstSections();
     this.generateYearOptions();
     // this.loadnativedistrict();
     this.loadVictimsDetails();
@@ -555,15 +567,15 @@ export class EditFirComponent implements OnInit, OnDestroy {
     }
 
     // Listen for route changes
-    this.router.events.subscribe((event: RouterEvent) => {
-      if (event instanceof NavigationStart) {
-        this.firId = this.getFirIdFromSession();
-        if(!this.firId)
-          { 
-            this.clearSession();
-          } 
-      }
-    });
+      this.router.events.subscribe((event: any) => {
+        if (event instanceof NavigationStart) {
+          this.firId = this.getFirIdFromSession();
+          if(!this.firId)
+            { 
+              this.clearSession();
+            } 
+        }
+      });
 
     this.userId = sessionStorage.getItem('userId') || '';
 
@@ -696,6 +708,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
       );
     }
   }
+
+  // imagePaths: string[] = [];
   loadFirDetails(firId: string): void {
 
     this.firService.getFirDetails(firId).subscribe(
@@ -1044,6 +1058,9 @@ export class EditFirComponent implements OnInit, OnDestroy {
 
           response.data1.forEach((victim: any, index: number) => {
             const victimGroup = this.createVictimGroup();
+
+
+
             let offence_committed_data: any[] = [];
             let scst_sections_data: any[] = [];
 
@@ -1077,12 +1094,36 @@ export class EditFirComponent implements OnInit, OnDestroy {
             this.onVictimAgeChange(index)
           });       
         }
+        const accusedFormArray = this.firForm.get('accuseds') as FormArray;
 
         if (response && response.data2 && response.data2.length > 0) {
-          const accusedFormArray = this.firForm.get('accuseds') as FormArray;
           accusedFormArray.clear(); 
-          response.data2.forEach((accused: any) => {
+          this.firCopyValue = [];
+          response.data2.forEach((accused: any,index:number) => {
+
+            const selectedCommunity = accused.community;
+       
+
+
+                       if (selectedCommunity) {
+                    this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
+                  (castes: string[]) => {
+                     this.scstSectionsOptions = castes;
+
+                       this.cdr.detectChanges();
+                 },
+                             (error) => {
+                        console.error('Error fetching accused castes:', error);
+                    Swal.fire('Error', 'Failed to load castes for the selected accused community.', 'error');
+                       }
+                       );
+                         }
+
+
             const accusedGroup = this.createAccusedGroup();
+
+            
+            // console.log('accusedGroupaccusedGroup:', accusedGroup);
 
             accusedGroup.patchValue({
               accusedId: accused.accused_id,
@@ -1103,10 +1144,17 @@ export class EditFirComponent implements OnInit, OnDestroy {
               antecedents: accused.antecedents,
               landOIssues: accused.land_o_issues,
               gistOfCurrentCase: accused.gist_of_current_case,
-              // uploadFIRCopy: accused.upload_fir_copy
+              uploadFIRCopy:accused.upload_fir_copy,
             });
 
+
+
+
+            
             accusedFormArray.push(accusedGroup);
+
+
+            console.log(accusedFormArray,"accusedFormArrayaccusedFormArrayaccusedFormArray")
           });
         }
 
@@ -1125,7 +1173,9 @@ export class EditFirComponent implements OnInit, OnDestroy {
         this.clearSession();
       } 
   } 
-
+  get accusedFormArray(): FormArray {
+    return this.firForm.get('accuseds') as FormArray; // Getter for the FormArray
+  }
   getFirIdFromSession(): string | null {
 
     // console.log("ppppppppppppppppppppppppppppppp",sessionStorage.getItem('firId'));
@@ -1261,13 +1311,48 @@ export class EditFirComponent implements OnInit, OnDestroy {
     );
   }
 
+
+
+  multipleFiles: any[][] = [];
+  showImage: boolean[] = []; 
+  onFileChange(event: any, i: number): void {
+
+    const selectedFile = event.target.files[0]; 
+  
+    this.accuseds.get('uploadFIRCopy')?.setValue(null);
+    if (!this.multipleFiles[i]) {
+      this.multipleFiles[i] = [];  
+      // this.fileUrls[i] = []; 
+    }
+  
+
+    this.multipleFiles[i].push(selectedFile);
+
+    const fileUrl = URL.createObjectURL(selectedFile);
+
+
+  
+  }
+ 
+  
+
+  
   saveStepFourAsDraft(): void {
+  
     const firData = {
       firId: this.firId,
       numberOfAccused: this.firForm.get('numberOfAccused')?.value,
-      accuseds: this.accuseds.value, // Accuseds array data (form values)
+      accuseds: this.firForm.get('accuseds')?.value.map((accused: any, index: number) => ({
+        ...accused,
+        accusedId: accused.accusedId || null,
+        uploadFIRCopy: this.multipleFiles[index] || null
+    
+  
+  
+      })),
     };
-
+console.log(firData,"firDatafirDatafirData")
+console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
     this.firService.saveStepFourAsDraft(firData).subscribe(
       (response: any) => {
         this.firId = response.fir_id;
@@ -2216,16 +2301,16 @@ export class EditFirComponent implements OnInit, OnDestroy {
     );
   }
 
-  loadScstSections() {
-    this.firService.getCastes().subscribe(
-      (sections: any) => {
-        this.scstSectionsOptions = sections.map((section: any) => section.caste_name);
-      },
-      (error: any) => {
-        Swal.fire('Error', 'Failed to load SC/ST sections options.', 'error');
-      }
-    );
-  }
+  // loadScstSections() {
+  //   this.firService.getCastes().subscribe(
+  //     (sections: any) => {
+  //       this.scstSectionsOptions = sections.map((section: any) => section.caste_name);
+  //     },
+  //     (error: any) => {
+  //       Swal.fire('Error', 'Failed to load SC/ST sections options.', 'error');
+  //     }
+  //   );
+  // }
 
   // loadUserData() {
   //   this.firService.getUserDetails(this.userId).subscribe(
@@ -2243,7 +2328,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   // }
 
   loadPoliceDivisionDetails() {
-    this.firService.getPoliceDivisionedit().subscribe(
+    this.firServiceAPI.getPoliceDivisionedit().subscribe(
       (data: any) => {
         
         this.policeCities = data.district_division_name || [];
@@ -2330,7 +2415,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
       antecedents: ['', Validators.required],
       landOIssues: ['', Validators.required],
       gistOfCurrentCase: ['', Validators.required],
-      // uploadFIRCopy: [null, Validators.required]
+      uploadFIRCopy: ['', Validators.required]
     });
   }
 
@@ -2550,39 +2635,20 @@ export class EditFirComponent implements OnInit, OnDestroy {
     return this.firForm.get('attachments') as FormArray;
   }
 
-
+apiurl = 'http://localhost:3010/'
 
   
    
   getImagePreviewForIndex(index: number) {
+
+    
     return this.imagePreviews1.some(item => item.index === index);
   }
   
   getImagePreviewsForIndex(index: number) {
     return this.imagePreviews1.filter(item => item.index === index);
   }
-  onFileChange(event: Event, index: number): void { 
-    const fileInput = event.target as HTMLInputElement;
-  
-    if (fileInput?.files?.length) {
-      const file = fileInput.files[0];  // Get the first selected file
-  
-      // Find and remove the existing file object with the same index
-      const existingFileIndex = this.imagePreviews1.findIndex(item => item.index === index);
-      if (existingFileIndex !== -1) {
-        // Remove the existing file object at that index
-        this.imagePreviews1.splice(existingFileIndex, 1);
-      }
-      this.accuseds.at(index).get('uploadFIRCopy')?.setValue(null);
-      // Push the new file object with the file, preview URL, and index
-      this.imagePreviews1.push({
-        file: file,
-        url: URL.createObjectURL(file),
-        index: index
-      });
-    }
-  } 
-  
+
   
   // saveStepFourAsDraft(): void {
   //   const firData = {
@@ -2921,7 +2987,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
     // }
     // const formDataObject = this.formDataToObject(formData);  
 
-    this.firService.editStepSevenAsDraft(formFields).subscribe({
+    this.firServiceAPI.editStepSevenAsDraft(formFields).subscribe({
       next: (response) => {
         if (isSubmit) {
           Swal.fire({
@@ -3309,7 +3375,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
     const accusedsArray = this.firForm.get('accuseds') as FormArray;
   
     let isValid = true;
-  
+    let isUploadFIRCopyFilled: boolean | null = null;
     // Check if 'numberOfAccused' control exists and is valid
     if (!numberOfAccusedControl || !numberOfAccusedControl.valid) {
       console.log('Invalid Field: numberOfAccused', numberOfAccusedControl?.errors);
@@ -3331,6 +3397,20 @@ export class EditFirComponent implements OnInit, OnDestroy {
           });
   
           isValid = false;
+        }
+// mahiis check
+        const uploadFIRCopyControl = accusedGroup.get('uploadFIRCopy');
+        if (uploadFIRCopyControl) {
+          const isFilled = uploadFIRCopyControl.value ? true : false;
+  
+          if (isUploadFIRCopyFilled === null) {
+     
+            isUploadFIRCopyFilled = isFilled;
+          } else if (isUploadFIRCopyFilled !== isFilled) {
+           
+            console.log(`Error: Inconsistent 'uploadFIRCopy' values in accuseds[${index}]`);
+            isValid = false;
+          }
         }
       });
     } else {

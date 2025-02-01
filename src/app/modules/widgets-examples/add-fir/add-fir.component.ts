@@ -1,16 +1,16 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, TemplateRef, OnDestroy, HostListener } from '@angular/core';
-import { Router, NavigationStart, Event as RouterEvent } from '@angular/router';
-import { FormControl, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { Router, NavigationStart, RouterEvent } from '@angular/router';
+// import { FormControl, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { NgxFileDropModule } from 'ngx-file-drop';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  Validators,
-  FormArray,
+// import {
+//   FormsModule,
+//   ReactiveFormsModule,
+//   FormBuilder,
+//   FormGroup,
+//   Validators,
+//   FormArray,
 
-} from '@angular/forms';
+// } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -23,6 +23,7 @@ declare var $: any;
 
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 
 
 
@@ -45,9 +46,7 @@ export class AddFirComponent implements OnInit, OnDestroy {
 
   selectedFile: File | null = null;
 
-  onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
-  }
+ 
 
   remainingCharacters: number[] = [];
   showOtherGender: boolean[] = [];
@@ -195,7 +194,7 @@ i: number;
     }
 
     // Listen for route changes
-    this.router.events.subscribe((event: RouterEvent) => {
+    this.router.events.subscribe((event: any) => {
       if (event instanceof NavigationStart) {
         this.clearSession();
       }
@@ -245,21 +244,21 @@ loadCommunities(): void {
 
 onCommunityChange(event: any, index: number): void {
   const selectedCommunity = event.target.value;
-
-  if (selectedCommunity) {
-    this.firService.getCastesByCommunity(selectedCommunity).subscribe(
-      (castes: string[]) => {
-        const victimGroup = this.victims.at(index) as FormGroup;
-        victimGroup.patchValue({ caste: '' }); // Reset caste selection
-        victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
-        this.cdr.detectChanges();
-      },
-      (error) => {
-        console.error('Error fetching castes:', error);
-        Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
-      }
-    );
-  }
+// console.log(selectedCommunity,"wssss")
+    if (selectedCommunity) {
+      this.firService.getCastesByCommunity(selectedCommunity).subscribe(
+        (castes: string[]) => {
+          const victimGroup = this.victims.at(index) as FormGroup;
+          victimGroup.patchValue({ caste: '' }); // Reset caste selection
+          victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+          this.cdr.detectChanges();
+        },
+        (error) => {
+          console.error('Error fetching castes:', error);
+          Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+        }
+      );
+    }
 }
 
 loadDistricts(): void {
@@ -276,7 +275,10 @@ loadDistricts(): void {
 loadAccusedCommunities(): void {
   this.firService.getAllAccusedCommunities().subscribe(
     (communities: string[]) => {
-      this.accusedCommunitiesOptions = communities; // Populate accused community options
+      this.accusedCommunitiesOptions = communities; 
+      
+      
+      // Populate accused community options
     },
     (error) => {
       console.error('Error loading accused communities:', error);
@@ -296,7 +298,8 @@ onAccusedCommunityChange(event: any, index: number): void {
       (castes: string[]) => {
         const accusedGroup = this.accuseds.at(index) as FormGroup;
         accusedGroup.patchValue({ caste: '' }); // Reset caste selection
-        accusedGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+        accusedGroup.get('availableCastes')?.setValue(castes);
+        // console.log(accusedGroup.get('availableCastes')?.value,"datdadadadada"); 
         this.cdr.detectChanges();
       },
       (error) => {
@@ -1950,44 +1953,68 @@ handleCaseTypeChange() {
 
 
 
+  // mahiiii coded.........////////////////////////////////
+  onFileSelected(event: any, i: number): void {
+    const selectedFile = event.target.files[0]; 
+  
+  
+    if (!this.multipleFiles[i]) {
+      this.multipleFiles[i] = [];  
+    }
+  
 
+    this.multipleFiles[i].push(selectedFile);
+  
+    // console.log('Updated files for accused index:', this.multipleFiles[i]);
+  }
+  
 
 // Save Step 4 as Draft
 saveStepFourAsDraft(): void {
   const firData = {
     firId: this.firId,
     numberOfAccused: this.firForm.get('numberOfAccused')?.value || '',
-    accuseds: this.accuseds.value.map((accused: any) => ({
+    accuseds: this.firForm.get('accuseds')?.value.map((accused: any, index: number) => ({
       ...accused,
-      accusedId: accused.accusedId || null, // Include accusedId if it exists
+      accusedId: accused.accusedId || null,
+      uploadFIRCopy: this.multipleFiles[index] || null
+  
+
+
     })),
-    uploadFIRCopy: this.selectedFile, // Pass the actual File object here
   };
 
   console.log('FIR Data:', firData);
 
+
   this.firService.saveStepFourAsDraft(firData).subscribe(
-    (response: any) => {
-      this.firId = response.fir_id; // Set FIR ID from backend response
-      if (this.firId) {
-        sessionStorage.setItem('firId', this.firId); // Save FIR ID in session
-      }
-      // Map accused IDs back to the form
-      const updatedAccuseds = response.accuseds || [];
-      updatedAccuseds.forEach((updatedAccused: any, index: number) => {
-        if (this.accuseds.at(index)) {
-          this.accuseds.at(index).patchValue({ accusedId: updatedAccused.accusedId });
-        }
-      });
-      Swal.fire('Success', 'FIR saved as draft for step 4.', 'success');
-    },
-    (error) => {
-      console.error('Error saving FIR for step 4:', error);
-      Swal.fire('Error', 'Failed to save FIR as draft for step 4.', 'error');
-    }
+    (response: any) => this.handleSuccess(response),
+    (error) => this.handleError(error)
   );
 }
+multipleFiles: any[][] = [];
 
+
+handleSuccess(response: any) {
+  this.firId = response.fir_id;
+  if (this.firId) {
+    sessionStorage.setItem('firId', this.firId);
+  }
+  const updatedAccuseds = response.accuseds || [];
+  updatedAccuseds.forEach((updatedAccused: any, index: number) => {
+    if (this.accuseds.at(index)) {
+      this.accuseds.at(index).patchValue({ accusedId: updatedAccused.accusedId });
+    }
+  });
+
+  Swal.fire('Success', 'FIR saved as draft for step 4.', 'success');
+}
+
+
+handleError(error: any) {
+  console.error('Error saving FIR for step 4:', error);
+  Swal.fire('Error', 'Failed to save FIR as draft for step 4.', 'error');
+}
 
 onProceedingsFileChange(event: Event): void {
   const input = event.target as HTMLInputElement;

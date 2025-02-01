@@ -475,16 +475,24 @@
                   <textarea [id]="'gistOfCurrentCase' + i" class="form-control" formControlName="gistOfCurrentCase" rows="4" maxlength="3000" placeholder="Enter gist of the current case" required></textarea>
                   <small class="form-text text-muted">Maximum of 3000 Characters</small>
                 </div>
+             
                 <div class="col-md-6 mb-3">
                   <label class="form-label">48. Upload FIR Copy *</label>
-                  <input type="file" [id]="'uploadFIRCopy' + i" class="form-control" formControlName="uploadFIRCopy" required (change)="onFileChange($event, i)" />
+                  <input type="file" [id]="'uploadFIRCopy' + i" class="form-control" formControlName="uploadFIRCopy"
+                         required (change)="onFileChange($event, i)" multiple />
                 </div>
-                <div *ngIf="accuseds.at(i).get('uploadFIRCopy')?.value">
-                  <img [src]="accuseds.at(i).get('uploadFIRCopy')?.value"  class="img-thumbnail" style="max-width: 150px; margin-bottom: 10px;">
-                </div> 
-                <div *ngIf="getImagePreviewForIndex(i)">
-                  <img *ngFor="let preview of getImagePreviewsForIndex(i)"[src]="preview.url" alt="FIR Copy Preview" class="img-thumbnail" style="max-width: 150px; margin-bottom: 10px;">
-                </div>
+
+           <!-- <div *ngIf="!multipleFiles[i]">
+
+            <div *ngIf="accused.get('uploadFIRCopy')?.value ">
+              <img [src]="apiurl + (accused.get('uploadFIRCopy')?.value ?? '')" 
+              class="img-thumbnail" alt="FIR Copy" style="max-width: 150px; margin-bottom: 10px;">
+            </div>
+           </div>
+               -->
+                
+  
+                
               </div>
             </div>
           </div>
@@ -492,7 +500,7 @@
         <div class="mt-4">
           <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-          <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid()">Next</button>
+          <button type="button" class="btn btn-primary" (click)="saveStepFourAsDraft()" [disabled]="!isStepValid()">Next</button>
         </div>
       </div>
       <div *ngIf="mainStep === 1 && step === 5" class="form-step">
