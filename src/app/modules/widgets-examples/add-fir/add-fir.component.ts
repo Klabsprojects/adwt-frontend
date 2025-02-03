@@ -73,6 +73,7 @@ export class AddFirComponent implements OnInit, OnDestroy {
   courtDivisions: string[] = [];
   courtRanges: string[] = [];
   proceedingsFile: File | null = null;
+  proceedingsFile_1: File | null = null;
   showDuplicateSection_1: boolean = false;
   showLegalOpinionObtained_two: boolean = false;
   showFiledBy_two: boolean = false;
@@ -524,20 +525,18 @@ onFileSelect_3(event: Event, controlName: string): void {
 
   // Handle file selection
   onFileSelect(event: any, index: number): void {
-    const file = event.target.files[0]; // Get the selected file
+    const file = event.target.files[0];
     if (file) {
       const attachmentGroup = this.attachments.at(index) as FormGroup;
 
-      // Simulate a file path (you might have an actual path from the file upload response in real scenarios)
       const simulatedFilePath = `/uploads/${file.name}`;
 
-      // Patch the values to the form group
+    
       attachmentGroup.patchValue({
-        fileName: file.name, // File name
-        filePath: simulatedFilePath, // Simulated file path
+        fileName: file.name,
+        filePath: simulatedFilePath, 
       });
 
-      // Trigger change detection to update the UI
       this.cdr.detectChanges();
     }
   }
@@ -776,8 +775,9 @@ onFileSelect_3(event: Event, controlName: string): void {
       proceedingsFile: ['', Validators.required],
       proceedingsDate: ['', Validators.required],
       uploadProceedings: ['', Validators.required],
-      attachments: this.fb.array([]) // Dynamic attachments array
+      // attachments: this.fb.array([]) 
 
+      attachments: this.fb.array([this.createAttachmentGroup()]),
     },
     { validators: this.dateTimeValidator() }
   );
@@ -838,14 +838,31 @@ get attachments_2(): FormArray {
 }
 
 
+// onFileSelect_1(event: any, index: number): void {
+//   const file = event.target.files[0];
+//   if (file) {
+//     const attachmentGroup = this.attachments_1.at(index) as FormGroup;
+//     attachmentGroup.patchValue({
+//       file,
+//       fileName: file.name,
+//     });
+//   }
+// }
+
 onFileSelect_1(event: any, index: number): void {
   const file = event.target.files[0];
   if (file) {
     const attachmentGroup = this.attachments_1.at(index) as FormGroup;
+
+    const simulatedFilePath = `/uploads/${file.name}`;
+
+  
     attachmentGroup.patchValue({
-      file,
       fileName: file.name,
+   file
     });
+
+    this.cdr.detectChanges();
   }
 }
 
@@ -1112,6 +1129,9 @@ onAdditionalReliefChange(event: Event, value: string): void {
 
   populateVictimsRelief(victimsReliefDetails: any[]): void {
     const victimsReliefArray = this.victimsRelief;
+
+console.log(victimsReliefArray,"victimsReliefArray")
+
     victimsReliefArray.clear(); // Clear existing form controls
 
     victimsReliefDetails.forEach((victim: any) => {
@@ -1307,7 +1327,7 @@ onAdditionalReliefChange(event: Event, value: string): void {
 
     this.firService.getVictimsReliefDetails(this.firId).subscribe(
       (response: any) => {
-        //console.log('Victim Relief Details:', response.victimsReliefDetails); // Log response data
+        console.log('Victim Relief Details:', response.victimsReliefDetails); // Log response data
         if (response && response.victimsReliefDetails) {
           this.populateVictimsRelief(response.victimsReliefDetails);
         } else {
@@ -1421,7 +1441,7 @@ updateVictimNames(): void {
 
   if (this.victimNames.length > 0) {
     // Call the API to fetch relief details for each victim
-    this.firService.getVictimsReliefDetails(this.firId!).subscribe(
+    this.firService.getVictimsReliefDetails(this.firId).subscribe(
       (response: any) => {
         if (response.victimsReliefDetails) {
           this.populateVictimsRelief(response.victimsReliefDetails);
@@ -1572,7 +1592,6 @@ createVictimReliefGroup(initialValues: any = {}): FormGroup {
     additionalRelief: [initialValues.additionalRelief || []],
   });
 }
-
 
 
 
@@ -1874,7 +1893,6 @@ handleCaseTypeChange() {
     }
   }
 
-
   addAttachment_2(): void {
     this.attachments_2.push(this.createAttachmentGroup());
   }
@@ -1895,7 +1913,17 @@ handleCaseTypeChange() {
     return this.firForm.get('attachments') as FormArray;
   }
 
-
+  onFileChange(event: any, index: number, fileControl: string, fileNameControl: string): void {
+    const file = event.target.files[0];
+    if (file) {
+      const attachment = this.attachments.at(index);
+      attachment.patchValue({
+        [fileControl]: file,
+        [fileNameControl]: file.name,
+      });
+    }
+  }
+  
 
   saveStepThreeAsDraft() {
     const firData = {
@@ -1928,7 +1956,7 @@ handleCaseTypeChange() {
       isDeceased: this.firForm.get('isDeceased')?.value,
       deceasedPersonNames: this.firForm.get('deceasedPersonNames')?.value || [],
     };
-
+console.log(firData,"firDatafirDatafirData")
     this.firService.saveStepThreeAsDraft(firData).subscribe(
       (response: any) => {
         this.firId = response.fir_id;
@@ -2019,9 +2047,16 @@ handleError(error: any) {
 onProceedingsFileChange(event: Event): void {
   const input = event.target as HTMLInputElement;
   if (input.files && input.files.length > 0) {
-    this.proceedingsFile = input.files[0]; // Save the selected file
+    this.proceedingsFile = input.files[0];
+
+    // console.log(this.proceedingsFile,"this.proceedingsFile")
+    
+    
+    // Save the selected file
   }
 }
+
+
 
 saveStepFiveAsDraft(isSubmit: boolean = false): void {
   if (!this.firId) {
@@ -2029,7 +2064,6 @@ saveStepFiveAsDraft(isSubmit: boolean = false): void {
     return;
   }
 
-  // Prepare the FIR data
   const firData = {
     firId: this.firId,
     victimsRelief: this.victimsRelief.value.map((relief: any, index: number) => ({
@@ -2049,13 +2083,14 @@ saveStepFiveAsDraft(isSubmit: boolean = false): void {
     totalCompensation: this.firForm.get('totalCompensation')?.value || '0.00',
     proceedingsFileNo: this.firForm.get('proceedingsFileNo')?.value || '',
     proceedingsDate: this.firForm.get('proceedingsDate')?.value || null,
-    proceedingsFile: this.firForm.get('proceedingsFile')?.value || '',
-    attachments: this.attachments.value.map((attachment: any) => ({
-      fileName: attachment.fileName || null, // Name of the uploaded file
-      filePath: attachment.filePath || null, // Path where the file is stored
-    })),
+    proceedingsFile: this.proceedingsFile || '',
+    attachments: this.attachments.value || '',
     status: isSubmit ? 5 : null, // Include status if this is a submission
   };
+
+
+
+// console.log(firData, "firDatafirDatafirDatafirData")
 
   // Call the service to save the data
   this.firService.saveStepFiveAsDraft(firData).subscribe(
@@ -2158,6 +2193,7 @@ navigateToNextPage(): void {
     this.step = 1;      // Reset to Step 1 of the new stage
   } else if (this.mainStep === 1 && this.step < 5) {
     this.step++;        // Go to the next step within the same main stage
+    this.loadVictimsReliefDetails();
   } else if (this.mainStep === 1 && this.step === 5) {
     this.mainStep = 2;  // Move to Chargesheet Stage after FIR Stage
     this.step = 1;      // Reset to Step 1 of Chargesheet Stage
@@ -2184,11 +2220,23 @@ saveAsDraft(): void {
   }
 }
 
-saveAsDraft_6(isSubmit: boolean = false): void {
-  if (!this.firId) {
-    Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
-    return;
+onProceedingsFileChange_1(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    this.proceedingsFile_1 = input.files[0];
+
+    console.log(this.proceedingsFile_1,"this.proceedingsFile")
+    
+    
+    // Save the selected file
   }
+}
+
+saveAsDraft_6(isSubmit: boolean = false): void {
+  // if (!this.firId) {
+  //   Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
+  //   return;
+  // }
   this.victimsRelief.controls.forEach((control) => {
     control.get('reliefAmountSecondStage')?.enable(); // Temporarily enable
   });
@@ -2213,7 +2261,7 @@ saveAsDraft_6(isSubmit: boolean = false): void {
       totalCompensation: parseFloat(this.firForm.get('totalCompensation_1')?.value || '0.00').toFixed(2),
       proceedingsFileNo: this.firForm.get('proceedingsFileNo_1')?.value || '',
       proceedingsDate: this.firForm.get('proceedingsDate_1')?.value || null,
-      uploadProceedingsPath: this.firForm.get('uploadProceedings_1')?.value || '',
+      // uploadProceedingsPath: this.proceedingsFile_1 || '',
     },
     victimsRelief: this.victimsRelief.value.map((relief: any, index: number) => ({
       victimId: relief.victimId || null,
@@ -2222,12 +2270,12 @@ saveAsDraft_6(isSubmit: boolean = false): void {
       reliefAmountExGratia: parseFloat(relief.reliefAmountExGratia_1 || '0.00').toFixed(2),
       reliefAmountSecondStage: parseFloat(relief.reliefAmountSecondStage || '0.00').toFixed(2),
     })),
-    attachments: this.attachments_1.value.map((attachment: any) => ({
-      fileName: attachment.fileName_1 || null,
-      filePath: attachment.file_1 || null,
-    })),
+    uploadProceedingsPath: this.proceedingsFile_1 ,
+    attachments: this.attachments_1.value || '',
     status: 6, // Update status to 6 for the FIR
   };
+
+  console.log(chargesheetData,"chargesheetData")
 
   // Call the service to send data to the backend
   this.firService.saveStepSixAsDraft(chargesheetData).subscribe(
@@ -2821,11 +2869,12 @@ nextStep(): void {
   } else if (this.step === 4 && this.isStep4Valid()) {
     this.saveStepFourAsDraft();
     this.updateFirStatus(4); // Update status for step 4
+    this.loadVictimsReliefDetails();
+
     this.step++;
   } else if (this.step === 5 && this.isStep5Valid()) {
     this.submitStepFive(); // Final submission for Step 5
     this.updateFirStatus(5); // Update status for step 5 on submission
-    this.loadVictimsReliefDetails();
 
   } else {
     // Show an error message if the required fields are not filled

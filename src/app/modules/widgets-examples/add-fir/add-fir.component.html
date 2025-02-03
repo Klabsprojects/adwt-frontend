@@ -941,19 +941,29 @@
 
                 <!-- Attachment Fields -->
                 <div class="mb-4" formArrayName="attachments">
-                    <label class="form-label">62. Upload key Attachments *</label>
-                    <div class="input-group mb-2" *ngFor="let attachment of attachments.controls; let j = index" [formGroupName]="j">
-                        <input type="file" class="form-control" />
-                        <div class="file-names mt-2" *ngIf="attachment.get('file')?.value">
-                            <span class="badge bg-secondary me-1">{{ attachment.get('file')?.value.name }}</span>
-                        </div>
-                        <button type="button" class="btn btn-danger btn-sm mt-2 ms-2" (click)="removeAttachment(j)" *ngIf="attachments.length > 1" title="Remove Attachment">
-                            <i class="bi bi-trash"></i>
-                        </button>
+                  <label class="form-label">62. Upload Key Attachments *</label>
+                
+                  <div class="input-group mb-2" *ngFor="let attachment of attachments.controls; let j = index" [formGroupName]="j">
+                    <!-- File Input 1 -->
+                    <input type="file" class="form-control mb-1" 
+                           (change)="onFileChange($event, j, 'file', 'fileName')" />
+                    <div class="file-names" *ngIf="attachment.get('fileName')?.value">
+                      <span class="badge bg-secondary">{{ attachment.get('fileName')?.value }}</span>
                     </div>
-                    <button type="button" class="btn btn-primary btn-sm mt-3" (click)="addAttachment()">Add Attachment</button>
+                
+                    <button type="button" class="btn btn-danger btn-sm mt-2" 
+                            (click)="removeAttachment(j)" 
+                            *ngIf="attachments.length > 1" 
+                            title="Remove Attachment">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                
+                  <button type="button" class="btn btn-primary btn-sm mt-3" (click)="addAttachment()">
+                    Add Attachment
+                  </button>
                 </div>
-
+                
                 <!-- Navigation Buttons -->
                 <div class="mt-4">
                     <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
@@ -1183,7 +1193,12 @@
 
                         <div class="mb-4">
                             <label class="form-label">78. Upload Commissionerate / S.P. Office Proceedings *</label>
-                            <input type="file" class="form-control" formControlName="uploadProceedings_1" required/>
+                            <!-- <input type="file" class="form-control" formControlName="uploadProceedings_1" required/> -->
+                            <input
+                            type="file"
+                            class="form-control"
+                            (change)="onProceedingsFileChange_1($event)" required
+                          />
                         </div>
 
                         <!-- Additional Attachments -->
@@ -1203,11 +1218,11 @@
                             />
 
                             <!-- Display File Name -->
-                            <div class="file-names mt-2" *ngIf="attachment.get('fileName_1')?.value">
+                            <!-- <div class="file-names mt-2" *ngIf="attachment.get('fileName_1')?.value">
                               <span class="badge bg-secondary me-1">
                                 {{ attachment.get('fileName_1')?.value }}
                               </span>
-                            </div>
+                            </div> -->
 
                             <!-- Remove Button -->
                             <button
@@ -1239,7 +1254,9 @@
                 <div class="mt-4">
                     <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft_6()">Save as Draft</button>
                     <!-- <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button> -->
-                    <button type="submit" class="btn btn-primary" (click)="submitStepSix()" [disabled]="!isStep6Valid()">
+                    <button type="submit" class="btn btn-primary" (click)="saveAsDraft_6()" 
+                   
+                    >
                         Submit
                     </button>
                 </div>

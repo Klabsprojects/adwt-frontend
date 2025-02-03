@@ -1680,11 +1680,12 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
     this.onNumberOfAccusedChange();
     this.populateVictimsRelief();
     // this.onCourtDivisionChange();
+    console.log(this.firForm,"firrrrrrrrrrrrrrrrrrrrrr");
 
   }
 
 
-
+  victimsReliefDetails: any[] = [];
 
   loadVictimsDetails(): void {
     // Check if FIR ID is null or doesn't match the one from session
@@ -1692,19 +1693,20 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
       return; // Skip loading if FIR ID is not valid or doesn't match
     }
 
-    // this.firService.getVictimsDetailsByFirId(this.firId).subscribe(
-    //   (response: any) => {
-    //     this.numberOfVictims = response.numberOfVictims;
-    //     this.victimNames = response.victimNames;
-
-    //     // Initialize victimsRelief array based on the number of victims
-    //     this.populateVictimsRelief();
-    //   },
-    //   (error) => {
-    //     console.error('Error fetching victim details:', error);
-    //     Swal.fire('Error', 'Failed to load victim details', 'error');
-    //   }
-    // );
+    this.firService.getVictimsReliefDetails(this.firId).subscribe(
+      (response: any) => {
+        console.log('Victim Relief Details:', response.victimsReliefDetails);
+        this.numberOfVictims = response.numberOfVictims;
+        this.victimNames = response.victimNames;
+          this.victimsReliefDetails = response.victimsReliefDetails;
+          // Initialize victimsRelief array based on the number of victims
+        this.populateVictimsRelief();
+      },
+      (error) => {
+        console.error('Error fetching victim details:', error);
+        Swal.fire('Error', 'Failed to load victim details', 'error');
+      }
+    );
   }
 
 
@@ -2030,19 +2032,47 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
   }
 
 
+  // populateVictimsRelief(): void {
+  //   const victimsReliefArray = this.victimsRelief;
+  //   victimsReliefArray.clear(); // Clear existing form controls
+
+  //   // Populate the form array with victim names
+  //   this.victimNames.forEach((victimName) => {
+  //     const reliefGroup = this.createVictimReliefGroup();
+  //     reliefGroup.patchValue({ name: victimName }); // Set victim name
+  //     victimsReliefArray.push(reliefGroup); // Add to FormArray
+  //   });
+
+  //   this.cdr.detectChanges(); // Trigger change detection
+  // }
+
   populateVictimsRelief(): void {
     const victimsReliefArray = this.victimsRelief;
     victimsReliefArray.clear(); // Clear existing form controls
+  
+    this.victimsReliefDetails.forEach((victimReliefDetail, index) => {
 
-    // Populate the form array with victim names
-    this.victimNames.forEach((victimName) => {
+      console.log(victimReliefDetail,"victimReliefDetail")
+
       const reliefGroup = this.createVictimReliefGroup();
-      reliefGroup.patchValue({ name: victimName }); // Set victim name
+      reliefGroup.patchValue({
+        victimId: victimReliefDetail.victim_id,
+        victimName: victimReliefDetail.victim_name,
+        reliefAmountScst: victimReliefDetail.fir_stage_as_per_act || '0.00',
+        reliefAmountExGratia: victimReliefDetail.fir_stage_ex_gratia || '0.00',
+        reliefAmountFirstStage: (
+          parseFloat(victimReliefDetail.fir_stage_as_per_act || '0') +
+          parseFloat(victimReliefDetail.fir_stage_ex_gratia || '0')
+        ).toFixed(2),
+        totalCompensation: victimReliefDetail.final_stage_as_per_act || '0.00',
+        additionalRelief: [], // Assuming additionalRelief is empty or needs to be handled
+      });
       victimsReliefArray.push(reliefGroup); // Add to FormArray
     });
-
+  
     this.cdr.detectChanges(); // Trigger change detection
   }
+  
 
 
 
