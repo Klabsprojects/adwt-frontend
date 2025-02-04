@@ -19,23 +19,23 @@
   </div>
   <div class="d-flex gap-3 mb-3 p-4">
     <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
-      <option value="" selected disabled>Select One</option>
+      <option value="" selected>Select One</option>
       <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
     </select>
 
     <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
-      <option value="" selected disabled>Select One</option>
+      <option value="" selected>Select One</option>
       <option *ngFor="let nature of natureOfOffences" [value]="nature">{{ nature }}</option>
     </select>
     
 
     <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
-      <option value="" selected disabled>Select One</option>
+      <option value="" selected>Select One</option>
       <option *ngFor="let status of caseStatuses" [value]="status">{{ status }}</option>
     </select>
 
     <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
-      <option value="" selected disabled>Select One</option>
+      <option value="" selected>Select One</option>
       <option *ngFor="let reliefStatus of statusesOfRelief" [value]="reliefStatus">
         {{ reliefStatus }}
       </option>

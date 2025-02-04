@@ -123,10 +123,10 @@ export class MonthlyReportComponent implements OnInit {
     for (let i = 1; i <= 50; i++) {
       this.reportData.push({
         sl_no: i,
-        policeCity: `City ${i}`,
+        policeCity: this.districts[i % this.districts.length],
         stationName: `Station ${i}`,
         firNumber: `FIR-${1000 + i}`,
-        natureOfOffence: `Offence ${i}`,
+        natureOfOffence: this.natureOfOffences[i % this.natureOfOffences.length],
         poaSection: `Section ${i % 10 + 1}`,
         noOfVictim: Math.floor(Math.random() * 5) + 1,
         courtDistrict: `Court District ${i % 3 + 1}`,
