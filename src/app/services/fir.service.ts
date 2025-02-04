@@ -14,6 +14,8 @@ export class FirService {
 
   constructor(private http: HttpClient) {}
 
+
+
   // Get user details by user ID
   getUserDetails(userId: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/user-details`, { userId });
@@ -29,6 +31,10 @@ export class FirService {
   // Get police division details by district
   getPoliceDivision(district: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/police-division?district=${district}`);
+  }
+
+  getPoliceDivisionedit(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/police-divisionedit`);
   }
 
   // Get offence options
@@ -99,41 +105,29 @@ saveStepThreeAsDraft(firData: any): Observable<any> {
 }
 
 saveStepFourAsDraft(firData: any): Observable<any> {
-  const formData = new FormData();
-
-  // Append other fields to FormData
-  formData.append('firId', firData.firId);
-  formData.append('numberOfAccused', firData.numberOfAccused);
-
-  // Append accuseds array as a single JSON string
-  formData.append('accuseds', JSON.stringify(firData.accuseds));
-
-  // Append the file
-  if (firData.uploadFIRCopy) {
-    formData.append('uploadFIRCopy', firData.uploadFIRCopy);
-  }
-
-  return this.http.post(`${this.baseUrl}/handle-step-four`, formData);
+  return this.http.post(`${this.baseUrl}/handle-step-four`, firData);
 }
 
 
-
-
-  // Save Step 5 as draft
-  saveStepFiveAsDraft(firData: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/handle-step-five`, firData);
-  }
+saveStepFiveAsDraft(firData: any): Observable<any> {
+  return this.http.post(`${this.baseUrl}/handle-step-five`, firData);
+}
 
 
 
 
   saveStepSixAsDraft(firData: any): Observable<any> {
+
     return this.http.post(`${this.baseUrl}/save-step-six`, firData);
   }
 
   saveStepSevenAsDraft(firData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/save-step-seven`, firData);
-}
+  }
+
+  editStepSevenAsDraft(firData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/save-step-sevenedit`, firData);
+  }
 
 
   updateFirStatus(firId: string, status: number): Observable<any> {
@@ -172,6 +166,24 @@ saveStepFourAsDraft(firData: any): Observable<any> {
   getFirStatus(firId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/status/${firId}`);
   }
+
+
+  removeAttachmentFromBackend(attachmentIdToDelete: any): Observable<any> {
+    return this.http.get(`${this.baseUrl}/remove-chargesheet-image?id=${attachmentIdToDelete}`); 
+  }
+  removeAttachmentFromBackend1(attachmentIdToDelete: any): Observable<any> {
+    return this.http.get(`${this.baseUrl}/remove-chargesheet-relief?id=${attachmentIdToDelete}`); 
+  }
+
+  // Get SC/ST sections
+  getCastes(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/scst-sections`);
+  }
+
+  uploadFile(formData: any): Observable<any> {
+    return this.http.post(`${environment.apiUrl}FileUpload`, formData);
+  }
+  
 
 
 }

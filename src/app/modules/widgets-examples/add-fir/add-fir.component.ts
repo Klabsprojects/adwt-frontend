@@ -43,6 +43,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class AddFirComponent implements OnInit, OnDestroy {
 
+  private fileStorage: { [key: number]: File[] } = {};
+
   selectedFile: File | null = null;
 
   onFileSelected(event: any) {
@@ -846,16 +848,34 @@ onFileSelect_1(event: any, index: number): void {
   }
 }
 
+// onFileSelect_2(event: any, index: number): void {
+//   const file = event.target.files[0];
+//   if (file) {
+//     const attachmentGroup = this.attachments_2.at(index) as FormGroup;
+//     attachmentGroup.patchValue({
+//       file_2: file,
+//       fileName_2: file.name,
+//     });
+//   }
+// }
+
 onFileSelect_2(event: any, index: number): void {
-  const file = event.target.files[0];
-  if (file) {
+  const files = event.target.files;
+  if (files && files.length > 0) {
     const attachmentGroup = this.attachments_2.at(index) as FormGroup;
+    const fileArray = Array.from(files) as File[];
+
+    // Store the actual files in our fileStorage
+    this.fileStorage[index] = fileArray;
+
+    // Only store the file names in the form
     attachmentGroup.patchValue({
-      file_2: file,
-      fileName_2: file.name,
+      fileName_2: fileArray.map(file => file.name).join(', ')
     });
   }
 }
+
+
 
 
 updateRemainingCharacters(index: number) {
@@ -2220,13 +2240,83 @@ saveAsDraft_6(isSubmit: boolean = false): void {
 
 
 
-saveAsDraft_7(): void {
+// saveAsDraft_7(): void {
+//   if (!this.firId) {
+//       Swal.fire('Error', 'FIR ID is missing. Unable to save draft.', 'error');
+//       return;
+//   }
+
+
+
+//     const trialDetails = {
+//         courtName: this.firForm.get('Court_name')?.value,
+//         courtDistrict: this.firForm.get('courtDistrict')?.value,
+//         trialCaseNumber: this.firForm.get('trialCaseNumber')?.value,
+//         publicProsecutor: this.firForm.get('publicProsecutor')?.value,
+//         prosecutorPhone: this.firForm.get('prosecutorPhone')?.value,
+//         firstHearingDate: this.firForm.get('firstHearingDate')?.value,
+//         judgementAwarded: this.firForm.get('judgementAwarded')?.value,
+//         judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
+//     };
+
+//     if (!trialDetails.judgementNature && trialDetails.judgementAwarded === 'yes') {
+//         Swal.fire('Error', 'Please select the nature of judgement.', 'error');
+//         return;
+//     }
+
+//   const compensationDetails = {
+//       totalCompensation: this.firForm.get('totalCompensation_2')?.value,
+//       proceedingsFileNo: this.firForm.get('proceedingsFileNo_2')?.value,
+//       proceedingsDate: this.firForm.get('proceedingsDate_2')?.value,
+//       uploadProceedings: this.firForm.get('uploadProceedings_2')?.value
+//   };
+
+//   const attachments = (this.firForm.get('attachments_2')?.value || []).map((attachment: any) => ({
+//       fileName: attachment.file_2
+//   }));
+
+//   const victimsDetails = this.victimsRelief.value.map((relief: any, index: number) => ({
+//       victimId: relief.victimId || null,
+//       victimName: this.victimNames[index] || '',
+//       reliefAmountAct: parseFloat(relief.reliefAmountScst || '0.00'),
+//       reliefAmountGovernment: parseFloat(relief.reliefAmountExGratia || '0.00'),
+//       reliefAmountFinalStage: parseFloat(relief.reliefAmountThirdStage || '0.00')
+//   }));
+
+//   const formData = {
+//       firId: this.firId,
+//       trialDetails,
+//       compensationDetails,
+//       attachments,
+//       victimsDetails
+//   };
+
+//   this.firService.saveStepSevenAsDraft(formData).subscribe({
+//       next: (response) => {
+//           Swal.fire('Success', 'Draft data saved successfully.', 'success');
+//       },
+//       error: (error) => {
+//           console.error('Error saving draft data:', error);
+//           Swal.fire('Error', 'Failed to save draft data.', 'error');
+//       }
+//   });
+// }
+
+
+
+
+async  saveAsDraft_7() {
   if (!this.firId) {
       Swal.fire('Error', 'FIR ID is missing. Unable to save draft.', 'error');
       return;
   }
 
-
+  let uploadJudgementPath: string | undefined;
+  const uploadJudgementFileFile = this.firForm.get('uploadJudgement')?.value;
+  if (uploadJudgementFileFile) {
+    const paths = await this.uploadMultipleFiles([uploadJudgementFileFile]);
+    uploadJudgementPath = paths[0];
+  }
 
     const trialDetails = {
         courtName: this.firForm.get('Court_name')?.value,
@@ -2237,6 +2327,7 @@ saveAsDraft_7(): void {
         firstHearingDate: this.firForm.get('firstHearingDate')?.value,
         judgementAwarded: this.firForm.get('judgementAwarded')?.value,
         judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
+        uploadJudgement: uploadJudgementPath
     };
 
     if (!trialDetails.judgementNature && trialDetails.judgementAwarded === 'yes') {
@@ -2244,16 +2335,36 @@ saveAsDraft_7(): void {
         return;
     }
 
+    let uploadproceedingPath: string | undefined;
+    const proceedingFile = this.firForm.get('uploadProceedings_2')?.value;
+    if (proceedingFile) {
+      const paths = await this.uploadMultipleFiles([proceedingFile]);
+      uploadproceedingPath = paths[0];
+    }
   const compensationDetails = {
       totalCompensation: this.firForm.get('totalCompensation_2')?.value,
       proceedingsFileNo: this.firForm.get('proceedingsFileNo_2')?.value,
       proceedingsDate: this.firForm.get('proceedingsDate_2')?.value,
-      uploadProceedings: this.firForm.get('uploadProceedings_2')?.value
+      uploadProceedings: uploadproceedingPath
   };
 
-  const attachments = (this.firForm.get('attachments_2')?.value || []).map((attachment: any) => ({
-      fileName: attachment.file_2
-  }));
+  const allFiles: File[] = [];
+  Object.values(this.fileStorage).forEach(files => {
+    allFiles.push(...files);
+  });
+
+  let attachments: string[] = [];
+  if (allFiles.length > 0) {
+    try {
+      attachments = await this.uploadMultipleFiles(allFiles);
+      console.log('Uploaded Files:', attachments);
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      Swal.fire('Error', 'Failed to upload one or more files.', 'error');
+      return;
+    }
+  }
+
 
   const victimsDetails = this.victimsRelief.value.map((relief: any, index: number) => ({
       victimId: relief.victimId || null,
@@ -2281,9 +2392,6 @@ saveAsDraft_7(): void {
       }
   });
 }
-
-
-
 
 
 getFiles(inputId: string): FileList | null {
@@ -3165,13 +3273,97 @@ isStep5Valid(): boolean {
 
 
 
+  // async uploadMultipleFiles(files: File[]): Promise<string[]> {
+  //   const uploadedPaths: string[] = [];
+
+  //   for (const file of files) {
+  //     try {
+  //       const filePath = await this.uploadFile(file);
+  //       uploadedPaths.push(filePath);
+  //     } catch (error) {
+  //       console.error('File upload failed:', error);
+  //     }
+  //   }
+
+  //   return uploadedPaths;
+  // }
 
 
+  // uploadFile(file: File): Promise<string> {
+  //   return new Promise((resolve, reject) => {
+  //     if (!file) {
+  //       reject('No file provided');
+  //       return;
+  //     }
+
+  //     const formData = new FormData();
+  //     formData.append('file', file);
+
+  //     this.firService.uploadFile(formData).subscribe(
+  //       (response) => resolve(response.filePath),
+  //       (error) => reject(error)
+  //     );
+  //   });
+  // }
 
 
+  async uploadMultipleFiles(files: File | File[]): Promise<string[]> {
+    // Ensure files is always an array
+    const fileArray = Array.isArray(files) ? files : [files];
+    
+    const uploadPromises = fileArray.map(file => this.uploadFile(file));
+    return Promise.all(uploadPromises);
+  }
 
+  uploadFile(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        reject('No file provided');
+        return;
+      }
 
+      const formData = new FormData();
+      formData.append('file', file);
 
+      this.firService.uploadFile(formData).subscribe({
+        next: (response) => resolve(response.filePath),
+        error: (error) => reject(error)
+      });
+    });
+  }
 
+  onuploadproceedSelect(event: any): void {
+    const file = event.target.files[0];  // Get the first selected file
+  
+    if (file) {
+   
+      // Patch the file into the form (this assumes you have the form control set up correctly)
+      this.firForm.patchValue({
+        uploadProceedings_2: file,  // Storing the file in the form control
+      });
+  
+      // Optionally, display the file name
+      console.log('File selected:', file.name);
+    } else {
+      console.log('No file selected');
+    }
+  }
+
+  uploadJudgementSelect(event: any): void {
+    const file = event.target.files[0];  // Get the first selected file
+  
+    if (file) {
+   
+      // Patch the file into the form (this assumes you have the form control set up correctly)
+      this.firForm.patchValue({
+        uploadJudgement: file,  // Storing the file in the form control
+      });
+  
+      // Optionally, display the file name
+      console.log('File selected:', file.name);
+    } else {
+      console.log('No file selected');
+    }
+  }
 
 }

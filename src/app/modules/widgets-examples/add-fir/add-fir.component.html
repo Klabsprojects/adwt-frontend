@@ -1411,6 +1411,7 @@
                                 type="file"
                                 class="form-control"
                                 id="uploadJudgement"
+                                (change)="uploadJudgementSelect($event)"
                                 formControlName="uploadJudgement"
                                 required
                               />
@@ -2028,7 +2029,7 @@
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">95. Upload Commissionerate / S.P. Office Proceedings *</label>
-                                <input type="file" class="form-control" formControlName="uploadProceedings_2" />
+                                <input type="file" (change)="onuploadproceedSelect($event)" class="form-control" formControlName="uploadProceedings_2" />
                             </div>
                         </div>
 
