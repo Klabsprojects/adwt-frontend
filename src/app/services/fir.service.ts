@@ -160,6 +160,43 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/handle-step-five`, formData);
   }
   
+
+
+
+
+  updatestep5(firData: any): Observable<any> {
+    const formData = new FormData();
+  
+
+    formData.append('firId', firData.firId || '');
+    formData.append('totalCompensation', firData.totalCompensation || '0.00');
+    formData.append('proceedingsFileNo', firData.proceedingsFileNo || '');
+    formData.append('proceedingsDate', firData.proceedingsDate || '');
+  
+
+    if (firData.proceedingsFile) {
+      formData.append('proceedingsFile', firData.proceedingsFile);
+    }
+ 
+    if (firData.victimsRelief && firData.victimsRelief.length) {
+      formData.append('victimsRelief', JSON.stringify(firData.victimsRelief));
+    }
+ 
+    if (firData.attachments && firData.attachments.length > 0) {
+      firData.attachments.forEach((attachment:any) => {
+        // console.log(attachment,"firData.filefilefile")
+
+        
+        if (attachment.file) {
+          formData.append('attachments', attachment.file); // Correct key: 'attachments'
+        }
+      });
+    }
+    
+  // console.log(firData.attachments,"firData.attachments")
+    return this.http.post(`${this.baseUrl}/save-step-fiveedit`, formData);
+  }
+
   saveStepSixAsDraft(firData: any): Observable<any> {
   
     const formData = new FormData();
@@ -185,12 +222,42 @@ saveStepFourAsDraft(firData: any): Observable<any> {
         }
       });
     }
-  
+  console.log(formData,"formDataformData")
 
     return this.http.post(`${this.baseUrl}/save-step-six`, formData);
   }
   
 
+ updateStep6(firData: any): Observable<any> {
+  
+    const formData = new FormData();
+  
+    formData.append('firId', firData.firId);
+    formData.append('chargesheet_id', firData.chargesheet_id);
+    formData.append('chargesheetDetails', JSON.stringify(firData.chargesheetDetails));
+    formData.append('victimsRelief', JSON.stringify(firData.victimsRelief));
+    formData.append('status', firData.status);
+  
+
+    if (firData.uploadProceedingsPath) {
+
+      formData.append('proceedingsFile', firData.uploadProceedingsPath); 
+    }
+  
+
+    if (firData.attachments && firData.attachments.length > 0) {
+      firData.attachments.forEach((attachment: any, index: number) => {
+        if (attachment) {
+    
+   
+          formData.append(`attachments`, attachment); 
+        }
+      });
+    }
+  
+
+    return this.http.post(`${this.baseUrl}/save-step-sixedit`, formData);
+  }
 
   // saveStepSixAsDraft(firData: any): Observable<any> {
   //   console.log(firData,"firDatafirData")

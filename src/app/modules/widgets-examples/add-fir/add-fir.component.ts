@@ -2276,6 +2276,8 @@ saveAsDraft_6(isSubmit: boolean = false): void {
   };
 
   console.log(chargesheetData,"chargesheetData")
+  console.log(this.victimsRelief.value,"victimsReliefvictimsRelief")
+  
 
   // Call the service to send data to the backend
   this.firService.saveStepSixAsDraft(chargesheetData).subscribe(

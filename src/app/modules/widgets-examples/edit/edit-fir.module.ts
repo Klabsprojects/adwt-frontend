@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { EditFirComponent } from './edit-fir.component';
 
@@ -14,6 +14,7 @@ import { EditFirComponent } from './edit-fir.component';
   imports: [
     MatTooltipModule,
     NgxChartsModule,
+    ReactiveFormsModule,
     CommonModule,
     FormsModule,
     NgCircleProgressModule.forRoot({

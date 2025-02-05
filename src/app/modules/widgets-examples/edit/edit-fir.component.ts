@@ -20,7 +20,7 @@ import { Router, ActivatedRoute, RouterEvent, NavigationStart} from '@angular/ro
 import Swal from 'sweetalert2';
 // import { MatRadioModule } from '@angular/material/radio';
 import Tagify from '@yaireo/tagify';
-import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatRadioModule } from '@angular/material/radio';
@@ -341,11 +341,17 @@ export class EditFirComponent implements OnInit, OnDestroy {
     this.files.splice(index, 1);
     this.imagePreviews.splice(index, 1);
   }
-
+  selectedFiles:any
   onChange2(event: Event): void { 
     const inputElement = event.target as HTMLInputElement;
     if (inputElement?.files) {
-      const selectedFiles = Array.from(inputElement.files);  // Convert FileList to File[]
+      const selectedFiles = Array.from(inputElement.files); 
+   
+  
+  this.selectedFiles =selectedFiles
+   
+      console.log(selectedFiles,"selectedFiles")
+       // Convert FileList to File[]
       this.processFiles2(selectedFiles);  // Process the selected files
     } else {
       console.log('No files selected or the input is empty');
@@ -353,6 +359,25 @@ export class EditFirComponent implements OnInit, OnDestroy {
     // Once files are processed, reset the flag to allow the next click
     this.isClickTriggered1 = false;
   }
+
+
+
+  // onFileSelect_1(event: any, index: number): void {
+  //   const file = event.target.files[0];
+  //   if (file) {
+  //     const attachmentGroup = this.attachments_1.at(index) as FormGroup;
+  
+  //     const simulatedFilePath = `/uploads/${file.name}`;
+  
+    
+  //     attachmentGroup.patchValue({
+  //       fileName: file.name,
+  //    file
+  //     });
+  
+  //     this.cdr.detectChanges();
+  //   }
+  // }
 
   onChange1(event: Event): void { 
     const inputElement = event.target as HTMLInputElement;
@@ -527,7 +552,10 @@ export class EditFirComponent implements OnInit, OnDestroy {
   triggerChangeDetection() {
     this.cdr.detectChanges();
   }
-  
+  // victimData = [
+  //   { communityCertificate: 'yes', reliefAmountScst: 1000, reliefAmountExGratia: 5000, reliefAmountFirstStage: 2000, totalCompensation: 8000 },
+  //   { communityCertificate: 'no', reliefAmountScst: 1200, reliefAmountExGratia: 4000, reliefAmountFirstStage: 1800, totalCompensation: 7000 },
+  // ];
   ngOnInit(): void {
 
     this.route.queryParams.subscribe((params) => {
@@ -536,6 +564,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
         sessionStorage.setItem('firId', firId); // Save FIR ID to session storage
       }
     });
+
 
 
     this.generateVictimCount();  
@@ -560,7 +589,9 @@ export class EditFirComponent implements OnInit, OnDestroy {
     this.loadDistricts();
     this.updateValidationForCaseType(); 
     if (this.firId) {
+      console.log("aaaaaaaaaaaaaaaaaaaaaaa",this.firId)
       this.loadFirDetails(this.firId);
+      this.loadVictimsReliefDetails();
       //console.log(`Using existing FIR ID: ${this.firId}`);
     } else {
       //console.log('Creating a new FIR entry');
@@ -605,7 +636,25 @@ export class EditFirComponent implements OnInit, OnDestroy {
       this.loadPoliceStations(district);
     });
 
+
+
+
+    // this.setVictimData();
   }
+
+  // setVictimData() {
+  //   this.victimData.forEach(victim => {
+  //     const victimGroup = this.fb.group({
+  //       communityCertificate: [victim.communityCertificate, Validators.required],
+  //       reliefAmountScst: [victim.reliefAmountScst, Validators.required],
+  //       reliefAmountExGratia: [victim.reliefAmountExGratia, Validators.required],
+  //       reliefAmountFirstStage: [victim.reliefAmountFirstStage, Validators.required],
+  //       totalCompensation: [victim.totalCompensation, Validators.required],
+  //     });
+
+  //     this.victimsRelief.push(victimGroup);
+  //   });
+  // }
 
   navigateToMainStep(stepNumber: number): void {
     this.mainStep = stepNumber; // Update mainStep
@@ -693,13 +742,27 @@ export class EditFirComponent implements OnInit, OnDestroy {
       }
     );
   }
-  onCourtDivisionChange1(value: any): void { 
+
+  selectedCourtName: string = '';
+  onCourtDivisionChange1(value: any): void {
+    console.log(value, "dadadada");
 
     if (value) {
       this.firService.getCourtRangesByDivision(value).subscribe(
         (ranges: string[]) => {
           this.courtRanges = ranges; // Populate court range options based on division
-          this.firForm.patchValue({ courtRange: '' }); // Reset court range selection
+          console.log(this.courtRanges, "xa");
+
+          // Check if the selected court name exists in the fetched court ranges
+          if (this.selectedCourtName && this.courtRanges.includes(this.selectedCourtName)) {
+            // Set the court name value in the form
+            this.firForm.get('courtName')?.setValue(this.selectedCourtName);
+          } else {
+            this.firForm.patchValue({ courtName: '' }); // Reset court name if not found in ranges
+          }
+
+          // Reset court range selection
+          this.firForm.patchValue({ courtRange: '' });
         },
         (error) => {
           console.error('Error fetching court ranges:', error);
@@ -709,6 +772,23 @@ export class EditFirComponent implements OnInit, OnDestroy {
     }
   }
 
+
+  // onCourtDivisionChange1(value: any): void {
+  //   if (value) {
+  //     this.firService.getCourtRangesByDivision(value).subscribe(
+  //       (ranges: string[]) => {
+  //         this.courtRanges = ranges; // Populate court range options based on division
+  //         this.firForm.patchValue({ courtName: value }); // Reset court name selection
+          
+       
+  //       },
+  //       (error) => {
+  //         console.error('Error fetching court ranges:', error);
+  //         Swal.fire('Error', 'Failed to load court ranges for the selected division.', 'error');
+  //       }
+  //     );
+  //   }
+  // }
   // imagePaths: string[] = [];
   loadFirDetails(firId: string): void {
 
@@ -1003,14 +1083,23 @@ export class EditFirComponent implements OnInit, OnDestroy {
 
           if(chargesheetDetails && chargesheetDetails.chargesheet_id){
             this.chargesheet_id = chargesheetDetails.chargesheet_id;
+
+
           }
 
         if (chargesheetDetails && chargesheetDetails.court_district) {
+          
           this.firForm.get('courtDivision')?.setValue(chargesheetDetails.court_district);
-          this.onCourtDivisionChange1(chargesheetDetails.court_district);
         }
         if (chargesheetDetails && chargesheetDetails.court_name) { 
-          this.firForm.get('courtName')?.setValue(chargesheetDetails.court_name);
+        
+this.selectedCourtName = chargesheetDetails.court_name;
+this.onCourtDivisionChange1(chargesheetDetails.court_district);
+
+// Now, patch the form with the court name value
+this.firForm.get('courtName')?.setValue(this.selectedCourtName);
+          // this.firForm.get('courtName')?.setValue(chargesheetDetails.court_name);
+          // this.firForm.patchValue({ courtName: chargesheetDetails.court_name });
         }
         if (chargesheetDetails && chargesheetDetails.case_type) {
           this.firForm.get('caseType')?.setValue(chargesheetDetails.case_type);
@@ -1333,6 +1422,19 @@ export class EditFirComponent implements OnInit, OnDestroy {
 
   
   }
+
+
+  
+  onFileChangee(event: any, index: number, fileControl: string, fileNameControl: string): void {
+    const file = event.target.files[0];
+    if (file) {
+      const attachment = this.attachments.at(index);
+      attachment.patchValue({
+        [fileControl]: file,
+        [fileNameControl]: file.name,
+      });
+    }
+  }
  
   
 
@@ -1378,19 +1480,24 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
     const firData = {
       firId: this.firId,
       victimsRelief: this.victimsRelief.value.map((relief: any) => ({
+
+        victimId:relief.victimId,
+        victimName:relief.victimName,
         communityCertificate: relief.communityCertificate,
-        reliefAmountScst: relief.reliefAmountScst,
-        reliefAmountExGratia: relief.reliefAmountExGratia,
-        reliefAmountFirstStage: relief.reliefAmountFirstStage,
+        // reliefAmountScst: relief.reliefAmountScst,
+        // reliefAmountExGratia: relief.reliefAmountExGratia,
+        // reliefAmountFirstStage: relief.reliefAmountFirstStage,
         additionalRelief: relief.additionalRelief,
       })),
       totalCompensation: this.firForm.get('totalCompensation')?.value,
       proceedingsFileNo: this.firForm.get('proceedingsFileNo')?.value,
       proceedingsDate: this.firForm.get('proceedingsDate')?.value,
+      proceedingsFile: this.proceedingsFile || '',
       status: isSubmit ? 5 : undefined,
     };
-  
-    this.firService.saveStepFiveAsDraft(firData).subscribe(
+  console.log(firData,"firDatafirDatafirData")
+  console.log(this.victimsRelief.value,"firDatafirDatafirData")
+    this.firService.updatestep5(firData).subscribe(
       (response) => {
         if (isSubmit) {
           Swal.fire({
@@ -1570,8 +1677,7 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
       accuseds: this.fb.array([]),
 
       // Step 5 Fields - Victim Relief and Compensation Details
-      victimsRelief: this.fb.array([this.createVictimReliefGroup()]),
-
+      victimsRelief: this.fb.array([]) ,
       reliefAmountScst: ['', Validators.required],
       reliefAmountExGratia: ['', Validators.required],
       reliefAmountFirstStage: ['', Validators.required],
@@ -1678,19 +1784,39 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
     this.trackStep1FormValidity();
     this.onNumberOfVictimsChange();
     this.onNumberOfAccusedChange();
-    this.populateVictimsRelief();
-    // this.onCourtDivisionChange();
-    console.log(this.firForm,"firrrrrrrrrrrrrrrrrrrrrr");
+    // this.populateVictimsRelief([]);
+
+    console.log(this.firForm.value,"firrrrrrrrrrrrrrrrrrrrrr");
 
   }
 
 
+  loadVictimsReliefDetails(): void {
+    if (!this.firId) {
+      console.error('FIR ID is missing.');
+      return;
+    }
+
+    this.firService.getVictimsReliefDetails(this.firId).subscribe(
+      (response: any) => {
+        console.log('Victim Relief Details:', response.victimsReliefDetails); // Log response data
+        if (response && response.victimsReliefDetails) {
+          this.populateVictimsRelief(response.victimsReliefDetails);
+        } else {
+          console.warn('No victim relief details found.');
+        }
+      },
+      (error) => {
+        console.error('Failed to fetch victim relief details:', error);
+      }
+    );
+  }
+
   victimsReliefDetails: any[] = [];
 
   loadVictimsDetails(): void {
-    // Check if FIR ID is null or doesn't match the one from session
     if (!this.firId || this.firId !== sessionStorage.getItem('firId')) { 
-      return; // Skip loading if FIR ID is not valid or doesn't match
+      return;
     }
 
     this.firService.getVictimsReliefDetails(this.firId).subscribe(
@@ -1700,7 +1826,7 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
         this.victimNames = response.victimNames;
           this.victimsReliefDetails = response.victimsReliefDetails;
           // Initialize victimsRelief array based on the number of victims
-        this.populateVictimsRelief();
+        // this.populateVictimsRelief();
       },
       (error) => {
         console.error('Error fetching victim details:', error);
@@ -1942,26 +2068,21 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
   }
 
 
-
-
-
-  onAdditionalReliefChange(event: any, value: string): void {
-    const checked = event.target.checked;
-
-    if (checked) {
-      // Add the value if checked
-      if (!this.selectedAdditionalReliefs.includes(value)) {
-        this.selectedAdditionalReliefs.push(value);
-      }
-    } else {
-      // Remove the value if unchecked
-      this.selectedAdditionalReliefs = this.selectedAdditionalReliefs.filter(
-        (relief) => relief !== value
-      );
+  onAdditionalReliefChange(event: Event, value: string, index: number): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
+    const victimGroup = victimsReliefArray.at(index) as FormGroup;
+  
+    let currentValues = victimGroup.get('additionalRelief')?.value || [];
+  
+    if (checked && !currentValues.includes(value)) {
+      currentValues.push(value);
+    } else if (!checked) {
+      currentValues = currentValues.filter((item: string) => item !== value);
     }
+  
+    victimGroup.get('additionalRelief')?.setValue(currentValues);
   }
-
-
   onJudgementSelectionChange_two(event: any): void {
     const value = event.target.value;
     if (value === 'yes') {
@@ -2046,35 +2167,45 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
   //   this.cdr.detectChanges(); // Trigger change detection
   // }
 
-  populateVictimsRelief(): void {
-    const victimsReliefArray = this.victimsRelief;
-    victimsReliefArray.clear(); // Clear existing form controls
+  proceedingsFile: File | null = null;
+
+  onProceedingsFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.proceedingsFile = input.files[0];
   
-    this.victimsReliefDetails.forEach((victimReliefDetail, index) => {
+      // console.log(this.proceedingsFile,"this.proceedingsFile")
+      
+      
+      // Save the selected file
+    }
+  }
+  populateVictimsRelief(victimsReliefDetails: any[]): void {
+    const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray; // Ensure you access the FormArray correctly
+    victimsReliefArray.clear(); // Clear existing FormArray
+  
+    console.log(victimsReliefDetails, "victimsReliefDetails");
+    victimsReliefDetails.forEach((victimReliefDetail) => {
 
-      console.log(victimReliefDetail,"victimReliefDetail")
+      const additionalRelief = victimReliefDetail.additional_relief
+      ? JSON.parse(victimReliefDetail.additional_relief)
+      : [];
 
-      const reliefGroup = this.createVictimReliefGroup();
-      reliefGroup.patchValue({
-        victimId: victimReliefDetail.victim_id,
-        victimName: victimReliefDetail.victim_name,
-        reliefAmountScst: victimReliefDetail.fir_stage_as_per_act || '0.00',
-        reliefAmountExGratia: victimReliefDetail.fir_stage_ex_gratia || '0.00',
-        reliefAmountFirstStage: (
-          parseFloat(victimReliefDetail.fir_stage_as_per_act || '0') +
-          parseFloat(victimReliefDetail.fir_stage_ex_gratia || '0')
-        ).toFixed(2),
-        totalCompensation: victimReliefDetail.final_stage_as_per_act || '0.00',
-        additionalRelief: [], // Assuming additionalRelief is empty or needs to be handled
+
+      const victimGroup = this.fb.group({
+        victimId: [victimReliefDetail.victim_id || ''],
+        victimName: [victimReliefDetail.victim_name || ''],
+        communityCertificate: [victimReliefDetail.community_certificate || ''],
+        reliefAmountScst: [victimReliefDetail.relief_amount_scst || '0.00'],
+        reliefAmountExGratia: [victimReliefDetail.relief_amount_exgratia || '0.00'],
+        reliefAmountFirstStage: [victimReliefDetail.relief_amount_first_stage || '0.00'],
+        totalCompensation: [victimReliefDetail.final_stage_as_per_act || '0.00'],
+        additionalRelief: [additionalRelief]
       });
-      victimsReliefArray.push(reliefGroup); // Add to FormArray
+      victimsReliefArray.push(victimGroup); 
     });
-  
-    this.cdr.detectChanges(); // Trigger change detection
   }
   
-
-
 
 
 
@@ -2155,11 +2286,14 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
 
   updateVictimNames(): void {
     this.victimNames = this.victims.controls.map((victim) => victim.get('name')?.value).filter(name => name);
-    this.populateVictimsRelief();
+    // this.populateVictimsRelief();
     this.cdr.detectChanges(); // Trigger change detection
   }
 
-
+  get victimsReliefArray(): FormArray {
+    return this.firForm.get('victimsRelief') as FormArray;
+  }
+  
   onIsDeceasedChangeOutside(): void {
     const isDeceasedControl = this.firForm.get('isDeceased');
     const deceasedPersonNamesControl = this.firForm.get('deceasedPersonNames');
@@ -2235,18 +2369,25 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
   }
 
 
+  createVictimReliefGroup(victimReliefDetail: any): FormGroup {
 
-  createVictimReliefGroup(): FormGroup {
+console.log(victimReliefDetail,"cretaieg")
+
     return this.fb.group({
-      communityCertificate: ['', Validators.required], // Form control for Community Certificate
-      reliefAmountScst: [{ value: '100', disabled: true }, [Validators.required, Validators.pattern('^[0-9]*$')]], // Pre-set to 100, read-only
-      reliefAmountExGratia: [{ value: '100', disabled: true }, [Validators.required, Validators.pattern('^[0-9]*$')]], // Pre-set to 100, read-only
-      reliefAmountFirstStage: [{ value: '100', disabled: true }, [Validators.required, Validators.pattern('^[0-9]*$')]], // Pre-set to 100, read-only
-      totalCompensation: ['', Validators.required], // Total compensation field, editable
-      additionalRelief: [[]], // Array for checkboxes or multi-select options
+      victimId: [victimReliefDetail.victim_id || ''],
+      victimName: [victimReliefDetail.victim_name || ''],
+      communityCertificate: [victimReliefDetail.community_certificate || ''],
+      reliefAmountScst: [victimReliefDetail.relief_amount_scst || '0.00'],
+      reliefAmountExGratia: [victimReliefDetail.relief_amount_exgratia || '0.00'],
+      reliefAmountFirstStage: [victimReliefDetail.relief_amount_first_stage || '0.00'],
+      totalCompensation: [victimReliefDetail.final_stage_as_per_act || '0.00'],
+      additionalRelief: this.fb.array(
+        victimReliefDetail.additional_relief 
+          ? JSON.parse(victimReliefDetail.additional_relief).map((relief: string) => new FormControl(relief)) 
+          : []
+      )
     });
   }
-
 
 
 
@@ -3040,14 +3181,27 @@ apiurl = 'http://localhost:3010/'
     
   }
 
+  populateForm(chargesheetDetails: any) {
+    if (chargesheetDetails) {
+      if (chargesheetDetails.court_district) {
+        this.firForm.get('courtDivision')?.setValue(chargesheetDetails.court_district);
+        this.onCourtDivisionChange1(chargesheetDetails.court_district); // Trigger the change manually
+      }
 
+      if (chargesheetDetails.court_name) {
+        console.log(chargesheetDetails.court_name, 'courtName from chargesheet');
+        // Patch the courtName value after courtRanges have been populated
+        this.firForm.get('courtName')?.setValue(chargesheetDetails.court_name);
+      }
+    }
+  }
   onCourtDivisionChange(event: any): void {
     const selectedDivision = event.target.value; 
     if (selectedDivision) {
       this.firService.getCourtRangesByDivision(selectedDivision).subscribe(
         (ranges: string[]) => {
           this.courtRanges = ranges; // Populate court range options based on division
-          this.firForm.patchValue({ courtRange: '' }); // Reset court range selection
+          this.firForm.patchValue({ courtName: '' }); // Reset court range selection
         },
         (error) => {
           console.error('Error fetching court ranges:', error);
@@ -3059,80 +3213,161 @@ apiurl = 'http://localhost:3010/'
 
 
 
-  saveAsDraft_6(isSubmit: boolean = false): void {
-    if (!this.firId) {
-      Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
-      return;
-    }
-    this.victimsRelief.controls.forEach((control) => {
-      control.get('reliefAmountSecondStage')?.enable(); // Temporarily enable
-    });
-    // Prepare data to be sent to the backend
-    const chargesheetData = {
-        firId: this.firId, 
+  // saveAsDraft_6(isSubmit: boolean = false): void {
+  //   if (!this.firId) {
+  //     Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
+  //     return;
+  //   }
+  //   this.victimsRelief.controls.forEach((control) => {
+  //     control.get('reliefAmountSecondStage')?.enable(); // Temporarily enable
+  //   });
+  //   // Prepare data to be sent to the backend
+  //   const chargesheetData = {
+  //       firId: this.firId, 
 
-        chargesheetDetails: {
-          chargesheet_id: this.chargesheet_id, 
-          chargeSheetFiled: this.firForm.get('chargeSheetFiled')?.value || '',
-          courtDivision: this.firForm.get('courtDivision')?.value || '',
-          courtName: this.firForm.get('courtName')?.value || '',
-          caseType: this.firForm.get('caseType')?.value || '',
-          caseNumber: this.firForm.get('caseType')?.value === 'chargeSheet'
-            ? this.firForm.get('caseNumber')?.value || ''
-            : null,
-          rcsFileNumber: this.firForm.get('caseType')?.value === 'referredChargeSheet'
-            ? this.firForm.get('rcsFileNumber')?.value || ''
-            : null,
-          rcsFilingDate: this.firForm.get('caseType')?.value === 'referredChargeSheet'
-            ? this.firForm.get('rcsFilingDate')?.value || null
-            : null,
-          mfCopyPath: this.firForm.get('mfCopy')?.value || '',
-          totalCompensation: parseFloat(this.firForm.get('totalCompensation_1')?.value || '0.00').toFixed(2),
-          proceedingsFileNo: this.firForm.get('proceedingsFileNo_1')?.value || '',
-          proceedingsDate: this.firForm.get('proceedingsDate_1')?.value || null,
-          // uploadProceedingsPath: this.firForm.get('uploadProceedings_1')?.value || '',
-        },
+  //       chargesheetDetails: {
+  //         chargesheet_id: this.chargesheet_id, 
+  //         chargeSheetFiled: this.firForm.get('chargeSheetFiled')?.value || '',
+  //         courtDivision: this.firForm.get('courtDivision')?.value || '',
+  //         courtName: this.firForm.get('courtName')?.value || '',
+  //         caseType: this.firForm.get('caseType')?.value || '',
+  //         caseNumber: this.firForm.get('caseType')?.value === 'chargeSheet'
+  //           ? this.firForm.get('caseNumber')?.value || ''
+  //           : null,
+  //         rcsFileNumber: this.firForm.get('caseType')?.value === 'referredChargeSheet'
+  //           ? this.firForm.get('rcsFileNumber')?.value || ''
+  //           : null,
+  //         rcsFilingDate: this.firForm.get('caseType')?.value === 'referredChargeSheet'
+  //           ? this.firForm.get('rcsFilingDate')?.value || null
+  //           : null,
+  //         mfCopyPath: this.firForm.get('mfCopy')?.value || '',
+  //         totalCompensation: parseFloat(this.firForm.get('totalCompensation_1')?.value || '0.00').toFixed(2),
+  //         proceedingsFileNo: this.firForm.get('proceedingsFileNo_1')?.value || '',
+  //         proceedingsDate: this.firForm.get('proceedingsDate_1')?.value || null,
+  //         // uploadProceedingsPath: this.firForm.get('uploadProceedings_1')?.value || '',
+  //       },
 
-        victimsRelief: this.victimsRelief.value.map((relief: any, index: number) => ({
-          victimId: relief.victimId || null,
-          victimName: this.victimNames[index] || '',
-          reliefAmountScst: parseFloat(relief.reliefAmountScst_1 || '0.00').toFixed(2),
-          reliefAmountExGratia: parseFloat(relief.reliefAmountExGratia_1 || '0.00').toFixed(2),
-          reliefAmountSecondStage: parseFloat(relief.reliefAmountSecondStage || '0.00').toFixed(2),
-        })),
+  //       victimsRelief: this.victimsRelief.value.map((relief: any, index: number) => ({
+  //         victimId: relief.victimId || null,
+  //         victimName: this.victimNames[index] || '',
+  //         reliefAmountScst: parseFloat(relief.reliefAmountScst_1 || '0.00').toFixed(2),
+  //         reliefAmountExGratia: parseFloat(relief.reliefAmountExGratia_1 || '0.00').toFixed(2),
+  //         reliefAmountSecondStage: parseFloat(relief.reliefAmountSecondStage || '0.00').toFixed(2),
+  //       })),
 
-        attachments: this.attachments_1.value.map((attachment: any) => ({
-          fileName: attachment.fileName_1 || null,
-          filePath: attachment.file_1 || null,
-        })),
+  //       attachments: this.attachments_1.value.map((attachment: any) => ({
+  //         fileName: attachment.fileName_1 || null,
+  //         filePath: attachment.file_1 || null,
+  //       })),
         
-        status: 6, // Update status to 6 for the FIR
+  //       status: 6, // Update status to 6 for the FIR
       
-    };
+  //   };
 
-    // const formData = new FormData(); 
+  //   // const formData = new FormData(); 
 
-    // Object.keys(chargesheetData).forEach((key) => {
-    //   const value = chargesheetData[key as keyof typeof chargesheetData]; 
-    //   formData.append(key, String(value));  // Convert value to string to avoid type issues 
-    // }); 
-    // this.imagePreviews3.forEach(image => {
-    //   formData.append('images', image.file, image.file.name);
-    // }); 
+  //   // Object.keys(chargesheetData).forEach((key) => {
+  //   //   const value = chargesheetData[key as keyof typeof chargesheetData]; 
+  //   //   formData.append(key, String(value));  // Convert value to string to avoid type issues 
+  //   // }); 
+  //   // this.imagePreviews3.forEach(image => {
+  //   //   formData.append('images', image.file, image.file.name);
+  //   // }); 
 
-    // const files = this.getFiles('uploadProceedings_1');  
-    // if (files && files.length > 0) { 
-    //   formData.append('uploadProceedings_1', files[0], files[0].name);
-    // } else {
-    //   console.error('No files selected or files are null/undefined');
-    // }
+  //   // const files = this.getFiles('uploadProceedings_1');  
+  //   // if (files && files.length > 0) { 
+  //   //   formData.append('uploadProceedings_1', files[0], files[0].name);
+  //   // } else {
+  //   //   console.error('No files selected or files are null/undefined');
+  //   // }
 
-    // Call the service to send data to the backend
+  //   // Call the service to send data to the backend
 
-    console.log("rrrrrrrrrrrrrrrr",chargesheetData);
+  //   console.log("rrrrrrrrrrrrrrrr",chargesheetData);
 
     
-    this.firService.saveStepSixAsDraft(chargesheetData).subscribe(
+  //   this.firService.saveStepSixAsDraft(chargesheetData).subscribe(
+  //     (response: any) => {
+  //       Swal.fire({
+  //         title: 'Success',
+  //         text: 'Step 6 data saved and FIR status updated to 6 successfully.',
+  //         icon: 'success',
+  //       });
+  //     },
+  //     (error) => {
+  //       console.error('Error saving Step 6 data:', error);
+  //       Swal.fire('Error', 'Failed to save Step 6 data.', 'error');
+  //     }
+  //   );
+  // }
+
+
+  onProceedingsFileChange_1(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.proceedingsFile_1 = input.files[0];
+  
+      console.log(this.proceedingsFile_1,"this.proceedingsFile")
+      
+      
+      // Save the selected file
+    }
+  }
+  
+
+  proceedingsFile_1: File | null = null;
+  saveAsDraft_6(isSubmit: boolean = false): void {
+    // if (!this.firId) {
+    //   Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
+    //   return;
+    // }
+    // this.victimsRelief.controls.forEach((control) => {
+    //   control.get('reliefAmountSecondStage')?.enable(); // Temporarily enable
+    // });
+    // Prepare data to be sent to the backend
+    const chargesheetData = {
+      firId: this.firId,
+      chargesheet_id: this.chargesheet_id,
+      chargesheetDetails: {
+      
+        chargeSheetFiled: this.firForm.get('chargeSheetFiled')?.value || '',
+        courtDistrict: this.firForm.get('courtDivision')?.value || '',
+        courtName: this.firForm.get('courtName')?.value || '',
+        caseType: this.firForm.get('caseType')?.value || '',
+        caseNumber: this.firForm.get('caseType')?.value === 'chargeSheet'
+          ? this.firForm.get('caseNumber')?.value || ''
+          : null,
+        rcsFileNumber: this.firForm.get('caseType')?.value === 'referredChargeSheet'
+          ? this.firForm.get('rcsFileNumber')?.value || ''
+          : null,
+        rcsFilingDate: this.firForm.get('caseType')?.value === 'referredChargeSheet'
+          ? this.firForm.get('rcsFilingDate')?.value || null
+          : null,
+        mfCopyPath: this.firForm.get('mfCopy')?.value || '',
+        totalCompensation: parseFloat(this.firForm.get('totalCompensation_1')?.value || '0.00').toFixed(2),
+        proceedingsFileNo: this.firForm.get('proceedingsFileNo_1')?.value || '',
+        proceedingsDate: this.firForm.get('proceedingsDate_1')?.value || null,
+        // uploadProceedingsPath: this.proceedingsFile_1 || '',
+      },
+
+      victimsRelief: this.victimsRelief.value.map((relief: any, index: number) => ({
+
+        victimId: relief.victimId || null,
+        victimName: this.victimNames[index] || '',
+        reliefAmountScst: parseFloat(relief.reliefAmountScst || '0.00').toFixed(2),
+        reliefAmountExGratia: parseFloat(relief.reliefAmountExGratia || '0.00').toFixed(2),
+        reliefAmountSecondStage: parseFloat(relief.reliefAmountSecondStage || '0.00').toFixed(2),
+      })),
+      uploadProceedingsPath: this.proceedingsFile_1 ,
+      attachments: this.selectedFiles || '',
+      status: 6, // Update status to 6 for the FIR
+    };
+  
+    console.log(chargesheetData,"chargesheetData")
+        console.log(this.victimsRelief.value,"this.victimsRelief.value")
+  
+    // Call the service to send data to the backend
+    this.firService.updateStep6(chargesheetData).subscribe(
       (response: any) => {
         Swal.fire({
           title: 'Success',
