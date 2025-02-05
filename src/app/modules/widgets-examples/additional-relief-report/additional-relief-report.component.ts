@@ -165,7 +165,7 @@ export class AdditionalReliefReportComponent implements OnInit{
   isAscending: boolean = true;
 
   constructor(
-    private firService: FirListTestService,
+    // private firService: FirListTestService,
     private cdr: ChangeDetectorRef,
     private router: Router
   ) {
