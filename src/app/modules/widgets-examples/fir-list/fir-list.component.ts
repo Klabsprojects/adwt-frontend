@@ -350,6 +350,8 @@ export class FirListComponent implements OnInit {
   selectedStatusOfRelief: string = '';
  @ViewChild('firDetailsModal') firDetailsModal!: TemplateRef<any>;
 
+
+
   // Filter options
   districts: string[] = [
     'Ariyalur',
@@ -449,14 +451,17 @@ export class FirListComponent implements OnInit {
   ngOnInit(): void {
     this.loadFirList();
     this.updateSelectedColumns();
-    // Remove fetchFirDetails() here
+
   }
 
   // funtions
-  fetchFirDetails(): void {
-    this.firService.getFirView(this.firId).subscribe(
+  fetchFirDetails(firId:any): void {
+
+
+    console.log(firId,"demooooooooooooooooooooooo")
+    this.firService.getFirView(firId).subscribe(
       (data) => {
-        console.log(data);
+        console.log(data,"demoooooo");
         if (!data || data.length === 0) {
           console.warn('No FIR found for the given ID');
           alert('No FIR found for the given ID');
@@ -532,7 +537,7 @@ export class FirListComponent implements OnInit {
           // this.victimCaste=data.queryResults1[0].caste;
           // this.victimGuardian=data.queryResults1[0].guardian_name;
           // this.isNativeDistrictSame=data.queryResults1[0].is_native_district_same;
-          // this.nativeDistrict=data.queryResults1[0].native_district;
+          this.nativeDistrict=data.queryResults1[0].native_district;
           // this.victimOffence=data.queryResults1[0].offence_committed;
           // this.invokedAct=data.queryResults1[0].scst_sections;
           // this.sectionsIPC=data.queryResults1[0].sectionsIPC;
@@ -713,11 +718,17 @@ export class FirListComponent implements OnInit {
 
 
 
-  openModal(firId: number): void {
-    this.firId = firId; // Save the FIR ID
+  openModal(data: any): void {
+
+
+    this.firId = data.fir_id; // Save the FIR ID
+
+    console.log(this.firId)
+
+    // alert(this.firId)
     this.currentStep = 0; // Reset to the first step
     this.modalService.open(this.firDetailsModal, { size: 'xl', backdrop: 'static' });
-    this.fetchFirDetails(); // Fetch details after opening the modal
+    this.fetchFirDetails(this.firId); // Fetch details after opening the modal
   }
 
 
@@ -727,6 +738,9 @@ export class FirListComponent implements OnInit {
     this.firService.getFirList().subscribe(
       (data: any[]) => {
         this.firList = data;
+
+console.log(this.firList,"loadfirst")
+
         this.filteredList = [...this.firList];
         this.isLoading = false;
         this.cdr.detectChanges();
