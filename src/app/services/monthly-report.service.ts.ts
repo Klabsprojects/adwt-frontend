@@ -11,10 +11,10 @@ export class MonthlyReportService {
 
   constructor(private http: HttpClient) {}
 
-  // Get districts and subdivisions
+/*   // Get districts and subdivisions
   getDistricts(): Observable<any> {
     return this.http.get(`${this.baseUrl}/districts`);
-  }
+  } */
 
   // Get attendees for SDLVMC or DLVMC
   getAttendees(
