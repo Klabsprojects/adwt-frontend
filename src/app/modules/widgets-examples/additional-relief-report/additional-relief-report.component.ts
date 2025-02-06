@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ReportsCommonService } from 'src/app/services/reports-common.service';
 
 @Component({
   selector: 'app-additional-relief-report',
@@ -34,7 +35,7 @@ export class AdditionalReliefReportComponent implements OnInit{
   selectedtypeOfAdditionalReleif: string = '';
   itemsPerPage: number = 10;
   isReliefLoading: boolean = true;
-
+  loading: boolean = false;
   // Filters
   selectedDistrict: string = '';
   selectedColumns: string[] = [];
@@ -44,69 +45,8 @@ export class AdditionalReliefReportComponent implements OnInit{
   // selectedtypeOfAdditionalReleif: string = '';
 
   // Filter options
-  districts: string[] = [
-    'Ariyalur',
-    'Chengalpattu',
-    'Chennai',
-    'Coimbatore',
-    'Cuddalore',
-    'Dharmapuri',
-    'Dindigul',
-    'Erode',
-    'Kallakurichi',
-    'Kanchipuram',
-    'Kanniyakumari',
-    'Karur',
-    'Krishnagiri',
-    'Madurai',
-    'Mayiladuthurai',
-    'Nagapattinam',
-    'Namakkal',
-    'Nilgiris',
-    'Perambalur',
-    'Pudukkottai',
-    'Ramanathapuram',
-    'Ranipet',
-    'Salem',
-    'Sivagangai',
-    'Tenkasi',
-    'Thanjavur',
-    'Theni',
-    'Thoothukudi (Tuticorin)',
-    'Tiruchirappalli (Trichy)',
-    'Tirunelveli',
-    'Tirupathur',
-    'Tiruppur',
-    'Tiruvallur',
-    'Tiruvannamalai',
-    'Tiruvarur',
-    'Vellore',
-    'Viluppuram',
-    'Virudhunagar',
-  ];
-
-  naturesOfOffence: string[] = [
-    'Theft',
-    'Assault',
-    'Fraud',
-    'Murder',
-    'Kidnapping',
-    'Cybercrime',
-    'Robbery',
-    'Arson',
-    'Cheating',
-    'Extortion',
-    'Dowry Harassment',
-    'Rape',
-    'Drug Trafficking',
-    'Human Trafficking',
-    'Domestic Violence',
-    'Burglary',
-    'Counterfeiting',
-    'Attempt to Murder',
-    'Hate Crime',
-    'Terrorism',
-  ];
+  districts: string[] = [];
+  naturesOfOffence: string[] = [];
 
   statusesOfCase: string[] = ['Just Starting', 'Pending', 'Completed'];
   statusesOfRelief: string[] = ['FIR Stage', 'ChargeSheet Stage', 'Trial Stage'];
@@ -167,6 +107,7 @@ export class AdditionalReliefReportComponent implements OnInit{
   constructor(
     // private firService: FirListTestService,
     private cdr: ChangeDetectorRef,
+    private reportsCommonService: ReportsCommonService,
     private router: Router
   ) {
     //this.getReportdata()
@@ -174,7 +115,13 @@ export class AdditionalReliefReportComponent implements OnInit{
 
   ngOnInit(): void {
     this.displayedColumns = [...this.defaultColumns];// Initialize default columns
-    this.generateDummyData(); // Load dummy data for testing
+    this.reportsCommonService
+      .getAllData()
+      .subscribe(({ districts, offences }) => {
+        this.districts = districts;
+        this.naturesOfOffence = offences;
+        this.generateDummyData();
+      });
     this.filteredData = [...this.reportData];
     this.selectedColumns = this.displayedColumns.map(column => column.field);
   }
@@ -241,6 +188,8 @@ export class AdditionalReliefReportComponent implements OnInit{
         others_reason_current: i % 4 === 0 ? 'Other Reason ' + i : '',
       });
     }
+    this.filteredData = [...this.reportData]; // Update filteredData
+    this.cdr.detectChanges(); // Trigger change detection
   }
 
   // Apply filters to the FIR list
@@ -254,6 +203,11 @@ export class AdditionalReliefReportComponent implements OnInit{
       
       return matchesSearchText && matchesDistrict && matchesNature;
     });
+    this.filteredData = this.filteredData.map((report, index) => ({...report, sl_no: index + 1 })); // Assign sl_no starting from 1
+    const totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage); // Reset page if filteredData is empty or if the current page exceeds the number of pages
+    if (this.page > totalPages) {
+        this.page = 1; // Reset to the first page
+    }
   }
 
   // Filtered FIR list based on search and filter criteria
@@ -295,27 +249,24 @@ export class AdditionalReliefReportComponent implements OnInit{
 
   // Sorting logic
   sortTable(field: string) {
-    if (this.currentSortField === field) {
-      this.isAscending = !this.isAscending;
-    } else {
-      this.currentSortField = field;
-      this.isAscending = true;
-    }
-
-    this.filteredData.sort((a, b) => {
-      const valA = a[field]?.toString().toLowerCase() || '';
-      const valB = b[field]?.toString().toLowerCase() || '';
-      return this.isAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
-    });
+    const result = this.reportsCommonService.sortTable(
+      this.filteredData,
+      field,
+      this.currentSortField,
+      this.isAscending
+    );
+    this.filteredData = result.sortedData;
+    this.currentSortField = result.newSortField;
+    this.isAscending = result.newIsAscending;
   }
 
   // Get the sort icon class
   getSortIcon(field: string): string {
-    return this.currentSortField === field
-      ? this.isAscending
-        ? 'fa-sort-up'
-        : 'fa-sort-down'
-      : 'fa-sort';
+    return this.reportsCommonService.getSortIcon(
+      field,
+      this.currentSortField,
+      this.isAscending
+    );
   }
 
    // Pagination controls
@@ -359,6 +310,16 @@ export class AdditionalReliefReportComponent implements OnInit{
         }
       );
   } */
+
+  // Download Reports
+  async onBtnExport(): Promise<void> {
+    this.loading = true;
+    await this.reportsCommonService.exportToExcel(
+      this.filteredData,
+      this.displayedColumns
+    );
+    this.loading = false;
+  }
 
 }
 

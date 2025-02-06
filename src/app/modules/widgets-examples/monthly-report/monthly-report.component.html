@@ -2,6 +2,7 @@
   <div class="card-header border-0 pt-6">
     <div class="card-title">
       <div class="d-flex align-items-center position-relative my-1">
+        <i class="fas fa-search fs-3 position-absolute ms-5"></i>
         <input type="text" [(ngModel)]="searchText" (input)="applyFilters()"
           class="form-control form-control-solid w-250px ps-12" placeholder="Search Reports" />
       </div>
@@ -64,7 +65,6 @@
         </tr>
       </thead>
       <tbody>
-        <ng-container *ngIf="dataReady">
           <tr *ngFor="let report of paginatedData()">
             <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
               <ng-container [ngSwitch]="column.field">
@@ -99,7 +99,6 @@
               </ng-container>
             </td>
           </tr>
-        </ng-container>
       </tbody>
     </table>
     <!-- Show message if filtered data is empty -->

@@ -8,7 +8,7 @@
             [(ngModel)]="searchText"
             (input)="applyFilters()"
             class="form-control form-control-solid w-250px ps-12"
-            placeholder="Search"
+            placeholder="Search Reports"
           />
         </div>
       </div>
@@ -77,9 +77,9 @@
         <table class="table table-bordered table-responsive">
           <thead>
             <tr>
-                <th *ngFor="let column of displayedColumns" [hidden]="!column.visible">
+                <th *ngFor="let column of displayedColumns" [hidden]="!column.visible" (click)="column.sortable ? sortTable(column.field) : null">
                   {{ column.label }}
-                  <i *ngIf="column.sortable" class="fas" [ngClass]="getSortIcon(column.field)" (click)="sortTable(column.field)"></i>
+                  <i *ngIf="column.sortable" class="fas" [ngClass]="getSortIcon(column.field)"></i>
                 </th>
             </tr>
           </thead>
@@ -94,7 +94,11 @@
             </tr>
           </tbody>
         </table>
-       
+       <!-- Show message if filtered data is empty -->
+      <div *ngIf="filteredData.length === 0 && reportData.length > 0" class="alert alert-warning">
+        No FIR data available.
+      </div>
+      <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button>
         <nav *ngIf="filteredData.length > itemsPerPage" class="d-flex justify-content-end mt-3">
           <ul class="pagination">
             <li class="page-item" [class.disabled]="page === 1">

@@ -10,8 +10,7 @@ import * as FileSaver from 'file-saver';
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
 import { MonthlyReportService } from 'src/app/services/monthly-report.service.ts';
-import { DistrictService } from 'src/app/services/district.service';
-import { OffenceService } from 'src/app/services/offence.service';
+import { ReportsCommonService } from 'src/app/services/reports-common.service';
 
 @Component({
   selector: 'app-monthly-report',
@@ -40,7 +39,6 @@ export class MonthlyReportComponent implements OnInit {
 
   districts: string[] = [];
   natureOfOffences: string[] = [];
-  dataReady: boolean = false;
 
   caseStatuses: string[] = ['Just Starting', 'Pending', 'Completed'];
   courtDistricts: string[] = [
@@ -63,6 +61,7 @@ export class MonthlyReportComponent implements OnInit {
   itemsPerPage: number = 10;
   isAdmin: boolean = true;
   selectedCaseStatus: string = '';
+  loading: boolean = false;
 
   displayedColumns: {
     field: string;
@@ -178,22 +177,24 @@ export class MonthlyReportComponent implements OnInit {
     },
   ];
 
-  loading = false;
-
   caseStatusOptions: string[] = ['Under Investigation', 'Pending Trial'];
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private districtService: DistrictService,
-    private offenceService: OffenceService,
+    private reportsCommonService: ReportsCommonService,
     private monthlyReportService: MonthlyReportService
   ) {
-    this.getAllDistricts();
-    this.getAllOffences();
     //this.getReportdata();
   }
 
   ngOnInit(): void {
+    this.reportsCommonService
+      .getAllData()
+      .subscribe(({ districts, offences }) => {
+        this.districts = districts;
+        this.natureOfOffences = offences;
+        this.generateDummyData();
+      });
     this.filteredData = [...this.reportData];
     this.selectedColumns = this.displayedColumns.map((column) => column.field);
   }
@@ -206,13 +207,6 @@ export class MonthlyReportComponent implements OnInit {
     } else {
       this.filteredData = [...this.reportData];
     }
-  }
-
-  formatPendingDays(days: number): string {
-    if (!days || days < 0) return 'NA';
-    if (days <= 90) return `${days} days`;
-    if (days <= 365) return `${Math.floor(days / 30)} months`;
-    return `${Math.floor(days / 365)} years`;
   }
 
   getCaseStatusDropdown(): string[] {
@@ -241,7 +235,6 @@ export class MonthlyReportComponent implements OnInit {
       });
     }
     this.filteredData = [...this.reportData]; // Update filteredData
-    this.dataReady = true;
     this.cdr.detectChanges(); // Trigger change detection
   }
 
@@ -311,32 +304,33 @@ export class MonthlyReportComponent implements OnInit {
         matchesSearchText && matchesDistrict && matchesNature && matchesStatus
       );
     });
+    this.filteredData = this.filteredData.map((report, index) => ({...report, sl_no: index + 1 })); // Assign sl_no starting from 1
+    const totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage); // Reset page if filteredData is empty or if the current page exceeds the number of pages
+    if (this.page > totalPages) {
+        this.page = 1; // Reset to the first page
+    }
   }
 
   // Sorting logic
   sortTable(field: string) {
-    if (this.currentSortField === field) {
-      this.isAscending = !this.isAscending;
-    } else {
-      this.currentSortField = field;
-      this.isAscending = true;
-    }
-    this.filteredData.sort((a, b) => {
-      const valA = a[field]?.toString().toLowerCase() || '';
-      const valB = b[field]?.toString().toLowerCase() || '';
-      return this.isAscending
-        ? valA.localeCompare(valB)
-        : valB.localeCompare(valA);
-    });
+    const result = this.reportsCommonService.sortTable(
+      this.filteredData,
+      field,
+      this.currentSortField,
+      this.isAscending
+    );
+    this.filteredData = result.sortedData;
+    this.currentSortField = result.newSortField;
+    this.isAscending = result.newIsAscending;
   }
 
   // Get the sort icon class
   getSortIcon(field: string): string {
-    return this.currentSortField === field
-      ? this.isAscending
-        ? 'fa-sort-up'
-        : 'fa-sort-down'
-      : 'fa-sort';
+    return this.reportsCommonService.getSortIcon(
+      field,
+      this.currentSortField,
+      this.isAscending
+    );
   }
 
   goToPage(page: number): void {
@@ -377,90 +371,13 @@ export class MonthlyReportComponent implements OnInit {
       );
   } */
 
-  getAllDistricts() {
-    // Call the method to get all districts
-    this.districtService.getAllDistricts().subscribe((districts) => {
-      this.districts = districts.map(
-        (district: { district_name: string }) => district.district_name
-      ); // Map the response to extract district_name values
-    });
-  }
-
-  getAllOffences() {
-    // Call the method to get all offences
-    this.offenceService.getAllOffences().subscribe((offence) => {
-      this.natureOfOffences = offence.map(
-        (offence: { offence_name: string }) => offence.offence_name
-      ); // Map the response to extract offence values
-      console.log('dataReady', this.dataReady);
-      this.generateDummyData(); // Call generateDummyData after districts are populated
-      console.log('dataReady', this.dataReady);
-    });
-  }
-
+  // Download Reports
   async onBtnExport(): Promise<void> {
-    try {
-      if (this.filteredData.length === 0) {
-        alert('No Data Found');
-        return;
-      }
-
-      this.loading = true;
-
-      // Filter columns based on visibility
-      const visibleColumns = this.displayedColumns.filter(
-        (column) => column.visible
-      );
-
-      // Prepare data for export
-      const exportData = this.filteredData.map((item, index) => {
-        const exportedItem: any = { 'S.No': index + 1 };
-
-        visibleColumns.forEach((column) => {
-          const key = column.field; // The key in the item to export
-          const label = column.label; // The label for the exported column
-          if (key === 'sl_no') {
-            // Skip adding "Sl. No." from the visibleColumns
-            return; // Skip this iteration
-          }
-          if (key in item) {
-            // Format specific fields if necessary
-            if (key === 'uiPendingDays' || key === 'ptPendingDays') {
-              exportedItem[label] = this.formatPendingDays(item[key]); // Corrected method name
-            } else {
-              exportedItem[label] = item[key];
-            }
-          }
-        });
-
-        return exportedItem;
-      });
-
-      // Export data to Excel
-      await this.exportExcel(exportData);
-    } catch (error) {
-      console.error('Export failed:', error);
-    } finally {
-      this.loading = false;
-    }
-  }
-
-  private async exportExcel(list: any[]): Promise<void> {
-    const xlsx = await import('xlsx');
-    const worksheet = xlsx.utils.json_to_sheet(list);
-    const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
-    const excelBuffer: any = xlsx.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
-    });
-    this.saveAsExcelFile(excelBuffer, 'All-Forms');
-  }
-
-  private saveAsExcelFile(buffer: any, fileName: string): void {
-    const EXCEL_TYPE =
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-    const EXCEL_EXTENSION = '.xlsx';
-    const data: Blob = new Blob([buffer], { type: EXCEL_TYPE });
-    FileSaver.saveAs(data, fileName + '_' + EXCEL_EXTENSION);
+    this.loading = true;
+    await this.reportsCommonService.exportToExcel(
+      this.filteredData,
+      this.displayedColumns
+    );
+    this.loading = false;
   }
 }

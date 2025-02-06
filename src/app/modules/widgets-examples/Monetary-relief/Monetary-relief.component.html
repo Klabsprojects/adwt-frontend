@@ -4,7 +4,7 @@
       <div class="d-flex align-items-center position-relative my-1">
         <i class="fas fa-search fs-3 position-absolute ms-5"></i>
         <input type="text" [(ngModel)]="searchText" (input)="applyFilters()"
-          class="form-control form-control-solid w-250px ps-12" placeholder="Search" />
+          class="form-control form-control-solid w-250px ps-12" placeholder="Search Reports" />
       </div>
     </div>
     <!-- Drop List for columns -->
@@ -51,40 +51,35 @@
       <table class="table table-bordered table-responsive">
         <thead>
           <tr>
-              <th *ngFor="let column of displayedColumns" [hidden]="!column.visible">
-                {{ column.label }}
-                <i *ngIf="column.sortable" class="fas" [ngClass]="getSortIcon(column.field)" (click)="sortTable(column.field)"></i>
-              </th>
+            <th *ngFor="let column of displayedColumns" [hidden]="!column.visible" (click)="column.sortable ? sortTable(column.field) : null">
+              {{ column.label }}
+              <i *ngIf="column.sortable" class="fas" [ngClass]="getSortIcon(column.field)"></i>
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let report of paginatedData()">
             <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
               <ng-container [ngSwitch]="column.field">
-  
+
                 <!-- Case Status Dropdown -->
-                <span *ngSwitchCase="'case_status'">
+                <!-- <span *ngSwitchCase="'case_status'">
                   <select class="form-select" [(ngModel)]="report.case_status" (change)="onCaseStatusChange(report)">
                     <option *ngFor="let status of caseStatusOptions" [value]="status">{{ status }}</option>
                   </select>
-                </span>
+                </span> -->
 
                 <!-- Relief Status Dropdown -->
-                <span *ngSwitchCase="'relief_status'">
+                <!-- <span *ngSwitchCase="'relief_status'">
                   <select class="form-select" [(ngModel)]="report.relief_status">
                     <option *ngFor="let relief of reliefStatusOptions" [value]="relief">{{ relief }}</option>
                   </select>
-                </span>
+                </span> -->
                 <!-- Reason for Status Current Month -->
-                <span *ngSwitchCase="'reason_current_month'">
-                  <input
-                    type="text"
-                    class="form-control"
-                    [(ngModel)]="report.reason_current_month"
-                  
-                    placeholder="Enter reason for current month"
-                  />
-                </span>
+                <!-- <span *ngSwitchCase="'reason_current_month'">
+                  <input type="text" class="form-control" [(ngModel)]="report.reason_current_month"
+                    placeholder="Enter reason for current month" />
+                </span> -->
                 <!-- Default Case -->
                 <span *ngSwitchDefault>{{ report[column.field] }}</span>
               </ng-container>
@@ -92,7 +87,11 @@
           </tr>
         </tbody>
       </table>
-     
+      <!-- Show message if filtered data is empty -->
+      <div *ngIf="filteredData.length === 0 && reportData.length > 0" class="alert alert-warning">
+        No FIR data available.
+      </div>
+      <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button>
       <nav *ngIf="filteredData.length > itemsPerPage" class="d-flex justify-content-end mt-3">
         <ul class="pagination">
           <li class="page-item" [class.disabled]="page === 1">
@@ -109,6 +108,6 @@
         </ul>
       </nav>
     </div>
-    
+
   </div>
 </div>
