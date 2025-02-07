@@ -165,14 +165,14 @@ export class MonthlyReportComponent implements OnInit {
       field: 'reasonPreviousMonth',
       label: 'Reason for Status (Previous Month)',
       visible: true,
-      sortable: false,
+      sortable: true,
       sortDirection: null,
     },
     {
       field: 'reasonCurrentMonth',
       label: 'Reason for Status (Current Month)',
       visible: true,
-      sortable: false,
+      sortable: true,
       sortDirection: null,
     },
   ];
@@ -215,19 +215,20 @@ export class MonthlyReportComponent implements OnInit {
 
   generateDummyData(): void {
     for (let i = 1; i <= 50; i++) {
+      const caseStatusIndex = Math.floor(Math.random() * 8);
+      const caseStatus = this.reportsCommonService.getCaseStatus(caseStatusIndex);
       this.reportData.push({
         sl_no: i,
         policeCity: this.districts[i % this.districts.length],
         stationName: `Station ${i}`,
         firNumber: `FIR-${1000 + i}`,
-        natureOfOffence:
-          this.natureOfOffences[i % this.natureOfOffences.length],
+        natureOfOffence: this.natureOfOffences[i % this.natureOfOffences.length],
         poaSection: `Section ${(i % 10) + 1}`,
         noOfVictim: Math.floor(Math.random() * 5) + 1,
         courtDistrict: `Court District ${(i % 3) + 1}`,
         courtName: `Court Name ${(i % 3) + 1}`,
         caseNumber: `CC-${2000 + i}`,
-        caseStatus: this.caseStatusOptions[i % this.caseStatusOptions.length],
+        caseStatus: caseStatus,
         uiPendingDays: Math.floor(Math.random() * 100),
         ptPendingDays: Math.floor(Math.random() * 100),
         reasonPreviousMonth: '',
@@ -286,29 +287,19 @@ export class MonthlyReportComponent implements OnInit {
     );
   }
 
+  // Applies filters, assigns serial numbers, and resets pagination
   applyFilters(): void {
-    this.filteredData = this.reportData.filter((report) => {
-      const matchesSearchText = Object.values(report).some((value) =>
-        value?.toString().toLowerCase().includes(this.searchText.toLowerCase())
-      );
-      const matchesDistrict = this.selectedDistrict
-        ? report.policeCity === this.selectedDistrict
-        : true;
-      const matchesNature = this.selectedNatureOfOffence
-        ? report.natureOfOffence === this.selectedNatureOfOffence
-        : true;
-      const matchesStatus = this.selectedStatusOfCase
-        ? report.caseStatus === this.selectedStatusOfCase
-        : true;
-      return (
-        matchesSearchText && matchesDistrict && matchesNature && matchesStatus
-      );
-    });
+    this.filteredData = this.reportsCommonService.applyFilters(
+      this.reportData,
+      this.searchText,
+      this.selectedDistrict,
+      this.selectedNatureOfOffence,
+      this.selectedStatusOfCase,
+      this.selectedStatusOfRelief,
+      'policeCity', 'natureOfOffence', 'caseStatus'
+    );
     this.filteredData = this.filteredData.map((report, index) => ({...report, sl_no: index + 1 })); // Assign sl_no starting from 1
-    const totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage); // Reset page if filteredData is empty or if the current page exceeds the number of pages
-    if (this.page > totalPages) {
-        this.page = 1; // Reset to the first page
-    }
+    this.page = 1; // Reset to the first page
   }
 
   // Sorting logic

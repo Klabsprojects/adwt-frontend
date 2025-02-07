@@ -90,7 +90,7 @@ export class MonetaryReliefComponent implements OnInit {
     {
       label: 'Status',
       field: 'status',
-      sortable: false,
+      sortable: true,
       visible: true,
       sortDirection: null,
     },
@@ -125,14 +125,14 @@ export class MonetaryReliefComponent implements OnInit {
     {
       label: 'Reason for Status (Previous Month)',
       field: 'reason_previous_month',
-      sortable: false,
+      sortable: true,
       visible: true,
       sortDirection: null,
     },
     {
       label: 'Reason for Status (Current Month)',
       field: 'reason_current_month',
-      sortable: false,
+      sortable: true,
       visible: true,
       sortDirection: null,
     },
@@ -201,12 +201,15 @@ export class MonetaryReliefComponent implements OnInit {
   // Load FIR list from the backend (dummy data for now)
   generateDummyData(): void {
     for (let i = 1; i <= 15; i++) {
+      const caseStatusIndex = Math.floor(Math.random() * 8);
+      const caseStatus =
+        this.reportsCommonService.getCaseStatus(caseStatusIndex);
       this.reportData.push({
         sl_no: i,
         fir_id: `FIR-${1000 + i}`,
         police_city: this.districts[i % this.districts.length],
         police_station: `Station ${i}`,
-        status: '',
+        status: caseStatus,
         nature_of_offence:
           this.naturesOfOffence[i % this.naturesOfOffence.length],
         case_status: this.caseStatusOptions[i % this.caseStatusOptions.length],
@@ -220,31 +223,24 @@ export class MonetaryReliefComponent implements OnInit {
     this.cdr.detectChanges(); // Trigger change detection
   }
 
-  // Apply filters to the FIR list
+  // Applies filters, assigns serial numbers, and resets pagination
   applyFilters(): void {
-    this.filteredData = this.reportData.filter((report) => {
-      const matchesSearchText = Object.values(report).some((value) =>
-        value?.toString().toLowerCase().includes(this.searchText.toLowerCase())
-      );
-
-      const matchesDistrict = this.selectedDistrict
-        ? report.police_city === this.selectedDistrict
-        : true;
-      const matchesNature = this.selectedNatureOfOffence
-        ? report.nature_of_offence === this.selectedNatureOfOffence
-        : true;
-      const matchesStatus = this.selectedStatusOfCase
-        ? report.case_status === this.selectedStatusOfCase
-        : true;
-      return (
-        matchesSearchText && matchesDistrict && matchesNature && matchesStatus
-      );
-    });
-    this.filteredData = this.filteredData.map((report, index) => ({...report, sl_no: index + 1 })); // Assign sl_no starting from 1
-    const totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage); // Reset page if filteredData is empty or if the current page exceeds the number of pages
-    if (this.page > totalPages) {
-        this.page = 1; // Reset to the first page
-    }
+    this.filteredData = this.reportsCommonService.applyFilters(
+      this.reportData,
+      this.searchText,
+      this.selectedDistrict,
+      this.selectedNatureOfOffence,
+      this.selectedStatusOfCase,
+      this.selectedStatusOfRelief,
+      'police_city',
+      'nature_of_offence',
+      'status'
+    );
+    this.filteredData = this.filteredData.map((report, index) => ({
+      ...report,
+      sl_no: index + 1,
+    })); // Assign sl_no starting from 1
+    this.page = 1; // Reset to the first page
   }
 
   // Filtered FIR list based on search and filter criteria
