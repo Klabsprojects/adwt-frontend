@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,8 @@ export class FirServiceAPI {
   getVictimDetailsByFirId(firId: string) {
     throw new Error('Method not implemented.');
   }
-  private baseUrl = 'http://localhost:3010/fir';
+  // private baseUrl = 'http://localhost:3010/fir';
+  private baseUrl = environment.apiUrl+'fir';
   // private baseUrl = 'https://adwatrocity.onlinetn.com/api/v1/fir';
   // Adjust this to your actual API base URL
 

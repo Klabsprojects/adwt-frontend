@@ -8,8 +8,6 @@ import { environment } from 'src/environments/environment.prod';
 export class FirListTestService {
   private baseUrl = environment.apiUrl+'fir_list'; // Your backend URL
   // private baseUrl = 'https://adwatrocity.onlinetn.com/api/v1/fir_list';
-  // private baseUrl1 = 'http://localhost:3010/fir_list';
-  private baseUrl1 = 'https://adwatrocity.onlinetn.com/api/v1/fir_list';
 
   constructor(private http: HttpClient) {}
 
@@ -31,10 +29,13 @@ export class FirListTestService {
   }
 
   getFirView(firId: number): Observable<any> {
-    return this.http.get<any[]>(`${this.baseUrl1}/view?fir_id=${firId}`);
+    return this.http.get<any[]>(`${this.baseUrl}/view?fir_id=${firId}`);
   }
 
+  // getReportdata(): Observable<any> {
+  //   return this.http.get('http://localhost:3010/additionalreport/getadditionalreportdetail');
+  // }
   getReportdata(): Observable<any> {
-    return this.http.get('http://localhost:3010/additionalreport/getadditionalreportdetail');
+    return this.http.get(`${environment.apiUrl}/additionalreport/getadditionalreportdetail`);
   }
 }

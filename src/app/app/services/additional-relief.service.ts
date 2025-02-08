@@ -8,7 +8,6 @@ import { environment } from 'src/environments/environment.prod';
 export class AdditionalReliefService {
 
   private apiUrl = environment.apiUrl+'fir-additional-relief';
-  //private apiUrl = 'http://localhost:3000/fir-additional-relief';
 
   constructor(private http: HttpClient) {}
 

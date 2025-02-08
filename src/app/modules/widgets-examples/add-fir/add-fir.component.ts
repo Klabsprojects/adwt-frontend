@@ -1,16 +1,16 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, TemplateRef, OnDestroy, HostListener } from '@angular/core';
-import { Router, NavigationStart, Event as RouterEvent } from '@angular/router';
-import { FormControl, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { Router, NavigationStart, RouterEvent } from '@angular/router';
+// import { FormControl, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { NgxFileDropModule } from 'ngx-file-drop';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  Validators,
-  FormArray,
+// import {
+//   FormsModule,
+//   ReactiveFormsModule,
+//   FormBuilder,
+//   FormGroup,
+//   Validators,
+//   FormArray,
 
-} from '@angular/forms';
+// } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -23,6 +23,7 @@ declare var $: any;
 
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 
 
 
@@ -47,9 +48,7 @@ export class AddFirComponent implements OnInit, OnDestroy {
 
   selectedFile: File | null = null;
 
-  onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
-  }
+ 
 
   remainingCharacters: number[] = [];
   showOtherGender: boolean[] = [];
@@ -76,6 +75,7 @@ export class AddFirComponent implements OnInit, OnDestroy {
   courtDivisions: string[] = [];
   courtRanges: string[] = [];
   proceedingsFile: File | null = null;
+  proceedingsFile_1: File | null = null;
   showDuplicateSection_1: boolean = false;
   showLegalOpinionObtained_two: boolean = false;
   showFiledBy_two: boolean = false;
@@ -197,7 +197,7 @@ i: number;
     }
 
     // Listen for route changes
-    this.router.events.subscribe((event: RouterEvent) => {
+    this.router.events.subscribe((event: any) => {
       if (event instanceof NavigationStart) {
         this.clearSession();
       }
@@ -247,21 +247,21 @@ loadCommunities(): void {
 
 onCommunityChange(event: any, index: number): void {
   const selectedCommunity = event.target.value;
-
-  if (selectedCommunity) {
-    this.firService.getCastesByCommunity(selectedCommunity).subscribe(
-      (castes: string[]) => {
-        const victimGroup = this.victims.at(index) as FormGroup;
-        victimGroup.patchValue({ caste: '' }); // Reset caste selection
-        victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
-        this.cdr.detectChanges();
-      },
-      (error) => {
-        console.error('Error fetching castes:', error);
-        Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
-      }
-    );
-  }
+// console.log(selectedCommunity,"wssss")
+    if (selectedCommunity) {
+      this.firService.getCastesByCommunity(selectedCommunity).subscribe(
+        (castes: string[]) => {
+          const victimGroup = this.victims.at(index) as FormGroup;
+          victimGroup.patchValue({ caste: '' }); // Reset caste selection
+          victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+          this.cdr.detectChanges();
+        },
+        (error) => {
+          console.error('Error fetching castes:', error);
+          Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+        }
+      );
+    }
 }
 
 loadDistricts(): void {
@@ -278,7 +278,10 @@ loadDistricts(): void {
 loadAccusedCommunities(): void {
   this.firService.getAllAccusedCommunities().subscribe(
     (communities: string[]) => {
-      this.accusedCommunitiesOptions = communities; // Populate accused community options
+      this.accusedCommunitiesOptions = communities; 
+      
+      
+      // Populate accused community options
     },
     (error) => {
       console.error('Error loading accused communities:', error);
@@ -298,7 +301,8 @@ onAccusedCommunityChange(event: any, index: number): void {
       (castes: string[]) => {
         const accusedGroup = this.accuseds.at(index) as FormGroup;
         accusedGroup.patchValue({ caste: '' }); // Reset caste selection
-        accusedGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+        accusedGroup.get('availableCastes')?.setValue(castes);
+        // console.log(accusedGroup.get('availableCastes')?.value,"datdadadadada"); 
         this.cdr.detectChanges();
       },
       (error) => {
@@ -523,20 +527,18 @@ onFileSelect_3(event: Event, controlName: string): void {
 
   // Handle file selection
   onFileSelect(event: any, index: number): void {
-    const file = event.target.files[0]; // Get the selected file
+    const file = event.target.files[0];
     if (file) {
       const attachmentGroup = this.attachments.at(index) as FormGroup;
 
-      // Simulate a file path (you might have an actual path from the file upload response in real scenarios)
       const simulatedFilePath = `/uploads/${file.name}`;
 
-      // Patch the values to the form group
+    
       attachmentGroup.patchValue({
-        fileName: file.name, // File name
-        filePath: simulatedFilePath, // Simulated file path
+        fileName: file.name,
+        filePath: simulatedFilePath, 
       });
 
-      // Trigger change detection to update the UI
       this.cdr.detectChanges();
     }
   }
@@ -775,8 +777,9 @@ onFileSelect_3(event: Event, controlName: string): void {
       proceedingsFile: ['', Validators.required],
       proceedingsDate: ['', Validators.required],
       uploadProceedings: ['', Validators.required],
-      attachments: this.fb.array([]) // Dynamic attachments array
+      // attachments: this.fb.array([]) 
 
+      attachments: this.fb.array([this.createAttachmentGroup()]),
     },
     { validators: this.dateTimeValidator() }
   );
@@ -837,14 +840,31 @@ get attachments_2(): FormArray {
 }
 
 
+// onFileSelect_1(event: any, index: number): void {
+//   const file = event.target.files[0];
+//   if (file) {
+//     const attachmentGroup = this.attachments_1.at(index) as FormGroup;
+//     attachmentGroup.patchValue({
+//       file,
+//       fileName: file.name,
+//     });
+//   }
+// }
+
 onFileSelect_1(event: any, index: number): void {
   const file = event.target.files[0];
   if (file) {
     const attachmentGroup = this.attachments_1.at(index) as FormGroup;
+
+    const simulatedFilePath = `/uploads/${file.name}`;
+
+  
     attachmentGroup.patchValue({
-      file,
       fileName: file.name,
+   file
     });
+
+    this.cdr.detectChanges();
   }
 }
 
@@ -1129,6 +1149,9 @@ onAdditionalReliefChange(event: Event, value: string): void {
 
   populateVictimsRelief(victimsReliefDetails: any[]): void {
     const victimsReliefArray = this.victimsRelief;
+
+console.log(victimsReliefArray,"victimsReliefArray")
+
     victimsReliefArray.clear(); // Clear existing form controls
 
     victimsReliefDetails.forEach((victim: any) => {
@@ -1324,7 +1347,7 @@ onAdditionalReliefChange(event: Event, value: string): void {
 
     this.firService.getVictimsReliefDetails(this.firId).subscribe(
       (response: any) => {
-        //console.log('Victim Relief Details:', response.victimsReliefDetails); // Log response data
+        console.log('Victim Relief Details:', response.victimsReliefDetails); // Log response data
         if (response && response.victimsReliefDetails) {
           this.populateVictimsRelief(response.victimsReliefDetails);
         } else {
@@ -1438,7 +1461,7 @@ updateVictimNames(): void {
 
   if (this.victimNames.length > 0) {
     // Call the API to fetch relief details for each victim
-    this.firService.getVictimsReliefDetails(this.firId!).subscribe(
+    this.firService.getVictimsReliefDetails(this.firId).subscribe(
       (response: any) => {
         if (response.victimsReliefDetails) {
           this.populateVictimsRelief(response.victimsReliefDetails);
@@ -1589,7 +1612,6 @@ createVictimReliefGroup(initialValues: any = {}): FormGroup {
     additionalRelief: [initialValues.additionalRelief || []],
   });
 }
-
 
 
 
@@ -1891,7 +1913,6 @@ handleCaseTypeChange() {
     }
   }
 
-
   addAttachment_2(): void {
     this.attachments_2.push(this.createAttachmentGroup());
   }
@@ -1912,7 +1933,17 @@ handleCaseTypeChange() {
     return this.firForm.get('attachments') as FormArray;
   }
 
-
+  onFileChange(event: any, index: number, fileControl: string, fileNameControl: string): void {
+    const file = event.target.files[0];
+    if (file) {
+      const attachment = this.attachments.at(index);
+      attachment.patchValue({
+        [fileControl]: file,
+        [fileNameControl]: file.name,
+      });
+    }
+  }
+  
 
   saveStepThreeAsDraft() {
     const firData = {
@@ -1945,7 +1976,7 @@ handleCaseTypeChange() {
       isDeceased: this.firForm.get('isDeceased')?.value,
       deceasedPersonNames: this.firForm.get('deceasedPersonNames')?.value || [],
     };
-
+console.log(firData,"firDatafirDatafirData")
     this.firService.saveStepThreeAsDraft(firData).subscribe(
       (response: any) => {
         this.firId = response.fir_id;
@@ -1970,51 +2001,82 @@ handleCaseTypeChange() {
 
 
 
+  // mahiiii coded.........////////////////////////////////
+  onFileSelected(event: any, i: number): void {
+    const selectedFile = event.target.files[0]; 
+  
+  
+    if (!this.multipleFiles[i]) {
+      this.multipleFiles[i] = [];  
+    }
+  
 
+    this.multipleFiles[i].push(selectedFile);
+  
+    // console.log('Updated files for accused index:', this.multipleFiles[i]);
+  }
+  
 
 // Save Step 4 as Draft
 saveStepFourAsDraft(): void {
   const firData = {
     firId: this.firId,
     numberOfAccused: this.firForm.get('numberOfAccused')?.value || '',
-    accuseds: this.accuseds.value.map((accused: any) => ({
+    accuseds: this.firForm.get('accuseds')?.value.map((accused: any, index: number) => ({
       ...accused,
-      accusedId: accused.accusedId || null, // Include accusedId if it exists
+      accusedId: accused.accusedId || null,
+      uploadFIRCopy: this.multipleFiles[index] || null
+  
+
+
     })),
-    uploadFIRCopy: this.selectedFile, // Pass the actual File object here
   };
 
   console.log('FIR Data:', firData);
 
+
   this.firService.saveStepFourAsDraft(firData).subscribe(
-    (response: any) => {
-      this.firId = response.fir_id; // Set FIR ID from backend response
-      if (this.firId) {
-        sessionStorage.setItem('firId', this.firId); // Save FIR ID in session
-      }
-      // Map accused IDs back to the form
-      const updatedAccuseds = response.accuseds || [];
-      updatedAccuseds.forEach((updatedAccused: any, index: number) => {
-        if (this.accuseds.at(index)) {
-          this.accuseds.at(index).patchValue({ accusedId: updatedAccused.accusedId });
-        }
-      });
-      Swal.fire('Success', 'FIR saved as draft for step 4.', 'success');
-    },
-    (error) => {
-      console.error('Error saving FIR for step 4:', error);
-      Swal.fire('Error', 'Failed to save FIR as draft for step 4.', 'error');
-    }
+    (response: any) => this.handleSuccess(response),
+    (error) => this.handleError(error)
   );
 }
+multipleFiles: any[][] = [];
 
+
+handleSuccess(response: any) {
+  this.firId = response.fir_id;
+  if (this.firId) {
+    sessionStorage.setItem('firId', this.firId);
+  }
+  const updatedAccuseds = response.accuseds || [];
+  updatedAccuseds.forEach((updatedAccused: any, index: number) => {
+    if (this.accuseds.at(index)) {
+      this.accuseds.at(index).patchValue({ accusedId: updatedAccused.accusedId });
+    }
+  });
+
+  Swal.fire('Success', 'FIR saved as draft for step 4.', 'success');
+}
+
+
+handleError(error: any) {
+  console.error('Error saving FIR for step 4:', error);
+  Swal.fire('Error', 'Failed to save FIR as draft for step 4.', 'error');
+}
 
 onProceedingsFileChange(event: Event): void {
   const input = event.target as HTMLInputElement;
   if (input.files && input.files.length > 0) {
-    this.proceedingsFile = input.files[0]; // Save the selected file
+    this.proceedingsFile = input.files[0];
+
+    // console.log(this.proceedingsFile,"this.proceedingsFile")
+    
+    
+    // Save the selected file
   }
 }
+
+
 
 saveStepFiveAsDraft(isSubmit: boolean = false): void {
   if (!this.firId) {
@@ -2022,7 +2084,6 @@ saveStepFiveAsDraft(isSubmit: boolean = false): void {
     return;
   }
 
-  // Prepare the FIR data
   const firData = {
     firId: this.firId,
     victimsRelief: this.victimsRelief.value.map((relief: any, index: number) => ({
@@ -2042,13 +2103,14 @@ saveStepFiveAsDraft(isSubmit: boolean = false): void {
     totalCompensation: this.firForm.get('totalCompensation')?.value || '0.00',
     proceedingsFileNo: this.firForm.get('proceedingsFileNo')?.value || '',
     proceedingsDate: this.firForm.get('proceedingsDate')?.value || null,
-    proceedingsFile: this.firForm.get('proceedingsFile')?.value || '',
-    attachments: this.attachments.value.map((attachment: any) => ({
-      fileName: attachment.fileName || null, // Name of the uploaded file
-      filePath: attachment.filePath || null, // Path where the file is stored
-    })),
+    proceedingsFile: this.proceedingsFile || '',
+    attachments: this.attachments.value || '',
     status: isSubmit ? 5 : null, // Include status if this is a submission
   };
+
+
+
+// console.log(firData, "firDatafirDatafirDatafirData")
 
   // Call the service to save the data
   this.firService.saveStepFiveAsDraft(firData).subscribe(
@@ -2151,6 +2213,7 @@ navigateToNextPage(): void {
     this.step = 1;      // Reset to Step 1 of the new stage
   } else if (this.mainStep === 1 && this.step < 5) {
     this.step++;        // Go to the next step within the same main stage
+    this.loadVictimsReliefDetails();
   } else if (this.mainStep === 1 && this.step === 5) {
     this.mainStep = 2;  // Move to Chargesheet Stage after FIR Stage
     this.step = 1;      // Reset to Step 1 of Chargesheet Stage
@@ -2177,11 +2240,23 @@ saveAsDraft(): void {
   }
 }
 
-saveAsDraft_6(isSubmit: boolean = false): void {
-  if (!this.firId) {
-    Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
-    return;
+onProceedingsFileChange_1(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    this.proceedingsFile_1 = input.files[0];
+
+    console.log(this.proceedingsFile_1,"this.proceedingsFile")
+    
+    
+    // Save the selected file
   }
+}
+
+saveAsDraft_6(isSubmit: boolean = false): void {
+  // if (!this.firId) {
+  //   Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
+  //   return;
+  // }
   this.victimsRelief.controls.forEach((control) => {
     control.get('reliefAmountSecondStage')?.enable(); // Temporarily enable
   });
@@ -2206,7 +2281,7 @@ saveAsDraft_6(isSubmit: boolean = false): void {
       totalCompensation: parseFloat(this.firForm.get('totalCompensation_1')?.value || '0.00').toFixed(2),
       proceedingsFileNo: this.firForm.get('proceedingsFileNo_1')?.value || '',
       proceedingsDate: this.firForm.get('proceedingsDate_1')?.value || null,
-      uploadProceedingsPath: this.firForm.get('uploadProceedings_1')?.value || '',
+      // uploadProceedingsPath: this.proceedingsFile_1 || '',
     },
     victimsRelief: this.victimsRelief.value.map((relief: any, index: number) => ({
       victimId: relief.victimId || null,
@@ -2215,12 +2290,14 @@ saveAsDraft_6(isSubmit: boolean = false): void {
       reliefAmountExGratia: parseFloat(relief.reliefAmountExGratia_1 || '0.00').toFixed(2),
       reliefAmountSecondStage: parseFloat(relief.reliefAmountSecondStage || '0.00').toFixed(2),
     })),
-    attachments: this.attachments_1.value.map((attachment: any) => ({
-      fileName: attachment.fileName_1 || null,
-      filePath: attachment.file_1 || null,
-    })),
+    uploadProceedingsPath: this.proceedingsFile_1 ,
+    attachments: this.attachments_1.value || '',
     status: 6, // Update status to 6 for the FIR
   };
+
+  console.log(chargesheetData,"chargesheetData")
+  console.log(this.victimsRelief.value,"victimsReliefvictimsRelief")
+  
 
   // Call the service to send data to the backend
   this.firService.saveStepSixAsDraft(chargesheetData).subscribe(
@@ -2312,7 +2389,7 @@ async  saveAsDraft_7() {
   }
 
   let uploadJudgementPath: string | undefined;
-  const uploadJudgementFileFile = this.firForm.get('uploadJudgement')?.value;
+  const uploadJudgementFileFile = this.firForm.get('judgementDetails.uploadJudgement')?.value;
   if (uploadJudgementFileFile) {
     const paths = await this.uploadMultipleFiles([uploadJudgementFileFile]);
     uploadJudgementPath = paths[0];
@@ -2902,11 +2979,12 @@ nextStep(): void {
   } else if (this.step === 4 && this.isStep4Valid()) {
     this.saveStepFourAsDraft();
     this.updateFirStatus(4); // Update status for step 4
+    this.loadVictimsReliefDetails();
+
     this.step++;
   } else if (this.step === 5 && this.isStep5Valid()) {
     this.submitStepFive(); // Final submission for Step 5
     this.updateFirStatus(5); // Update status for step 5 on submission
-    this.loadVictimsReliefDetails();
 
   } else {
     // Show an error message if the required fields are not filled
@@ -3307,11 +3385,30 @@ isStep5Valid(): boolean {
   // }
 
 
+  // async uploadMultipleFiles(files: File | File[]): Promise<string[]> {
+  //   // Ensure files is always an array
+  //   const fileArray = Array.isArray(files) ? files : [files];
+    
+  //   const uploadPromises = fileArray.map(file => this.uploadFile(file));
+  //   return Promise.all(uploadPromises);
+  // }
+
   async uploadMultipleFiles(files: File | File[]): Promise<string[]> {
+    // If no file is provided, return an empty array
+    if (!files) return [];
+  
     // Ensure files is always an array
     const fileArray = Array.isArray(files) ? files : [files];
+  
+    // Filter out any invalid file values (optional, to prevent processing invalid data)
+    const validFiles = fileArray.filter(file => file instanceof File);
     
-    const uploadPromises = fileArray.map(file => this.uploadFile(file));
+    // If no valid files remain, stop execution
+    if (validFiles.length === 0) return [];
+  
+    // Upload each valid file
+    const uploadPromises = validFiles.map(file => this.uploadFile(file));
+  
     return Promise.all(uploadPromises);
   }
 
@@ -3349,15 +3446,16 @@ isStep5Valid(): boolean {
     }
   }
 
-  uploadJudgementSelect(event: any): void {
-    const file = event.target.files[0];  // Get the first selected file
-  
-    if (file) {
-   
-      // Patch the file into the form (this assumes you have the form control set up correctly)
-      this.firForm.patchValue({
-        uploadJudgement: file,  // Storing the file in the form control
-      });
+  uploadJudgementSelect(event: Event): void {
+    const fileInput = event.target as HTMLInputElement;
+    
+    if (fileInput.files && fileInput.files.length > 0) {
+      const file = fileInput.files[0]; // Get the first selected file
+      
+      // Ensure the form control exists
+      if (this.firForm.get('judgementDetails')) {
+        this.firForm.get('judgementDetails.uploadJudgement')?.setValue(file); // Store the file object
+      }
   
       // Optionally, display the file name
       console.log('File selected:', file.name);
@@ -3365,5 +3463,6 @@ isStep5Valid(): boolean {
       console.log('No file selected');
     }
   }
+  
 
 }

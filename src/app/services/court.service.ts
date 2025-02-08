@@ -7,8 +7,8 @@ import { environment } from 'src/environments/environment.prod';
 })
 export class CourtService {
 
-  private baseUrl = environment.apiUrl+'court';  // Update to match the route definition
-  // private baseUrl = 'http://localhost:3000/court';
+  private baseUrl = environment.apiUrl+'court';  
+  // private baseUrl = 'http://localhost:3010/court';
 
   constructor(private http: HttpClient) {}
 

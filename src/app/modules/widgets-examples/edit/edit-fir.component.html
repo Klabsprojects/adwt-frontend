@@ -475,16 +475,24 @@
                   <textarea [id]="'gistOfCurrentCase' + i" class="form-control" formControlName="gistOfCurrentCase" rows="4" maxlength="3000" placeholder="Enter gist of the current case" required></textarea>
                   <small class="form-text text-muted">Maximum of 3000 Characters</small>
                 </div>
+             
                 <div class="col-md-6 mb-3">
                   <label class="form-label">48. Upload FIR Copy *</label>
-                  <input type="file" [id]="'uploadFIRCopy' + i" class="form-control" formControlName="uploadFIRCopy" required (change)="onFileChange($event, i)" />
+                  <input type="file" [id]="'uploadFIRCopy' + i" class="form-control" formControlName="uploadFIRCopy"
+                         required (change)="onFileChange($event, i)" multiple />
                 </div>
-                <div *ngIf="accuseds.at(i).get('uploadFIRCopy')?.value">
-                  <img [src]="accuseds.at(i).get('uploadFIRCopy')?.value"  class="img-thumbnail" style="max-width: 150px; margin-bottom: 10px;">
-                </div> 
-                <div *ngIf="getImagePreviewForIndex(i)">
-                  <img *ngFor="let preview of getImagePreviewsForIndex(i)"[src]="preview.url" alt="FIR Copy Preview" class="img-thumbnail" style="max-width: 150px; margin-bottom: 10px;">
-                </div>
+
+           <!-- <div *ngIf="!multipleFiles[i]">
+
+            <div *ngIf="accused.get('uploadFIRCopy')?.value ">
+              <img [src]="apiurl + (accused.get('uploadFIRCopy')?.value ?? '')" 
+              class="img-thumbnail" alt="FIR Copy" style="max-width: 150px; margin-bottom: 10px;">
+            </div>
+           </div>
+               -->
+                
+  
+                
               </div>
             </div>
           </div>
@@ -492,30 +500,41 @@
         <div class="mt-4">
           <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-          <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid()">Next</button>
+          <button type="button" class="btn btn-primary" (click)="saveStepFourAsDraft()" [disabled]="!isStepValid()">Next</button>
         </div>
       </div>
       <div *ngIf="mainStep === 1 && step === 5" class="form-step">
-        <div *ngFor="let victimRelief of victimsRelief.controls; let i = index" [formGroupName]="i" class="card border-primary mb-4">
+
+<!-- <div formArrayName="victimsRelief">
+  <div *ngFor="let victimRelief of victimsRelief.controls; let i = index" [formGroupName]="i">
+    <input formControlName="victimName" placeholder="Victim Name" />
+    <input formControlName="reliefAmountScst" placeholder="SC/ST Relief Amount" />
+    <input formControlName="communityCertificate" placeholder="Community Certificate" />
+  </div>
+</div> -->
+<form [formGroup]="firForm">
+<div formArrayName="victimsRelief">
+
+        <div   *ngFor="let victimRelief of victimsRelief.controls; let i = index" [formGroupName]="i" class="card border-primary mb-4">
           <div class="card-body">
             <div class="mb-4 col-md-4">
-              <label class="form-label">49. Has the Community Certificate of the Victim(s) been Verified and Obtained? *</label>
-              <select formControlName="communityCertificate" class="form-select" required>
+              <label for="communityCertificate" class="form-label">49. Has the Community Certificate of the Victim(s) been Verified and Obtained? *</label>
+              <select id="communityCertificate" formControlName="communityCertificate" class="form-select" required>
                 <option value="" disabled selected>Select One</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
+                <option value="yes">yes</option>
+                <option value="no">no</option>
               </select>
             </div>
             <div class="mb-4 col-lg-4">
               <label class="form-label">50. Name of the Victim *</label>
-              <input type="text" class="form-control mb-3" [value]="victimNames[0]" placeholder="Name of the Victim" disabled />
+              <input id="victimName" type="text" class="form-control mb-3" formControlName="victimName" placeholder="Name of the Victim" readonly />
             </div>
             <div class="row mb-3">
               <div class="col-8">
-                <label class="form-label">51. Eligible relief amount for the victim as per SC/ST Act *</label>
+                <label for="reliefAmountScst" class="form-label">51. Eligible relief amount for the victim as per SC/ST Act *</label>
               </div>
               <div class="col-4">
-                <input type="text" class="form-control text-end" formControlName="reliefAmountScst" placeholder="₹ 100" readonly />
+                <input id="reliefAmountScst" type="text" class="form-control text-end" formControlName="reliefAmountScst"readonly />
               </div>
             </div>
             <div class="row mb-3">
@@ -535,16 +554,31 @@
               </div>
             </div>
             <div class="mb-4">
-              <label class="form-label d-block mb-2">54. Eligible additional relief for the legal heir of the person died *</label>
+              <label class="form-label d-block mb-2">
+                54. Eligible additional relief for the legal heir of the person died (Victim {{ i + 1 }}) *
+              </label>
+              
               <div class="d-flex flex-wrap gap-3">
-                <div class="form-check" *ngFor="let option of additionalReliefOptions; let i = index">
-                  <input type="checkbox" class="form-check-input" [value]="option.value" [id]="'additionalRelief-' + option.value + '-' + i" (change)="onAdditionalReliefChange($event, option.value)" />
-                  <label class="form-check-label ms-2" [for]="'additionalRelief-' + option.value + '-' + i" [ngClass]="{ 'selected-text': selectedAdditionalReliefs.includes(option.value) }">
+                <div class="form-check" *ngFor="let option of additionalReliefOptions; let j = index">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [id]="'additionalRelief-' + option.value + '-' + j + '-' + i"
+                    [value]="option.value"
+                    (change)="onAdditionalReliefChange($event, option.value, i)"
+                    [checked]="victimRelief.get('additionalRelief')?.value.includes(option.value)"
+                  />
+                  <label
+                    class="form-check-label ms-2"
+                    [for]="'additionalRelief-' + option.value + '-' + j + '-' + i"
+                    [ngClass]="{ 'selected-text': victimRelief.get('additionalRelief')?.value.includes(option.value) }"
+                  >
                     {{ option.label }}
                   </label>
                 </div>
               </div>
             </div>
+            
           </div>
         </div>
         <div class="row mb-4">
@@ -555,7 +589,11 @@
             <input type="text" class="form-control text-end" formControlName="totalCompensation" placeholder="₹ 300" />
           </div>
         </div>
-        <div class="row mb-4">
+      </div>
+      
+      
+    </form>
+      <div class="row mb-4">
           <div class="mb-4 col-6">
             <label class="form-label">56. Proceedings File No. *</label>
             <input type="text" class="form-control" formControlName="proceedingsFileNo" placeholder="Enter File No." />
@@ -565,10 +603,43 @@
             <input type="date" class="form-control" formControlName="proceedingsDate" />
           </div>
         </div>
-        <div class="mb-4">
+        <!-- <div class="mb-4">
           <label class="form-label">58. Upload Commissionerate / S.P. Office Proceedings *</label>
           <input type="file" class="form-control" id="proceedingsFile" />
+        </div> -->
+        <div class="mb-4">
+          <label class="form-label">58. Upload Commissionerate / S.P. Office Proceedings *</label>
+          <input
+            type="file"
+            class="form-control"
+            (change)="onProceedingsFileChange($event)"
+          />
         </div>
+
+        <div class="mb-4" formArrayName="attachments">
+          <label class="form-label">59. Upload Other Attachment (If any)*</label>
+        
+          <div class="input-group mb-2" *ngFor="let attachment of attachments.controls; let j = index" [formGroupName]="j">
+            <!-- File Input 1 -->
+            <input type="file" class="form-control mb-1" 
+                   (change)="onFileChangee($event, j, 'file', 'fileName')" />
+            <div class="file-names" *ngIf="attachment.get('fileName')?.value">
+              <span class="badge bg-secondary">{{ attachment.get('fileName')?.value }}</span>
+            </div>
+        
+            <button type="button" class="btn btn-danger btn-sm mt-2" 
+                    (click)="removeAttachment(j)" 
+                    *ngIf="attachments.length > 1" 
+                    title="Remove Attachment">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        
+          <button type="button" class="btn btn-primary btn-sm mt-3" (click)="addAttachment()">
+            Add Attachment
+          </button>
+        </div>
+<!-- 
         <div class="mb-4">
           <label class="form-label">93. Upload Other Attachment (If any)</label>
           <div class="file-drop-container">
@@ -592,7 +663,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
         <div class="mt-4">
           <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
@@ -671,7 +742,7 @@
                     <label class="form-label">65. Eligible relief amount as per the SC/ST Act *</label>
                   </div>
                   <div class="col-4">
-                    <input type="text" class="form-control text-end" formControlName="reliefAmountScst_1"  />
+                    <input type="text" class="form-control text-end" formControlName="reliefAmountScst"  />
                   </div>
                 </div>
                 <div class="row mb-3">
@@ -679,7 +750,7 @@
                     <label class="form-label">66. Eligible relief amount (ex-gratia) by the Govt. of Tamil Nadu *</label>
                   </div>
                   <div class="col-4">
-                    <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia_1"  />
+                    <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia"  />
                   </div>
                 </div>
                 <div class="row mb-3">
@@ -714,13 +785,23 @@
                 <input type="date" class="form-control" formControlName="proceedingsDate_1" [max]="today" required/>
               </div>
             </div>
-            <div class="mb-4">
+            <!-- <div class="mb-4">
               <label class="form-label">71. Upload Commissionerate / S.P. Office Proceedings *</label>
               <input type="file" class="form-control" id="uploadProceedings_1" />
               <div *ngIf="firForm.get('uploadProceedings_1')?.value"> 
                 <img [src]="firForm.get('uploadProceedings_1')?.value" alt="Proceedings File" class="file-preview-img" />
               </div>
-            </div>
+            </div> -->
+
+            <div class="mb-4">
+              <label class="form-label">71. Upload Commissionerate / S.P. Office Proceedings *</label>
+              <!-- <input type="file" class="form-control" formControlName="uploadProceedings_1" required/> -->
+              <input
+              type="file"
+              class="form-control"
+              (change)="onProceedingsFileChange_1($event)" required
+            />
+          </div>
             <div class="mb-4">
               <label class="form-label">72. Upload Other Attachment (If any)</label>
               <div class="file-drop-container">
@@ -841,7 +922,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">84. Upload Judgement Copy *</label>
-                <input type="file" class="form-control" id="uploadJudgement" formControlName="uploadJudgement" required/>
+                <input type="file" class="form-control" (change)="uploadJudgementSelect($event)"  id="uploadJudgement" formControlName="uploadJudgement" required/>
               </div>
             </div>
           </div>
@@ -1240,7 +1321,7 @@
                 </div>
                 <div class="col-md-6 mb-3">
                   <label class="form-label">92. Upload Commissionerate / S.P. Office Proceedings *</label>
-                  <input type="file" class="form-control" formControlName="uploadProceedings" id="uploadProceedings" />
+                  <input type="file" class="form-control" (change)="onuploadproceedSelect($event)" formControlName="uploadProceedings" id="uploadProceedings" />
                 </div>
               </div>
               <div class="mb-4">
@@ -1266,9 +1347,9 @@
           </div>
         </div>
         <div class="mt-4">
-          <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft_7()">Save as Draft</button>
+          <button type="button" class="btn btn-warning me-2" (click)="UpdateAsDraft_7()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-          <button type="submit" class="btn btn-primary" (click)="submitStepSeven();saveAsDraft_7()">Submit</button>
+          <button type="submit" class="btn btn-primary" (click)="submitStepSeven();UpdateAsDraft_7()">Submit</button>
         </div>
       </div>
     </form>

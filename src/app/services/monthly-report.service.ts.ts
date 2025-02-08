@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MonthlyReportService {
-  private baseUrl = 'https://adwatrocity.onlinetn.com/api/v1/monthlyreport';
+  // private baseUrl = 'https://adwatrocity.onlinetn.com/api/v1/monthlyreport';
+  private baseUrl = environment.apiUrl+'monthlyreport';
   // private baseUrl = 'http://localhost:3010/monthlyreport';
 
   constructor(private http: HttpClient) {}
