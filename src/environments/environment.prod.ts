@@ -9,6 +9,8 @@ export const environment = {
   isMockEnabled: true,
   // apiUrl: 'https://adwatrocity.onlinetn.com/api/v1/', 
   apiUrl: 'http://localhost:3010/', 
+image_access:'http://localhost:3010/uploadedfile/',
+
   appThemeName: 'ADWT',
   appPurchaseUrl: 'https://1.envato.market/EA4JP',
   appHTMLIntegration: 'https://preview.keenthemes.com/metronic8/demo1/documentation/base/helpers/flex-layouts.html',

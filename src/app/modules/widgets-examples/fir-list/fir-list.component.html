@@ -999,6 +999,10 @@
                     class="form-control"
                     [value]="uploadFIRCopy"
                   />
+
+                  <div *ngIf="uploadFIRCopy">
+                    <img [src]="image_access + uploadFIRCopy" alt="FIR Copy" style="max-width: 100px;" class=" mt-2" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1206,6 +1210,13 @@
                 rows="2"
                 placeholder="Enter details or references for key attachments"
               ></textarea>
+
+              <div *ngIf="attachments.length > 0">
+                <div *ngFor="let attachment of attachments">
+                  <img [src]="image_access + attachment" alt="Attachment" style="max-width: 100px;" class="mt-2" />
+                </div>
+              </div>
+              
             </div>
           </div>
         </div>
@@ -1445,6 +1456,11 @@
                 class="form-control"
                 [value]="uploadProceedings"
               />
+
+              
+              <div *ngIf="uploadProceedings">
+                <img [src]="image_access + uploadProceedings" alt="uploadProceedings" style="max-width: 100px;" class=" mt-2" />
+              </div>
             </div>
 
             <!-- Other Attachments -->

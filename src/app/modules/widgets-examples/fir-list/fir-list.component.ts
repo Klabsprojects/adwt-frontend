@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 
 import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-
+import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-fir-list',
   templateUrl: './fir-list.component.html',
@@ -16,6 +16,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 export class FirListComponent implements OnInit {
 
   firId: number;
+  image_access = environment.image_access;
 
 
   policeCity: string = '';
@@ -581,7 +582,12 @@ export class FirListComponent implements OnInit {
           this.proceedingsDate= data.queryResults[0].proceedings_date ? this.convertToNormalDate(data.queryResults[0].proceedings_date) : data.queryResults[0].proceedings_date;
           //need to check
           this.proceedingsFile=data.queryResults[0].Commissionerate_file;
-          this.attachments=data.queryResults[0].file_name;
+          // this.attachments=data.queryResults[0].file_path;
+
+          this.attachments = data.queryResults.map((item: any) => {
+            return item.file_path.startsWith('uploads/') ? item.file_path : 'uploads/' + item.file_path;
+          });
+          
 
 
 
