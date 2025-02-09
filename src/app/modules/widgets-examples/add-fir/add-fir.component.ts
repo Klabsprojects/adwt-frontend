@@ -24,8 +24,9 @@ declare var $: any;
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { PoliceDivisionService } from 'src/app/services/police-division.service';
 
-
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-add-fir',
@@ -125,6 +126,7 @@ export class AddFirComponent implements OnInit, OnDestroy {
   @ViewChild('tagifyInput', { static: false }) tagifyInput!: ElementRef;
   sectionsIPC: string[] = []; // Array to store multiple tags
 
+  image_access = environment.image_access;
 
   // Dropdown options
   policeCities: string[] = [];
@@ -147,7 +149,8 @@ i: number;
     private firService: FirService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private policeDivisionService :PoliceDivisionService
   ) {}
 
 
@@ -219,7 +222,7 @@ i: number;
       }
     });
 
-
+this.loadPoliceDivision();
   }
 
   navigateToMainStep(stepNumber: number): void {
@@ -289,8 +292,19 @@ loadAccusedCommunities(): void {
     }
   );
 }
+antecedents: { [key: number]: string } = {};
 
+onInputChange(index: number, event: Event) {
+  const inputValue = (event.target as HTMLInputElement).value.trim();
+  this.antecedents[index] = inputValue; 
+}
 
+landOIssues: { [key: number]: string } = {};
+
+onInputChangeee(index: number, event: Event) {
+  const inputValue = (event.target as HTMLInputElement).value.trim();
+  this.landOIssues[index] = inputValue; 
+}
 
 
 onAccusedCommunityChange(event: any, index: number): void {
@@ -545,29 +559,76 @@ onFileSelect_3(event: Event, controlName: string): void {
 
 
 
+  // onVictimAgeChange(index: number): void {
+  //   const victimGroup = this.victims.at(index) as FormGroup;
+  //   const ageControl = victimGroup.get('age');
+  //   const nameControl = victimGroup.get('name');
+
+  //   if (ageControl) {
+  //     const ageValue = ageControl.value;
+
+  //     // If age is below 18, disable the name field
+  //     if (ageValue < 18) {
+  //       nameControl?.disable({ emitEvent: false });
+  //       nameControl?.reset();
+  //     } else {
+  //       nameControl?.enable({ emitEvent: false });
+  //     }
+
+  //     this.cdr.detectChanges(); // Trigger change detection
+  //   }
+  // }
+
+
   onVictimAgeChange(index: number): void {
     const victimGroup = this.victims.at(index) as FormGroup;
     const ageControl = victimGroup.get('age');
     const nameControl = victimGroup.get('name');
-
+  
     if (ageControl) {
-      const ageValue = ageControl.value;
-
-      // If age is below 18, disable the name field
-      if (ageValue < 18) {
+      let ageValue = ageControl.value;
+  
+    
+      ageValue = ageValue.toString().replace(/^0+/, '');
+      
+  
+      if (!/^(?:[1-9][0-9]?|1[01][0-9]|120)$/.test(ageValue)) {
+        ageControl.setErrors({ invalidAge: true });
+      } else {
+        ageControl.setErrors(null);
+      }
+  
+  
+      ageControl.setValue(ageValue, { emitEvent: false });
+  
+      if (Number(ageValue) < 18) {
         nameControl?.disable({ emitEvent: false });
         nameControl?.reset();
       } else {
         nameControl?.enable({ emitEvent: false });
       }
-
-      this.cdr.detectChanges(); // Trigger change detection
+  
+      this.cdr.detectChanges(); 
     }
   }
-
-
-
-
+  getAgeErrorMessage(index: number): string {
+    const ageControl = this.victims.at(index).get('age');
+  
+    if (ageControl?.hasError('required')) {
+      return 'Age is required.';
+    }
+    if (ageControl?.hasError('min')) {
+      return 'Age must be at least 1.';
+    }
+    // if (ageControl?.hasError('max')) {
+    //   return 'Age cannot exceed 120.';
+    // }
+    // if (ageControl?.hasError('invalidAge')) {
+    //   return 'Invalid age format. Only numbers between 1 and 120 are allowed.';
+    // }
+    return '';
+  }
+  
   loadPoliceStations(district: string): void {
     if (district) {
       this.firService.getPoliceStations(district).subscribe(
@@ -1150,7 +1211,7 @@ onAdditionalReliefChange(event: Event, value: string): void {
   populateVictimsRelief(victimsReliefDetails: any[]): void {
     const victimsReliefArray = this.victimsRelief;
 
-console.log(victimsReliefArray,"victimsReliefArray")
+console.log(victimsReliefArray.value,"victimsReliefArray")
 
     victimsReliefArray.clear(); // Clear existing form controls
 
@@ -1545,7 +1606,7 @@ createVictimGroup(): FormGroup {
     isNativeDistrictSame: ['', Validators.required],
     nativeDistrict: [''],
     offenceCommitted: ['', Validators.required],
-    scstSections: [[]],
+    scstSections: [[], Validators.required],
     sectionsIPC: ['', Validators.required],
     fir_stage_as_per_act: [''],
     fir_stage_ex_gratia: [''],
@@ -1744,8 +1805,10 @@ handleCaseTypeChange() {
       (user: any) => {
         if (user && user.district) {
           const district = user.district;
-          this.firForm.patchValue({ policeCity: district });
-          this.loadPoliceDivisionDetails(district);
+          // this.firForm.patchValue({ policeCity: district });
+          // this.loadPoliceDivisionDetails(district);
+
+          this.loadPoliceDivision();
         }
       },
       (error: any) => {
@@ -1758,14 +1821,41 @@ handleCaseTypeChange() {
     this.firService.getPoliceDivision(district).subscribe(
       (data: any) => {
         this.policeCities = [district];
+
+        console.log(data,"this.policeCities")
         this.policeZones = data.map((item: any) => item.police_zone_name);
         this.policeRanges = data.map((item: any) => item.police_range_name);
         this.revenueDistricts = data.map((item: any) => item.district_division_name);
         this.firForm.patchValue({
-          policeZone: this.policeZones[0] || '',
-          policeRange: this.policeRanges[0] || '',
-          revenueDistrict: this.revenueDistricts[0] || '',
+          policeZone: '',
+          policeRange: '',
+          revenueDistrict:  '',
         });
+      },
+      (error: any) => {
+        Swal.fire('Error', 'Failed to load division details.', 'error');
+      }
+    );
+  }
+
+  police_Cities_data:any
+
+  loadPoliceDivision() {
+    this.policeDivisionService.getAllPoliceDivisions().subscribe(
+      (data: any) => {
+        // this.police_Cities_data =data;
+
+        this.police_Cities_data = data.map((item: any) => item.district_division_name);
+
+        console.log( data)
+        this.policeZones = data.map((item: any) => item.police_zone_name);
+        this.policeRanges = data.map((item: any) => item.police_range_name);
+        this.revenueDistricts = data.map((item: any) => item.district_division_name);
+        // this.firForm.patchValue({
+        //   policeZone: this.policeZones ,
+        //   policeRange: this.policeRanges ,
+        //   revenueDistrict: this.revenueDistricts,
+        // });
       },
       (error: any) => {
         Swal.fire('Error', 'Failed to load division details.', 'error');
@@ -1860,6 +1950,7 @@ handleCaseTypeChange() {
       community: ['', Validators.required],
       caste: ['', Validators.required],
       guardianName: ['', Validators.required],
+      uploadFIRCopy: ['', Validators.required],
       previousIncident: [false],
       customGender: [''],
       previousFIRNumber: [''],
@@ -1881,6 +1972,9 @@ handleCaseTypeChange() {
     const selectedCity = event.target.value;
     if (selectedCity) {
       this.loadPoliceDivisionDetails(selectedCity);
+
+      // this.loadPoliceDivisionDetails(selectedCity);
+
     }
   }
 
@@ -2002,20 +2096,66 @@ console.log(firData,"firDatafirDatafirData")
 
 
   // mahiiii coded.........////////////////////////////////
-  onFileSelected(event: any, i: number): void {
-    const selectedFile = event.target.files[0]; 
+  // onFileSelected(event: any, i: number): void {
+  //   const selectedFile = event.target.files[0]; 
   
   
-    if (!this.multipleFiles[i]) {
-      this.multipleFiles[i] = [];  
-    }
+  //   if (!this.multipleFiles[i]) {
+  //     this.multipleFiles[i] = [];  
+  //   }
   
 
+  //   this.multipleFiles[i].push(selectedFile);
+  
+  //   // console.log('Updated files for accused index:', this.multipleFiles[i]);
+  // }
+  
+
+
+
+
+
+
+
+
+
+  multipleFilesForproceeding: any[][] = [];
+  showImage_proceding: boolean[] = []; 
+  
+  uploadedFiles: { [key: number]: boolean } = {};
+  fileUrls: { [key: number]: string } = {};
+
+  onFileSelected(event: any, i: number): void {
+    const selectedFile = event.target.files[0]; 
+    if (!selectedFile) return;
+
+    this.accuseds.get('uploadFIRCopy')?.setValue(null);
+  
+    if (!this.multipleFiles[i]) {
+      this.multipleFiles[i] = [];
+    }
+  
     this.multipleFiles[i].push(selectedFile);
   
-    // console.log('Updated files for accused index:', this.multipleFiles[i]);
+
+    this.fileUrls[i] = URL.createObjectURL(selectedFile);
+    
+   
+    this.uploadedFiles[i] = true;
   }
   
+  onDeleteFile(i: number): void {
+
+    this.multipleFiles[i] = [];
+    this.fileUrls[i] = '';
+    this.uploadedFiles[i] = false;
+
+    this.accuseds.get('uploadFIRCopy')?.setValue(null);
+  }
+
+
+
+
 
 // Save Step 4 as Draft
 saveStepFourAsDraft(): void {
@@ -2064,17 +2204,57 @@ handleError(error: any) {
   Swal.fire('Error', 'Failed to save FIR as draft for step 4.', 'error');
 }
 
-onProceedingsFileChange(event: Event): void {
-  const input = event.target as HTMLInputElement;
-  if (input.files && input.files.length > 0) {
-    this.proceedingsFile = input.files[0];
+// onProceedingsFileChange(event: Event): void {
+//   const input = event.target as HTMLInputElement;
+//   if (input.files && input.files.length > 0) {
+//     this.proceedingsFile = input.files[0];
 
-    // console.log(this.proceedingsFile,"this.proceedingsFile")
+//     // console.log(this.proceedingsFile,"this.proceedingsFile")
     
     
-    // Save the selected file
+//     // Save the selected file
+//   }
+// }
+
+
+
+
+uploadedFiles_proceding: { [key: number]: boolean } = {};
+
+fileUrls_proceding: { [key: number]: string } = {};
+
+
+ onProceedingsFileChange(event: any, i: number): void {
+    const selectedFile = event.target.files[0]; 
+    if (!selectedFile) return;
+
+    this.firForm.get('proceedingsFile')?.setValue(null);
+  
+    if (!this.multipleFilesForproceeding[i]) {
+      this.multipleFilesForproceeding[i] = [];
+    }
+    this.multipleFilesForproceeding[i].push(selectedFile);
+  
+
+    this.fileUrls_proceding[i] = URL.createObjectURL(selectedFile);
+    
+    this.proceedingsFile= selectedFile
+   
+    this.uploadedFiles_proceding[i] = true;
   }
-}
+  
+  onDeleteFile_proceding(i: number): void {
+
+    this.multipleFilesForproceeding[i] = [];
+    this.fileUrls_proceding[i] = '';
+    this.uploadedFiles_proceding[i] = false;
+    
+    const existingFile = this.firForm.get('proceedingsFile')?.value;
+    if (existingFile) {
+      this.fileUrls_proceding[i] = this.image_access + existingFile;
+    }
+  }
+
 
 
 
@@ -2253,10 +2433,10 @@ onProceedingsFileChange_1(event: Event): void {
 }
 
 saveAsDraft_6(isSubmit: boolean = false): void {
-  // if (!this.firId) {
-  //   Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
-  //   return;
-  // }
+  if (!this.firId) {
+    Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
+    return;
+  }
   this.victimsRelief.controls.forEach((control) => {
     control.get('reliefAmountSecondStage')?.enable(); // Temporarily enable
   });
@@ -3090,9 +3270,28 @@ isStep5Valid(): boolean {
 
 
 
+  // previousStep() {
+  //   if (this.step > 1) {
+  //     this.step--;
+  //   }
+  // }
+
   previousStep() {
     if (this.step > 1) {
-      this.step--;
+      this.step--; 
+    } else if (this.mainStep > 1 && this.step === 1) {
+      this.mainStep--;
+      this.step = this.getLastStepOfMainStep(this.mainStep);
+    }
+    this.cdr.detectChanges(); 
+  }
+
+  getLastStepOfMainStep(mainStep: number): number {
+    switch (mainStep) {
+      case 1: return 5; 
+      case 2: return 1; 
+      case 3: return 1;
+      default: return 1;
     }
   }
 

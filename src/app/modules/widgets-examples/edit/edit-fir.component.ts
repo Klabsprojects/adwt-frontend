@@ -26,6 +26,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatRadioModule } from '@angular/material/radio';
 import { FirServiceAPI } from './editfir.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { environment } from '../../../../environments/environment';
+import { PoliceDivisionService } from 'src/app/services/police-division.service';
+
+
+
 declare var $: any;
 
 interface HearingDetail {
@@ -136,6 +141,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   showDesignatedCourt_one = false;
   showCaseFitForAppeal_one = false;
 
+  image_access = environment.image_access;
 
   reliefValues: any;
 
@@ -187,7 +193,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private firServiceAPI : FirServiceAPI,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private police_district :PoliceDivisionService
    ) {}
 
   onDrop1(event: DragEvent): void {
@@ -993,6 +1000,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
             });
         
             this.allFiles = allFilesArray;
+
+            console.log(response,"this.allFiles")
           } catch (error) {
             console.error('Error parsing all_attachments:', error);
             this.allFiles = [];
@@ -1059,7 +1068,15 @@ export class EditFirComponent implements OnInit, OnDestroy {
 
           // 3. Proceeding File (judgement file URL)
           if (response && response.data3 && response.data3.proceedings_file) {
-            this.firForm.get('proceedingsFile')?.setValue(response.data3.proceedings_file);
+
+            console.log("response.data3:", response.data3 );
+
+            const filePath = response.data3.proceedings_file.startsWith('uploads/') 
+            ? response.data3.proceedings_file 
+            : 'uploads/' + response.data3.proceedings_file;
+    
+        this.firForm.get('proceedingsFile')?.setValue(filePath);
+    
           }
 
           // 4. Proceedings Date
@@ -1122,20 +1139,20 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
           this.firForm.get('totalCompensation_1')?.setValue(response.data4.total_compensation_1);
         } 
         if (response && response.data4 && response.data4.proceedings_file_no) {
-          console.log(response.data4.proceedings_file_no);
-          console.log("response.data4.proceedings_file_no");
+          // console.log(response.data4.proceedings_file_no);
+          // console.log("response.data4.proceedings_file_no");
           this.firForm.get('proceedingsFileNo_1')?.setValue(response.data4.proceedings_file_no);
         }
 
         if (response && response.data6 && response.data6.Commissionerate_file) {
-          console.log(response.data6.Commissionerate_file);
-          console.log("response.data6.Commissionerate_file");
+          // console.log(response.data6.Commissionerate_file);
+          // console.log("response.data6.Commissionerate_file");
           this.firForm.get('uploadProceedings')?.setValue(response.data6.Commissionerate_file);
         }
 
         if (response && response.data6 && response.data6.proceedings_file_no) {
-          console.log(response.data6.proceedings_file_no);
-          console.log("response.data6.proceedings_file_no");
+          // console.log(response.data6.proceedings_file_no);
+          // console.log("response.data6.proceedings_file_no");
           this.firForm.get('proceedingsFileNo')?.setValue(response.data6.proceedings_file_no);
         }
 
@@ -1213,6 +1230,9 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
           this.firCopyValue = [];
           response.data2.forEach((accused: any,index:number) => {
 
+            console.log(accused.upload_fir_copy,"uploadFIRCopy")
+            
+
             const selectedCommunity = accused.community;
        
 
@@ -1257,6 +1277,7 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
               landOIssues: accused.land_o_issues,
               gistOfCurrentCase: accused.gist_of_current_case,
               uploadFIRCopy:accused.upload_fir_copy,
+
             });
 
 
@@ -1427,25 +1448,39 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
 
   multipleFiles: any[][] = [];
   showImage: boolean[] = []; 
-  onFileChange(event: any, i: number): void {
-
-    const selectedFile = event.target.files[0]; 
   
+  uploadedFiles: { [key: number]: boolean } = {};
+
+  fileUrls: { [key: number]: string } = {};
+  onFileChange(event: any, i: number): void {
+    const selectedFile = event.target.files[0]; 
+    if (!selectedFile) return;
+
     this.accuseds.get('uploadFIRCopy')?.setValue(null);
+  
     if (!this.multipleFiles[i]) {
-      this.multipleFiles[i] = [];  
-      // this.fileUrls[i] = []; 
+      this.multipleFiles[i] = [];
     }
   
-
     this.multipleFiles[i].push(selectedFile);
-
-    const fileUrl = URL.createObjectURL(selectedFile);
-
-
   
+
+    this.fileUrls[i] = URL.createObjectURL(selectedFile);
+    
+   
+    this.uploadedFiles[i] = true;
+  }
+  
+  onDeleteFile(i: number): void {
+
+    this.multipleFiles[i] = [];
+    this.fileUrls[i] = '';
+    this.uploadedFiles[i] = false;
+
+    this.accuseds.get('uploadFIRCopy')?.setValue(null);
   }
 
+  
 
   
   onFileChangee(event: any, index: number, fileControl: string, fileNameControl: string): void {
@@ -1515,7 +1550,13 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
       totalCompensation: this.firForm.get('totalCompensation')?.value,
       proceedingsFileNo: this.firForm.get('proceedingsFileNo')?.value,
       proceedingsDate: this.firForm.get('proceedingsDate')?.value,
-      proceedingsFile: this.proceedingsFile || '',
+      // uploadFIRCopy: this.multipleFiles[index] || null
+      // this.multipleFilesForproceeding[i]
+      proceedingsFile: this.multipleFilesForproceeding || '',
+      attachments: this.attachments.value.map((attachment: any) => ({
+        file: attachment.file || null,  
+        fileName: attachment.fileName || '',
+      })),
       status: isSubmit ? 5 : undefined,
     };
   console.log(firData,"firDatafirDatafirData")
@@ -1592,24 +1633,75 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
   }
 
 
+  // onVictimAgeChange(index: number): void {
+  //   const victimGroup = this.victims.at(index) as FormGroup;
+  //   const ageControl = victimGroup.get('age');
+  //   const nameControl = victimGroup.get('name');
+
+  //   if (ageControl) {
+  //     const ageValue = ageControl.value;
+
+  //     // If age is below 18, disable the name field
+  //     if (ageValue < 18) {
+  //       nameControl?.disable({ emitEvent: false });
+  //       nameControl?.reset();
+  //     } else {
+  //       nameControl?.enable({ emitEvent: false });
+  //     }
+
+  //     this.cdr.detectChanges(); // Trigger change detection
+  //   }
+  // }
+
+
+
   onVictimAgeChange(index: number): void {
     const victimGroup = this.victims.at(index) as FormGroup;
     const ageControl = victimGroup.get('age');
     const nameControl = victimGroup.get('name');
-
+  
     if (ageControl) {
-      const ageValue = ageControl.value;
-
-      // If age is below 18, disable the name field
-      if (ageValue < 18) {
+      let ageValue = ageControl.value;
+  
+    
+      ageValue = ageValue.toString().replace(/^0+/, '');
+      
+  
+      if (!/^(?:[1-9][0-9]?|1[01][0-9]|120)$/.test(ageValue)) {
+        ageControl.setErrors({ invalidAge: true });
+      } else {
+        ageControl.setErrors(null);
+      }
+  
+  
+      ageControl.setValue(ageValue, { emitEvent: false });
+  
+      if (Number(ageValue) < 18) {
         nameControl?.disable({ emitEvent: false });
         nameControl?.reset();
       } else {
         nameControl?.enable({ emitEvent: false });
       }
-
-      this.cdr.detectChanges(); // Trigger change detection
+  
+      this.cdr.detectChanges(); 
     }
+  }
+  getAgeErrorMessage(index: number): string {
+    const ageControl = this.victims.at(index).get('age');
+  
+    if (ageControl?.hasError('required')) {
+      return 'Age is required.';
+    }
+    if (ageControl?.hasError('min')) {
+      return 'Age must be at least 1.';
+    }
+    // if (ageControl?.hasError('max')) {
+    //   return 'Age cannot exceed 120.';
+    // }
+    // if (ageControl?.hasError('invalidAge')) {
+    //   return 'Invalid age format. Only numbers between 1 and 120 are allowed.';
+    // }
+    return '';
   }
 
   loadPoliceStations(district: string): void {
@@ -1682,7 +1774,7 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
       timeOfRegistration: ['', Validators.required],
       // natureOfOffence: [[], Validators.required],
       sectionsIPC: ['trerterterterter'],
-      scstSections: [[]],
+      scstSections: [[],Validators.required],
 
       // Step 3 Fields - Complainant and Victim Details
       complainantDetails: this.fb.group({
@@ -2194,17 +2286,83 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
 
   proceedingsFile: File | null = null;
 
-  onProceedingsFileChange(event: Event): void {
+  // onProceedingsFileChange(event: Event): void {
+  //   const input = event.target as HTMLInputElement;
+  //   if (input.files && input.files.length > 0) {
+  //     this.proceedingsFile = input.files[0];
+  
+  //     // console.log(this.proceedingsFile,"this.proceedingsFile")
+      
+      
+  //     // Save the selected file
+  //   }
+  // }
+
+
+
+
+
+
+
+
+  multipleFilesForproceeding: any[][] = [];
+  showImage_proceding: boolean[] = []; 
+  
+  uploadedFiles_proceding: { [key: number]: boolean } = {};
+
+  fileUrls_proceding: { [key: number]: string } = {};
+
+
+  onProceedingsFileChange_1(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.proceedingsFile = input.files[0];
+      this.proceedingsFile_1 = input.files[0];
   
-      // console.log(this.proceedingsFile,"this.proceedingsFile")
+      console.log(this.proceedingsFile_1,"this.proceedingsFile")
       
       
       // Save the selected file
     }
   }
+  
+  onProceedingsFileChange(event: any, i: number): void {
+    const selectedFile = event.target.files[0]; 
+    if (!selectedFile) return;
+
+    this.firForm.get('proceedingsFile')?.setValue(null);
+  
+    if (!this.multipleFilesForproceeding[i]) {
+      this.multipleFilesForproceeding[i] = [];
+    }
+    this.multipleFilesForproceeding[i].push(selectedFile);
+  
+
+    this.fileUrls_proceding[i] = URL.createObjectURL(selectedFile);
+    
+    this.multipleFilesForproceeding = selectedFile
+   
+    this.uploadedFiles_proceding[i] = true;
+  }
+  
+  onDeleteFile_proceding(i: number): void {
+
+    this.multipleFilesForproceeding[i] = [];
+    this.fileUrls_proceding[i] = '';
+    this.uploadedFiles_proceding[i] = false;
+    
+    const existingFile = this.firForm.get('proceedingsFile')?.value;
+    if (existingFile) {
+      this.fileUrls_proceding[i] = this.image_access + existingFile;
+    }
+  }
+
+  
+
+
+
+
+
+
   populateVictimsRelief(victimsReliefDetails: any[]): void {
     const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray; // Ensure you access the FormArray correctly
     victimsReliefArray.clear(); // Clear existing FormArray
@@ -2385,7 +2543,7 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
       nativeDistrict: [''],
       offenceCommitted: ['', Validators.required],
       scstSections:  ['', Validators.required], // Ensure this field exists for multi-select
-      sectionsIPC:  [''],
+      sectionsIPC:  ['',Validators.required],
     });
   }
 
@@ -2528,7 +2686,7 @@ console.log(victimReliefDetail,"cretaieg")
   loadPoliceDivisionDetails() {
     this.firServiceAPI.getPoliceDivisionedit().subscribe(
       (data: any) => {
-        
+        console.log(data,"policeCities")
         this.policeCities = data.district_division_name || [];
         this.policeZones = data.police_zone_name || [];
         this.policeRanges = data.police_range_name || [];
@@ -3428,18 +3586,7 @@ console.log(victimReliefDetail,"cretaieg")
   // }
 
 
-  onProceedingsFileChange_1(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.proceedingsFile_1 = input.files[0];
-  
-      console.log(this.proceedingsFile_1,"this.proceedingsFile")
-      
-      
-      // Save the selected file
-    }
-  }
-  
+
 
   proceedingsFile_1: File | null = null;
   saveAsDraft_6(isSubmit: boolean = false): void {

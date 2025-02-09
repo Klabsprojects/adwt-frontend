@@ -58,7 +58,7 @@
                             <label for="policeCity" class="form-label">1. Police City / District *</label>
                             <select id="policeCity" class="form-select" formControlName="policeCity" (change)="onCityChange($event)" required>
                                 <option value="" disabled>Select one</option>
-                                <option *ngFor="let city of policeCities" [value]="city">{{ city }}</option>
+                                <option *ngFor="let city of police_Cities_data" [value]="city">{{ city }}</option>
                             </select>
                         </div>
 
@@ -203,9 +203,9 @@
 
 
                             </div>
-                            <small class="text-danger d-block mt-1">
+                            <!-- <small class="text-danger d-block mt-1">
                 Please Follow the format "12-2024".
-              </small>
+              </small> -->
                         </div>
 
 
@@ -367,10 +367,32 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-4 mb-3">
+                                <!-- <div class="col-md-4 mb-3">
                                     <label for="victimAge-{{i}}" class="form-label">19. Age of the Victim *</label>
                                     <input type="number" id="victimAge-{{i}}" class="form-control" formControlName="age" placeholder="Enter victim's age" (input)="onVictimAgeChange(i)" required />
+                                </div> -->
+
+                                <div class="col-md-4 mb-3">
+                                  <label for="victimAge-{{i}}" class="form-label">19. Age of the Victim *</label>
+                                  <input 
+                                    type="number"
+                                    id="victimAge-{{i}}"
+                                    class="form-control"
+                                    formControlName="age"
+                                    placeholder="Enter victim's age"
+                                    (input)="onVictimAgeChange(i)"
+                                    min="1" 
+                                    required />
+                                
+                                 
+                                  <small 
+                                    class="text-danger d-block mt-1" 
+                                    *ngIf="victims.at(i).get('age')?.invalid && victims.at(i).get('age')?.touched">
+                                      {{ getAgeErrorMessage(i) }}
+                                  </small>
                                 </div>
+                                
+                              
 
                                 <div class="col-md-4 mb-3">
                                     <label for="victimName-{{ i }}" class="form-label">20. Name of the Victim *</label>
@@ -764,17 +786,35 @@
 
 
                                 <!-- Antecedents of the Accused -->
-                                <div class="col-md-6 mb-3">
+                                <!-- <div class="col-md-6 mb-3">
                                     <label for="antecedents{{ i }}" class="form-label">48. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *</label>
                                     <input type="text" [id]="'antecedents' + i" class="form-control" formControlName="antecedents" placeholder="Enter antecedents" required />
                                     <small class="text-danger">Please type 'NA' if there are no antecedents of the accused.</small>
+                                </div> -->
+                                <div class="col-md-6 mb-3">
+                                  <label for="antecedents{{ i }}" class="form-label">
+                                    48. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *
+                                  </label>
+                                  <input
+                                    type="text"
+                                    [id]="'antecedents' + i"
+                                    class="form-control"
+                                    formControlName="antecedents"
+                                    placeholder="Enter antecedents"
+                                    required
+                                    (input)="onInputChange(i, $event)"
+                                  />
+                                  <small class="text-danger" *ngIf="!antecedents[i]">Please type 'NA' if there are no antecedents of the accused.</small>
                                 </div>
+                                
+
 
                                 <!-- L&O Issues -->
                                 <div class="col-md-6 mb-3">
                                     <label for="landOIssues{{ i }}" class="form-label">49. L&O Issues (Pickets, Bandoust, etc) *</label>
-                                    <input type="text" [id]="'landOIssues' + i" class="form-control" formControlName="landOIssues" placeholder="Enter L&O issues" required />
-                                    <small class="text-danger">Please type 'NA' if there are no L&O Issues.</small>
+                                    <input type="text" [id]="'landOIssues' + i" class="form-control" 
+                                    formControlName="landOIssues" placeholder="Enter L&O issues" required (input)="onInputChangeee(i, $event)" />
+                                    <small class="text-danger" *ngIf="!landOIssues[i]">Please type 'NA' if there are no L&O Issues.</small>
                                   </div>
 
                                 <!-- Gist of the Current Case -->
@@ -799,7 +839,7 @@
                                 <!-- File Uploads -->
 
 
-                                <div class="col-md-6 mb-3">
+                                <!-- <div class="col-md-6 mb-3">
                                   <label for="uploadFIRCopy" class="form-label">51. Upload FIR Copy *</label>
                 
                                   <input
@@ -809,7 +849,20 @@
                                     (change)="onFileSelected($event, i)"
                                     required
                                   />
+                              </div> -->
+
+                              <div class="col-md-6 mb-3">
+                                <label class="form-label">51. Upload FIR Copy *</label>
+                                <input type="file" [id]="'uploadFIRCopy' + i" class="form-control" formControlName="uploadFIRCopy"
+                                       required (change)="onFileSelected($event, i)"  multiple />
                               </div>
+                              
+                              <div *ngIf="uploadedFiles[i]; ">
+                                <img [src]="fileUrls[i]" class="img-thumbnail" alt="FIR Copy" style="max-width: 150px; margin-bottom: 10px;">
+                                <button class="btn btn-danger btn-sm mt-2" (click)="onDeleteFile(i)">Delete</button>
+                              </div>
+                              
+                         
 
 
 
@@ -929,14 +982,32 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
+                <!-- <div class="mb-4">
                   <label class="form-label">61. Upload Commissionerate / S.P. Office Proceedings *</label>
                   <input
                     type="file"
                     class="form-control"
                     (change)="onProceedingsFileChange($event)"
                   />
+                </div> -->
+
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">61. Upload Commissionerate / S.P. Office Proceedings *</label>
+                  <input type="file" [id]="'proceedingsFile' + i" class="form-control" 
+                         formControlName="proceedingsFile" required 
+                         (change)="onProceedingsFileChange($event, i)" multiple />
                 </div>
+                
+             
+                <div *ngIf="fileUrls_proceding[i]">
+                  <img [src]="fileUrls_proceding[i]" class="img-thumbnail" 
+                       alt="Proceedings File" style="max-width: 150px; margin-bottom: 10px;">
+                  <!-- <button class="btn btn-danger btn-sm mt-2" (click)="onDeleteFile_proceding(i)">Delete</button> -->
+                </div>
+                
+        
+        
 
 
                 <!-- Attachment Fields -->
@@ -973,10 +1044,9 @@
                     type="submit"
                     class="btn btn-primary"
                     (click)="submitStepFive()">
-
+                    <!-- [disabled]="!isStep5Valid()"/ -->
                     Submit
                   </button>
- <!-- >[disabled]="!isStep5Valid()" -->
 
                 </div>
             </div>
@@ -1253,8 +1323,8 @@
                 <!-- Navigation Buttons -->
                 <div class="mt-4">
                     <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft_6()">Save as Draft</button>
-                    <!-- <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button> -->
-                    <button type="submit" class="btn btn-primary" (click)="saveAsDraft_6()" 
+                    <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
+                    <button type="submit" class="btn btn-primary" (click)="submitStepSix()" 
                    
                     >
                         Submit

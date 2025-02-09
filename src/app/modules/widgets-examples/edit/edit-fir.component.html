@@ -232,11 +232,26 @@
               <h5 class="text-white mt-3">#{{ i + 1 }} Victim Details</h5>
             </div>
             <div class="card-body">
+
+
+
               <div class="row">
+
+
+
                 <div class="col-md-4 mb-3">
                   <label for="victimAge-{{i}}" class="form-label">18. Age of the Victim *</label>
-                  <input type="number" id="victimAge-{{i}}" class="form-control" formControlName="age" placeholder="Enter victim's age" (input)="onVictimAgeChange(i)" required />
+                  <input type="number" id="victimAge-{{i}}" class="form-control" formControlName="age" placeholder="Enter victim's age" (input)="onVictimAgeChange(i)"  min="1"  required />
+
+                  <small 
+                  class="text-danger d-block mt-1" 
+                  *ngIf="victims.at(i).get('age')?.invalid && victims.at(i).get('age')?.touched">
+                    {{ getAgeErrorMessage(i) }}
+                </small>
                 </div>
+
+
+
                 <div class="col-md-4 mb-3">
                   <label for="victimName-{{ i }}" class="form-label">19. Name of the Victim *</label>
                   <input type="text" id="victimName-{{ i }}" class="form-control" formControlName="name" placeholder="Enter victim's name" required (input)="updateVictimNames()" (keypress)="allowOnlyLetters($event)" style="text-transform: capitalize;" />
@@ -475,21 +490,27 @@
                   <textarea [id]="'gistOfCurrentCase' + i" class="form-control" formControlName="gistOfCurrentCase" rows="4" maxlength="3000" placeholder="Enter gist of the current case" required></textarea>
                   <small class="form-text text-muted">Maximum of 3000 Characters</small>
                 </div>
-             
+
                 <div class="col-md-6 mb-3">
                   <label class="form-label">48. Upload FIR Copy *</label>
                   <input type="file" [id]="'uploadFIRCopy' + i" class="form-control" formControlName="uploadFIRCopy"
-                         required (change)="onFileChange($event, i)" multiple />
+                         required (change)="onFileChange($event, i)"  multiple />
                 </div>
-
-           <!-- <div *ngIf="!multipleFiles[i]">
-
-            <div *ngIf="accused.get('uploadFIRCopy')?.value ">
-              <img [src]="apiurl + (accused.get('uploadFIRCopy')?.value ?? '')" 
-              class="img-thumbnail" alt="FIR Copy" style="max-width: 150px; margin-bottom: 10px;">
-            </div>
-           </div>
-               -->
+                
+                <div *ngIf="uploadedFiles[i]; else existingFile">
+                  <img [src]="fileUrls[i]" class="img-thumbnail" alt="FIR Copy" style="max-width: 150px; margin-bottom: 10px;">
+                  <button class="btn btn-danger btn-sm mt-2" (click)="onDeleteFile(i)">Delete</button>
+                </div>
+                
+                <ng-template #existingFile>
+                  <div *ngIf="accused.get('uploadFIRCopy')?.value">
+                    <img [src]="image_access + accused.get('uploadFIRCopy')?.value" 
+                         class="img-thumbnail" alt="FIR Copy" style="max-width: 150px; margin-bottom: 10px;">
+                    <!-- <button class="btn btn-danger btn-sm mt-2" (click)="onDelete()">Delete</button> -->
+                  </div>
+                </ng-template>
+                
+              
                 
   
                 
@@ -607,14 +628,42 @@
           <label class="form-label">58. Upload Commissionerate / S.P. Office Proceedings *</label>
           <input type="file" class="form-control" id="proceedingsFile" />
         </div> -->
-        <div class="mb-4">
+        <!-- <div class="mb-4">
           <label class="form-label">58. Upload Commissionerate / S.P. Office Proceedings *</label>
           <input
             type="file"
             class="form-control"
             (change)="onProceedingsFileChange($event)"
           />
+        </div> -->
+
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">58. Upload Commissionerate / S.P. Office Proceedings *</label>
+          <input type="file" [id]="'proceedingsFile' + i" class="form-control" 
+                 formControlName="proceedingsFile" required 
+                 (change)="onProceedingsFileChange($event, i)" multiple />
         </div>
+        
+     
+        <div *ngIf="fileUrls_proceding[i]; else existingFile_proceding">
+          <img [src]="fileUrls_proceding[i]" class="img-thumbnail" 
+               alt="Proceedings File" style="max-width: 150px; margin-bottom: 10px;">
+          <!-- <button class="btn btn-danger btn-sm mt-2" (click)="onDeleteFile_proceding(i)">Delete</button> -->
+        </div>
+        
+
+        <ng-template #existingFile_proceding>
+          <div *ngIf="firForm.get('proceedingsFile')?.value">
+            <img [src]="image_access + firForm.get('proceedingsFile')?.value" 
+                 class="img-thumbnail" alt="FIR Copy" style="max-width: 150px; margin-bottom: 10px;">
+          </div>
+        </ng-template>
+        
+        
+
+
+
 
         <div class="mb-4" formArrayName="attachments">
           <label class="form-label">59. Upload Other Attachment (If any)*</label>
