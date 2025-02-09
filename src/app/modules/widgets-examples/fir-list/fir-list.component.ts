@@ -546,7 +546,8 @@ export class FirListComponent implements OnInit {
           this.deceasedPersonNames= data.queryResults[0].deceased_person_names ? this.formatedata(data.queryResults[0].deceased_person_names) : data.queryResults[0].deceased_person_names;
 
           this.numberOfAccused=data.queryResults[0].number_of_accused;
-
+console.log( this.numberOfAccused,"number")
+console.log( data.queryResults[0],"vire ")
           // this.accusedAge=data.queryResults2[0].age;
           // this.accusedName=data.queryResults2[0].name;
           // this.accusedGender=data.queryResults2[0].gender;

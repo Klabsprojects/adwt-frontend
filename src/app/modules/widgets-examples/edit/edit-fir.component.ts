@@ -186,6 +186,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   specialCourtname: string[] = [];
   firCopyValue: any;
   uploadedFIRCopy: any;
+  attachmentss_1: any;
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -1173,6 +1174,13 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
         // 3. Proceeding File (judgement file URL)
         if (response && response.data4 && response.data4.upload_proceedings_path) { 
           this.firForm.get('uploadProceedings_1')?.setValue(response.data4.upload_proceedings_path);
+        }  if (response && response.data4 && response.data4.attachments) { 
+
+
+          this.attachmentss_1 =  response.data4.attachments
+
+          console.log(this.attachmentss_1," response.data4.attachments")
+          // this.firForm.get('attachments')?.setValue(response.data4.attachments);
         }
 
           // 4. Proceedings Date
@@ -1338,7 +1346,14 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
       } 
   }
 
-
+  getImagePath(path: string): string {
+    if (!path) return '';
+    return this.image_access + path.replace(/\\/g, '/');  
+  }
+  
+  // Handle image load errors
+ 
+    
   checkFormValidity() {
     // Enable the "Next" button only if the form is valid and it's Step 1
     this.nextButtonDisabled = !(this.firForm.valid && this.step === 1);
@@ -1483,17 +1498,59 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
   
 
   
+  // onFileChangee(event: any, index: number, fileControl: string, fileNameControl: string): void {
+  //   const file = event.target.files[0];
+  //   if (file) {
+  //     const attachment = this.attachments.at(index);
+  //     attachment.patchValue({
+  //       [fileControl]: file,
+  //       [fileNameControl]: file.name,
+  //     });
+  //   }
+  // }
+ 
+  // removeAttachment_1(index: number): void {
+  //   if (this.attachmentss_1.length > 1) {
+  //     this.attachmentss_1.removeAt(index);
+  //   }
+  // }
+
   onFileChangee(event: any, index: number, fileControl: string, fileNameControl: string): void {
     const file = event.target.files[0];
+  
     if (file) {
-      const attachment = this.attachments.at(index);
+      const reader = new FileReader();
+  
+      reader.onload = () => {
+        const uniqueId = Math.random().toString(36).substr(2, 9);
+  
+        this.attachmentss_1[index] = {
+          id: this.attachmentss_1[index]?.id || "", 
+          path:"", 
+          file: file 
+        };
+      };
+  
+      reader.readAsDataURL(file);
+  
+      const attachment = this.attachmentss_1.at(index);
+      
+      console.log(attachment, "on file change");
+  
       attachment.patchValue({
         [fileControl]: file,
         [fileNameControl]: file.name,
       });
     }
   }
- 
+  
+  
+  removeAttachment_1(index: number): void {
+    if (this.attachmentss_1.length > 1) {
+      this.attachmentss_1.splice(index, 1); // Remove from array
+      this.attachments.removeAt(index); // Remove from FormArray
+    }
+  }
   
 
   
@@ -1553,14 +1610,11 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
       // uploadFIRCopy: this.multipleFiles[index] || null
       // this.multipleFilesForproceeding[i]
       proceedingsFile: this.multipleFilesForproceeding || '',
-      attachments: this.attachments.value.map((attachment: any) => ({
-        file: attachment.file || null,  
-        fileName: attachment.fileName || '',
-      })),
+      attachments: this.attachmentss_1.value || this.attachmentss_1,
       status: isSubmit ? 5 : undefined,
     };
   console.log(firData,"firDatafirDatafirData")
-  console.log(this.victimsRelief.value,"firDatafirDatafirData")
+  console.log(this.attachmentss_1,"attachmentss_1attachmentss_1")
     this.firService.updatestep5(firData).subscribe(
       (response) => {
         if (isSubmit) {
@@ -2299,8 +2353,36 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
   // }
 
 
+  multipleFilesForproceeding1: any[][] = [];
+  showImage_proceding1: boolean[] = []; 
+  
+  uploadedFiles_procedin1g: { [key: number]: boolean } = {};
 
+  fileUrls_proceding1: { [key: number]: string } = {};
 
+  onProceedingsFileChange_1(event: any, i: number): void {
+    const selectedFile = event.target.files[0]; 
+    if (!selectedFile) return;
+
+    this.firForm.get('uploadProceedings_1')?.setValue(null);
+  
+    if (!this.multipleFilesForproceeding1[i]) {
+      this.multipleFilesForproceeding1[i] = [];
+    }
+    this.multipleFilesForproceeding1[i].push(selectedFile);
+  
+
+    this.fileUrls_proceding1[i] = URL.createObjectURL(selectedFile);
+    
+
+    this.multipleFilesForproceeding1 = selectedFile
+
+    console.log( this.multipleFilesForproceeding1)
+
+   
+    this.uploadedFiles_procedin1g[i] = true;
+  }
+  
 
 
 
@@ -2313,17 +2395,17 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
   fileUrls_proceding: { [key: number]: string } = {};
 
 
-  onProceedingsFileChange_1(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.proceedingsFile_1 = input.files[0];
+  // onProceedingsFileChange_1(event: Event): void {
+  //   const input = event.target as HTMLInputElement;
+  //   if (input.files && input.files.length > 0) {
+  //     this.proceedingsFile_1 = input.files[0];
   
-      console.log(this.proceedingsFile_1,"this.proceedingsFile")
+  //     console.log(this.proceedingsFile_1,"this.proceedingsFile")
       
       
-      // Save the selected file
-    }
-  }
+  //     // Save the selected file
+  //   }
+  // }
   
   onProceedingsFileChange(event: any, i: number): void {
     const selectedFile = event.target.files[0]; 
@@ -2915,11 +2997,7 @@ console.log(victimReliefDetail,"cretaieg")
   }
   
 
-  removeAttachment_1(index: number): void {
-    if (this.attachments_1.length > 1) {
-      this.attachments_1.removeAt(index);
-    }
-  }
+
 
 
     // Handle single file selection
@@ -2975,7 +3053,7 @@ console.log(victimReliefDetail,"cretaieg")
   }
 
   addAttachment(): void {
-    this.attachments.push(this.createAttachmentGroup());
+    this.attachmentss_1.push(this.createAttachmentGroup());
   }
 
   removeAttachment(index: number): void {
@@ -3631,7 +3709,7 @@ console.log(victimReliefDetail,"cretaieg")
         reliefAmountExGratia: parseFloat(relief.reliefAmountExGratia || '0.00').toFixed(2),
         reliefAmountSecondStage: parseFloat(relief.reliefAmountSecondStage || '0.00').toFixed(2),
       })),
-      uploadProceedingsPath: this.proceedingsFile_1 ,
+      uploadProceedingsPath: this.multipleFilesForproceeding1,
       attachments: this.selectedFiles || '',
       status: 6, // Update status to 6 for the FIR
     };
@@ -3642,6 +3720,8 @@ console.log(victimReliefDetail,"cretaieg")
     // Call the service to send data to the backend
     this.firService.updateStep6(chargesheetData).subscribe(
       (response: any) => {
+
+        this.submitStepSix();
         Swal.fire({
           title: 'Success',
           text: 'Step 6 data saved and FIR status updated to 6 successfully.',
@@ -3982,7 +4062,7 @@ console.log(victimReliefDetail,"cretaieg")
     const isProceedingsFileNoValid = this.firForm.get('proceedingsFileNo')?.valid || false;
     const isProceedingsDateValid = this.firForm.get('proceedingsDate')?.valid || false;
     const isProceedingsFileValid = this.firForm.get('proceedingsFile')?.valid || false;
-    const areAttachmentsValid = this.attachments.valid;
+    const areAttachmentsValid = this.attachmentss_1.valid;
 
     // Ensure all conditions are true before enabling the button
     return (
