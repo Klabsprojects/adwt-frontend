@@ -172,6 +172,11 @@ i: number;
     this.updateValidationForCaseType();
 
 
+     // Listen for input changes and trigger UI update
+     this.firForm.valueChanges.subscribe(() => {
+      console.log('Form Updated:', this.firForm.value); // Debugging log
+      this.cdr.detectChanges(); // Manually trigger UI update
+    });
 
     const preFilledDistrict = this.firForm.get('policeCity')?.value; // Get pre-filled district
     if (preFilledDistrict) {
@@ -266,6 +271,8 @@ loadDistricts(): void {
   this.firService.getDistricts().subscribe(
     (districts: string[]) => {
       this.courtDistricts = districts; // Populate district options
+      this.policeCities = [...districts]; // To Load the District in Dropdown
+      console.log('Police Cities Updated:', this.policeCities);
     },
     (error) => {
       console.error('Error loading districts:', error);
@@ -273,6 +280,14 @@ loadDistricts(): void {
     }
   );
 }
+
+// To Load the Dropdown ever time when the user click District Dropdown
+reloadPoliceCities(): void {
+  this.policeCities = [...this.courtDistricts]; // Reset to original list
+  console.log('Dropdown clicked, reloading policeCities:', this.policeCities);
+  this.cdr.detectChanges(); // Ensure Angular detects the change
+}
+
 loadAccusedCommunities(): void {
   this.firService.getAllAccusedCommunities().subscribe(
     (communities: string[]) => {
@@ -549,8 +564,17 @@ onFileSelect_3(event: Event, controlName: string): void {
     const nameControl = victimGroup.get('name');
 
     if (ageControl) {
-      const ageValue = ageControl.value;
+      let ageValue = ageControl.value || ''; // Ensure it's always a string
 
+      // Remove any non-numeric characters
+      ageValue = ageValue.toString().replace(/\D/g, '');
+
+      // If input exceeds 3 digits, reset it
+      if (ageValue.length > 2) {
+          ageControl.setValue('');
+      } else {
+          ageControl.setValue(ageValue);
+        }
       // If age is below 18, disable the name field
       if (ageValue < 18) {
         nameControl?.disable({ emitEvent: false });
@@ -591,7 +615,17 @@ onFileSelect_3(event: Event, controlName: string): void {
     const nameControl = accusedGroup.get('name');
 
     if (ageControl) {
-      const ageValue = ageControl.value;
+      let ageValue = ageControl.value || ''; // Ensure it's always a string
+
+      // Remove any non-numeric characters
+      ageValue = ageValue.toString().replace(/\D/g, '');
+
+      // If input exceeds 3 digits, reset it
+      if (ageValue.length > 2) {
+          ageControl.setValue('');
+      } else {
+          ageControl.setValue(ageValue);
+        }// Update the age value in the form group
 
       // If age is below 18, disable the name field
       if (ageValue < 18) {
@@ -795,8 +829,13 @@ onFileSelect_3(event: Event, controlName: string): void {
 
   }
 
-
-
+// To remove the Error text for FIR Number *
+  isFirFormatValid(): boolean {
+    const firNumber = this.firForm.get('firNumber')?.value;
+    const firYear = this.firForm.get('firNumberSuffix')?.value;
+  
+    return !!(firNumber && firYear); // Returns true only if both are selected
+  }    
 
   get hearingDetails(): FormArray {
     return this.firForm.get('hearingDetails') as FormArray;
@@ -1258,6 +1297,7 @@ console.log(victimsReliefArray,"victimsReliefArray")
   handleSCSTSectionChange(event: any, index: number): void {
     const selectedValues = event.value; // Selected SC/ST sections
     const victimGroup = this.victims.at(index) as FormGroup; // Access the victim's FormGroup
+    console.log("SELECTED : ", selectedValues);
 
     if (selectedValues.length > 0) {
       this.firService.getOffenceActs().subscribe(
@@ -1505,7 +1545,7 @@ maxDateValidator() {
 createVictimGroup(): FormGroup {
   return this.fb.group({
     victimId: [''], // Track existing victim IDs
-    age: ['', Validators.required],
+    age: ['', [Validators.required, Validators.min(0), Validators.max(99)]],
     name: [{ value: '', disabled: false }, [Validators.required, Validators.pattern('^[A-Za-z\\s]*$')]],
     gender: ['', Validators.required],
     mobileNumber: [
@@ -1525,7 +1565,7 @@ createVictimGroup(): FormGroup {
     isNativeDistrictSame: ['', Validators.required],
     nativeDistrict: [''],
     offenceCommitted: ['', Validators.required],
-    scstSections: [[]],
+    scstSections: ['', Validators.required],
     sectionsIPC: ['', Validators.required],
     fir_stage_as_per_act: [''],
     fir_stage_ex_gratia: [''],
@@ -1724,8 +1764,8 @@ handleCaseTypeChange() {
       (user: any) => {
         if (user && user.district) {
           const district = user.district;
-          this.firForm.patchValue({ policeCity: district });
-          this.loadPoliceDivisionDetails(district);
+          // this.firForm.patchValue({ policeCity: district });
+          // this.loadPoliceDivisionDetails(district);
         }
       },
       (error: any) => {
