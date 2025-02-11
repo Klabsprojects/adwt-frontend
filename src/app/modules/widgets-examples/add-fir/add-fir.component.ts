@@ -837,6 +837,59 @@ onFileSelect_3(event: Event, controlName: string): void {
     return !!(firNumber && firYear); // Returns true only if both are selected
   }    
 
+  // Validate SCST FIR Number and FIR Year (Suffix)
+  isScstFirFormatValid(): boolean {
+    const scstFIRNumber = this.firForm.get('scstFIRNumber')?.value;
+    const scstFIRNumberSuffix = this.firForm.get('scstFIRNumberSuffix')?.value;
+
+    return !!(scstFIRNumber && scstFIRNumberSuffix); // Return true only if both are selected
+  }
+
+  // Validate Previous FIR Number and FIR Year (Suffix)
+  isPreviousFirFormatValid(): boolean {
+    const previousFIRNumber = this.firForm.get('previousFIRNumber')?.value;
+    const previousFIRNumberSuffix = this.firForm.get('previousFIRNumberSuffix')?.value;
+
+    return !!(previousFIRNumber && previousFIRNumberSuffix); // Return true only if both are selected
+  }
+  
+/**
+ * This function checks the input field and hides/shows the warning text accordingly.
+ * It also logs the changes for debugging.
+ * 
+ * @param {number} index - The index of the input field (useful when handling multiple inputs dynamically).
+ * @param {string} field - The name of the field (e.g., 'antecedents', 'landOIssues').
+ */
+// Function to validate if input is filled
+isInputValid(index: number, field: string): boolean {
+  const inputValue = this.accuseds.at(index).get(field)?.value; // Get value properly from FormArray
+  return !!inputValue && inputValue.trim() !== ''; // Returns true if input is filled
+}
+
+// Function to log user input and update UI validation
+checkInput(index: number, field: string) {  
+  const control = this.accuseds.at(index).get(field); // Access form control correctly
+
+  if (control) {
+    const value = control.value?.trim() || '';
+
+    console.log(`[INFO] Input detected - Field: ${field}, Index: ${index}, Value: "${value}"`);
+
+    if (value !== '') {  
+      console.log(`[SUCCESS] ${field} input filled for index ${index}: "${value}" - No error shown.`);
+      control.setErrors(null); // Clear errors if input is valid
+    } else {  
+      console.log(`[ERROR] ${field} input is empty for index ${index} - Showing error.`);
+      control.setErrors({ required: true }); // Set error if input is empty
+    }  
+
+    // Ensure UI updates properly
+    control.markAsTouched();
+    control.updateValueAndValidity(); // Force validation check
+    this.cdr.detectChanges();
+  }
+}
+
   get hearingDetails(): FormArray {
     return this.firForm.get('hearingDetails') as FormArray;
   }
