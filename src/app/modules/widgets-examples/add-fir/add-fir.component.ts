@@ -1910,7 +1910,9 @@ handleCaseTypeChange() {
     const accusedsArray = this.firForm.get('accuseds') as FormArray;
 
     // Clear existing accused fields
-    accusedsArray.clear();
+    while (accusedsArray.length > 0) {
+      accusedsArray.removeAt(0);
+    }
 
     // Add new accused fields based on the selected number
     for (let i = 0; i < numberOfAccused; i++) {
@@ -1943,7 +1945,8 @@ handleCaseTypeChange() {
       antecedents: ['', Validators.required],
       landOIssues: ['', Validators.required],
       gistOfCurrentCase: ['', [Validators.required, Validators.maxLength(3000)]],
-      availableCastes: [[]]
+      availableCastes: [[]],
+      uploadFIRCopy: [null] // Add this field for File upload
 
     });
   }
@@ -2092,10 +2095,11 @@ console.log(firData,"firDatafirDatafirData")
 
 // Save Step 4 as Draft
 saveStepFourAsDraft(): void {
+  const accusedArray = this.firForm.get('accuseds')?.value || [];
   const firData = {
     firId: this.firId,
     numberOfAccused: this.firForm.get('numberOfAccused')?.value || '',
-    accuseds: this.firForm.get('accuseds')?.value.map((accused: any, index: number) => ({
+    accuseds: accusedArray.map((accused: any, index: number) => ({
       ...accused,
       accusedId: accused.accusedId || null,
       uploadFIRCopy: this.multipleFiles[index] || null

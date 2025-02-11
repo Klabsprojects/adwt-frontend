@@ -831,7 +831,7 @@
                 <div class="mt-4">
                     <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
                     <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-                    <button type="button" class="btn btn-primary" (click)="nextStep()">
+                    <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid()">
                         Next
                     </button>
                 </div>
