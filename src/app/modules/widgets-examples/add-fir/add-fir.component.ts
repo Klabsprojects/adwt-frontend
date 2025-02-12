@@ -132,7 +132,8 @@ export class AddFirComponent implements OnInit, OnDestroy {
   offenceOptions: string[] = [];
   offenceActsOptions: { offence_act_name: string; [key: string]: any }[] = [];
   courtDistricts: string[] = [];
-
+  offenceReliefDetails: any[] = []; 
+  
   alphabetList: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   stationNumbers: number[] = Array.from({ length: 99 }, (_, k) => k + 1);
   firNumberOptions: number[] = Array.from({ length: 99 }, (_, k) => k + 1);
@@ -147,12 +148,13 @@ i: number;
     private router: Router,
     private modalService: NgbModal
   ) {}
-
+  private wasVictimSame: boolean = false; // Track the previous state of on Victim same as Complainant
 
 
   triggerChangeDetection() {
     this.cdr.detectChanges();
   }
+
   ngOnInit(): void {
     this.generateVictimCount();
     this.clearSession();
@@ -170,6 +172,7 @@ i: number;
     this.loadCommunities();
     this.loadDistricts();
     this.updateValidationForCaseType();
+    this.loadAllOffenceReliefDetails();
 
 
      // Listen for input changes and trigger UI update
@@ -222,7 +225,26 @@ i: number;
       }
     });
 
+  // Listen for changes in isVictimSameAsComplainant
+  this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.valueChanges.subscribe(isVictimSame => {
+    console.log('isVictimSame ',isVictimSame)
+    this.onVictimSameAsComplainantChange(isVictimSame=== 'true');
+    this.wasVictimSame = isVictimSame=== 'true'; // Update the previous state
+  });
+  // Listen for changes in complainant's name
+  this.firForm.get('complainantDetails.nameOfComplainant')?.valueChanges.subscribe(name => {
+    const isVictimSame = this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.value;
+    const victimsArray = this.firForm.get('victims') as FormArray;
+    if (isVictimSame && victimsArray.length > 0 && this.wasVictimSame) {
+        victimsArray.at(0).get('name')?.setValue(name, { emitEvent: false });
+    }
+  });
+  }
 
+  // Handles the change in victim status relative to the complainant and updates the form accordingly.
+  onVictimSameAsComplainantChange(isVictimSame: boolean) {
+    this.firService.onVictimSameAsComplainantChange(isVictimSame, this.firForm, this.wasVictimSame);
+    this.wasVictimSame = isVictimSame; // Update the previous state
   }
 
   navigateToMainStep(stepNumber: number): void {
@@ -280,14 +302,6 @@ loadDistricts(): void {
     }
   );
 }
-
-// To Load the Dropdown ever time when the user click District Dropdown
-reloadPoliceCities(): void {
-  this.policeCities = [...this.courtDistricts]; // Reset to original list
-  console.log('Dropdown clicked, reloading policeCities:', this.policeCities);
-  this.cdr.detectChanges(); // Ensure Angular detects the change
-}
-
 loadAccusedCommunities(): void {
   this.firService.getAllAccusedCommunities().subscribe(
     (communities: string[]) => {
@@ -400,6 +414,32 @@ updateValidationForCaseType() {
   this.firForm.get('rcsFilingDate')?.updateValueAndValidity();
   this.firForm.get('mfCopy')?.updateValueAndValidity();
 }
+
+loadAllOffenceReliefDetails(): void {
+  this.firService.getOffenceReliefDetails().subscribe(
+    (offence_relief: any[]) => {
+      this.offenceReliefDetails = offence_relief; // Store data
+      console.log('Offence Relief Details:', this.offenceReliefDetails);
+    },
+    (error) => {
+      console.error('Error loading districts:', error);
+      Swal.fire('Error', 'Failed to load offence relief details.', 'error');
+    }
+  );
+}
+
+onOffenceCommittedChange(event: any): void {
+  const selectedOffences = event.value; // Get selected values in 30th field
+console.log('selectedOffences ',selectedOffences);
+  // Filter to find matching poa_act_section values
+  const matchingSections = this.offenceReliefDetails
+    .filter(offence => selectedOffences.includes(offence.name_of_offence))
+    .map(offence => offence.poa_act_section);
+    console.log('matchingSections ',matchingSections);
+  // Set the 31st field with matching sections
+  this.firForm.patchValue({ scstSections: matchingSections });
+}
+
 
 onCaseTypeChange() {
   this.updateValidationForCaseType(); // Update validations whenever caseType is changed
@@ -570,7 +610,7 @@ onFileSelect_3(event: Event, controlName: string): void {
       ageValue = ageValue.toString().replace(/\D/g, '');
 
       // If input exceeds 3 digits, reset it
-      if (ageValue.length > 2) {
+      if (ageValue.length > 3) {
           ageControl.setValue('');
       } else {
           ageControl.setValue(ageValue);
@@ -621,7 +661,7 @@ onFileSelect_3(event: Event, controlName: string): void {
       ageValue = ageValue.toString().replace(/\D/g, '');
 
       // If input exceeds 3 digits, reset it
-      if (ageValue.length > 2) {
+      if (ageValue.length > 3) {
           ageControl.setValue('');
       } else {
           ageControl.setValue(ageValue);
@@ -829,28 +869,9 @@ onFileSelect_3(event: Event, controlName: string): void {
 
   }
 
-// To remove the Error text for FIR Number *
-  isFirFormatValid(): boolean {
-    const firNumber = this.firForm.get('firNumber')?.value;
-    const firYear = this.firForm.get('firNumberSuffix')?.value;
-  
-    return !!(firNumber && firYear); // Returns true only if both are selected
-  }    
-
-  // Validate SCST FIR Number and FIR Year (Suffix)
-  isScstFirFormatValid(): boolean {
-    const scstFIRNumber = this.firForm.get('scstFIRNumber')?.value;
-    const scstFIRNumberSuffix = this.firForm.get('scstFIRNumberSuffix')?.value;
-
-    return !!(scstFIRNumber && scstFIRNumberSuffix); // Return true only if both are selected
-  }
-
-  // Validate Previous FIR Number and FIR Year (Suffix)
-  isPreviousFirFormatValid(): boolean {
-    const previousFIRNumber = this.firForm.get('previousFIRNumber')?.value;
-    const previousFIRNumberSuffix = this.firForm.get('previousFIRNumberSuffix')?.value;
-
-    return !!(previousFIRNumber && previousFIRNumberSuffix); // Return true only if both are selected
+  // Validates the FIR Number values using the firValidationService.
+  isFirValid(fir: string, suffix: string): boolean {
+    return this.firService.isFirValid(fir, suffix, this.firForm);
   }
   
 /**
@@ -1817,8 +1838,8 @@ handleCaseTypeChange() {
       (user: any) => {
         if (user && user.district) {
           const district = user.district;
-          // this.firForm.patchValue({ policeCity: district });
-          // this.loadPoliceDivisionDetails(district);
+          this.firForm.patchValue({ policeCity: district });
+          this.loadPoliceDivisionDetails(district);
         }
       },
       (error: any) => {

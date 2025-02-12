@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.prod';
+import { FormArray, FormGroup } from '@angular/forms';
 @Injectable({
   providedIn: 'root'
 })
@@ -40,6 +41,11 @@ export class FirService {
   // Get offence acts
  getOffenceActs(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/offence-acts`);
+  }
+
+  // Get offence acts
+ getOffenceReliefDetails(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/offence/relief/details`);
   }
 
   getPoliceRevenue(): Observable<any> {
@@ -307,5 +313,38 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     return this.http.get(`${this.baseUrl}/status/${firId}`);
   }
 
-
+  // Updates the victim's name field based on whether the victim is the same as the complainant.
+  onVictimSameAsComplainantChange(isVictimSame: boolean, firForm: FormGroup, wasVictimSame: boolean) {
+    const victimsArray = firForm.get('victims') as FormArray;
+    if (victimsArray && victimsArray.length > 0) {
+      const firstVictim = victimsArray.at(0);
+      if (isVictimSame) {
+        const complainantName = firForm.get('complainantDetails.nameOfComplainant')?.value;
+        firstVictim.get('name')?.setValue(complainantName, { emitEvent: false });
+        firstVictim.get('name')?.disable(); // Disable the first control
+      } else if (wasVictimSame) {
+        // Only reset the name if switching from "Yes" to "No"
+        firstVictim.get('name')?.reset();
+        firstVictim.get('name')?.enable(); // Enable the first control
+      }
+    }
+  }
+  
+  // Validates if both the FIR number and its corresponding year are selected for the given field.
+  isFirValid(fir: string, suffix: string, firForm: FormGroup): boolean {
+    // If fir and suffix are 'firNumber' and 'firNumberSuffix', check directly in form values
+    if (fir === 'firNumber' && suffix === 'firNumberSuffix') {
+      return !!(firForm.get(fir)?.value && firForm.get(suffix)?.value);
+    }
+    // Extract numeric index as string
+    const index = fir.match(/\d+$/)?.[0]; 
+    if (!index) return false; // Return false if no index is found
+    // Convert index to number for array access
+    const accused = firForm.value.accuseds?.[parseInt(index, 10)];
+    if (!accused) return false;
+    // Remove index from keys
+    const firKey = fir.replace(index, ''); 
+    const suffixKey = suffix.replace(index, '');
+    return !!(accused[firKey] && accused[suffixKey]); // Check if both values exist
+  }
 }

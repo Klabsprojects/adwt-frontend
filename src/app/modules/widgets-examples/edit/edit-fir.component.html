@@ -167,7 +167,7 @@
                   <option *ngFor="let year of yearOptions" [value]="year">{{ year }}</option>
                 </select>
               </div>
-              <small class="text-danger d-block mt-1">Please Follow the format "12-2024".</small>
+              <small *ngIf="!isFirValid('firNumber', 'firNumberSuffix')" class="text-danger d-block mt-1">Please Follow the format "12/2024".</small>
             </div>
           </div>
           <div class="col-md-4 mb-3">
@@ -437,7 +437,7 @@
                       <option *ngFor="let year of yearOptions" [value]="year">{{ year }}</option>
                     </select>
                   </div>
-                  <small class="text-danger d-block mt-1">Please follow the format "12-2024".</small>
+                  <small *ngIf="!isFirValid('previousFIRNumber'+ i, 'previousFIRNumberSuffix'+ i)"  class="text-danger d-block mt-1">Please follow the format "12/2024".</small>
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="scstOffence{{ i }}" class="form-label">43. Previously Committed Offence Against SC/ST Community? *</label>
@@ -460,7 +460,7 @@
                       <option *ngFor="let year of yearOptions" [value]="year">{{ year }}</option>
                     </select>
                   </div>
-                  <small class="text-danger d-block mt-1">Please follow the format "12-2024".</small>
+                  <small *ngIf="!isFirValid('scstFIRNumber' + i, 'scstFIRNumberSuffix' + i)" class="text-danger d-block mt-1">Please follow the format "12/2024".</small>
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="antecedents{{ i }}" class="form-label">45. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *</label>

@@ -189,6 +189,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
     private firServiceAPI : FirServiceAPI,
     private sanitizer: DomSanitizer
    ) {}
+   private wasVictimSame: boolean = false; // Track the previous state of on Victim same as Complainant
 
   onDrop1(event: DragEvent): void {
     if (event.dataTransfer?.files) {
@@ -636,9 +637,20 @@ export class EditFirComponent implements OnInit, OnDestroy {
       this.loadPoliceStations(district);
     });
 
-
-
-
+    // Listen for changes in isVictimSameAsComplainant
+    this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.valueChanges.subscribe(isVictimSame => {
+      console.log('isVictimSame ',isVictimSame)
+      this.onVictimSameAsComplainantChange(isVictimSame=== 'true');
+      this.wasVictimSame = isVictimSame=== 'true'; // Update the previous state
+    });
+    // Listen for changes in complainant's name
+    this.firForm.get('complainantDetails.nameOfComplainant')?.valueChanges.subscribe(name => {
+      const isVictimSame = this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.value;
+      const victimsArray = this.firForm.get('victims') as FormArray;
+      if (isVictimSame && victimsArray.length > 0 && this.wasVictimSame) {
+          victimsArray.at(0).get('name')?.setValue(name, { emitEvent: false });
+      }
+    });
     // this.setVictimData();
   }
 
@@ -655,6 +667,12 @@ export class EditFirComponent implements OnInit, OnDestroy {
   //     this.victimsRelief.push(victimGroup);
   //   });
   // }
+
+  // Handles the change in victim status relative to the complainant and updates the form accordingly.
+  onVictimSameAsComplainantChange(isVictimSame: boolean) {
+    this.firService.onVictimSameAsComplainantChange(isVictimSame, this.firForm, this.wasVictimSame);
+    this.wasVictimSame = isVictimSame; // Update the previous state
+  }
 
   navigateToMainStep(stepNumber: number): void {
     this.mainStep = stepNumber; // Update mainStep
@@ -1575,8 +1593,15 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
     const nameControl = victimGroup.get('name');
 
     if (ageControl) {
-      const ageValue = ageControl.value;
-
+      let ageValue = ageControl.value || ''; // Ensure it's always a string
+      // Remove any non-numeric characters
+      ageValue = ageValue.toString().replace(/\D/g, '');
+      // If input exceeds 3 digits, reset it
+      if (ageValue.length > 3) {
+          ageControl.setValue('');
+      } else {
+          ageControl.setValue(ageValue);
+      }
       // If age is below 18, disable the name field
       if (ageValue < 18) {
         nameControl?.disable({ emitEvent: false });
@@ -1609,8 +1634,15 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
     const nameControl = accusedGroup.get('name');
 
     if (ageControl) {
-      const ageValue = ageControl.value;
-
+      let ageValue = ageControl.value || ''; // Ensure it's always a string
+      // Remove any non-numeric characters
+      ageValue = ageValue.toString().replace(/\D/g, '');
+      // If input exceeds 3 digits, reset it
+      if (ageValue.length > 3) {
+          ageControl.setValue('');
+      } else {
+          ageControl.setValue(ageValue);
+      }
       // If age is below 18, disable the name field
       if (ageValue < 18) {
         nameControl?.disable({ emitEvent: false });
@@ -1866,8 +1898,10 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
     }
   }
 
-
-
+  // Validates the FIR Number values using the firValidationService.
+  isFirValid(fir: string, suffix: string): boolean {
+    return this.firService.isFirValid(fir, suffix, this.firForm);
+  }
 
   onJudgementNatureChange_one(): void {
     const judgementNature = this.firForm.get('judgementDetails_one.judgementNature_one')?.value;
