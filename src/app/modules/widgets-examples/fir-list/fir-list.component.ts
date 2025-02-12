@@ -585,8 +585,16 @@ console.log( data.queryResults[0],"vire ")
           this.proceedingsFile=data.queryResults[0].Commissionerate_file;
           // this.attachments=data.queryResults[0].file_path;
 
+          // this.attachments = data.queryResults.map((item: any) => {
+          //   return item.file_path.startsWith('uploads/') ? item.file_path : 'uploads/' + item.file_path;
+          // });
           this.attachments = data.queryResults.map((item: any) => {
-            return item.file_path.startsWith('uploads/') ? item.file_path : 'uploads/' + item.file_path;
+            // Check if file_path is null or undefined before calling startsWith
+            if (item.file_path && typeof item.file_path === 'string') {
+              return item.file_path.startsWith('uploads/') ? item.file_path : 'uploads/' + item.file_path;
+            } else {
+              return '';  // Return an empty string or handle it as needed
+            }
           });
           
 

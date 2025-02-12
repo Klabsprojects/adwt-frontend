@@ -313,7 +313,7 @@
                   <label for="victimNativeDistrict{{ i }}" class="form-label">28. Victim's Native District *</label>
                   <select [id]="'victimNativeDistrict' + i" class="form-select" formControlName="nativeDistrict" required>
                      <option value="" disabled>Select District</option>
-                     <option *ngFor="let district of policeStations" [value]="district">{{ district }}</option>
+                     <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
                   </select>
                 </div>
                 <div class="col-md-6 mb-3">
