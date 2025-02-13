@@ -313,19 +313,26 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     return this.http.get(`${this.baseUrl}/status/${firId}`);
   }
 
-  // Updates the victim's name field based on whether the victim is the same as the complainant.
+  // Updates the victim's name and mobileNumber fields based on whether the victim is the same as the complainant.
   onVictimSameAsComplainantChange(isVictimSame: boolean, firForm: FormGroup, wasVictimSame: boolean) {
     const victimsArray = firForm.get('victims') as FormArray;
     if (victimsArray && victimsArray.length > 0) {
       const firstVictim = victimsArray.at(0);
+      console.log('firstVictim.get(mobileNumber) ',firstVictim.get('mobileNumber'));
       if (isVictimSame) {
         const complainantName = firForm.get('complainantDetails.nameOfComplainant')?.value;
+        const complainantMobile = firForm.get('complainantDetails.mobileNumberOfComplainant')?.value;
+        console.log('complainantMobile ',complainantMobile);
         firstVictim.get('name')?.setValue(complainantName, { emitEvent: false });
         firstVictim.get('name')?.disable(); // Disable the first control
+        firstVictim.get('mobileNumber')?.setValue(complainantMobile, { emitEvent: false });
+        firstVictim.get('mobileNumber')?.disable(); // Disable the first control
       } else if (wasVictimSame) {
         // Only reset the name if switching from "Yes" to "No"
         firstVictim.get('name')?.reset();
         firstVictim.get('name')?.enable(); // Enable the first control
+        firstVictim.get('mobileNumber')?.reset();
+        firstVictim.get('mobileNumber')?.enable(); // Enable the first control
       }
     }
   }
@@ -347,4 +354,11 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     const suffixKey = suffix.replace(index, '');
     return !!(accused[firKey] && accused[suffixKey]); // Check if both values exist
   }
+
+  // Checks if a given field in the FormArray at a specific index has a valid (non-empty) value.
+  isInputValid(index: number, field: string, formArray: FormArray): boolean {
+    const inputValue = formArray.at(index).get(field)?.value; // Retrieve the field value from FormArray
+    return !!inputValue && inputValue.trim() !== ''; // Returns true if input is filled
+  }
+
 }

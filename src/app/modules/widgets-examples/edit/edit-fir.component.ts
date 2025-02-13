@@ -639,17 +639,28 @@ export class EditFirComponent implements OnInit, OnDestroy {
 
     // Listen for changes in isVictimSameAsComplainant
     this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.valueChanges.subscribe(isVictimSame => {
-      console.log('isVictimSame ',isVictimSame)
       this.onVictimSameAsComplainantChange(isVictimSame=== 'true');
       this.wasVictimSame = isVictimSame=== 'true'; // Update the previous state
+      const victimGroup = this.victims.at(0) as FormGroup;
+      const ageControl = victimGroup.get('age');
+      const nameControl = victimGroup.get('name');
+      if (Number(ageControl?.value?.toString().replace(/\D/g, '')) < 18) {
+        nameControl?.disable({ emitEvent: false });
+        nameControl?.reset();
+      }
     });
-    // Listen for changes in complainant's name
-    this.firForm.get('complainantDetails.nameOfComplainant')?.valueChanges.subscribe(name => {
+    // Updates the victim's details if they are the same as the complainant.
+    const updateVictimDetails = (field: string, value: any) => {
       const isVictimSame = this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.value;
       const victimsArray = this.firForm.get('victims') as FormArray;
       if (isVictimSame && victimsArray.length > 0 && this.wasVictimSame) {
-          victimsArray.at(0).get('name')?.setValue(name, { emitEvent: false });
+        victimsArray.at(0).get(field)?.setValue(value, { emitEvent: false });
       }
+    };
+    ['nameOfComplainant', 'mobileNumberOfComplainant'].forEach(field => {
+      this.firForm.get(`complainantDetails.${field}`)?.valueChanges.subscribe(value => {
+        updateVictimDetails(field === 'nameOfComplainant' ? 'name' : 'mobileNumber', value);
+      });
     });
     // this.setVictimData();
   }
@@ -1437,7 +1448,7 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
 
     const fileUrl = URL.createObjectURL(selectedFile);
 
-
+console.log('selectedFile ',selectedFile);
   
   }
 
@@ -1608,6 +1619,10 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
         nameControl?.reset();
       } else {
         nameControl?.enable({ emitEvent: false });
+        if(index===0){
+          this.onVictimSameAsComplainantChange(this.wasVictimSame);
+          this.wasVictimSame && nameControl?.disable({ emitEvent: false });
+        }
       }
 
       this.cdr.detectChanges(); // Trigger change detection
@@ -1901,6 +1916,12 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
   // Validates the FIR Number values using the firValidationService.
   isFirValid(fir: string, suffix: string): boolean {
     return this.firService.isFirValid(fir, suffix, this.firForm);
+  }
+
+  // This function checks the input field and hides/shows the warning text accordingly
+  isInputValid(index: number, field: string): boolean {
+    const inputValue = this.accuseds.at(index).get(field)?.value; // Get value properly from FormArray
+    return !!inputValue && inputValue.trim() !== ''; // Returns true if input is filled
   }
 
   onJudgementNatureChange_one(): void {
@@ -3593,9 +3614,10 @@ apiurl = 'http://localhost:3010/'
     const isDeceased = this.firForm.get('isDeceased')?.value;
     const isDeceasedValid = isDeceased !== '' &&
       (isDeceased === 'no' || (this.firForm.get('deceasedPersonNames')?.valid === true));
+    const isValuePresent = this.firForm.get('deceasedPersonNames')?.value?.length !== 0;
 
     // Ensure all conditions return a boolean
-    return Boolean(isComplainantValid && victimsValid && isDeceasedValid);
+    return Boolean(isComplainantValid && victimsValid && isDeceasedValid && isValuePresent);
   }
 
 
@@ -3699,6 +3721,8 @@ apiurl = 'http://localhost:3010/'
         }
 // mahiis check
         const uploadFIRCopyControl = accusedGroup.get('uploadFIRCopy');
+        console.log('uploadFIRCopyControl ',uploadFIRCopyControl);
+        console.log('uploadFIRCopyControl.value ',uploadFIRCopyControl?.value);
         if (uploadFIRCopyControl) {
           const isFilled = uploadFIRCopyControl.value ? true : false;
   
@@ -3716,7 +3740,8 @@ apiurl = 'http://localhost:3010/'
       console.log('accuseds is not a FormArray');
       isValid = false;
     }
-  
+
+  console.log('isValid ',isValid);
     return isValid;
   }
   

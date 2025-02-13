@@ -227,17 +227,28 @@ i: number;
 
   // Listen for changes in isVictimSameAsComplainant
   this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.valueChanges.subscribe(isVictimSame => {
-    console.log('isVictimSame ',isVictimSame)
     this.onVictimSameAsComplainantChange(isVictimSame=== 'true');
     this.wasVictimSame = isVictimSame=== 'true'; // Update the previous state
+    const victimGroup = this.victims.at(0) as FormGroup;
+    const ageControl = victimGroup.get('age');
+    const nameControl = victimGroup.get('name');
+    if (Number(ageControl?.value?.toString().replace(/\D/g, '')) < 18) {
+      nameControl?.disable({ emitEvent: false });
+      nameControl?.reset();
+    }
   });
-  // Listen for changes in complainant's name
-  this.firForm.get('complainantDetails.nameOfComplainant')?.valueChanges.subscribe(name => {
+  // Updates the victim's details if they are the same as the complainant.
+  const updateVictimDetails = (field: string, value: any) => {
     const isVictimSame = this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.value;
     const victimsArray = this.firForm.get('victims') as FormArray;
     if (isVictimSame && victimsArray.length > 0 && this.wasVictimSame) {
-        victimsArray.at(0).get('name')?.setValue(name, { emitEvent: false });
+      victimsArray.at(0).get(field)?.setValue(value, { emitEvent: false });
     }
+  };
+  ['nameOfComplainant', 'mobileNumberOfComplainant'].forEach(field => {
+    this.firForm.get(`complainantDetails.${field}`)?.valueChanges.subscribe(value => {
+      updateVictimDetails(field === 'nameOfComplainant' ? 'name' : 'mobileNumber', value);
+    });
   });
   }
 
@@ -621,6 +632,10 @@ onFileSelect_3(event: Event, controlName: string): void {
         nameControl?.reset();
       } else {
         nameControl?.enable({ emitEvent: false });
+        if(index===0){
+          this.onVictimSameAsComplainantChange(this.wasVictimSame);
+          this.wasVictimSame && nameControl?.disable({ emitEvent: false });
+        }
       }
 
       this.cdr.detectChanges(); // Trigger change detection
@@ -874,18 +889,11 @@ onFileSelect_3(event: Event, controlName: string): void {
     return this.firService.isFirValid(fir, suffix, this.firForm);
   }
   
-/**
- * This function checks the input field and hides/shows the warning text accordingly.
- * It also logs the changes for debugging.
- * 
- * @param {number} index - The index of the input field (useful when handling multiple inputs dynamically).
- * @param {string} field - The name of the field (e.g., 'antecedents', 'landOIssues').
- */
-// Function to validate if input is filled
-isInputValid(index: number, field: string): boolean {
-  const inputValue = this.accuseds.at(index).get(field)?.value; // Get value properly from FormArray
-  return !!inputValue && inputValue.trim() !== ''; // Returns true if input is filled
-}
+  // This function checks the input field and hides/shows the warning text accordingly
+  isInputValid(index: number, field: string): boolean {
+    const inputValue = this.accuseds.at(index).get(field)?.value; // Get value properly from FormArray
+    return !!inputValue && inputValue.trim() !== ''; // Returns true if input is filled
+  }
 
 // Function to log user input and update UI validation
 checkInput(index: number, field: string) {  
@@ -2881,9 +2889,10 @@ isStep3Valid(): boolean {
   const isDeceased = this.firForm.get('isDeceased')?.value;
   const isDeceasedValid = isDeceased !== '' &&
                           (isDeceased === 'no' || (this.firForm.get('deceasedPersonNames')?.valid === true));
+  const isValuePresent = this.firForm.get('deceasedPersonNames')?.value?.length !== 0;
 
   // Ensure all conditions return a boolean
-  return Boolean(isComplainantValid && victimsValid && isDeceasedValid);
+  return Boolean(isComplainantValid && victimsValid && isDeceasedValid && isValuePresent);
 }
 
 
