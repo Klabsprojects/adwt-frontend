@@ -24,6 +24,7 @@ declare var $: any;
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 
@@ -39,7 +40,8 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, FormsM
     MatSelectModule,
     MatFormFieldModule,
     MatRadioModule,
-    NgxFileDropModule
+    NgxFileDropModule,
+    NgSelectModule
   ],
 })
 export class AddFirComponent implements OnInit, OnDestroy {
@@ -281,9 +283,10 @@ loadCommunities(): void {
   );
 }
 
-onCommunityChange(event: any, index: number): void {
-  const selectedCommunity = event.target.value;
-// console.log(selectedCommunity,"wssss")
+// onCommunityChange(event: any, index: number): void {
+//   const selectedCommunity = event.target.value;
+onCommunityChange(selectedCommunity: string, index: number): void {
+ console.log(selectedCommunity,"wssss")
     if (selectedCommunity) {
       this.firService.getCastesByCommunity(selectedCommunity).subscribe(
         (castes: string[]) => {
@@ -331,9 +334,9 @@ loadAccusedCommunities(): void {
 
 
 
-onAccusedCommunityChange(event: any, index: number): void {
-  const selectedCommunity = event.target.value;
-
+// onAccusedCommunityChange(event: any, index: number): void {
+//   const selectedCommunity = event.target.value;
+onAccusedCommunityChange(selectedCommunity: string, index: number): void {
   if (selectedCommunity) {
     this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
       (castes: string[]) => {
@@ -372,9 +375,9 @@ loadCourtDivisions(): void {
     return sessionStorage.getItem('firId');
   }
 
-  onCourtDivisionChange(event: any): void {
-    const selectedDivision = event.target.value;
-
+  // onCourtDivisionChange(event: any): void {
+  //   const selectedDivision = event.target.value;
+  onCourtDivisionChange(selectedDivision : string): void {
     if (selectedDivision) {
       this.firService.getCourtRangesByDivision(selectedDivision).subscribe(
         (ranges: string[]) => {
@@ -708,6 +711,7 @@ onFileSelect_3(event: Event, controlName: string): void {
       stationName: ['', Validators.required],
       officerName: ['', [Validators.required, Validators.pattern('^[A-Za-z\\s]*$')]], // Name validation
       officerDesignation: ['', Validators.required], // Dropdown selection
+      otherOfficerDesignation: [''],  // Add this line
       officerPhone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]], // 10-digit phone validation
 
       attachments_1: this.fb.array([this.createAttachmentGroup()]),
@@ -1982,10 +1986,26 @@ handleCaseTypeChange() {
 
 
   // Handle City Change
-  onCityChange(event: any) {
-    const selectedCity = event.target.value;
+  // onCityChange(event: any) {
+  //   const selectedCity = event.target.value;
+  onCityChange(selectedCity:string){
     if (selectedCity) {
       this.loadPoliceDivisionDetails(selectedCity);
+    }
+  }
+
+  showOtherDesignation = false;
+  otherDesignation = '';  // Local variable to store the custom input value
+  
+  onDesignationChange(event: any) {
+    const selectedValue = event.target.value;
+
+    if (selectedValue === 'Others') {
+      this.showOtherDesignation = true;
+      this.firForm.get('officerDesignation')?.setValue(''); // Clear the value when "Others" is selected
+      this.otherDesignation = ''; // Reset the other designation input field
+    } else {
+      this.showOtherDesignation = false;
     }
   }
 
@@ -3059,16 +3079,18 @@ isStep4Valid(): boolean {
 isStep5Valid(): boolean {
   // Validate mandatory fields directly
   const mandatoryFields = [
-    'communityCertificate',
     'proceedingsFileNo',
     'proceedingsDate',
-    'proceedingsFile',
   ];
 
   // Check each field's validity
   let isFormValid = true;
   mandatoryFields.forEach((field) => {
     const control = this.firForm.get(field);
+    // Ensure communityCertificate is set to "no" if it's undefined
+    if (field === 'communityCertificate' && (control?.value === undefined || control?.value === '')) {
+      control?.setValue('no'); // Set default value
+    }
     const value = control?.value;
     const isValid = control?.disabled || (control?.valid === true && value !== null && value !== '');
     console.log(`Field: ${field}, Value: ${value}, Valid: ${isValid}`);
@@ -3114,6 +3136,13 @@ isStep5Valid(): boolean {
       this.step--;
     }
   }
+
+  previousMainStep() {
+    if (this.mainStep > 1) {
+      this.mainStep -= 1;
+    }
+  }
+  
 
   setStep(stepNumber: number) {
     this.step = stepNumber;

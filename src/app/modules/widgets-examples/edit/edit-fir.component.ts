@@ -26,6 +26,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatRadioModule } from '@angular/material/radio';
 import { FirServiceAPI } from './editfir.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { NgSelectModule } from '@ng-select/ng-select';
 declare var $: any;
 
 interface HearingDetail {
@@ -66,7 +67,8 @@ interface ImagePreview {
     MatSelectModule,
     MatFormFieldModule,
     MatRadioModule,
-    NgxDropzoneModule
+    NgxDropzoneModule,
+    NgSelectModule
   ],
   templateUrl: './edit-fir.component.html',
   styleUrl: './edit-fir.component.scss'
@@ -96,6 +98,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   firForm: FormGroup;
   firId: string | null = null;
   chargesheet_id: string | null = null;
+  accusedCommunitiesOptions: string[] = []; // Stores all accused community options
 
 
   case_id: string | undefined = '';
@@ -361,6 +364,60 @@ export class EditFirComponent implements OnInit, OnDestroy {
     this.isClickTriggered1 = false;
   }
 
+loadAccusedCommunities(): void {
+  this.firService.getAllAccusedCommunities().subscribe(
+    (communities: string[]) => {
+      this.accusedCommunitiesOptions = communities; 
+      
+      
+      // Populate accused community options
+    },
+    (error) => {
+      console.error('Error loading accused communities:', error);
+      Swal.fire('Error', 'Failed to load accused communities.', 'error');
+    }
+  );
+}
+
+// onCommunityChange(event: any, index: number): void {
+//   const selectedCommunity = event.target.value;
+onCommunityChange(selectedCommunity: string, index: number): void {
+ console.log(selectedCommunity,"wssss")
+    if (selectedCommunity) {
+      this.firService.getCastesByCommunity(selectedCommunity).subscribe(
+        (castes: string[]) => {
+          const victimGroup = this.victims.at(index) as FormGroup;
+          victimGroup.patchValue({ caste: '' }); // Reset caste selection
+          victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+          this.cdr.detectChanges();
+        },
+        (error) => {
+          console.error('Error fetching castes:', error);
+          Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+        }
+      );
+    }
+}
+
+// onAccusedCommunityChange(event: any, index: number): void {
+//   const selectedCommunity = event.target.value;
+onAccusedCommunityChange(selectedCommunity: string, index: number): void {
+  if (selectedCommunity) {
+    this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
+      (castes: string[]) => {
+        const accusedGroup = this.accuseds.at(index) as FormGroup;
+        accusedGroup.patchValue({ caste: '' }); // Reset caste selection
+        accusedGroup.get('availableCastes')?.setValue(castes);
+        // console.log(accusedGroup.get('availableCastes')?.value,"datdadadadada"); 
+        this.cdr.detectChanges();
+      },
+      (error) => {
+        console.error('Error fetching accused castes:', error);
+        Swal.fire('Error', 'Failed to load castes for the selected accused community.', 'error');
+      }
+    );
+  }
+}
 
 
   // onFileSelect_1(event: any, index: number): void {
@@ -548,7 +605,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
     this.imagePreviews.splice(index, 1);
   }
 
-
+  showOtherDesignation = false;
 
   triggerChangeDetection() {
     this.cdr.detectChanges();
@@ -665,6 +722,24 @@ export class EditFirComponent implements OnInit, OnDestroy {
     // this.setVictimData();
   }
 
+
+  onDesignationChange(event: any) {
+    const selectedValue = event.target.value;
+    console.log("Dropdown Changed:", selectedValue);
+  
+    if (selectedValue === 'Others') {
+      this.showOtherDesignation = true;
+      this.otherDesignation = '';
+      console.log("Others selected. Showing input field.");
+    } else {
+      this.showOtherDesignation = false;
+      this.otherDesignation = '';
+      console.log("Non-Others selected. Hiding input field.");
+    }
+
+    // Force UI update
+  this.cdr.detectChanges();
+  }
   // setVictimData() {
   //   this.victimData.forEach(victim => {
   //     const victimGroup = this.fb.group({
@@ -1690,6 +1765,7 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
       proceedingsFile: ['', Validators.required],
       officerName: ['', [Validators.required, Validators.pattern('^[A-Za-z\\s]*$')]], // Name validation
       officerDesignation: ['', Validators.required], // Dropdown selection
+      otherOfficerDesignation: [''],  // Add this line
       officerPhone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]], // 10-digit phone validation
 
       attachments_1: this.fb.array([this.createAttachmentGroup()]),
@@ -1833,11 +1909,36 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
     this.onNumberOfAccusedChange();
     // this.populateVictimsRelief([]);
 
+    
+     // Get the pre-filled value in the edit screen
+     const selectedDesignation = this.firForm.get('officerDesignation')?.value;
+  console.log("Initial Designation:", selectedDesignation);
+
+  if (!["DSP", "ACP", "ASP", "ADSP", "Others"].includes(selectedDesignation)) {
+    this.showOtherDesignation = true;
+    // Use setTimeout to allow Angular to detect changes
+    setTimeout(() => {
+    this.firForm.get('officerDesignation')?.setValue('Others');
+    this.otherDesignation = selectedDesignation;
+    
+    console.log("Custom Designation detected. Setting 'Others' as selected.");
+    console.log("Updated Dropdown Value:", this.firForm.get('officerDesignation')?.value);
+    console.log("Other Designation Input Value:", this.otherDesignation);
+    // Force UI update
+    this.cdr.detectChanges();
+  });
+  }
     console.log(this.firForm.value,"firrrrrrrrrrrrrrrrrrrrrr");
 
   }
 
+  otherDesignation: string = ''; // Local variable for custom value (when 'Others' is selected)
 
+  setDesignationToOthers() {
+    if (this.otherDesignation) {
+      this.firForm.patchValue({ officerDesignation: 'Others' });
+    }
+  }
   loadVictimsReliefDetails(): void {
     if (!this.firId) {
       console.error('FIR ID is missing.');
@@ -2647,8 +2748,9 @@ console.log(victimReliefDetail,"cretaieg")
 
 
   // Handle City Change
-  onCityChange(event: any) {
-    const selectedCity = event.target.value;
+  // onCityChange(event: any) {
+  //   const selectedCity = event.target.value;
+  onCityChange(selectedCity:string){
     // if (selectedCity) {
     //   this.loadPoliceDivisionDetails();
     // }
@@ -3250,8 +3352,9 @@ apiurl = 'http://localhost:3010/'
       }
     }
   }
-  onCourtDivisionChange(event: any): void {
-    const selectedDivision = event.target.value; 
+  // onCourtDivisionChange(event: any): void {
+  //   const selectedDivision = event.target.value;
+  onCourtDivisionChange(selectedDivision : string): void { 
     if (selectedDivision) {
       this.firService.getCourtRangesByDivision(selectedDivision).subscribe(
         (ranges: string[]) => {
