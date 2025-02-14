@@ -1255,13 +1255,18 @@ onAdditionalReliefChange(event: Event, value: string): void {
   populateVictimsRelief(victimsReliefDetails: any[]): void {
     const victimsReliefArray = this.victimsRelief;
 
-    console.log("victimsReliefDetails received:", victimsReliefDetails.length);
-    console.log("Before Clearing: victimsRelief.controls.length =", this.victimsRelief.controls.length);
+  // Ensure the value is retrieved as a number
+  let selectedVictimCount = Number(this.firForm.get('complainantDetails.numberOfVictims')?.value) || 0;
+  console.log("count ----------> ",selectedVictimCount);
+  console.log("Selected Number of Victims from Dropdown:", selectedVictimCount);
 
-    victimsReliefArray.clear(); // Clear existing form controls
+  console.log("Before Clearing: victimsRelief.controls.length =", victimsReliefArray.controls.length);
 
-    victimsReliefDetails.forEach((victim: any, index) => {
-      console.log(`Adding victim #${index + 1}:`, victim);
+  victimsReliefArray.clear(); // Clear existing form controls
+
+  for (let i = 0; i < selectedVictimCount; i++) {
+    const victim = victimsReliefDetails[i] || {}; // Use existing data if available
+      console.log(`Adding victim #${i + 1}:`, victim);
       const reliefGroup = this.createVictimReliefGroup();
 
       // Set initial values for each victim
@@ -1321,7 +1326,7 @@ onAdditionalReliefChange(event: Event, value: string): void {
       });
 
       victimsReliefArray.push(reliefGroup); // Add the relief group to the FormArray
-    });
+    }
 
     console.log("After Adding: victimsRelief.controls.length =", this.victimsRelief.controls.length);
 
