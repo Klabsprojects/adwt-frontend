@@ -179,7 +179,7 @@ i: number;
 
      // Listen for input changes and trigger UI update
      this.firForm.valueChanges.subscribe(() => {
-      console.log('Form Updated:', this.firForm.value); // Debugging log
+      //console.log('Form Updated:', this.firForm.value); // Debugging log
       this.cdr.detectChanges(); // Manually trigger UI update
     });
 
@@ -1255,11 +1255,13 @@ onAdditionalReliefChange(event: Event, value: string): void {
   populateVictimsRelief(victimsReliefDetails: any[]): void {
     const victimsReliefArray = this.victimsRelief;
 
-console.log(victimsReliefArray,"victimsReliefArray")
+    console.log("victimsReliefDetails received:", victimsReliefDetails.length);
+    console.log("Before Clearing: victimsRelief.controls.length =", this.victimsRelief.controls.length);
 
     victimsReliefArray.clear(); // Clear existing form controls
 
-    victimsReliefDetails.forEach((victim: any) => {
+    victimsReliefDetails.forEach((victim: any, index) => {
+      console.log(`Adding victim #${index + 1}:`, victim);
       const reliefGroup = this.createVictimReliefGroup();
 
       // Set initial values for each victim
@@ -1320,6 +1322,8 @@ console.log(victimsReliefArray,"victimsReliefArray")
 
       victimsReliefArray.push(reliefGroup); // Add the relief group to the FormArray
     });
+
+    console.log("After Adding: victimsRelief.controls.length =", this.victimsRelief.controls.length);
 
     // Perform initial calculation
     this.updateTotalCompensation();
@@ -3093,7 +3097,7 @@ isStep5Valid(): boolean {
     }
     const value = control?.value;
     const isValid = control?.disabled || (control?.valid === true && value !== null && value !== '');
-    console.log(`Field: ${field}, Value: ${value}, Valid: ${isValid}`);
+    // console.log(`Field: ${field}, Value: ${value}, Valid: ${isValid}`);
 
     if (!isValid) {
       isFormValid = false;
@@ -3106,16 +3110,16 @@ isStep5Valid(): boolean {
     const value = fileControl?.value;
     const isValid = value === null || (fileControl?.valid === true && value !== '');
 
-    console.log(`Attachment ${index + 1} - Value: ${value}, Valid: ${isValid}`);
+    //console.log(`Attachment ${index + 1} - Value: ${value}, Valid: ${isValid}`);
 
     return isValid;
   });
 
-  console.log(`Attachments Valid: ${areAttachmentsValid}`);
+  //console.log(`Attachments Valid: ${areAttachmentsValid}`);
 
   // Final validation status
   const finalStatus = isFormValid && areAttachmentsValid;
-  console.log(`Step 5 Form Valid: ${finalStatus}`);
+  //console.log(`Step 5 Form Valid: ${finalStatus}`);
   return finalStatus;
 }
 
