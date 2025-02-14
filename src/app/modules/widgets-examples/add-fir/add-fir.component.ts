@@ -2450,6 +2450,56 @@ saveAsDraft_6(isSubmit: boolean = false): void {
   );
 }
 
+isFormValid(): boolean {
+  const trialDetails: Record<string, any> = {
+      courtName: this.firForm.get('Court_name')?.value,
+      courtDistrict: this.firForm.get('courtDistrict')?.value,
+      trialCaseNumber: this.firForm.get('trialCaseNumber')?.value,
+      publicProsecutor: this.firForm.get('publicProsecutor')?.value,
+      prosecutorPhone: this.firForm.get('prosecutorPhone')?.value,
+      firstHearingDate: this.firForm.get('firstHearingDate')?.value,
+      judgementAwarded: this.firForm.get('judgementAwarded')?.value,
+      judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
+  };
+
+  const compensationDetails: Record<string, any> = {
+      totalCompensation: this.firForm.get('totalCompensation_2')?.value,
+      proceedingsFileNo: this.firForm.get('proceedingsFileNo_2')?.value,
+      proceedingsDate: this.firForm.get('proceedingsDate_2')?.value,
+      uploadProceedings: this.firForm.get('uploadProceedings_2')?.value
+  };
+
+  let missingFields: string[] = [];
+
+  // Check Trial Details
+  Object.entries(trialDetails).forEach(([key, value]) => {
+      if (!value) {
+          missingFields.push(`Trial Details: ${key} is missing`);
+      }
+  });
+
+  // Check Compensation Details
+  Object.entries(compensationDetails).forEach(([key, value]) => {
+      if (!value) {
+          missingFields.push(`Compensation Details: ${key} is missing`);
+      }
+  });
+
+  // Check Victims Details
+  const victimsMissing = this.victimsRelief.controls.some(control => !control.get('victimId')?.value);
+  if (victimsMissing) {
+      missingFields.push("At least one victim is missing victimId");
+  }
+
+  // Log missing fields
+  if (missingFields.length > 0) {
+      console.log("Missing Fields:", missingFields);
+      return false;
+  }
+
+  return true;
+}
+
 
 
 saveAsDraft_7(): void {

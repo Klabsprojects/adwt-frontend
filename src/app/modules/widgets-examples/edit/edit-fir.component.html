@@ -199,7 +199,7 @@
             <div class="col-md-6 col-lg-4 mb-3">
               <label for="officerDesignation" class="form-label">7. Designation of the Investigating Officer *</label>
               <select id="officerDesignation" class="form-select" formControlName="officerDesignation" placeholder="Enter Designation" (change)="onDesignationChange($event)"  required>
-                <option value="" disabled>Select Designation</option>
+                <option value="" disabled>Choose Designation</option>
                 <option value="DSP">DSP</option>
                 <option value="ACP">ACP</option>
                 <option value="ASP">ASP</option>
@@ -212,7 +212,7 @@
                 *ngIf="showOtherDesignation"
                 type="text"
                 class="form-control mt-2"
-                placeholder="Enter Designation"
+                placeholder="Enter the Other Designation"
                 [(ngModel)]="otherDesignation"
                 formControlName="officerDesignation" 
               />
