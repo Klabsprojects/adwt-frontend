@@ -320,10 +320,19 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/save-step-sevenedit`, firData)
   }
 
-  saveStepSevenAsDraft(firData : any) :Observable<any> {
-    return this.http.post(`${this.baseUrl}/save-step-seven`, firData)
-  }
+  // saveStepSevenAsDraft(firData : any) :Observable<any> {
+    
+  //   return this.http.post(`${this.baseUrl}/save-step-seven`, firData)
+  // }
 
+
+  saveStepSevenAsDraft(firData: any, hearingdetail: any): Observable<any> {
+    // Add hearingdetail directly to firData
+    firData.hearingdetail = hearingdetail;
+  
+    return this.http.post(`${this.baseUrl}/save-step-seven`, firData);
+  }
+  
 
 
 }

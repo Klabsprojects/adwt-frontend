@@ -104,7 +104,12 @@ export class AddFirComponent implements OnInit, OnDestroy {
     { value: 'Provisions', label: 'Provisions' },
     { value: 'House site Patta', label: 'House site Patta' }
   ];
-
+  CaseHandledBy = [
+    'Special Public Prosecutor',
+    'Empanelled advocate',
+    'Private advocate selected by the victim'
+  ];
+  
   // Tabs for step navigation
   tabs = [
     { label: 'Basic Information' },
@@ -754,6 +759,19 @@ onFileSelect_3(event: Event, controlName: string): void {
       Court_name: ['', Validators.required],
       trialCourtDistrict: ['', Validators.required],
       trialCaseNumber: ['', Validators.required],
+// A
+CaseHandledBy:['',Validators.required],
+// b
+NameOfAdvocate:['',Validators.required],
+
+// c
+
+advocateMobNumber:['', Validators.required],
+
+
+
+
+
       publicProsecutor: ['', Validators.required],
       prosecutorPhone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
 
@@ -766,7 +784,7 @@ onFileSelect_3(event: Event, controlName: string): void {
 
       judgementDetails: this.fb.group({
         judgementNature: ['', Validators.required],
-        uploadJudgement: [''],
+        uploadJudgement: [null],
         legalOpinionObtained: [''],
         caseFitForAppeal: [''],
         governmentApprovalForAppeal: [''],
@@ -859,7 +877,17 @@ onFileSelect_3(event: Event, controlName: string): void {
   }
 
 
-
+  show94BAnd94C = false;
+  show95Onwards = false;
+  show97Onwards = false;
+  
+  onCaseHandledByChange(event: Event) {
+    const selectedValue = (event.target as HTMLSelectElement).value;
+    this.show94BAnd94C = selectedValue === 'Empanelled advocate' || selectedValue === 'Private advocate selected by the victim';
+    this.show95Onwards = selectedValue === 'Special Public Prosecutor';
+    this.show97Onwards = selectedValue === 'Empanelled advocate' || selectedValue === 'Private advocate selected by the victim';
+  }
+  
 
   get hearingDetails(): FormArray {
     return this.firForm.get('hearingDetails') as FormArray;
@@ -940,19 +968,43 @@ onFileSelect_1(event: any, index: number): void {
 //   }
 // }
 
+// onFileSelect_2(event: any, index: number): void {
+//   const files = event.target.files;
+//   if (files && files.length > 0) {
+//     const attachmentGroup = this.attachments_2.at(index) as FormGroup;
+//     const fileArray = Array.from(files) as File[];
+
+//     // Store the actual files in our fileStorage
+//     this.fileStorage[index] = fileArray;
+
+//     // Only store the file names in the form
+//     attachmentGroup.patchValue({
+//       fileName_2: fileArray.map(file => file.name).join(', ')
+//     });
+//   }
+// }
+
+filePreviews: { [key: number]: string | ArrayBuffer | null } = {}; 
+
 onFileSelect_2(event: any, index: number): void {
   const files = event.target.files;
   if (files && files.length > 0) {
     const attachmentGroup = this.attachments_2.at(index) as FormGroup;
     const fileArray = Array.from(files) as File[];
 
-    // Store the actual files in our fileStorage
+ 
     this.fileStorage[index] = fileArray;
 
-    // Only store the file names in the form
     attachmentGroup.patchValue({
       fileName_2: fileArray.map(file => file.name).join(', ')
     });
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.filePreviews[index] = reader.result; 
+    };
+
+    reader.readAsDataURL(fileArray[0]); 
   }
 }
 
@@ -2562,93 +2614,246 @@ saveAsDraft_6(isSubmit: boolean = false): void {
 
 
 
-async  saveAsDraft_7() {
-  if (!this.firId) {
-      Swal.fire('Error', 'FIR ID is missing. Unable to save draft.', 'error');
-      return;
+// async  saveAsDraft_7() {
+//   // if (!this.firId) {
+//   //     Swal.fire('Error', 'FIR ID is missing. Unable to save draft.', 'error');
+//   //     return;
+//   // }
+
+//   let uploadJudgementPath: string | undefined;
+//   const uploadJudgementFileFile = this.firForm.get('judgementDetails.uploadJudgement')?.value;
+//   if (uploadJudgementFileFile) {
+//     const paths = await this.uploadMultipleFiles([uploadJudgementFileFile]);
+//     uploadJudgementPath = paths[0];
+//   }
+
+//     const trialDetails = {
+//         courtName: this.firForm.get('Court_name')?.value,
+//         courtDistrict: this.firForm.get('courtDistrict')?.value,
+//         trialCaseNumber: this.firForm.get('trialCaseNumber')?.value,
+//         publicProsecutor: this.firForm.get('publicProsecutor')?.value,
+//         prosecutorPhone: this.firForm.get('prosecutorPhone')?.value,
+//         firstHearingDate: this.firForm.get('firstHearingDate')?.value,
+//         judgementAwarded: this.firForm.get('judgementAwarded')?.value,
+//         judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
+//         uploadJudgement: uploadJudgementPath
+//     };
+
+//     if (!trialDetails.judgementNature && trialDetails.judgementAwarded === 'yes') {
+//         Swal.fire('Error', 'Please select the nature of judgement.', 'error');
+//         return;
+//     }
+
+//     let uploadproceedingPath: string | undefined;
+//     const proceedingFile = this.firForm.get('uploadProceedings_2')?.value;
+//     if (proceedingFile) {
+//       const paths = await this.uploadMultipleFiles([proceedingFile]);
+//       uploadproceedingPath = paths[0];
+//     }
+//   const compensationDetails = {
+//       totalCompensation: this.firForm.get('totalCompensation_2')?.value,
+//       proceedingsFileNo: this.firForm.get('proceedingsFileNo_2')?.value,
+//       proceedingsDate: this.firForm.get('proceedingsDate_2')?.value,
+//       uploadProceedings: uploadproceedingPath
+//   };
+
+//   const allFiles: File[] = [];
+//   Object.values(this.fileStorage).forEach(files => {
+//     allFiles.push(...files);
+//   });
+
+//   let attachments: string[] = [];
+//   if (allFiles.length > 0) {
+//     try {
+//       attachments = await this.uploadMultipleFiles(allFiles);
+//       console.log('Uploaded Files:', attachments);
+//     } catch (error) {
+//       console.error('Error uploading files:', error);
+//       Swal.fire('Error', 'Failed to upload one or more files.', 'error');
+//       return;
+//     }
+//   }
+
+
+//   const victimsDetails = this.victimsRelief.value.map((relief: any, index: number) => ({
+//       victimId: relief.victimId || null,
+//       victimName: this.victimNames[index] || '',
+//       reliefAmountAct: parseFloat(relief.reliefAmountScst || '0.00'),
+//       reliefAmountGovernment: parseFloat(relief.reliefAmountExGratia || '0.00'),
+//       reliefAmountFinalStage: parseFloat(relief.reliefAmountThirdStage || '0.00')
+//   }));
+
+//   const formData = {
+//       firId: this.firId,
+//       trialDetails,
+//       compensationDetails,
+//       attachments,
+//       victimsDetails
+//   };
+// console.log(formData,"formData")
+//   // this.firService.saveStepSevenAsDraft(formData).subscribe({
+//   //     next: (response) => {
+//   //         Swal.fire('Success', 'Draft data saved successfully.', 'success');
+//   //     },
+//   //     error: (error) => {
+//   //         console.error('Error saving draft data:', error);
+//   //         Swal.fire('Error', 'Failed to save draft data.', 'error');
+//   //     }
+//   // });
+// }
+
+
+
+
+saveAsDraft_7(isSubmit: boolean = false): void {
+  const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement | null;
+  
+  // Check if the file input exists and has files
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    console.log(fileInput.files[0]);
   }
+  const formData = new FormData();
 
-  let uploadJudgementPath: string | undefined;
-  const uploadJudgementFileFile = this.firForm.get('judgementDetails.uploadJudgement')?.value;
-  if (uploadJudgementFileFile) {
-    const paths = await this.uploadMultipleFiles([uploadJudgementFileFile]);
-    uploadJudgementPath = paths[0];
-  }
+  formData.append("name", String(true)); 
+  formData.append("name1", String(72));   
 
-    const trialDetails = {
-        courtName: this.firForm.get('Court_name')?.value,
-        courtDistrict: this.firForm.get('courtDistrict')?.value,
-        trialCaseNumber: this.firForm.get('trialCaseNumber')?.value,
-        publicProsecutor: this.firForm.get('publicProsecutor')?.value,
-        prosecutorPhone: this.firForm.get('prosecutorPhone')?.value,
-        firstHearingDate: this.firForm.get('firstHearingDate')?.value,
-        judgementAwarded: this.firForm.get('judgementAwarded')?.value,
-        judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
-        uploadJudgement: uploadJudgementPath
-    };
 
-    if (!trialDetails.judgementNature && trialDetails.judgementAwarded === 'yes') {
-        Swal.fire('Error', 'Please select the nature of judgement.', 'error');
-        return;
-    }
+  const allNames = formData.getAll("name");
+  formData.forEach((value, key) => {
+    console.log(key + ": " + value);
+  });
+  const hearingdetail = this.hearingDetails.value
+  const formFields = {
+    firId: this.firId,
 
-    let uploadproceedingPath: string | undefined;
-    const proceedingFile = this.firForm.get('uploadProceedings_2')?.value;
-    if (proceedingFile) {
-      const paths = await this.uploadMultipleFiles([proceedingFile]);
-      uploadproceedingPath = paths[0];
-    }
-  const compensationDetails = {
-      totalCompensation: this.firForm.get('totalCompensation_2')?.value,
-      proceedingsFileNo: this.firForm.get('proceedingsFileNo_2')?.value,
-      proceedingsDate: this.firForm.get('proceedingsDate_2')?.value,
-      uploadProceedings: uploadproceedingPath
+    // Trial Details
+    trialDetails: {
+      courtName: this.firForm.get('Court_name')?.value,
+      courtDistrict: this.firForm.get('courtDistrict')?.value,
+      trialCaseNumber: this.firForm.get('caseNumber')?.value,
+      publicProsecutor: this.firForm.get('publicProsecutor')?.value,
+      prosecutorPhone: this.firForm.get('prosecutorPhone')?.value,
+      firstHearingDate: this.firForm.get('firstHearingDate')?.value,
+
+
+
+      CaseHandledBy:this.firForm.get('CaseHandledBy')?.value,
+// b
+NameOfAdvocate:this.firForm.get('NameOfAdvocate')?.value,
+
+// c
+
+advocateMobNumber:this.firForm.get('advocateMobNumber')?.value,
+
+
+      judgementAwarded: [
+        this.firForm.get('judgementAwarded')?.value,
+      
+      ].filter(Boolean), // Remove null values
+      judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
+      uploadJudgement: this.firForm.get('uploadJudgement')?.value,
+    },
+    
+    // Compensation Details
+    compensationDetails: {
+      totalCompensation: this.firForm.get('totalCompensation')?.value,
+      proceedingsDate: this.firForm.get('proceedingsDate')?.value,
+      proceedingsFileNo: this.firForm.get('proceedingsFileNo')?.value,
+      uploadProceedings: this.firForm.get('uploadProceedings')?.value,
+    },
+    
+    // Appeal Details
+    appealDetails: {
+      legalOpinionObtained: this.firForm.get('judgementDetails.legalOpinionObtained')?.value,
+      caseFitForAppeal: this.firForm.get('judgementDetails.caseFitForAppeal')?.value,
+      governmentApprovalForAppeal: this.firForm.get('judgementDetails.governmentApprovalForAppeal')?.value,
+      filedBy: this.firForm.get('judgementDetails.filedBy')?.value,
+      designatedCourt: this.firForm.get('judgementDetails.designatedCourt')?.value,
+    },
+    
+    // Appeal Details One
+    appealDetailsOne: {
+      legalOpinionObtained: this.firForm.get('judgementDetails_one.legalOpinionObtained_one')?.value,
+      caseFitForAppeal: this.firForm.get('judgementDetails_one.caseFitForAppeal_one')?.value,
+      governmentApprovalForAppeal: this.firForm.get('judgementDetails_one.governmentApprovalForAppeal_one')?.value,
+      filedBy: this.firForm.get('judgementDetails_one.filedBy_one')?.value,
+      designatedCourt: this.firForm.get('judgementDetails_one.designatedCourt_one')?.value,
+    },
+    
+    // Case Appeal Details Two
+    caseAppealDetailsTwo: {
+      legalOpinionObtained: this.firForm.get('judgementDetails_two.legalOpinionObtained_two')?.value,
+      caseFitForAppeal: this.firForm.get('judgementDetails_two.caseFitForAppeal_two')?.value,
+      governmentApprovalForAppeal: this.firForm.get('judgementDetails_two.governmentApprovalForAppeal_two')?.value,
+      filedBy: this.firForm.get('judgementDetails_two.filedBy_two')?.value,
+    },
+    
+    // Submission Status
+    status: isSubmit ? 7 : undefined,
   };
+  
 
-  const allFiles: File[] = [];
-  Object.values(this.fileStorage).forEach(files => {
-    allFiles.push(...files);
+  this.imagePreviews.forEach(image => {
+    formData.append('images', image.file, image.file.name);
   });
 
-  let attachments: string[] = [];
-  if (allFiles.length > 0) {
-    try {
-      attachments = await this.uploadMultipleFiles(allFiles);
-      console.log('Uploaded Files:', attachments);
-    } catch (error) {
-      console.error('Error uploading files:', error);
-      Swal.fire('Error', 'Failed to upload one or more files.', 'error');
-      return;
-    }
-  }
 
 
-  const victimsDetails = this.victimsRelief.value.map((relief: any, index: number) => ({
-      victimId: relief.victimId || null,
-      victimName: this.victimNames[index] || '',
-      reliefAmountAct: parseFloat(relief.reliefAmountScst || '0.00'),
-      reliefAmountGovernment: parseFloat(relief.reliefAmountExGratia || '0.00'),
-      reliefAmountFinalStage: parseFloat(relief.reliefAmountThirdStage || '0.00')
-  }));
-
-  const formData = {
-      firId: this.firId,
-      trialDetails,
-      compensationDetails,
-      attachments,
-      victimsDetails
-  };
-
-  this.firService.saveStepSevenAsDraft(formData).subscribe({
-      next: (response) => {
-          Swal.fire('Success', 'Draft data saved successfully.', 'success');
-      },
-      error: (error) => {
-          console.error('Error saving draft data:', error);
-          Swal.fire('Error', 'Failed to save draft data.', 'error');
+  Object.keys(formFields).forEach((key) => {
+    const value = formFields[key as keyof typeof formFields];
+    if (value !== null && value !== undefined) { // Ensure value is valid before appending
+      if (typeof value === 'object') {
+        formData.append(key, JSON.stringify(value)); // Convert objects to JSON string
+      } else {
+        formData.append(key, String(value));  
       }
+    }
   });
+  
+
+
+  const filesFields = ['uploadJudgement', 'uploadJudgement_one', 'uploadJudgement_two','uploadProceedings'];
+
+  // Add files to FormData
+  filesFields.forEach((field) => {
+    const files = this.getFiles(field); 
+    if (files && files.length > 0) { // Ensure files exist before appending
+      for (let i = 0; i < files.length; i++) {
+        formData.append(field, files[i]); 
+      }
+    }
+  });
+
+  const formDataObject = this.formDataToObject(formData);
+
+  console.log(this.attachments, "formFieldsformFields");
+  // console.log("formFields");
+  // console.log(formData1);
+
+  // Now send the formData to the backend
+  this.firService.saveStepSevenAsDraft(formDataObject,hearingdetail).subscribe({
+    next: (response) => {
+      if (isSubmit) {
+        Swal.fire({
+          title: 'Success',
+          text: 'FIR Stage Form Completed! Redirecting to Chargesheet...',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        }).then(() => {
+          this.navigateToChargesheetPage();
+        });
+      } else {
+        Swal.fire('Success', 'Step 5 data saved as draft successfully', 'success');
+      }
+    },
+    error: (error) => {
+      console.error('Error saving Step 5 data:', error);
+      Swal.fire('Error', 'Failed to save Step 5 data', 'error');
+    }
+  });
+
 }
+
 
 
 getFiles(inputId: string): FileList | null {
@@ -3628,40 +3833,72 @@ isStep5Valid(): boolean {
     });
   }
 
-  onuploadproceedSelect(event: any): void {
-    const file = event.target.files[0];  // Get the first selected file
+  // onuploadproceedSelect(event: any): void {
+  //   const file = event.target.files[0];  // Get the first selected file
   
-    if (file) {
+  //   if (file) {
    
-      // Patch the file into the form (this assumes you have the form control set up correctly)
-      this.firForm.patchValue({
-        uploadProceedings_2: file,  // Storing the file in the form control
-      });
+  //     // Patch the file into the form (this assumes you have the form control set up correctly)
+  //     this.firForm.patchValue({
+  //       uploadProceedings_2: file,  // Storing the file in the form control
+  //     });
   
-      // Optionally, display the file name
-      console.log('File selected:', file.name);
-    } else {
-      console.log('No file selected');
-    }
-  }
+  //     // Optionally, display the file name
+  //     console.log('File selected:', file.name);
+  //   } else {
+  //     console.log('No file selected');
+  //   }
+  // }
 
-  uploadJudgementSelect(event: Event): void {
-    const fileInput = event.target as HTMLInputElement;
-    
-    if (fileInput.files && fileInput.files.length > 0) {
-      const file = fileInput.files[0]; // Get the first selected file
-      
-      // Ensure the form control exists
-      if (this.firForm.get('judgementDetails')) {
-        this.firForm.get('judgementDetails.uploadJudgement')?.setValue(file); // Store the file object
-      }
-  
-      // Optionally, display the file name
-      console.log('File selected:', file.name);
-    } else {
-      console.log('No file selected');
-    }
+
+  uploadedImageSrc: any | ArrayBuffer;
+
+onuploadproceedSelect(event: any): void {
+  const file = event.target.files[0];
+
+  if (file) {
+    // Display image preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.uploadedImageSrc = e.target?.result;
+    };
+    reader.readAsDataURL(file);
+
+    // Patch file to form control (for backend submission)
+    this.firForm.patchValue({
+      uploadProceedings_2: file,
+    });
+
+    console.log('File selected:', file.name);
+  } else {
+    this.uploadedImageSrc = null;
+    console.log('No file selected');
   }
-  
+}
+uploadJudgementPreview: any | ArrayBuffer;
+
+uploadJudgementSelect(event: any): void {
+  const file = event.target.files[0];
+  console.log('Preview data fileInput:',file);
+
+  if (file) {
+   
+
+    // Store the file in the form control
+    this.firForm.get('judgementDetails.uploadJudgement')?.setValue(file);
+
+    // Show image preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.uploadJudgementPreview = e.target?.result;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    console.log('No file selected');
+    this.uploadJudgementPreview = null;
+  }
+}
+
+
 
 }

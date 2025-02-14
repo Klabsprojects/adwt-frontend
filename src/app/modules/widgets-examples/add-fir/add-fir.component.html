@@ -1342,23 +1342,71 @@
                       <h4 class="mb-4">Case Trial and Court Details</h4>
                       <div class="row">
                           <!-- Item 74 -->
-                          <div class="col-md-6 mb-3">
-                              <label class="form-label">80. Name of the Designated / Special court *</label>
-                              <input type="text" class="form-control" formControlName="Court_name" placeholder="Enter Name" required />
-                          </div>
+                        
                           <!-- Item 75 -->
                           <div class="col-md-6 mb-3">
-                            <label class="form-label">81. District in which court is present *</label>
+                            <label class="form-label">80. District in which court is present *</label>
                             <select class="form-select" formControlName="courtDistrict" required>
                               <option value="" disabled selected>Select District</option>
                               <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
                             </select>
                           </div>
+
+                          <div class="col-md-6 mb-3">
+                            <label class="form-label">81. Name of the Designated / Special court *</label>
+                            <input type="text" class="form-control" formControlName="Court_name" placeholder="Enter Name" required />
+                        </div>
                           <!-- Item 76 -->
                           <div class="col-md-6 mb-3">
                               <label class="form-label">82. Case Number Report (CNR) / Special SC number *</label>
                               <input type="text" class="form-control" formControlName="trialCaseNumber" placeholder="Enter Case Number" required />
                           </div>
+
+<!-- newly addaed item -->
+
+<div class="col-md-6 mb-3">
+  <label class="form-label">82. A. Case is handled by *</label>
+  <select class="form-select" formControlName="CaseHandledBy"(change)="onCaseHandledByChange($event)" required>
+    <option value="" disabled selected>Select </option>
+    <option *ngFor="let data of CaseHandledBy" [value]="data">{{ data }}</option>
+  </select>
+</div>
+
+
+<div *ngIf="show94BAnd94C" class="col-md-6 mb-3">
+  <label class="form-label">82. B. Name of the advocate *</label>
+  <input type="text" class="form-control" formControlName="NameOfAdvocate" placeholder="Enter advocate name" required />
+</div>
+
+
+
+
+
+<div *ngIf="show94BAnd94C" class="col-md-6 mb-3">
+  <label class="form-label">82. C. Phone Number of the advocate *</label>
+  <input
+    type="text"
+    class="form-control"
+    formControlName="advocateMobNumber"
+    placeholder="Enter mobile Number"
+    maxlength="10"
+    (keypress)="allowOnlyNumbers($event)"
+  />
+  <div *ngIf="firForm.get('advocateMobNumber')?.invalid && (firForm.get('advocateMobNumber')?.touched || firForm.get('advocateMobNumber')?.dirty)" class="text-danger">
+    <div *ngIf="firForm.get('advocateMobNumber')?.errors?.['required']">Phone number is required.</div>
+    <div *ngIf="firForm.get('advocateMobNumber')?.errors?.['pattern']">Phone number must contain only numbers.</div>
+    <div *ngIf="firForm.get('advocateMobNumber')?.errors?.['minlength'] || firForm.get('advocateMobNumber')?.errors?.['maxlength']">Phone number must be exactly 10 digits.</div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
                           <!-- Item 77 -->
                           <div class="col-md-6 mb-3">
                               <label class="form-label">83. Special Public Prosecutor's Name *</label>
@@ -1483,7 +1531,7 @@
                             </div>
 
                             <!-- Upload Judgement Copy -->
-                            <div class="col-md-6">
+                            <!-- <div class="col-md-6">
                               <label class="form-label">88. Upload Judgement Copy *</label>
                               <input
                                 type="file"
@@ -1493,7 +1541,31 @@
                                 formControlName="uploadJudgement"
                                 required
                               />
+                            </div> -->
+
+                            <div class="col-md-6">
+                              <label class="form-label">88. Upload Judgement Copy *</label>
+                              <input
+                                type="file"
+                                class="form-control"
+                                id="uploadJudgement"
+                                (change)="uploadJudgementSelect($event)"
+                                formControlName="uploadJudgement"
+                                accept="image/*"
+                                required
+                              />
+                            
+                              <!-- Image Preview -->
+                              <div *ngIf="uploadJudgementPreview" class="mt-2">
+                                <img
+                                  [src]="uploadJudgementPreview"
+                                  alt="Judgement Copy Preview"
+                                  class="img-thumbnail"
+                                  style="max-width: 150px; max-height: 150px"
+                                />
+                              </div>
                             </div>
+                            
                           </div>
                         </div>
 
@@ -2105,49 +2177,80 @@
                                 <label class="form-label">94. Proceedings Date *</label>
                                 <input type="date" class="form-control" formControlName="proceedingsDate_2" [max]="today" />
                             </div>
-                            <div class="col-md-12 mb-3">
+                            <!-- <div class="col-md-12 mb-3">
                                 <label class="form-label">95. Upload Commissionerate / S.P. Office Proceedings *</label>
                                 <input type="file" (change)="onuploadproceedSelect($event)" class="form-control" formControlName="uploadProceedings_2" />
+                            </div> -->
+
+                            <div class="col-md-12 mb-3">
+                              <label class="form-label">95. Upload Commissionerate / S.P. Office Proceedings *</label>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                (change)="onuploadproceedSelect($event)"
+                                class="form-control"
+                                formControlName="uploadProceedings_2"
+                              />
+                            
+                         
+                              <div *ngIf="uploadedImageSrc" class="mt-3">
+                           
+                                <img [src]="uploadedImageSrc" alt="Uploaded Image" class="img-thumbnail" style="max-width: 200px; max-height: 200px;" />
+                              </div>
                             </div>
+                            
+
                         </div>
 
                         <!-- Additional Attachments -->
                         <div class="mb-4" formArrayName="attachments_2">
                           <label class="form-label">96. Upload Other Attachments (If any)</label>
                           <div
-                            class="input-group mb-2"
+                            class="mb-3"
                             *ngFor="let attachment of attachments_2.controls; let j = index"
                             [formGroupName]="j"
                           >
-                            <!-- File Input -->
-                            <input
-                              type="file"
-                              class="form-control"
-                              (change)="onFileSelect_2($event, j)"
-                              formControlName="file_2"
-                            />
-
-                            <!-- Remove Button -->
-                            <button
-                              type="button"
-                              class="btn btn-danger btn-sm mt-2 ms-2"
-                              (click)="removeAttachment_2(j)"
-                              *ngIf="attachments_2.length > 1"
-                              title="Remove Attachment"
-                            >
-                              <i class="bi bi-trash"></i>
-                            </button>
+                            <div class="input-group">
+                   
+                              <input
+                                type="file"
+                                class="form-control"
+                                (change)="onFileSelect_2($event, j)"
+                                formControlName="file_2"
+                                accept="image/*"
+                              />
+                       
+                              <button
+                                type="button"
+                                class="btn btn-danger btn-sm ms-2"
+                                (click)="removeAttachment_2(j)"
+                                *ngIf="attachments_2.length > 1"
+                                title="Remove Attachment"
+                              >
+                                <i class="bi bi-trash"></i>
+                              </button>
+                            </div>
+                        
+                            <div *ngIf="filePreviews[j]" class="mt-2">
+                              <img
+                                [src]="filePreviews[j]"
+                                alt="Preview"
+                                class="img-thumbnail"
+                                style="max-width: 150px; max-height: 150px"
+                              />
+                            </div>
                           </div>
-
-                          <!-- Add Button -->
+                    
                           <button
                             type="button"
-                            class="btn btn-primary btn-sm mt-3"
+                            class="btn btn-primary btn-sm"
                             (click)="addAttachment_2()"
                           >
                             Add Attachment
                           </button>
                         </div>
+                        
+                        
 
                     </div>
                 </div>
@@ -2160,7 +2263,9 @@
                   <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">
                       Previous
                   </button>
-                  <button type="submit" class="btn btn-primary" (click)="submitStepSeven()" >
+                  <!-- (click)="submitStepSeven()" -->
+                  <button type="submit" class="btn btn-primary" 
+                  (click)="saveAsDraft_7()" >
                       Submit
                   </button>
               </div>
