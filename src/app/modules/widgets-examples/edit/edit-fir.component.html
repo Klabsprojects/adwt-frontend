@@ -646,10 +646,10 @@
              
                 <div class="col-md-6 mb-3">
                   <label class="form-label">51. Upload FIR Copy *</label>
-                  <input type="file" [id]="'uploadFIRCopy' + i" class="form-control" formControlName="uploadFIRCopy"
+                  <input type="file" [id]="'uploadFIRCopy' + i" class="form-control mb-2" formControlName="uploadFIRCopy"
                          required (change)="onFileChange($event, i)" multiple />
+                  <span *ngIf="fileName[i]">{{ fileName[i] }}</span> <!-- Display the file name if present -->
                 </div>
-
            <!-- <div *ngIf="!multipleFiles[i]">
 
             <div *ngIf="accused.get('uploadFIRCopy')?.value ">
@@ -782,6 +782,7 @@
             class="form-control"
             (change)="onProceedingsFileChange($event)"
           />
+         <!--  <span *ngIf="proceedingsFileNameMRF">{{ fileName }}</span> -->
         </div>
 
         <div class="mb-4" formArrayName="attachments">

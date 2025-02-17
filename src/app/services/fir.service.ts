@@ -115,9 +115,8 @@ saveStepFourAsDraft(firData: any): Observable<any> {
 
   formData.append('accuseds', JSON.stringify(firData.accuseds || []));
 
-
   firData.accuseds.forEach((accused: any, index: number) => {
-    if (accused.uploadFIRCopy && accused.uploadFIRCopy.length > 0) {
+    if (accused.uploadFIRCopy && accused.uploadFIRCopy.length > 0 && Array.isArray(accused.uploadFIRCopy)) {
       accused.uploadFIRCopy.forEach((file: File) => {
         formData.append(`uploadFIRCopy[]`, file, file.name);
       });

@@ -183,6 +183,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   specialCourtname: string[] = [];
   firCopyValue: any;
   uploadedFIRCopy: any;
+  fileName: string[] = [];
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -1530,7 +1531,6 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
   }
 
 
-
   multipleFiles: any[][] = [];
   showImage: boolean[] = []; 
   onFileChange(event: any, i: number): void {
@@ -1545,11 +1545,11 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
   
 
     this.multipleFiles[i].push(selectedFile);
-
+    this.fileName[i] = '';
     const fileUrl = URL.createObjectURL(selectedFile);
 
 console.log('selectedFile ',selectedFile);
-  
+  this.cdr.detectChanges();
   }
 
 
@@ -1569,21 +1569,22 @@ console.log('selectedFile ',selectedFile);
 
   
   saveStepFourAsDraft(): void {
-  
     const firData = {
       firId: this.firId,
       numberOfAccused: this.firForm.get('numberOfAccused')?.value,
       accuseds: this.firForm.get('accuseds')?.value.map((accused: any, index: number) => ({
         ...accused,
         accusedId: accused.accusedId || null,
-        uploadFIRCopy: this.multipleFiles[index] || null
-    
+        uploadFIRCopy: this.multipleFiles[index] && this.multipleFiles[index].length > 0 
+        ? this.multipleFiles[index] 
+        : this.fileName[index] && this.fileName[index] !== '' 
+          ? `uploads\\${this.fileName[index]}` 
+          : null
   
   
       })),
     };
-console.log(firData,"firDatafirDatafirData")
-console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
+
     this.firService.saveStepFourAsDraft(firData).subscribe(
       (response: any) => {
         this.firId = response.fir_id;
@@ -3855,8 +3856,10 @@ apiurl = 'http://localhost:3010/'
           const isFilled = uploadFIRCopyControl.value ? true : false;
   
           if (isUploadFIRCopyFilled === null) {
-     
             isUploadFIRCopyFilled = isFilled;
+            this.fileName = uploadFIRCopyControl?.value?.startsWith('uploads\\') && this.multipleFiles.length===0
+            ? uploadFIRCopyControl.value.replace('uploads\\', '') 
+            : '';          
           } else if (isUploadFIRCopyFilled !== isFilled) {
            
             console.log(`Error: Inconsistent 'uploadFIRCopy' values in accuseds[${index}]`);
@@ -3920,7 +3923,7 @@ apiurl = 'http://localhost:3010/'
       this.mainStep -= 1;
     }
   }
-  
+
   setStep(stepNumber: number) {
     this.step = stepNumber;
   }
