@@ -7,10 +7,13 @@ export const environment = {
   appVersion: 'v8.2.4',
   USERDATA_KEY: 'authf649fc9a5f55',
   isMockEnabled: true,
-  apiUrl: 'https://adwatrocity.onlinetn.com/api/v1/', 
+  // file_access:'http://localhost:3010/',   
   // apiUrl: 'http://localhost:3010/', 
-// image_access:'http://localhost:3010/uploadedfile/',
-image_access:'https://adwatrocity.onlinetn.com/api/v1/uploadedfile/',
+  // image_access:'http://localhost:3010/uploadedfile/',
+
+  file_access:'https://adwatrocity.onlinetn.com/api/v1/',
+  apiUrl: 'https://adwatrocity.onlinetn.com/api/v1/',
+  image_access:'https://adwatrocity.onlinetn.com/api/v1/uploadedfile/',
 
   appThemeName: 'ADWT',
   appPurchaseUrl: 'https://1.envato.market/EA4JP',

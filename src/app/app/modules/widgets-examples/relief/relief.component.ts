@@ -74,6 +74,7 @@ export class ReliefComponent implements OnInit {
   // Fetch FIR Details based on FIR ID
   private fetchFirDetails(firId: string): Promise<void> {
     return new Promise((resolve, reject) => {
+      console.log('SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS',firId)
       this.firService.getFirDetails(firId).subscribe({
         next: (details: any) => {
           this.firDetails = details;

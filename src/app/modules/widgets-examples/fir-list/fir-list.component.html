@@ -185,11 +185,17 @@
     <h5 class="modal-title fw-bold mb-0 text-uppercase">
       FIR Details
     </h5>
-    <button
+    <button *ngIf="!RecivedFirData"
       type="button"
       class="btn-close btn-close-white"
       aria-label="Close"
       (click)="modal.dismiss()">
+    </button>
+    <button *ngIf="RecivedFirData"
+      type="button"
+      class="btn-close btn-close-white"
+      aria-label="Close"
+      (click)="modal.dismiss();GotoRelief()">
     </button>
   </div>
 
@@ -2883,7 +2889,8 @@
     >
       Next
     </button>
-    <button type="button" class="btn btn-secondary me-2" (click)="modal.dismiss()">Close</button>
+    <button *ngIf="!RecivedFirData" type="button" class="btn btn-secondary me-2" (click)="modal.dismiss()">Close</button>
+    <button *ngIf="RecivedFirData" type="button" class="btn btn-secondary me-2" (click)="modal.dismiss();GotoRelief()">Close</button>
   </div>
 </ng-template>
 

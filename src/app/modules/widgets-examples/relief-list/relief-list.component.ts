@@ -274,9 +274,10 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
     { label: 'Created By', field: 'created_by', sortable: true, visible: true },
     { label: 'Created At', field: 'created_at', sortable: true, visible: true },
     { label: 'Status', field: 'status', sortable: false, visible: true },
+    { label: 'Actions', field: 'actions', sortable: false, visible: true },
   ];
 
-  selectedColumns: any[] = [...this.displayedFirList];
+  selectedColumns: any[] = [...this.displayedColumns];
 
   // Sorting variables
   currentSortField: string = '';
@@ -286,7 +287,7 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
 
 
   updateSelectedColumns() {
-    this.selectedColumns = this.displayedFirList.filter((col) => col.visible);
+    this.selectedColumns = this.displayedColumns.filter((col) => col.visible);
   }
   // Toggle column visibility
   toggleColumnVisibility(column: any) {
@@ -296,56 +297,55 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
 
   // Drag and drop for rearranging columns
   dropColumn(event: CdkDragDrop<any[]>) {
-    moveItemInArray(this.displayedFirList, event.previousIndex, event.currentIndex);
+    moveItemInArray(this.displayedColumns, event.previousIndex, event.currentIndex);
     this.updateSelectedColumns(); // Update selected columns after rearranging
   }
 
-  // Load FIR list from the backend
-  // loadFirList() {
-  //   this.isLoading = true;
-  //   this.firService.getFirList().subscribe(
-  //     (data: any[]) => {
-  //       this.firList = data;
-  //       this.isLoading = false;
-  //       this.cdr.detectChanges();
-  //     },
-  //     (error) => {
-  //       this.isLoading = false;
-  //       Swal.fire('Error', 'Failed to load FIR data', 'error');
-  //     }
-  //   );
-  // }
 
   // Apply filters to the FIR list
   applyFilters() {
-    this.page = 1; // Reset to the first page
-    this.cdr.detectChanges();
+    this.page = 1; // Reset pagination to the first page
+    this.filteredFirList(); // Update displayed list
+    this.cdr.detectChanges(); // Ensure UI updates
   }
 
-  // Filtered FIR list based on search and filter criteria
+
   filteredFirList() {
     const searchLower = this.searchText.toLowerCase();
-
+    console.log(searchLower)
     return this.firList.filter((fir) => {
       // Apply search filter
       const matchesSearch =
-        fir.fir_id.toString().includes(searchLower) ||
+        fir.fir_id.toString().toLowerCase().includes(searchLower) ||
         (fir.police_city || '').toLowerCase().includes(searchLower) ||
         (fir.police_station || '').toLowerCase().includes(searchLower);
 
       // Apply dropdown filters
-      const matchesDistrict =
-        this.selectedDistrict ? fir.district === this.selectedDistrict : true;
-      const matchesNatureOfOffence =
-        this.selectedNatureOfOffence
-          ? fir.nature_of_offence === this.selectedNatureOfOffence
-          : true;
-      const matchesStatusOfCase =
-        this.selectedStatusOfCase ? fir.status_of_case === this.selectedStatusOfCase : true;
-      const matchesStatusOfRelief =
-        this.selectedStatusOfRelief
-          ? fir.status_of_relief === this.selectedStatusOfRelief
-          : true;
+      const matchesDistrict = this.selectedDistrict ? fir.police_city === this.selectedDistrict : true;
+      const matchesNatureOfOffence = this.selectedNatureOfOffence? fir.police_station === this.selectedNatureOfOffence: true;
+      // const matchesStatusOfCase = this.selectedStatusOfCase ? fir.relief_status == this.selectedStatusOfCase : true;
+      // const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status == this.selectedStatusOfRelief : true;
+      let matchesStatusOfRelief = true;
+      if (this.selectedStatusOfRelief) {
+        if (this.selectedStatusOfRelief === 'FIR Stage') {
+          matchesStatusOfRelief = fir.relief_status == '1';
+        } else if (this.selectedStatusOfRelief === 'ChargeSheet Stage') {
+          matchesStatusOfRelief = fir.relief_status == '2';
+        } else if (this.selectedStatusOfRelief === 'Trial Stage') {
+          matchesStatusOfRelief = fir.relief_status == '3';
+        }
+      }
+
+      let matchesStatusOfCase = true;
+      if (this.selectedStatusOfCase) {
+        if (this.selectedStatusOfCase === 'Just Starting') {
+          matchesStatusOfCase = fir.status == '0';
+        } else if (this.selectedStatusOfCase === 'Pending') {
+          matchesStatusOfCase = (fir.status >= '1' && fir.status <= '12') ;
+        } else if (this.selectedStatusOfCase === 'Completed') {
+          matchesStatusOfCase = fir.status == '13';
+        }
+      }
 
       return (
         matchesSearch &&
@@ -356,6 +356,16 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
       );
     });
   }
+
+    clearfilter(){
+    this.searchText = '';
+    this.selectedDistrict = '';
+    this.selectedNatureOfOffence = '';
+    this.selectedStatusOfCase = '';
+    this.selectedStatusOfRelief = '';
+    this.applyFilters();
+  }
+  
 
 
   // Sorting logic

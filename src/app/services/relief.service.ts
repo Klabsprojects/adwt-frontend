@@ -40,6 +40,9 @@ export class ReliefService {
     return this.http.post<any>(`${this.apiUrl}/trial_relief_save/`, data);
   }
 
+  FetchAllInstallmentDetails(firId: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/Fetch_relief_details/`, firId);
+  }
 
 }
 

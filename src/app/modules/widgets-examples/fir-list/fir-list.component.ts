@@ -3,7 +3,7 @@ import Swal from 'sweetalert2';
 import { FirListTestService } from 'src/app/services/fir-list-test.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ChangeDetectorRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router , ActivatedRoute } from '@angular/router';
 
 import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -439,11 +439,12 @@ export class FirListComponent implements OnInit {
   // Sorting variables
   currentSortField: string = '';
   isAscending: boolean = true;
-
+  RecivedFirData : any;
   constructor(
     private firService: FirListTestService,
     private cdr: ChangeDetectorRef,
     private router: Router,
+    private route: ActivatedRoute,
     private modalService: NgbModal,
   ) {}
 
@@ -451,16 +452,29 @@ export class FirListComponent implements OnInit {
     this.loadFirList();
     this.updateSelectedColumns();
 
+    setTimeout(() => {
+      this.route.queryParams.subscribe(params => {
+        if (params['shouldCallFunction'] == 'true') {
+          this.RecivedFirData = decodeURIComponent(params['data']);
+          if(this.RecivedFirData){
+            let data = {
+              fir_id : this.RecivedFirData.replace(/"/g, '')
+            }
+            this.openModal(data);
+          }
+        }
+      });    
+    }, 2000);
   }
 
   // funtions
   fetchFirDetails(firId:any): void {
 
 
-    console.log(firId,"demooooooooooooooooooooooo")
+    console.log(firId)
     this.firService.getFirView(firId).subscribe(
       (data) => {
-        console.log(data,"demoooooo");
+        console.log(data);
         if (!data || data.length === 0) {
           console.warn('No FIR found for the given ID');
           alert('No FIR found for the given ID');
@@ -998,6 +1012,14 @@ getStatusBadgeClass(status: number): string {
     var data2 = JSON.parse(value)
     var data3 = data2.join(',')
     return data3;
+  }
+
+  GotoRelief(){
+    this.router.navigate(['/widgets-examples/relief-list'], {
+      queryParams: { shouldCallFunction: 'true', data: encodeURIComponent(JSON.stringify(this.RecivedFirData)) }
+    }).catch(err => {
+      console.error('Navigation Error:', err);
+    });
   }
 
 }

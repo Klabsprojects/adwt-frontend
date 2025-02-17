@@ -5,8 +5,13 @@ import { ReliefService } from 'src/app/services/relief.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+// import { forkJoin } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
+import { of, forkJoin, Observable } from 'rxjs';
+
 import Swal from 'sweetalert2';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { environment } from 'src/environments/environment.prod';
 
 
 @Component({
@@ -23,7 +28,22 @@ export class ReliefComponent implements OnInit {
   firId: string | undefined;
   firDetails: any;
 
+  file_access = environment.file_access;
+
+  form: FormGroup;
+  existingFilePath: string | null;
+  existingFilePath_relief_2: string | null;
+  existingFilePath_relief_3: string | null;
+  showFileInput: boolean = true;
+  showFileInput_2: boolean = true;
+  showFileInput_3: boolean = true;
+
   enabledTabs: boolean[] = [false, false, false]; // Dynamic enabling of tabs
+  public isDialogVisible: boolean = false;
+  victimsReliefDetails : any = [];
+  secondFormVictimInformation : any = [];
+  trialReliefDetails : any = [];
+  RemoveFormUpload : any;
 
   constructor(
     private fb: FormBuilder,
@@ -32,13 +52,17 @@ export class ReliefComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private ReliefService: ReliefService,
-  ) {}
+    private modalService: NgbModal,
+  ) {
+    this.form = this.fb.group({
+      firstInstallmentUploadDocument: ['']
+    });
+  }
   loading = true;
 
   ngOnInit(): void {
     this.initializeForm();
     this.firId = this.getFirIdFromRouter();
-
     if (this.firId) {
       this.fetchFirStatus(this.firId); // Fetch status
 
@@ -53,10 +77,12 @@ export class ReliefComponent implements OnInit {
           this.cdr.detectChanges(); // Ensure UI updates
         },
         error: (err) => {
+          console.log(err)
           console.error('Error fetching initial data:', err);
           this.loading = false;
         },
       });
+      this.GetInstallmemtList(this.firId);
     } else {
       console.error('No FIR ID found.');
       this.router.navigate(['/']); // Redirect if FIR ID is missing
@@ -73,21 +99,21 @@ export class ReliefComponent implements OnInit {
   }
 
   // Fetch FIR Details based on FIR ID
-  private fetchFirDetails(firId: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.firService.getFirDetails(firId).subscribe({
-        next: (details: any) => {
-          this.firDetails = details;
-          this.patchFirDetailsToForm(this.firDetails);
-          resolve();
-        },
-        error: (err: any) => {
-          console.error('Error fetching FIR details:', err);
-          reject(err);
-        },
-      });
-    });
-  }
+  // private fetchFirDetails(firId: string): Promise<void> {
+  //   return new Promise((resolve, reject) => {
+  //     this.firService.getFirDetails(firId).subscribe({
+  //       next: (details: any) => {
+  //         this.firDetails = details;
+  //         this.patchFirDetailsToForm(this.firDetails);
+  //         resolve();
+  //       },
+  //       error: (err: any) => {
+  //         console.error('Error fetching FIR details:', err);
+  //         reject(err);
+  //       },
+  //     });
+  //   });
+  // }
 
 
   private fetchFirStatus(firId: string): void {
@@ -132,7 +158,7 @@ export class ReliefComponent implements OnInit {
       firstInstallmentProceedingsFileDate: [null, Validators.required],
       firstInstallmentProceedingsFileNumber: ['', Validators.required],
       firstInstallmentPfmsPortalUploaded: ['', Validators.required],
-      proceedingsReceiptDate: ['', Validators.required],
+      // proceedingsReceiptDate: ['', Validators.required],
       secondInstallmentProceedingsFileNumber: ['', Validators.required],
       secondInstallmentProceedingsFileDate: ['', Validators.required],
       secondInstallmentUploadDocument: ['', Validators.required],
@@ -148,62 +174,62 @@ export class ReliefComponent implements OnInit {
   }
 
 
-  private fetchVictimDetails(firId: string): void {
-    this.ReliefService.getVictimsReliefDetails_1(firId).subscribe({
-      next: (response: any) => {
-        console.log('Fetched Victim Details:', response);
+  // private fetchVictimDetails(firId: string): void {
+  //   this.ReliefService.getVictimsReliefDetails_1(firId).subscribe({
+  //     next: (response: any) => {
+  //       console.log('Fetched Victim Details:', response);
 
-        if (response?.victimsReliefDetails) {
-          this.populateVictimFields(response.victimsReliefDetails);
-        } else {
-          console.error('Invalid response structure:', response);
-        }
-      },
-      error: (err: any) => {
-        console.error('Error fetching victim details:', err);
-      },
-    });
-  }
+  //       if (response?.victimsReliefDetails) {
+  //         this.populateVictimFields(response.victimsReliefDetails);
+  //       } else {
+  //         console.error('Invalid response structure:', response);
+  //       }
+  //     },
+  //     error: (err: any) => {
+  //       console.error('Error fetching victim details:', err);
+  //     },
+  //   });
+  // }
 
 
 
-  private fetchSecondInstallmentDetails(firId: string): void {
-    this.ReliefService.getSecondInstallmentDetails(firId).subscribe({
-      next: (response: any) => {
-        console.log('Fetched Second Installment Victim Details:', response);
+  // private fetchSecondInstallmentDetails(firId: string): void {
+  //   this.ReliefService.getSecondInstallmentDetails(firId).subscribe({
+  //     next: (response: any) => {
+  //       console.log('Fetched Second Installment Victim Details:', response);
 
-        // Adjusted to handle the correct key
-        if (response?.victims && Array.isArray(response.victims)) {
-          this.populateSecondInstallmentVictimFields(response.victims);
-        } else {
-          console.error('Invalid response structure:', response);
-        }
-      },
-      error: (err: any) => {
-        console.error('Error fetching second installment details:', err);
-      },
-    });
-  }
-  private fetchThirdInstallmentDetails(firId: string): void {
-    this.ReliefService.getThirdInstallmentDetails(firId).subscribe({
-      next: (response: any) => {
-        console.log('Raw Third Installment Response:', response);
+  //       // Adjusted to handle the correct key
+  //       if (response?.victims && Array.isArray(response.victims)) {
+  //         this.populateSecondInstallmentVictimFields(response.victims);
+  //       } else {
+  //         console.error('Invalid response structure:', response);
+  //       }
+  //     },
+  //     error: (err: any) => {
+  //       console.error('Error fetching second installment details:', err);
+  //     },
+  //   });
+  // }
+  // private fetchThirdInstallmentDetails(firId: string): void {
+  //   this.ReliefService.getThirdInstallmentDetails(firId).subscribe({
+  //     next: (response: any) => {
+  //       console.log('Raw Third Installment Response:', response);
 
-        // Updated the key to match the actual response structure
-        const trialReliefDetails = response?.trialReliefDetails || [];
-        console.log('Resolved trialReliefDetails:', trialReliefDetails);
+  //       // Updated the key to match the actual response structure
+  //       const trialReliefDetails = response?.trialReliefDetails || [];
+  //       console.log('Resolved trialReliefDetails:', trialReliefDetails);
 
-        if (Array.isArray(trialReliefDetails)) {
-          this.populateThirdInstallmentVictimFields(trialReliefDetails);
-        } else {
-          console.error('Invalid response structure for Third Installment:', response);
-        }
-      },
-      error: (err: any) => {
-        console.error('Error fetching third installment details:', err);
-      },
-    });
-  }
+  //       if (Array.isArray(trialReliefDetails)) {
+  //         this.populateThirdInstallmentVictimFields(trialReliefDetails);
+  //       } else {
+  //         console.error('Invalid response structure for Third Installment:', response);
+  //       }
+  //     },
+  //     error: (err: any) => {
+  //       console.error('Error fetching third installment details:', err);
+  //     },
+  //   });
+  // }
 
 
 
@@ -377,187 +403,187 @@ export class ReliefComponent implements OnInit {
 
 
 
- private addDynamicListeners(group: FormGroup): void {
-  // Listener for First Installment Total
-  group.get('firstInstallmentReliefScst')?.valueChanges.subscribe(() => {
-    const scstValue = parseFloat(group.get('firstInstallmentReliefScst')?.value || '0');
-    const exGratiaValue = parseFloat(group.get('firstInstallmentReliefExGratia')?.value || '0');
-    const total = this.calculateTotal(scstValue, exGratiaValue);
+  private addDynamicListeners(group: FormGroup): void {
+    // Listener for First Installment Total
+    group.get('firstInstallmentReliefScst')?.valueChanges.subscribe(() => {
+      const scstValue = parseFloat(group.get('firstInstallmentReliefScst')?.value || '0');
+      const exGratiaValue = parseFloat(group.get('firstInstallmentReliefExGratia')?.value || '0');
+      const total = this.calculateTotal(scstValue, exGratiaValue);
 
-    console.log('Updated First Installment Relief Amount (SC/ST):', { scstValue, exGratiaValue, total });
-    group.get('firstInstallmentTotalRelief')?.setValue(total.toFixed(2), { emitEvent: false });
-  });
-
-  group.get('firstInstallmentReliefExGratia')?.valueChanges.subscribe(() => {
-    const scstValue = parseFloat(group.get('firstInstallmentReliefScst')?.value || '0');
-    const exGratiaValue = parseFloat(group.get('firstInstallmentReliefExGratia')?.value || '0');
-    const total = this.calculateTotal(scstValue, exGratiaValue);
-
-    console.log('Updated First Installment Relief Amount (Ex-Gratia):', { scstValue, exGratiaValue, total });
-    group.get('firstInstallmentTotalRelief')?.setValue(total.toFixed(2), { emitEvent: false });
-  });
-
-  // Listener for Second Installment Total
-  group.get('secondInstallmentReliefScst')?.valueChanges.subscribe(() => {
-    const secondScstValue = parseFloat(group.get('secondInstallmentReliefScst')?.value || '0');
-    const secondExGratiaValue = parseFloat(group.get('secondInstallmentReliefExGratia')?.value || '0');
-    const secondTotal = this.calculateTotal(secondScstValue, secondExGratiaValue);
-
-    console.log('Updated Second Installment Relief Amount (SC/ST):', { secondScstValue, secondExGratiaValue, secondTotal });
-    group.get('secondInstallmentTotalRelief')?.setValue(secondTotal.toFixed(2), { emitEvent: false });
-  });
-
-  group.get('secondInstallmentReliefExGratia')?.valueChanges.subscribe(() => {
-    const secondScstValue = parseFloat(group.get('secondInstallmentReliefScst')?.value || '0');
-    const secondExGratiaValue = parseFloat(group.get('secondInstallmentReliefExGratia')?.value || '0');
-    const secondTotal = this.calculateTotal(secondScstValue, secondExGratiaValue);
-
-    console.log('Updated Second Installment Relief Amount (Ex-Gratia):', { secondScstValue, secondExGratiaValue, secondTotal });
-    group.get('secondInstallmentTotalRelief')?.setValue(secondTotal.toFixed(2), { emitEvent: false });
-  });
-
-  // Listener for Third Installment Total
-  group.get('thirdInstallmentReliefAct')?.valueChanges.subscribe(() => {
-    const thirdReliefAct = parseFloat(group.get('thirdInstallmentReliefAct')?.value || '0');
-    const thirdReliefGovernment = parseFloat(group.get('thirdInstallmentReliefGovernment')?.value || '0');
-    const thirdTotal = this.calculateTotal(thirdReliefAct, thirdReliefGovernment);
-
-    console.log('Updated Third Installment Relief Amount (Act):', { thirdReliefAct, thirdReliefGovernment, thirdTotal });
-    group.get('thirdInstallmentReliefTotal')?.setValue(thirdTotal.toFixed(2), { emitEvent: false });
-  });
-
-  group.get('thirdInstallmentReliefGovernment')?.valueChanges.subscribe(() => {
-    const thirdReliefAct = parseFloat(group.get('thirdInstallmentReliefAct')?.value || '0');
-    const thirdReliefGovernment = parseFloat(group.get('thirdInstallmentReliefGovernment')?.value || '0');
-    const thirdTotal = this.calculateTotal(thirdReliefAct, thirdReliefGovernment);
-
-    console.log('Updated Third Installment Relief Amount (Government):', { thirdReliefAct, thirdReliefGovernment, thirdTotal });
-    group.get('thirdInstallmentReliefTotal')?.setValue(thirdTotal.toFixed(2), { emitEvent: false });
-  });
-
-}
-
-
-
-
-private getInvalidFields(target: string): string[] {
-  const invalidFields: string[] = [];
-
-  // Map technical field names to user-friendly names
-  const fieldLabels: { [key: string]: string } = {
-    firstInstallmentProceedingsFileNumber: 'File Number',
-    firstInstallmentProceedingsFileDate: 'File Date',
-    firstInstallmentUploadDocument: 'Upload Document',
-    firstInstallmentPfmsPortalUploaded: 'PFMS Portal Uploaded',
-    firstInstallmentDateOfDisbursement: 'Date of Disbursement',
-    secondInstallmentProceedingsFileNumber: 'Second Installment File Number',
-    secondInstallmentProceedingsFileDate: 'Second Installment File Date',
-    secondInstallmentUploadDocument: 'Second Installment Upload Document',
-    secondInstallmentPfmsPortalUploaded: 'Second Installment PFMS Portal Uploaded',
-    secondInstallmentDateOfDisbursement: 'Second Installment Date of Disbursement',
-    firstInstallmentVictimName: 'Victim Name',
-    firstInstallmentReliefScst: 'Relief Amount (SC/ST)',
-    firstInstallmentReliefExGratia: 'Relief Amount (Ex-Gratia)',
-    secondInstallmentVictimName: 'Second Installment Victim Name',
-    secondInstallmentReliefScst: 'Second Installment Relief Amount (SC/ST)',
-    secondInstallmentReliefExGratia: 'Second Installment Relief Amount (Ex-Gratia)',
-    thirdInstallmentProceedingsFileNumber: 'Third Installment File Number',
-    thirdInstallmentProceedingsFileDate: 'Third Installment File Date',
-    thirdInstallmentUploadDocument: 'Third Installment Upload Document',
-    thirdInstallmentPfmsPortalUploaded: 'Third Installment PFMS Portal Uploaded',
-    thirdInstallmentDateOfDisbursement: 'Third Installment Date of Disbursement',
-    thirdInstallmentVictimName: 'Third Installment Victim Name',
-    thirdInstallmentReliefAct: 'Relief Amount (Act)',
-    thirdInstallmentReliefGovernment: 'Relief Amount (Government)',
-    thirdInstallmentReliefTotal: 'Total Relief Amount',
-  };
-
-  if (target === 'firstInstallment') {
-    // Validate top-level fields for the First Installment
-    const firstInstallmentFields = [
-      'firstInstallmentProceedingsFileNumber',
-      'firstInstallmentProceedingsFileDate',
-      'firstInstallmentUploadDocument',
-      'firstInstallmentPfmsPortalUploaded',
-      'firstInstallmentDateOfDisbursement',
-    ];
-
-    firstInstallmentFields.forEach((field) => {
-      if (this.reliefForm.get(field)?.invalid) {
-        invalidFields.push(fieldLabels[field] || field); // Use user-friendly name
-      }
+      console.log('Updated First Installment Relief Amount (SC/ST):', { scstValue, exGratiaValue, total });
+      group.get('firstInstallmentTotalRelief')?.setValue(total.toFixed(2), { emitEvent: false });
     });
 
-    // Validate the Victims Array for the First Installment
-    const victims = this.reliefForm.get('victims') as FormArray;
-    victims.controls.forEach((group, index) => {
-      const groupControls = (group as FormGroup).controls;
-      ['firstInstallmentVictimName', 'firstInstallmentReliefScst', 'firstInstallmentReliefExGratia'].forEach((key) => {
-        if (groupControls[key]?.invalid) {
-          invalidFields.push(`Victim ${index + 1} - ${fieldLabels[key] || key}`);
-        }
-      });
-    });
-  } else if (target === 'secondInstallment') {
-    // Validate top-level fields for the Second Installment
-    const secondInstallmentFields = [
-      'secondInstallmentProceedingsFileNumber',
-      'secondInstallmentProceedingsFileDate',
-      'secondInstallmentUploadDocument',
-      'secondInstallmentPfmsPortalUploaded',
-      'secondInstallmentDateOfDisbursement',
-    ];
+    group.get('firstInstallmentReliefExGratia')?.valueChanges.subscribe(() => {
+      const scstValue = parseFloat(group.get('firstInstallmentReliefScst')?.value || '0');
+      const exGratiaValue = parseFloat(group.get('firstInstallmentReliefExGratia')?.value || '0');
+      const total = this.calculateTotal(scstValue, exGratiaValue);
 
-    secondInstallmentFields.forEach((field) => {
-      if (this.reliefForm.get(field)?.invalid) {
-        invalidFields.push(fieldLabels[field] || field); // Use user-friendly name
-      }
+      console.log('Updated First Installment Relief Amount (Ex-Gratia):', { scstValue, exGratiaValue, total });
+      group.get('firstInstallmentTotalRelief')?.setValue(total.toFixed(2), { emitEvent: false });
     });
 
-    // Validate the Victims Array for the Second Installment
-    const victims = this.reliefForm.get('secondInstallmentVictims') as FormArray;
-    victims.controls.forEach((group, index) => {
-      const groupControls = (group as FormGroup).controls;
-      ['secondInstallmentVictimName', 'secondInstallmentReliefScst', 'secondInstallmentReliefExGratia'].forEach((key) => {
-        if (groupControls[key]?.invalid) {
-          invalidFields.push(`Victim ${index + 1} - ${fieldLabels[key] || key}`);
-        }
-      });
-    });
-  } else if (target === 'thirdInstallment') {
-    // Validate top-level fields for the Third Installment
-    const thirdInstallmentFields = [
-      'thirdInstallmentProceedingsFileNumber',
-      'thirdInstallmentProceedingsFileDate',
-      'thirdInstallmentUploadDocument',
-      'thirdInstallmentPfmsPortalUploaded',
-      'thirdInstallmentDateOfDisbursement',
-    ];
+    // Listener for Second Installment Total
+    group.get('secondInstallmentReliefScst')?.valueChanges.subscribe(() => {
+      const secondScstValue = parseFloat(group.get('secondInstallmentReliefScst')?.value || '0');
+      const secondExGratiaValue = parseFloat(group.get('secondInstallmentReliefExGratia')?.value || '0');
+      const secondTotal = this.calculateTotal(secondScstValue, secondExGratiaValue);
 
-    thirdInstallmentFields.forEach((field) => {
-      if (this.reliefForm.get(field)?.invalid) {
-        invalidFields.push(fieldLabels[field] || field); // Use user-friendly name
-      }
+      console.log('Updated Second Installment Relief Amount (SC/ST):', { secondScstValue, secondExGratiaValue, secondTotal });
+      group.get('secondInstallmentTotalRelief')?.setValue(secondTotal.toFixed(2), { emitEvent: false });
     });
 
-    // Validate the Victims Array for the Third Installment
-    const victims = this.reliefForm.get('thirdInstallmentVictims') as FormArray;
-    victims.controls.forEach((group, index) => {
-      const groupControls = (group as FormGroup).controls;
-      ['thirdInstallmentVictimName', 'thirdInstallmentReliefAct', 'thirdInstallmentReliefGovernment'].forEach((key) => {
-        if (groupControls[key]?.invalid) {
-          invalidFields.push(`Victim ${index + 1} - ${fieldLabels[key] || key}`);
-        }
-      });
+    group.get('secondInstallmentReliefExGratia')?.valueChanges.subscribe(() => {
+      const secondScstValue = parseFloat(group.get('secondInstallmentReliefScst')?.value || '0');
+      const secondExGratiaValue = parseFloat(group.get('secondInstallmentReliefExGratia')?.value || '0');
+      const secondTotal = this.calculateTotal(secondScstValue, secondExGratiaValue);
+
+      console.log('Updated Second Installment Relief Amount (Ex-Gratia):', { secondScstValue, secondExGratiaValue, secondTotal });
+      group.get('secondInstallmentTotalRelief')?.setValue(secondTotal.toFixed(2), { emitEvent: false });
     });
+
+    // Listener for Third Installment Total
+    group.get('thirdInstallmentReliefAct')?.valueChanges.subscribe(() => {
+      const thirdReliefAct = parseFloat(group.get('thirdInstallmentReliefAct')?.value || '0');
+      const thirdReliefGovernment = parseFloat(group.get('thirdInstallmentReliefGovernment')?.value || '0');
+      const thirdTotal = this.calculateTotal(thirdReliefAct, thirdReliefGovernment);
+
+      console.log('Updated Third Installment Relief Amount (Act):', { thirdReliefAct, thirdReliefGovernment, thirdTotal });
+      group.get('thirdInstallmentReliefTotal')?.setValue(thirdTotal.toFixed(2), { emitEvent: false });
+    });
+
+    group.get('thirdInstallmentReliefGovernment')?.valueChanges.subscribe(() => {
+      const thirdReliefAct = parseFloat(group.get('thirdInstallmentReliefAct')?.value || '0');
+      const thirdReliefGovernment = parseFloat(group.get('thirdInstallmentReliefGovernment')?.value || '0');
+      const thirdTotal = this.calculateTotal(thirdReliefAct, thirdReliefGovernment);
+
+      console.log('Updated Third Installment Relief Amount (Government):', { thirdReliefAct, thirdReliefGovernment, thirdTotal });
+      group.get('thirdInstallmentReliefTotal')?.setValue(thirdTotal.toFixed(2), { emitEvent: false });
+    });
+
   }
 
-  return invalidFields;
-}
 
 
 
-  onFirstInstallmentSubmit(): void {
+  private getInvalidFields(target: string): string[] {
+    const invalidFields: string[] = [];
+
+    // Map technical field names to user-friendly names
+    const fieldLabels: { [key: string]: string } = {
+      firstInstallmentProceedingsFileNumber: 'File Number',
+      firstInstallmentProceedingsFileDate: 'File Date',
+      firstInstallmentUploadDocument: 'Upload Document',
+      firstInstallmentPfmsPortalUploaded: 'PFMS Portal Uploaded',
+      firstInstallmentDateOfDisbursement: 'Date of Disbursement',
+      secondInstallmentProceedingsFileNumber: 'Second Installment File Number',
+      secondInstallmentProceedingsFileDate: 'Second Installment File Date',
+      secondInstallmentUploadDocument: 'Second Installment Upload Document',
+      secondInstallmentPfmsPortalUploaded: 'Second Installment PFMS Portal Uploaded',
+      secondInstallmentDateOfDisbursement: 'Second Installment Date of Disbursement',
+      firstInstallmentVictimName: 'Victim Name',
+      firstInstallmentReliefScst: 'Relief Amount (SC/ST)',
+      firstInstallmentReliefExGratia: 'Relief Amount (Ex-Gratia)',
+      secondInstallmentVictimName: 'Second Installment Victim Name',
+      secondInstallmentReliefScst: 'Second Installment Relief Amount (SC/ST)',
+      secondInstallmentReliefExGratia: 'Second Installment Relief Amount (Ex-Gratia)',
+      thirdInstallmentProceedingsFileNumber: 'Third Installment File Number',
+      thirdInstallmentProceedingsFileDate: 'Third Installment File Date',
+      thirdInstallmentUploadDocument: 'Third Installment Upload Document',
+      thirdInstallmentPfmsPortalUploaded: 'Third Installment PFMS Portal Uploaded',
+      thirdInstallmentDateOfDisbursement: 'Third Installment Date of Disbursement',
+      thirdInstallmentVictimName: 'Third Installment Victim Name',
+      thirdInstallmentReliefAct: 'Relief Amount (Act)',
+      thirdInstallmentReliefGovernment: 'Relief Amount (Government)',
+      thirdInstallmentReliefTotal: 'Total Relief Amount',
+    };
+
+    if (target === 'firstInstallment') {
+      // Validate top-level fields for the First Installment
+      const firstInstallmentFields = [
+        'firstInstallmentProceedingsFileNumber',
+        'firstInstallmentProceedingsFileDate',
+        // 'firstInstallmentUploadDocument',
+        'firstInstallmentPfmsPortalUploaded',
+        'firstInstallmentDateOfDisbursement',
+      ];
+
+      firstInstallmentFields.forEach((field) => {
+        if (this.reliefForm.get(field)?.invalid) {
+          invalidFields.push(fieldLabels[field] || field); // Use user-friendly name
+        }
+      });
+
+      // Validate the Victims Array for the First Installment
+      const victims = this.reliefForm.get('victims') as FormArray;
+      victims.controls.forEach((group, index) => {
+        const groupControls = (group as FormGroup).controls;
+        ['firstInstallmentVictimName', 'firstInstallmentReliefScst', 'firstInstallmentReliefExGratia'].forEach((key) => {
+          if (groupControls[key]?.invalid) {
+            invalidFields.push(`Victim ${index + 1} - ${fieldLabels[key] || key}`);
+          }
+        });
+      });
+    } else if (target === 'secondInstallment') {
+      // Validate top-level fields for the Second Installment
+      const secondInstallmentFields = [
+        'secondInstallmentProceedingsFileNumber',
+        'secondInstallmentProceedingsFileDate',
+        'secondInstallmentUploadDocument',
+        'secondInstallmentPfmsPortalUploaded',
+        'secondInstallmentDateOfDisbursement',
+      ];
+
+      secondInstallmentFields.forEach((field) => {
+        if (this.reliefForm.get(field)?.invalid) {
+          invalidFields.push(fieldLabels[field] || field); // Use user-friendly name
+        }
+      });
+
+      // Validate the Victims Array for the Second Installment
+      const victims = this.reliefForm.get('secondInstallmentVictims') as FormArray;
+      victims.controls.forEach((group, index) => {
+        const groupControls = (group as FormGroup).controls;
+        ['secondInstallmentVictimName', 'secondInstallmentReliefScst', 'secondInstallmentReliefExGratia'].forEach((key) => {
+          if (groupControls[key]?.invalid) {
+            invalidFields.push(`Victim ${index + 1} - ${fieldLabels[key] || key}`);
+          }
+        });
+      });
+    } else if (target === 'thirdInstallment') {
+      // Validate top-level fields for the Third Installment
+      const thirdInstallmentFields = [
+        'thirdInstallmentProceedingsFileNumber',
+        'thirdInstallmentProceedingsFileDate',
+        'thirdInstallmentUploadDocument',
+        'thirdInstallmentPfmsPortalUploaded',
+        'thirdInstallmentDateOfDisbursement',
+      ];
+
+      thirdInstallmentFields.forEach((field) => {
+        if (this.reliefForm.get(field)?.invalid) {
+          invalidFields.push(fieldLabels[field] || field); // Use user-friendly name
+        }
+      });
+
+      // Validate the Victims Array for the Third Installment
+      const victims = this.reliefForm.get('thirdInstallmentVictims') as FormArray;
+      victims.controls.forEach((group, index) => {
+        const groupControls = (group as FormGroup).controls;
+        ['thirdInstallmentVictimName', 'thirdInstallmentReliefAct', 'thirdInstallmentReliefGovernment'].forEach((key) => {
+          if (groupControls[key]?.invalid) {
+            invalidFields.push(`Victim ${index + 1} - ${fieldLabels[key] || key}`);
+          }
+        });
+      });
+    }
+
+    return invalidFields;
+  }
+
+
+
+  async onFirstInstallmentSubmit(): Promise<void> {
     const invalidFields = this.getInvalidFields('firstInstallment');
     if (invalidFields.length > 0) {
       Swal.fire({
@@ -577,10 +603,18 @@ private getInvalidFields(target: string): string[] {
       control.get('firstInstallmentTotalRelief')?.enable();
     });
 
+    let firstInstallmentUploadDocumentPath: string | undefined;
+    const firstInstallmentUploadDocument = this.reliefForm.get('firstInstallmentUploadDocument')?.value;
+      if (firstInstallmentUploadDocument) {
+        const paths = await this.uploadMultipleFiles([firstInstallmentUploadDocument]);
+        firstInstallmentUploadDocumentPath = paths[0];
+      }
+
     // Prepare the data to send to the backend
     const firstInstallmentData = {
       firId: this.firId,
-      victims: this.victimsArray.value.map((victim: any) => ({
+      victims: this.victimsArray.value.map((victim: any, index: number) => ({
+        victimReliefId: this.victimsReliefDetails?.[index]?.victim_relif_id || null, // Ensure index exists before accessing
         victimId: victim.victimId || null,
         reliefId: victim.reliefId || null,
         victimName: victim.firstInstallmentVictimName,
@@ -594,7 +628,7 @@ private getInvalidFields(target: string): string[] {
       proceedings: {
         fileNo: this.reliefForm.get('firstInstallmentProceedingsFileNumber')?.value,
         fileDate: this.reliefForm.get('firstInstallmentProceedingsFileDate')?.value,
-        uploadDocument: this.reliefForm.get('firstInstallmentUploadDocument')?.value,
+        uploadDocument: firstInstallmentUploadDocumentPath || this.existingFilePath || null, // Simplified ternary
         pfmsPortalUploaded: this.reliefForm.get('firstInstallmentPfmsPortalUploaded')?.value,
         dateOfDisbursement: this.reliefForm.get('firstInstallmentDateOfDisbursement')?.value,
       },
@@ -628,7 +662,7 @@ private getInvalidFields(target: string): string[] {
     });
   }
 
-  onSecondInstallmentSubmit(): void {
+   async onSecondInstallmentSubmit(): Promise<void> {
     const invalidFields = this.getInvalidFields('secondInstallment');
     if (invalidFields.length > 0) {
       Swal.fire({
@@ -648,11 +682,19 @@ private getInvalidFields(target: string): string[] {
       control.get('secondInstallmentTotalRelief')?.enable();
     });
 
+    let secondInstallmentUploadDocumentPath: string | undefined;
+    const secondInstallmentUploadDocument = this.reliefForm.get('secondInstallmentUploadDocument')?.value;
+      if (secondInstallmentUploadDocument) {
+        const paths = await this.uploadMultipleFiles([secondInstallmentUploadDocument]);
+        secondInstallmentUploadDocumentPath = paths[0];
+      }
+
     // Prepare the data for the backend
     const secondInstallmentData = {
       firId: this.firId,
-      victims: this.secondInstallmentVictimsArray.value.map((victim: any) => ({
+      victims: this.secondInstallmentVictimsArray.value.map((victim: any, index: number) => ({
         victimId: victim.victimId || null,
+        victimChargesheetId: this.secondFormVictimInformation?.[index]?.victim_chargesheet_id || null, 
         chargesheetId: victim.chargesheetId || null,
         victimName: victim.secondInstallmentVictimName,
         secondInstallmentReliefScst: victim.secondInstallmentReliefScst,
@@ -662,7 +704,7 @@ private getInvalidFields(target: string): string[] {
       proceedings: {
         fileNumber: this.reliefForm.get('secondInstallmentProceedingsFileNumber')?.value,
         fileDate: this.reliefForm.get('secondInstallmentProceedingsFileDate')?.value,
-        uploadDocument: this.reliefForm.get('secondInstallmentUploadDocument')?.value,
+        uploadDocument: secondInstallmentUploadDocumentPath || this.existingFilePath_relief_2 || null,
         pfmsPortalUploaded: this.reliefForm.get('secondInstallmentPfmsPortalUploaded')?.value,
         dateOfDisbursement: this.reliefForm.get('secondInstallmentDateOfDisbursement')?.value,
       },
@@ -696,7 +738,7 @@ private getInvalidFields(target: string): string[] {
     });
   }
 
-  onThirdInstallmentSubmit(): void {
+  async onThirdInstallmentSubmit(): Promise<void> {
     const invalidFields = this.getInvalidFields('thirdInstallment');
     if (invalidFields.length > 0) {
       Swal.fire({
@@ -713,10 +755,17 @@ private getInvalidFields(target: string): string[] {
       control.get('thirdInstallmentReliefTotal')?.enable();
     });
 
+      let thirdInstallmentUploadDocumentPath: string | undefined;
+    const thirdInstallmentUploadDocument = this.reliefForm.get('thirdInstallmentUploadDocument')?.value;
+      if (thirdInstallmentUploadDocument) {
+        const paths = await this.uploadMultipleFiles([thirdInstallmentUploadDocument]);
+        thirdInstallmentUploadDocumentPath = paths[0];
+      }
+
     // Prepare the data for the backend
     const thirdInstallmentData = {
       firId: this.firId,
-      victims: this.thirdInstallmentVictimsArray.value.map((victim: any) => ({
+      victims: this.thirdInstallmentVictimsArray.value.map((victim: any, index: number) => ({
         trialId: victim.trialId, // Use existing trial_id
         victimId: victim.victimId, // Use victim_id
         victimName: victim.thirdInstallmentVictimName,
@@ -728,7 +777,7 @@ private getInvalidFields(target: string): string[] {
         trialId: this.thirdInstallmentVictimsArray.value[0]?.trialId, // Use the trial_id from the first victim
         fileNumber: this.reliefForm.get('thirdInstallmentProceedingsFileNumber')?.value,
         fileDate: this.reliefForm.get('thirdInstallmentProceedingsFileDate')?.value,
-        uploadDocument: this.reliefForm.get('thirdInstallmentUploadDocument')?.value,
+        uploadDocument: thirdInstallmentUploadDocumentPath || this.existingFilePath_relief_3 || null,
         pfmsPortalUploaded: this.reliefForm.get('thirdInstallmentPfmsPortalUploaded')?.value,
         dateOfDisbursement: this.reliefForm.get('thirdInstallmentDateOfDisbursement')?.value,
       },
@@ -764,6 +813,368 @@ private getInvalidFields(target: string): string[] {
   }
 
 
+  private fetchFirDetails(firId: string): Observable<any> {
+    return this.firService.getFirDetails(firId).pipe(
+      tap((details: any) => {
+        this.firDetails = details;
+        if (this.firDetails && this.firDetails.data && this.firDetails.data.date_of_registration) {
+          this.firDetails.data.date_of_registration = this.convertToNormalDate(this.firDetails.data.date_of_registration);
+        }
+        if (this.firDetails && this.firDetails.data && this.firDetails.data.date_of_occurrence) {
+          this.firDetails.data.date_of_occurrence = this.convertToNormalDate(this.firDetails.data.date_of_occurrence);
+        }
+        console.log('fetchFirDetails', details);
+        this.patchFirDetailsToForm(this.firDetails);
+      }),
+      catchError((err) => {
+        console.error('Error fetching FIR details:', err);
+        return of(null); // Ensures forkJoin doesn't fail
+      })
+    );
+  }
 
+  private fetchVictimDetails(firId: string): Observable<any> {
+    return this.ReliefService.getVictimsReliefDetails_1(firId).pipe(
+      tap((response: any) => {
+        console.log('Fetched Victim Details:', response);
+        if (response?.victimsReliefDetails) {
+          this.victimsReliefDetails = response.victimsReliefDetails;
+          this.populateVictimFields(response.victimsReliefDetails);
+        } else {
+          console.error('Invalid response structure:', response);
+        }
+      }),
+      catchError((err) => {
+        console.error('Error fetching victim details:', err);
+        return of(null);
+      })
+    );
+  }
+
+  private fetchSecondInstallmentDetails(firId: string): Observable<any> {
+    return this.ReliefService.getSecondInstallmentDetails(firId).pipe(
+      tap((response: any) => {
+        console.log('Fetched Second Installment Victim Details:', response);
+        if (response?.victims && Array.isArray(response.victims)) {
+          this.secondFormVictimInformation = response.victims; 
+          this.populateSecondInstallmentVictimFields(response.victims);
+        } else {
+          console.error('Invalid response structure:', response);
+        }
+      }),
+      catchError((err) => {
+        console.error('Error fetching second installment details:', err);
+        return of(null);
+      })
+    );
+  }
+
+  private fetchThirdInstallmentDetails(firId: string): Observable<any> {
+    return this.ReliefService.getThirdInstallmentDetails(firId).pipe(
+      tap((response: any) => {
+        console.log('Raw Third Installment Response:', response);
+        const trialReliefDetails = response?.trialReliefDetails || [];
+        console.log('Resolved trialReliefDetails:', trialReliefDetails);
+        this.trialReliefDetails = response?.trialReliefDetails || [];
+
+        if (Array.isArray(trialReliefDetails)) {
+          this.populateThirdInstallmentVictimFields(trialReliefDetails);
+        } else {
+          console.error('Invalid response structure for Third Installment:', response);
+        }
+      }),
+      catchError((err) => {
+        console.error('Error fetching third installment details:', err);
+        return of(null);
+      })
+    );
+  }
+
+  convertToNormalDate(isoDate: string): string {
+    if (!isoDate) return '';
+
+    const date = new Date(isoDate);
+    const day = date.getDate().toString().padStart(2, '0'); // Ensure two digits
+    const month = date.toLocaleString('en-US', { month: 'short' }); // Get short month (Jan, Feb, etc.)
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`; // Format as DD-MMM-YYYY
+  }
+
+
+  getFileName(): string {
+    return this.existingFilePath ? this.existingFilePath.split('/').pop() || '' : '';
+  }
+
+  viewFile(): void {
+    if (this.existingFilePath) {
+      window.open(this.file_access+this.existingFilePath, '_blank');
+    }
+  }
+
+  getFileName_2(): string {
+    return this.existingFilePath_relief_2 ? this.existingFilePath_relief_2.split('/').pop() || '' : '';
+  }
+
+  viewFile_2(): void {
+    if (this.existingFilePath_relief_2) {
+      window.open(this.file_access+this.existingFilePath_relief_2, '_blank');
+    }
+  }
+
+  getFileName_3(): string {
+    return this.existingFilePath_relief_3 ? this.existingFilePath_relief_3.split('/').pop() || '' : '';
+  }
+
+  viewFile_3(): void {
+    if (this.existingFilePath_relief_3) {
+      window.open(this.file_access+this.existingFilePath_relief_3, '_blank');
+    }
+  }
+
+
+  confirmClear(result: any) {
+    if (this.RemoveFormUpload == '1') {
+      this.clearFileRelief_1();
+    } else if (this.RemoveFormUpload == '2') {
+      this.clearFileRelief_2();
+    } else if (this.RemoveFormUpload == '3') {
+      this.clearFileRelief_3();
+    }
+    this.closeDialog();
+  }
+
+  clearFileRelief_1(): void {
+    this.existingFilePath = null;
+    this.showFileInput = true;
+    this.form.get('firstInstallmentUploadDocument')?.setValue(null);
+  }
+
+  clearFileRelief_2(): void {
+    this.existingFilePath_relief_2 = null;
+    this.showFileInput_2 = true;
+    this.form.get('secondInstallmentUploadDocument')?.setValue(null);
+  }
+
+  clearFileRelief_3(): void {
+    this.existingFilePath_relief_3 = null;
+    this.showFileInput_3 = true;
+    this.form.get('thirdInstallmentUploadDocument')?.setValue(null);
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Handle your file upload logic here
+      this.form.get('firstInstallmentUploadDocument')?.setValue(file);
+    }
+  }
+
+  openDialog(form:any): void {
+    // this.dialogMessage = 'This is a dialog message!';
+    this.RemoveFormUpload = form;
+    this.isDialogVisible = true;
+  }
+
+  closeDialog(): void {
+    this.isDialogVisible = false;
+  }
+
+  GetInstallmemtList(firid : any) {
+    const Fir_ID = {
+      firId: firid,
+    };
+    this.ReliefService.FetchAllInstallmentDetails(Fir_ID).subscribe(
+      (data: any) => {
+        console.log(data)
+        if(data && data.firstInstallment && data.firstInstallment[0]){
+          this.FirstrelifDetails(data.firstInstallment[0])
+        }
+        if(data && data.secondInstallment && data.secondInstallment[0]){
+          this.SecondrelifDetails(data.secondInstallment[0])
+        }
+        if(data && data.trialProceedings && data.trialProceedings[0]){
+          this.ThirdrelifDetails(data.trialProceedings[0])
+        }
+      },
+      (error :any) => {
+        console.error(error)
+      }
+    );
+  }
+
+
+  FirstrelifDetails(InstallementDetails : any){
+    if(InstallementDetails.proceedings_file_no){
+      this.reliefForm.get('firstInstallmentProceedingsFileNumber')?.setValue(InstallementDetails.proceedings_file_no); 
+    }
+    if(InstallementDetails.proceedings_date){
+      const formattedDate = InstallementDetails.proceedings_date.split('T')[0]; 
+      this.reliefForm.get('firstInstallmentProceedingsFileDate')?.setValue(formattedDate);
+    }
+    if(InstallementDetails.pfms_portal_uploaded){
+      this.reliefForm.get('firstInstallmentPfmsPortalUploaded')?.setValue(InstallementDetails.pfms_portal_uploaded); 
+    }
+    if(InstallementDetails.date_of_disbursement){
+      const formattedDate = InstallementDetails.date_of_disbursement.split('T')[0]; 
+      this.reliefForm.get('firstInstallmentDateOfDisbursement')?.setValue(formattedDate);
+    }
+    if(InstallementDetails.proceedings_file){
+      this.existingFilePath = InstallementDetails.proceedings_file;
+      this.showFileInput = false;
+      // this.reliefForm.get('firstInstallmentUploadDocument')?.setValue(InstallementDetails.proceedings_file);
+    }
+  }
+
+  SecondrelifDetails(InstallementDetails : any){
+    console.log('function called')
+    if(InstallementDetails.file_number){
+      this.reliefForm.get('secondInstallmentProceedingsFileNumber')?.setValue(InstallementDetails.file_number); 
+    }
+    if(InstallementDetails.file_date){
+      const formattedDate = InstallementDetails.file_date.split('T')[0]; 
+      this.reliefForm.get('secondInstallmentProceedingsFileDate')?.setValue(formattedDate);
+    }
+    if(InstallementDetails.pfms_portal_uploaded){
+      this.reliefForm.get('secondInstallmentPfmsPortalUploaded')?.setValue(InstallementDetails.pfms_portal_uploaded); 
+    }
+    if(InstallementDetails.date_of_disbursement){
+      const formattedDate = InstallementDetails.date_of_disbursement.split('T')[0]; 
+      this.reliefForm.get('secondInstallmentDateOfDisbursement')?.setValue(formattedDate);
+    }
+    if(InstallementDetails.upload_document){
+      this.existingFilePath_relief_2 = InstallementDetails.upload_document;
+      this.showFileInput_2 = false;
+      this.reliefForm.get('secondInstallmentUploadDocument')?.setValue(InstallementDetails.upload_document);
+    }
+  }
+
+  ThirdrelifDetails(InstallementDetails : any){
+    console.log('function called')
+    if(InstallementDetails.file_number){
+      this.reliefForm.get('thirdInstallmentProceedingsFileNumber')?.setValue(InstallementDetails.file_number); 
+    }
+    if(InstallementDetails.file_date){
+      const formattedDate = InstallementDetails.file_date.split('T')[0]; 
+      this.reliefForm.get('thirdInstallmentProceedingsFileDate')?.setValue(formattedDate);
+    }
+    if(InstallementDetails.pfms_portal_uploaded){
+      this.reliefForm.get('thirdInstallmentPfmsPortalUploaded')?.setValue(InstallementDetails.pfms_portal_uploaded); 
+    }
+    if(InstallementDetails.date_of_disbursement){
+      const formattedDate = InstallementDetails.date_of_disbursement.split('T')[0]; 
+      this.reliefForm.get('thirdInstallmentDateOfDisbursement')?.setValue(formattedDate);
+    }
+    if(InstallementDetails.upload_document){
+      this.existingFilePath_relief_3 = InstallementDetails.upload_document;
+      this.showFileInput_3 = false;
+      this.reliefForm.get('thirdInstallmentUploadDocument')?.setValue(InstallementDetails.upload_document);
+    }
+  }
+
+
+  uploadfirstInstallmentDocument(event: any): void {
+    const file = event.target.files[0];  // Get the first selected file
+  
+    if (file) {
+   
+      // Patch the file into the form (this assumes you have the form control set up correctly)
+      this.reliefForm.patchValue({
+        firstInstallmentUploadDocument: file,  // Storing the file in the form control
+      });
+  
+      // Optionally, display the file name
+      console.log('File selected:', file.name);
+    } else {
+      console.log('No file selected');
+    }
+  }
+
+
+  uploadSecondInstallmentDocument(event: any): void {
+    const file = event.target.files[0];  // Get the first selected file
+  
+    if (file) {
+   
+      // Patch the file into the form (this assumes you have the form control set up correctly)
+      this.reliefForm.patchValue({
+        secondInstallmentUploadDocument: file,  // Storing the file in the form control
+      });
+  
+      // Optionally, display the file name
+      console.log('File selected:', file.name);
+    } else {
+      console.log('No file selected');
+    }
+  }
+
+  uploadThirdInstallmentDocument(event: any): void {
+    const file = event.target.files[0];  // Get the first selected file
+  
+    if (file) {
+   
+      // Patch the file into the form (this assumes you have the form control set up correctly)
+      this.reliefForm.patchValue({
+        thirdInstallmentUploadDocument: file,  // Storing the file in the form control
+      });
+  
+      // Optionally, display the file name
+      console.log('File selected:', file.name);
+    } else {
+      console.log('No file selected');
+    }
+  }
+
+  async uploadMultipleFiles(files: File | File[]): Promise<string[]> {
+    // If no file is provided, return an empty array
+    if (!files) return [];
+  
+    // Ensure files is always an array
+    const fileArray = Array.isArray(files) ? files : [files];
+  
+    // Filter out any invalid file values (optional, to prevent processing invalid data)
+    const validFiles = fileArray.filter(file => file instanceof File);
+    
+    // If no valid files remain, stop execution
+    if (validFiles.length === 0) return [];
+  
+    // Upload each valid file
+    const uploadPromises = validFiles.map(file => this.uploadFile(file));
+  
+    return Promise.all(uploadPromises);
+  }
+
+  uploadFile(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        reject('No file provided');
+        return;
+      }
+
+      if (!(file instanceof File)) {
+        reject('Invalid file. Please upload a valid file.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      this.firService.uploadFile(formData).subscribe({
+        next: (response : any) => resolve(response.filePath),
+        error: (error : any) => reject(error)
+      });
+    });
+  }
+
+
+  goToFirViewForm() {
+
+    this.router.navigate(['/widgets-examples/fir-list'], {
+      queryParams: { shouldCallFunction: 'true', data: encodeURIComponent(JSON.stringify(this.firId)) }
+    }).catch(err => {
+      console.error('Navigation Error:', err);
+    });
+
+  }
 
 }

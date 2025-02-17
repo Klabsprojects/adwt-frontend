@@ -8,7 +8,7 @@ export const environment = {
   USERDATA_KEY: 'authf649fc9a5f55',
   isMockEnabled: true,
   apiUrl: 'https://adwatrocity.onlinetn.com/api/v1/',
-  // // apiUrl: 'http://localhost:3010/',
+  // apiUrl: 'http://localhost:3010/',
   // apiUrl: 'http://localhost:3010/api/v1/',
 // image_access:'http://localhost:3010/uploadedfile/',
 image_access:'https://adwatrocity.onlinetn.com/api/v1/uploadedfile/',

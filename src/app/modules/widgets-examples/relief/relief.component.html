@@ -4,41 +4,41 @@
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
       <h3>Relief Processing</h3>
-      <button class="btn btn-primary">View FIR</button>
+      <button (click)="goToFirViewForm()" class="btn btn-primary">View FIR</button>
     </div>
     <div class="card-body">
       <div class="row text-left">
         <div class="col-md-3 mb-3">
           <strong>FIR Number:</strong>
-          <p class="text-dark">{{ firDetails.fir_id || 'N/A' }}</p>
+          <p class="text-dark">{{ firDetails.data.fir_id || 'N/A' }}</p>
         </div>
         <div class="col-md-3 mb-3">
           <strong>Police Station Details:</strong>
-          <p class="text-dark">{{ firDetails.police_station || 'N/A' }}</p>
+          <p class="text-dark">{{ firDetails.data.police_station || 'N/A' }}</p>
         </div>
         <div class="col-md-3 mb-3">
           <strong>Date of Reporting:</strong>
-          <p class="text-dark">{{ firDetails.date_of_registration || 'N/A' }}</p>
+          <p class="text-dark">{{ firDetails.data.date_of_registration || 'N/A' }}</p>
         </div>
         <div class="col-md-3 mb-3">
           <strong>Date of Occurrence:</strong>
-          <p class="text-dark">{{ firDetails.date_of_occurrence || 'N/A' }}</p>
+          <p class="text-dark">{{ firDetails.data.date_of_occurrence || 'N/A' }}</p>
         </div>
         <!-- <div class="col-md-3 mb-3">
           <strong>Nature of Offence:</strong>
-          <p class="text-dark">{{ firDetails.nature_of_offence || 'N/A' }}</p>
+          <p class="text-dark">{{ firDetails.data.nature_of_offence || 'N/A' }}</p>
         </div> -->
         <div class="col-md-3 mb-3">
           <strong>Place of Occurrence:</strong>
-          <p class="text-dark">{{ firDetails.place_of_occurrence || 'N/A' }}</p>
+          <p class="text-dark">{{ firDetails.data.place_of_occurrence || 'N/A' }}</p>
         </div>
         <div class="col-md-3 mb-3">
           <strong>Number of Victims:</strong>
-          <p class="text-dark">{{ firDetails.number_of_victim || 'N/A' }}</p>
+          <p class="text-dark">{{ firDetails.data.number_of_victim || 'N/A' }}</p>
         </div>
         <div class="col-md-3 mb-3">
           <strong>Number of Accused:</strong>
-          <p class="text-dark">{{ firDetails.number_of_accused || 'N/A' }}</p>
+          <p class="text-dark">{{ firDetails.data.number_of_accused || 'N/A' }}</p>
         </div>
 
       </div>
@@ -70,7 +70,7 @@
     <div class="card-body">
       <form [formGroup]="reliefForm">
 
-        <div class="col-md-4 mb-3">
+        <!-- <div class="col-md-4 mb-3">
           <strong>Date of Receipt of Proceedings from SJ&HRs:</strong>
           <input
             type="date"
@@ -78,7 +78,7 @@
             placeholder="Select Date"
             formControlName="proceedingsReceiptDate"
           />
-        </div>
+        </div> -->
         <div *ngIf="loading">Loading...</div>
         <!-- Installment Section -->
         <div *ngIf="currentTab === 0">
@@ -220,13 +220,31 @@
                 <div class="col-md-8 mb-3">
                   <label class="form-label">Upload Proceedings Document:</label>
                 </div>
-                <div class="col-md-4 mb-3">
-                  <input
-                    type="file"
-                    class="form-control"
-                    formControlName="firstInstallmentUploadDocument"
-                  />
+                <div class="col-md-4 mb-3">                
+                 <div *ngIf="existingFilePath && !showFileInput">
+                  <div class="col-12 mb-3">
+                    <div style="padding: 7px;" class="card">
+                      <div style="padding: 7px;" class="card-body d-flex justify-content-between align-items-center">
+                        <span class="text-truncate me-2">{{ getFileName() }}</span>
+                        <div>
+                          <button type="button" class="btn btn-primary btn-sm me-2" (click)="viewFile()">
+                            View
+                          </button>
+                          <button type="button" class="btn btn-danger btn-sm" (click)="openDialog('1')">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                    <input *ngIf="showFileInput"
+                      type="file" 
+                      class="form-control" 
+                      formControlName="firstInstallmentUploadDocument"
+                      (change)="uploadfirstInstallmentDocument($event)" 
+                    />
+                </div> 
 
                 <!-- PFMS Portal -->
                 <div class="col-md-8 mb-3">
@@ -368,7 +386,7 @@
                   </div>
 
                   <!-- Upload Proceedings Document -->
-                  <div class="col-md-8 mb-3">
+                  <!-- <div class="col-md-8 mb-3">
                     <label class="form-label">Upload Proceedings Document:</label>
                   </div>
                   <div class="col-md-4 mb-3">
@@ -377,7 +395,36 @@
                       class="form-control"
                       formControlName="secondInstallmentUploadDocument"
                     />
+                  </div> -->
+
+                  <div class="col-md-8 mb-3">
+                    <label class="form-label">Upload Proceedings Document:</label>
                   </div>
+                  <div class="col-md-4 mb-3">                
+                   <div *ngIf="existingFilePath_relief_2 && !showFileInput_2">
+                    <div class="col-12 mb-3">
+                      <div style="padding: 7px;" class="card">
+                        <div style="padding: 7px;" class="card-body d-flex justify-content-between align-items-center">
+                          <span class="text-truncate me-2">{{ getFileName_2() }}</span>
+                          <div>
+                            <button type="button" class="btn btn-primary btn-sm me-2" (click)="viewFile_2()">
+                              View
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" (click)="openDialog('2')">
+                              <i class="fas fa-times"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                      <input *ngIf="showFileInput_2"
+                        type="file" 
+                        class="form-control" 
+                        formControlName="secondInstallmentUploadDocument"
+                        (change)="uploadSecondInstallmentDocument($event)" 
+                      />
+                  </div> 
 
                   <!-- PFMS Portal -->
                   <div class="col-md-8 mb-3">
@@ -519,7 +566,7 @@
                 </div>
 
                 <!-- Upload Proceedings Document -->
-                <div class="col-md-8 mb-3">
+                <!-- <div class="col-md-8 mb-3">
                   <label class="form-label">Upload Proceedings Document:</label>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -528,7 +575,36 @@
                     class="form-control"
                     formControlName="thirdInstallmentUploadDocument"
                   />
+                </div> -->
+
+                <div class="col-md-8 mb-3">
+                  <label class="form-label">Upload Proceedings Document:</label>
                 </div>
+                <div class="col-md-4 mb-3">                
+                 <div *ngIf="existingFilePath_relief_3 && !showFileInput_3">
+                  <div class="col-12 mb-3">
+                    <div style="padding: 7px;" class="card">
+                      <div style="padding: 7px;" class="card-body d-flex justify-content-between align-items-center">
+                        <span class="text-truncate me-2">{{ getFileName_3() }}</span>
+                        <div>
+                          <button type="button" class="btn btn-primary btn-sm me-2" (click)="viewFile_3()">
+                            View
+                          </button>
+                          <button type="button" class="btn btn-danger btn-sm" (click)="openDialog('3')">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                    <input *ngIf="showFileInput_3"
+                      type="file" 
+                      class="form-control" 
+                      formControlName="thirdInstallmentUploadDocument"
+                      (change)="uploadThirdInstallmentDocument($event)" 
+                    />
+                </div> 
 
                 <!-- PFMS Portal -->
                 <div class="col-md-8 mb-3">
@@ -564,9 +640,21 @@
         </div>
 
       </form>
-
-
-
     </div>
   </div>
 
+  <div class="dialog-overlay" *ngIf="isDialogVisible">
+    <div class="dialog-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Confirm Clear</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeDialog()"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to remove this file?</p>
+      </div>
+      <div style="justify-content: space-between;" class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDialog()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="confirmClear('confirm')">Remove</button>
+      </div>
+    </div>
+  </div>

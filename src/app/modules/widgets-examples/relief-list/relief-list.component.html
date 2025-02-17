@@ -52,7 +52,7 @@
 
       <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
         <option value="" selected disabled>Select One</option>
-        <option *ngFor="let nature of naturesOfOffence" [value]="nature">{{ nature }}</option>
+        <option *ngFor="let nature of firList" [value]="nature.police_station">{{ nature.police_station }}</option>
       </select>
 
       <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
@@ -66,16 +66,18 @@
           {{ reliefStatus }}
         </option>
       </select>
+
+      <button style="width: 40% !important;" (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
     </div>
     <!-- Show message if FIR list is empty -->
-    <div *ngIf="displayedFirList.length === 0" class="alert alert-warning">
-      No FIR data available.
+    <div *ngIf="filteredFirList().length === 0" class="alert alert-warning">
+      No Relif data available.
     </div>
 
     <!-- Table displaying FIRs -->
-    <table *ngIf="displayedFirList.length > 0" class="table table-striped table-bordered table-hover">
+    <table *ngIf="filteredFirList().length > 0" class="table table-striped table-bordered table-hover">
       <thead>
-        <tr>
+        <!-- <tr>
           <th>Sl.No</th>
           <th>FIR No.</th>
           <th>Police City</th>
@@ -84,11 +86,22 @@
           <th>Created At</th>
           <th>Status</th>
           <th>Action</th>
+        </tr> -->
+        <tr>
+          <th *ngFor="let column of displayedColumns" [hidden]="!column.visible">
+            {{ column.label }}
+            <i
+              *ngIf="column.sortable"
+              class="fas"
+              [ngClass]="getSortIcon(column.field)"
+              (click)="sortTable(column.field)"
+            ></i>
+          </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let fir of displayedFirList; let i = index">
-          <td>{{ (page - 1) * itemsPerPage + i + 1 }}</td>
+        <tr *ngFor="let fir of paginatedFirList(); let i = index">
+          <!-- <td>{{ (page - 1) * itemsPerPage + i + 1 }}</td>
           <td>{{ fir.fir_id }}</td>
           <td>{{ fir.police_city }}</td>
           <td>{{ fir.police_station }}</td>
@@ -106,6 +119,32 @@
           >
             Relief Process
           </button>
+          </td> -->
+
+          <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
+            <ng-container [ngSwitch]="column.field">
+              <span *ngSwitchCase="'sl_no'">{{ (page - 1) * itemsPerPage + i + 1 }}</span>
+              <span *ngSwitchCase="'fir_id'">{{ fir.fir_id }}</span>
+              <span *ngSwitchCase="'police_city'">{{ fir.police_city }}</span>
+              <span *ngSwitchCase="'police_station'">{{ fir.police_station }}</span>
+              <span *ngSwitchCase="'created_by'">{{ fir.created_by || 'Super User' }}</span>
+              <span *ngSwitchCase="'created_at'">{{ fir.created_at | date: 'dd-MM-yyyy' }}</span>
+              <span *ngSwitchCase="'status'">
+                <span class="badge" [ngClass]="getStatusBadgeClass(fir.status)">
+                  {{ getStatusText(fir.status, fir.relief_status, fir.nature_of_judgement) }}
+                </span>
+              </span>
+              <span *ngSwitchCase="'actions'">
+                  <button
+                  class="btn btn-primary btn-sm"
+                  (click)="navigateToRelief(fir.fir_id)"
+                >
+                  Relief Process
+                </button>
+              </span>
+
+
+            </ng-container>
           </td>
         </tr>
       </tbody>
