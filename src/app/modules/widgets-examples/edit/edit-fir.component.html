@@ -441,7 +441,7 @@
                   <label class="form-label">30. Nature of offence committed against the victim *</label>
                   <mat-form-field appearance="outline" class="w-100">
                     <mat-label>Select options</mat-label>
-                    <mat-select formControlName="offenceCommitted" multiple>
+                    <mat-select formControlName="offenceCommitted" multiple (selectionChange)="onOffenceCommittedChange($event, i)">
                       <mat-option *ngFor="let option of offenceOptions" [value]="option">{{ option }}</mat-option>
                     </mat-select>
                   </mat-form-field>
@@ -451,7 +451,7 @@
                   <mat-form-field appearance="outline" class="w-100">
                     <mat-label>Offence Acts</mat-label>
                     <mat-select formControlName="scstSections" multiple>
-                      <mat-option *ngFor="let act of offenceActsOptions" [value]="act">{{ act }}</mat-option>
+                      <mat-option *ngFor="let act of offenceActsOptions" [value]="act" [disabled]="true">{{ act }}</mat-option>
                     </mat-select>
                   </mat-form-field>
                 </div>
@@ -835,7 +835,7 @@
         <div class="mt-4">
           <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-          <button *ngIf="step === 5" type="submit" class="btn btn-primary" (click)="submitStepFive()">Submit</button>
+          <button *ngIf="step === 5" type="submit" class="btn btn-primary" [disabled]="!isStep5Valid()" (click)="submitStepFive()">Submit</button>
         </div>
       </div>
       <div *ngIf="mainStep === 2 && step === 1" class="form-step">
@@ -1029,7 +1029,7 @@
         </div>
         <div class="mt-4">
           <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft_6()">Save as Draft</button>
-          <!-- <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button> -->
+          <button type="button" class="btn btn-secondary me-2" (click)="previousMainStep()">Previous</button>
           <button type="button" class="btn btn-primary" (click)="submitStepSix();saveAsDraft_6()" [disabled]="!isStep6Valid()">Submit</button>
         </div>
       </div>

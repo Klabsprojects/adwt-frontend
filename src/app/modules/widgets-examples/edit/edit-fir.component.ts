@@ -169,7 +169,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   policeRanges: string[] = [];
   revenueDistricts: string[] = [];
 
-
+  offenceReliefDetails: any[] = []; 
   offenceOptions: string[] = [];
   offenceActsOptions: string[] = [];
   scstSectionsOptions: any;
@@ -646,6 +646,7 @@ onAccusedCommunityChange(selectedCommunity: string, index: number): void {
 
     this.loadDistricts();
     this.updateValidationForCaseType(); 
+    this.loadAllOffenceReliefDetails();
     if (this.firId) {
       console.log("aaaaaaaaaaaaaaaaaaaaaaa",this.firId)
       this.loadFirDetails(this.firId);
@@ -876,6 +877,30 @@ onAccusedCommunityChange(selectedCommunity: string, index: number): void {
     }
   }
 
+loadAllOffenceReliefDetails(): void {
+  this.firService.getOffenceReliefDetails().subscribe(
+    (offence_relief: any[]) => {
+      this.offenceReliefDetails = offence_relief; // Store data
+      console.log('Offence Relief Details:', this.offenceReliefDetails);
+    },
+    (error) => {
+      console.error('Error loading districts:', error);
+      Swal.fire('Error', 'Failed to load offence relief details.', 'error');
+    }
+  );
+}
+
+// Calls firService to update victim details based on selected offences
+onOffenceCommittedChange(event: any, index: number): void {
+  const selectedOffences = event.value; // Get selected values from the 30th field
+  this.firService.onOffenceCommittedChange(
+    selectedOffences,
+    index,
+    this.offenceReliefDetails,
+    this.victims
+  );
+  this.cdr.detectChanges();
+}
 
   // onCourtDivisionChange1(value: any): void {
   //   if (value) {
@@ -3890,6 +3915,12 @@ apiurl = 'http://localhost:3010/'
     }
   }
 
+  previousMainStep() {
+    if (this.mainStep > 1) {
+      this.mainStep -= 1;
+    }
+  }
+  
   setStep(stepNumber: number) {
     this.step = stepNumber;
   }

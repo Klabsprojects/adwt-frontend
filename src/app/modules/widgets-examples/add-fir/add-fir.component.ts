@@ -442,18 +442,17 @@ loadAllOffenceReliefDetails(): void {
   );
 }
 
-onOffenceCommittedChange(event: any): void {
-  const selectedOffences = event.value; // Get selected values in 30th field
-console.log('selectedOffences ',selectedOffences);
-  // Filter to find matching poa_act_section values
-  const matchingSections = this.offenceReliefDetails
-    .filter(offence => selectedOffences.includes(offence.name_of_offence))
-    .map(offence => offence.poa_act_section);
-    console.log('matchingSections ',matchingSections);
-  // Set the 31st field with matching sections
-  this.firForm.patchValue({ scstSections: matchingSections });
+// Calls firService to update victim details based on selected offences
+onOffenceCommittedChange(event: any, index: number): void {
+  const selectedOffences = event.value; // Get selected values from the 30th field
+  this.firService.onOffenceCommittedChange(
+    selectedOffences,
+    index,
+    this.offenceReliefDetails,
+    this.victims
+  );
+  this.cdr.detectChanges();
 }
-
 
 onCaseTypeChange() {
   this.updateValidationForCaseType(); // Update validations whenever caseType is changed
@@ -1389,7 +1388,7 @@ onAdditionalReliefChange(event: Event, value: string): void {
 
 
 
-  handleSCSTSectionChange(event: any, index: number): void {
+  /* handleSCSTSectionChange(event: any, index: number): void {
     const selectedValues = event.value; // Selected SC/ST sections
     const victimGroup = this.victims.at(index) as FormGroup; // Access the victim's FormGroup
     console.log("SELECTED : ", selectedValues);
@@ -1449,7 +1448,7 @@ onAdditionalReliefChange(event: Event, value: string): void {
         reliefAmountFirstStage: '', // Reset the 1st stage relief amount
       });
     }
-  }
+  } */
 
 
 

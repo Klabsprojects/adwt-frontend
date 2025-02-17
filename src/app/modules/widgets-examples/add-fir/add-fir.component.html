@@ -627,7 +627,7 @@
                                     <label class="form-label">30. Nature of offence committed against the victim *</label>
                                     <mat-form-field appearance="outline" class="w-100">
                                         <mat-label>Select options</mat-label>
-                                        <mat-select formControlName="offenceCommitted" multiple (selectionChange)="onOffenceCommittedChange($event)">
+                                        <mat-select formControlName="offenceCommitted" multiple (selectionChange)="onOffenceCommittedChange($event, i)">
                                             <mat-option *ngFor="let option of offenceOptions" [value]="option">
                                                 {{ option }}
                                             </mat-option>
@@ -642,16 +642,13 @@
     <mat-select
     formControlName="scstSections"
     multiple
-    (selectionChange)="handleSCSTSectionChange($event, i)"
   >
-    <mat-option *ngFor="let act of offenceActsOptions" [value]="act.offence_act_name">
+    <mat-option *ngFor="let act of offenceActsOptions" [value]="act.offence_act_name" [disabled]="true">
       {{ act.offence_act_name }}
     </mat-option>
   </mat-select>
   </mat-form-field>
-
 </div>
-
 
 <div class="col-md-12 mb-3">
   <label for="sectionsIPC" class="form-label">32. Section Invoked Under IPC/POCSO/etc. *</label>

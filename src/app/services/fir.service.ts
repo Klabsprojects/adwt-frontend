@@ -361,4 +361,77 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     return !!inputValue && inputValue.trim() !== ''; // Returns true if input is filled
   }
 
+ /**
+ * Handles offence selection changes by updating victim details with relevant SC/ST sections, 
+ * FIR stages, and relief amounts based on selected offences.
+ */
+  onOffenceCommittedChange(
+    selectedOffences: any[],
+    index: number,
+    offenceReliefDetails: any[],
+    victims: FormArray
+  ): void {
+    const victimGroup = victims.at(index) as FormGroup; // Access the victim's FormGroup
+    // Filter to find matching poa_act_section values
+    const matchingSections = offenceReliefDetails
+      .filter(offence => selectedOffences.includes(offence.name_of_offence))
+      .map(offence => offence.poa_act_section);
+    // Set the 31st field with matching sections
+    if (matchingSections.length > 0) {
+      this.getOffenceActs().subscribe(
+        (response: any[]) => {
+          // Filter the offence acts based on selected values
+          const matchedActs = response.filter((act) =>
+            matchingSections.includes(act.offence_act_name)
+          );
+          if (matchedActs.length > 0) {
+            // Update the victim's FormGroup with the fetched values
+            victimGroup.patchValue({
+              scstSections: matchedActs.map(act => act.offence_act_name), // Auto-select field 31
+              fir_stage_as_per_act: matchedActs[0].fir_stage_as_per_act || '',
+              fir_stage_ex_gratia: matchedActs[0].fir_stage_ex_gratia || '',
+              chargesheet_stage_as_per_act: matchedActs[0].chargesheet_stage_as_per_act || '',
+              chargesheet_stage_ex_gratia: matchedActs[0].chargesheet_stage_ex_gratia || '',
+              final_stage_as_per_act: matchedActs[0].final_stage_as_per_act || '',
+              final_stage_ex_gratia: matchedActs[0].final_stage_ex_gratia || '',
+            });
+            // Calculate and update the 1st stage relief amount
+            const reliefAmountFirstStage =
+              parseFloat(matchedActs[0].fir_stage_as_per_act || '0') +
+              parseFloat(matchedActs[0].fir_stage_ex_gratia || '0');
+            victimGroup.patchValue({
+              reliefAmountFirstStage: reliefAmountFirstStage.toFixed(2),
+            });
+          } else {
+            // Reset the fields if no matched acts are found
+            victimGroup.patchValue({
+              scstSections: [],
+              fir_stage_as_per_act: '',
+              fir_stage_ex_gratia: '',
+              chargesheet_stage_as_per_act: '',
+              chargesheet_stage_ex_gratia: '',
+              final_stage_as_per_act: '',
+              final_stage_ex_gratia: '',
+              reliefAmountFirstStage: '', // Reset the 1st stage relief amount
+            });
+          }
+        },
+        (error) => {
+          console.error('Error fetching offence acts:', error);
+        }
+      );
+    } else {
+      // Reset the fields if no sections are selected
+      victimGroup.patchValue({
+        scstSections: [],
+        fir_stage_as_per_act: '',
+        fir_stage_ex_gratia: '',
+        chargesheet_stage_as_per_act: '',
+        chargesheet_stage_ex_gratia: '',
+        final_stage_as_per_act: '',
+        final_stage_ex_gratia: '',
+        reliefAmountFirstStage: '', // Reset the 1st stage relief amount
+      });
+    }
+  }  
 }
