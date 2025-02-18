@@ -1,0 +1,193 @@
+import { Injectable } from '@angular/core';
+import { DistrictService } from './district.service';
+import { OffenceService } from './offence.service';
+import { Observable, forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
+import * as FileSaver from 'file-saver';
+import * as moment from 'moment';
+import * as xlsx from 'xlsx';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ReportsCommonService {
+  constructor(
+    private districtService: DistrictService,
+    private offenceService: OffenceService
+  ) {}
+
+  // Fetches all district names from the district service and maps them to a string array.
+  getAllDistricts(): Observable<string[]> {
+    return this.districtService
+      .getAllDistricts()
+      .pipe(
+        map((districts: { district_name: string }[]) =>
+          districts.map((district) => district.district_name)
+        )
+      );
+  }
+
+  // Fetches all offence names from the offence service and maps them to a string array.
+  getAllOffences(): Observable<string[]> {
+    return this.offenceService
+      .getAllOffences()
+      .pipe(
+        map((offences: { offence_name: string }[]) =>
+          offences.map((offence) => offence.offence_name)
+        )
+      );
+  }
+
+  // Fetches both districts and offences simultaneously using forkJoin.
+  getAllData(): Observable<{ districts: string[]; offences: string[] }> {
+    return forkJoin({
+      districts: this.getAllDistricts(),
+      offences: this.getAllOffences(),
+    });
+  }
+
+  // Converts pending days into a readable format (days, months, or years).
+  formatPendingDays(days: number): string {
+    if (!days || days < 0) return 'NA';
+    if (days <= 90) return `${days} days`;
+    if (days <= 365) return `${Math.floor(days / 30)} months`;
+    return `${Math.floor(days / 365)} years`;
+  }
+
+  // Sorts a given dataset based on a specific field and maintains sorting order.
+  sortTable(data: any[], field: string, currentSortField: string, isAscending: boolean): { sortedData: any[], newSortField: string, newIsAscending: boolean } {
+    let newIsAscending = isAscending;
+    if (currentSortField === field) {
+      newIsAscending = !isAscending;
+    } else {
+      currentSortField = field;
+      newIsAscending = true;
+    }
+    const sortedData = [...data].sort((a, b) => {
+      const valA = a[field]?.toString().toLowerCase() || '';
+      const valB = b[field]?.toString().toLowerCase() || '';
+      return newIsAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
+    });
+    // Reassign sl_no after sorting
+    sortedData.forEach((item, index) => {
+        item.sl_no = index + 1;
+    });
+    return { sortedData, newSortField: field, newIsAscending };
+  }
+
+  // Returns the appropriate sort icon class based on sorting state.
+  getSortIcon(field: string, currentSortField: string, isAscending: boolean): string {
+    return currentSortField === field
+      ? isAscending
+        ? 'fa-sort-up'
+        : 'fa-sort-down'
+      : 'fa-sort';
+  }
+
+  // Exports filtered table data to an Excel file, considering only visible columns.
+  async exportToExcel(
+    filteredData: any[],
+    displayedColumns: any[]
+  ): Promise<void> {
+    try {
+      if (filteredData.length === 0) {
+        alert('No Data Found');
+        return;
+      }
+      // Filter visible columns
+      const visibleColumns = displayedColumns.filter(
+        (column) => column.visible
+      );
+      // Prepare data for export
+      const exportData = filteredData.map((item, index) => {
+        const exportedItem: any = { 'S.No': index + 1 };
+        visibleColumns.forEach((column) => {
+          const key = column.field; // Field name in data
+          const label = column.label; // Label in Excel file
+          if (key === 'sl_no') return; // Skip "Sl. No."
+          if (key in item) {
+            // Format specific fields if necessary
+            if (key === 'uiPendingDays' || key === 'ptPendingDays') {
+              exportedItem[label] = this.formatPendingDays(item[key]); // Corrected method name
+            } else {
+              exportedItem[label] = item[key];
+            }
+          }
+        });
+        return exportedItem;
+      });
+      // Export data to Excel
+      await this.exportExcel(exportData);
+    } catch (error) {
+      console.error('Export failed:', error);
+    }
+  }
+
+  // Converts JSON data into an Excel worksheet and triggers the download.
+  private async exportExcel(list: any[]): Promise<void> {
+    const xlsx = await import('xlsx');
+    const worksheet = xlsx.utils.json_to_sheet(list);
+    const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+    const excelBuffer: any = xlsx.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array',
+    });
+    this.saveAsExcelFile(excelBuffer, 'All-Forms');
+  }
+
+  // Saves the provided Excel buffer as a downloadable file with the appropriate format.
+  private saveAsExcelFile(buffer: any, fileName: string): void {
+    const EXCEL_TYPE =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const EXCEL_EXTENSION = '.xlsx';
+    const data: Blob = new Blob([buffer], { type: EXCEL_TYPE });
+    FileSaver.saveAs(data, fileName + '_' + EXCEL_EXTENSION);
+  }
+
+  // Returns the corresponding case status label based on the provided index.
+  getCaseStatus(caseStatusIndex: number): string {
+    return caseStatusIndex === 0 ? 'FIR Draft' 
+      : caseStatusIndex <= 4 ? 'Pending FIR Stage' 
+      : caseStatusIndex === 5 ? 'Completed FIR Stage' 
+      : caseStatusIndex === 6 ? 'Charge Sheet Completed'
+      : caseStatusIndex === 7 ? 'Trial Stage Completed' 
+      : '';
+  }
+
+  // Filters report data based on search text, district, nature of offense, case status, and relief status
+  applyFilters(
+    reportData: any[],
+    searchText: string,
+    selectedDistrict: string,
+    selectedNatureOfOffence: string,
+    selectedStatusOfCase: string,
+    selectedStatusOfRelief: string,
+    districtKey: string,
+    offenceKey: string,
+    caseStatusKey: string
+  ): any[] {
+    return reportData.filter((report) => {
+      const matchesSearchText = Object.values(report).some((value) =>
+        value?.toString().toLowerCase().includes(searchText.toLowerCase())
+      );
+      const district = report[districtKey];
+      const offence = report[offenceKey];
+      const caseStatus = report[caseStatusKey];
+      const matchesDistrict = selectedDistrict ? district === selectedDistrict : true;
+      const matchesNature = selectedNatureOfOffence ? offence === selectedNatureOfOffence : true;
+      const matchesStatus = selectedStatusOfCase
+        ? (selectedStatusOfCase === 'Just Starting' && caseStatus === 'FIR Draft') ||
+          (selectedStatusOfCase === 'Pending' && caseStatus.includes('Pending')) ||
+          (selectedStatusOfCase === 'Completed' && 
+            (caseStatus === 'FIR Draft' || caseStatus.includes('Completed')))
+        : true;
+      const matchesReliefStatus = selectedStatusOfRelief
+        ? (selectedStatusOfRelief === 'FIR Stage' && caseStatus.includes('FIR Stage')) ||
+          (selectedStatusOfRelief === 'ChargeSheet Stage' && caseStatus.includes('Charge Sheet')) ||
+          (selectedStatusOfRelief === 'Trial Stage' && caseStatus.includes('Trial'))
+        : true;
+
+      return matchesSearchText && matchesDistrict && matchesNature && matchesStatus && matchesReliefStatus;
+    });
+  }
+}

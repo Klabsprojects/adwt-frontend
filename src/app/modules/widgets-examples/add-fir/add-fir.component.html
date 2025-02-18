@@ -56,40 +56,89 @@
                     <div class="row">
                         <div class="col-md-6 col-lg-3 mb-3">
                             <label for="policeCity" class="form-label">1. Police City / District *</label>
-                            <select id="policeCity" class="form-select" formControlName="policeCity" (change)="onCityChange($event)" required>
+                            <!-- <select id="policeCity" class="form-select" formControlName="policeCity" (change)="onCityChange($event)" required>
                                 <option value="" disabled>Select one</option>
                                 <option *ngFor="let city of police_Cities_data" [value]="city">{{ city }}</option>
-                            </select>
+                            </select> -->
+                            <ng-select 
+                            id="policeCity" 
+                            class="form-select" 
+                            [items]="policeCities" 
+                            bindLabel="city" 
+                            bindValue="city"
+                            formControlName="policeCity" 
+                            [searchable]="true"
+                            [clearable]="false"
+                            [placeholder]="firForm.get('policeCity')?.value ? '' : 'Select one'"
+                            (change)="onCityChange($event)"
+                            required>
+                          </ng-select>
                         </div>
 
                         <div class="col-md-6 col-lg-3 mb-3">
                             <label for="policeZone" class="form-label">2. Police Zone *</label>
-                            <select id="policeZone" class="form-select" formControlName="policeZone" required>
+                            <!-- <select id="policeZone" class="form-select" formControlName="policeZone" required>
                                 <option value="" disabled>Select one</option>
                                 <option *ngFor="let zone of policeZones" [value]="zone">{{ zone }}</option>
-                            </select>
+                            </select> -->
+                            <ng-select 
+                            id="policeZone" 
+                            class="form-select" 
+                            [items]="policeZones" 
+                            bindLabel="zone" 
+                            bindValue="zone"
+                            formControlName="policeZone" 
+                            [searchable]="true"
+                            [clearable]="false"
+                            [placeholder]="firForm.get('policeZone')?.value ? '' : 'Select one'"
+                            required>
+                          </ng-select>
                         </div>
 
                         <div class="col-md-6 col-lg-3 mb-3">
                             <label for="policeRange" class="form-label">3. Police Range *</label>
-                            <select id="policeRange" class="form-select" formControlName="policeRange" required>
+                            <!-- <select id="policeRange" class="form-select" formControlName="policeRange" required>
                                 <option value="" disabled>Select one</option>
                                 <option *ngFor="let range of policeRanges" [value]="range">{{ range }}</option>
-                            </select>
+                            </select> -->
+                            <ng-select 
+                            id="policeRange" 
+                            class="form-select" 
+                            [items]="policeRanges" 
+                            bindLabel="range" 
+                            bindValue="range"
+                            formControlName="policeRange" 
+                            [searchable]="true"
+                            [clearable]="false"
+                            [placeholder]="firForm.get('policeRange')?.value ? '' : 'Select one'"
+                            required>
+                          </ng-select>
                         </div>
 
                         <div class="col-md-6 col-lg-3 mb-3">
                             <label for="revenueDistrict" class="form-label">4. Revenue District *</label>
-                            <select id="revenueDistrict" class="form-select" formControlName="revenueDistrict" required>
+                            <!-- <select id="revenueDistrict" class="form-select" formControlName="revenueDistrict" required>
                                 <option value="" disabled>Select one</option>
                                 <option *ngFor="let district of revenueDistricts" [value]="district">{{ district }}</option>
-                            </select>
+                            </select> -->
+                            <ng-select 
+                            id="revenueDistrict" 
+                            class="form-select" 
+                            [items]="revenueDistricts" 
+                            bindLabel="district" 
+                            bindValue="district"
+                            formControlName="revenueDistrict" 
+                            [searchable]="true"
+                            [clearable]="false"
+                            [placeholder]="firForm.get('revenueDistrict')?.value ? '' : 'Select one'"
+                            required>
+                          </ng-select>
                         </div>
 
                         <div class="col-md-6 mb-3">
 
                               <label for="stationName" class="form-label">5. Police Station Name *</label>
-                              <select
+                              <!-- <select
                                 id="stationName"
                                 class="form-select"
                                 formControlName="stationName"
@@ -97,11 +146,19 @@
                               >
                                 <option value="" disabled>Select Police Station</option>
                                 <option *ngFor="let station of policeStations" [value]="station">{{ station }}</option>
-                              </select>
-
-
-
-
+                              </select> -->
+                              <ng-select 
+                              id="stationName" 
+                              class="form-select" 
+                              [items]="policeStations" 
+                              bindLabel="station" 
+                              bindValue="station"
+                              formControlName="stationName" 
+                              [searchable]="true"
+                              [clearable]="false"
+                              [placeholder]="firForm.get('stationName')?.value ? '' : 'Select Police Station'"
+                              required>
+                            </ng-select>
                         </div>
                     </div>
 
@@ -127,13 +184,23 @@
                       <!-- Designation of the Investigating Officer -->
                       <div class="col-md-6 col-lg-4 mb-3">
                         <label for="officerDesignation" class="form-label">7. Designation of the Investigating Officer *</label>
-                        <select id="officerDesignation" class="form-select" formControlName="officerDesignation" required>
-                          <option value="" disabled>Select Designation</option>
+                        <select id="officerDesignation" class="form-select" formControlName="officerDesignation" placeholder="Enter Designation" (change)="onDesignationChange($event)"  required>
+                          <option value="" disabled>Choose Designation</option>
                           <option value="DSP">DSP</option>
                           <option value="ACP">ACP</option>
                           <option value="ASP">ASP</option>
                           <option value="ADSP">ADSP</option>
+                          <option value="Others">Others</option>
                         </select>
+
+                        <!-- Input field for "Others" option -->
+                          <input
+                          *ngIf="showOtherDesignation"
+                          type="text"
+                          class="form-control mt-2"
+                          placeholder="Enter the Other Designation"
+                          formControlName="officerDesignation"
+                        />
                         <small class="text-danger" *ngIf="firForm.get('officerDesignation')?.invalid && firForm.get('officerDesignation')?.touched">
                           Please select a designation.
                         </small>
@@ -186,26 +253,48 @@
                             <label for="firNumber" class="form-label">9. FIR Number *</label>
                             <div class="input-group">
                                 <!-- FIR Number (Select dropdown from 1 to 99) -->
-                                <select id="firNumber" class="form-select" formControlName="firNumber" required>
+                                <!-- <select id="firNumber" class="form-select" formControlName="firNumber" required>
                                     <option value="" disabled selected>Select FIR Number</option>
                                     <option *ngFor="let num of firNumberOptions" [value]="num">{{ num }}</option>
-                                </select>
+                                </select> -->
+                                <ng-select 
+                                  id="firNumber" 
+                                  class="form-select" 
+                                  [items]="firNumberOptions" 
+                                  bindLabel="num" 
+                                  bindValue="num"
+                                  formControlName="firNumber" 
+                                  [searchable]="true"
+                                  [clearable]="false"
+                                  [placeholder]="firForm.get('firNumber')?.value ? '' : 'Select FIR Number'"
+                                  required>
+                              </ng-select>
 
                                 <!-- Separator -->
                                 <span class="input-group-text">/</span>
 
 
-                                <select id="firNumberSuffix" class="form-select" formControlName="firNumberSuffix" required>
+                                <!-- <select id="firNumberSuffix" class="form-select" formControlName="firNumberSuffix" required>
                                     <option value="" disabled selected>Select Year</option>
                                     <option *ngFor="let year of yearOptions" [value]="year">{{ year }}</option>
-                                </select>
-
-
-
+                                </select> -->
+                                <!-- FIR Number Suffix (ng-select for year selection) -->
+                                <ng-select 
+                                id="firNumberSuffix" 
+                                class="form-select" 
+                                [items]="yearOptions" 
+                                bindLabel="year" 
+                                bindValue="year"
+                                formControlName="firNumberSuffix" 
+                                [searchable]="true"
+                                [clearable]="false"
+                                [placeholder]="firForm.get('firNumberSuffix')?.value ? '' : 'Select Year'"
+                                required>
+                            </ng-select>
                             </div>
-                            <!-- <small class="text-danger d-block mt-1">
-                Please Follow the format "12-2024".
-              </small> -->
+                            <small *ngIf="!isFirValid('firNumber', 'firNumberSuffix')"  class="text-danger d-block mt-1">
+                              Please Follow the format "12/2024".
+                            </small>
                         </div>
 
 
@@ -367,12 +456,12 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <!-- <div class="col-md-4 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label for="victimAge-{{i}}" class="form-label">19. Age of the Victim *</label>
                                     <input type="number" id="victimAge-{{i}}" class="form-control" formControlName="age" placeholder="Enter victim's age" (input)="onVictimAgeChange(i)" required />
-                                </div> -->
+                                </div>
 
-                                <div class="col-md-4 mb-3">
+                                <!-- <div class="col-md-4 mb-3">
                                   <label for="victimAge-{{i}}" class="form-label">19. Age of the Victim *</label>
                                   <input 
                                     type="number"
@@ -390,7 +479,7 @@
                                     *ngIf="victims.at(i).get('age')?.invalid && victims.at(i).get('age')?.touched">
                                       {{ getAgeErrorMessage(i) }}
                                   </small>
-                                </div>
+                                </div> -->
                                 
                               
 
@@ -456,7 +545,7 @@
 
                                 <div class="col-md-3 mb-3">
                                   <label for="victimCommunity{{ i }}" class="form-label">25. Community of the Victim *</label>
-                                  <select
+                                  <!-- <select
                                     [id]="'victimCommunity' + i"
                                     class="form-select"
                                     formControlName="community"
@@ -467,12 +556,25 @@
                                     <option *ngFor="let community of communitiesOptions" [value]="community">
                                       {{ community }}
                                     </option>
-                                  </select>
+                                  </select> -->
+                                  <ng-select 
+                                      [id]="'victimCommunity' + i"
+                                      class="form-select"
+                                      [items]="communitiesOptions"
+                                      bindLabel="label"
+                                      bindValue="value"
+                                      formControlName="community"
+                                      [searchable]="true"
+                                      [clearable]="false"
+                                      [placeholder]="victim.get('community')?.value ? '' : 'Select Community'"
+                                      (change)="onCommunityChange($event, i)"  
+                                      required>
+                                  </ng-select>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
                                   <label for="victimCaste{{ i }}" class="form-label">26. Caste of the Victim *</label>
-                                  <select
+                                  <!-- <select
                                     [id]="'victimCaste' + i"
                                     class="form-select"
                                     formControlName="caste"
@@ -482,7 +584,19 @@
                                     <option *ngFor="let caste of victims.at(i).get('availableCastes')?.value" [value]="caste">
                                       {{ caste }}
                                     </option>
-                                  </select>
+                                  </select> -->
+                                  <ng-select  
+                                    [id]="'victimCaste' + i"
+                                    class="form-select"
+                                    [items]="victims.at(i).get('availableCastes')?.value"
+                                    bindLabel="caste"
+                                    bindValue="caste"
+                                    formControlName="caste"
+                                    [searchable]="true"
+                                    [clearable]="false"
+                                    [placeholder]="victims.at(i).get('caste')?.value ? '' : 'Select Caste'"
+                                    required>
+                                    </ng-select>
                                 </div>
 
                                 <div class="col-md-5 mb-3">
@@ -508,7 +622,8 @@
                                     <label for="victimNativeDistrict{{ i }}" class="form-label">29. Victim's Native District *</label>
                                     <select [id]="'victimNativeDistrict' + i" class="form-select" formControlName="nativeDistrict" required>
                                         <option value="" selected disabled>Select District</option>
-                                        <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
+                                        <!-- <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option> -->
+                                        <option *ngFor="let district of policeStations" [value]="district">{{ district }}</option>
                                     </select>
                                 </div>
 
@@ -516,7 +631,7 @@
                                     <label class="form-label">30. Nature of offence committed against the victim *</label>
                                     <mat-form-field appearance="outline" class="w-100">
                                         <mat-label>Select options</mat-label>
-                                        <mat-select formControlName="offenceCommitted" multiple>
+                                        <mat-select formControlName="offenceCommitted" multiple (selectionChange)="onOffenceCommittedChange($event, i)">
                                             <mat-option *ngFor="let option of offenceOptions" [value]="option">
                                                 {{ option }}
                                             </mat-option>
@@ -531,9 +646,8 @@
     <mat-select
     formControlName="scstSections"
     multiple
-    (selectionChange)="handleSCSTSectionChange($event, i)"
   >
-    <mat-option *ngFor="let act of offenceActsOptions" [value]="act.offence_act_name">
+    <mat-option *ngFor="let act of offenceActsOptions" [value]="act.offence_act_name" [disabled]="true">
       {{ act.offence_act_name }}
     </mat-option>
   </mat-select>
@@ -669,7 +783,7 @@
                                 <!-- Community and Caste -->
                                 <div class="col-md-3 mb-3">
                                   <label for="accusedCommunity{{ i }}" class="form-label">41. Community of the Accused *</label>
-                                  <select
+                                  <!-- <select
                                     [id]="'accusedCommunity' + i"
                                     class="form-select"
                                     formControlName="community"
@@ -680,12 +794,25 @@
                                     <option *ngFor="let community of accusedCommunitiesOptions" [value]="community">
                                       {{ community }}
                                     </option>
-                                  </select>
+                                  </select> -->
+                                  <ng-select  
+                                    [id]="'accusedCommunity' + i"
+                                    class="form-select"
+                                    [items]="accusedCommunitiesOptions"
+                                    bindLabel="community"
+                                    bindValue="community"
+                                    formControlName="community"
+                                    [searchable]="true"
+                                    [clearable]="false"
+                                    [placeholder]="accused.get('community')?.value ? '' : 'Select Community'"
+                                    (change)="onAccusedCommunityChange($event, i)"
+                                    required>
+                                  </ng-select>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
                                   <label for="accusedCaste{{ i }}" class="form-label">42. Caste of the Accused *</label>
-                                  <select
+                                  <!-- <select
                                     [id]="'accusedCaste' + i"
                                     class="form-select"
                                     formControlName="caste"
@@ -695,7 +822,19 @@
                                     <option *ngFor="let caste of accuseds.at(i).get('availableCastes')?.value" [value]="caste">
                                       {{ caste }}
                                     </option>
-                                  </select>
+                                  </select> -->
+                                  <ng-select  
+                                    [id]="'accusedCaste' + i"
+                                    class="form-select"
+                                    [items]="accuseds.at(i).get('availableCastes')?.value"
+                                    bindLabel="caste"
+                                    bindValue="caste"
+                                    formControlName="caste"
+                                    [searchable]="true"
+                                    [clearable]="false"
+                                    [placeholder]="accuseds.at(i).get('caste')?.value ? '' : 'Select Caste'"
+                                    required>
+                                  </ng-select>
                                 </div>
 
 
@@ -735,7 +874,9 @@
                                             <option *ngFor="let year of yearOptions" [value]="year">{{ year }}</option>
                                         </select>
                                     </div>
-                                    <small class="text-danger d-block mt-1">Please follow the format "12-2024".</small>
+                                    <small *ngIf="!isFirValid('previousFIRNumber'+ i, 'previousFIRNumberSuffix'+ i)" class="text-danger d-block mt-1">
+                                      Please Follow the format "12/2024".
+                                    </small>
                                 </div>
 
                                 <!-- SC/ST Offences -->
@@ -779,19 +920,21 @@
                                       <option *ngFor="let year of yearOptions" [value]="year">{{ year }}</option>
                                     </select>
                                   </div>
-                                  <small class="text-danger d-block mt-1">
-                                    Please follow the format "12-2024".
+                                  <small *ngIf="!isFirValid('scstFIRNumber' + i, 'scstFIRNumberSuffix' + i)" class="text-danger d-block mt-1">
+                                    Please Follow the format "12/2024".
                                   </small>
                                 </div>
 
 
                                 <!-- Antecedents of the Accused -->
-                                <!-- <div class="col-md-6 mb-3">
-                                    <label for="antecedents{{ i }}" class="form-label">48. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *</label>
-                                    <input type="text" [id]="'antecedents' + i" class="form-control" formControlName="antecedents" placeholder="Enter antecedents" required />
-                                    <small class="text-danger">Please type 'NA' if there are no antecedents of the accused.</small>
-                                </div> -->
                                 <div class="col-md-6 mb-3">
+                                  <label for="antecedents{{ i }}" class="form-label">48. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *</label>
+                                  <input type="text" [id]="'antecedents' + i" class="form-control" formControlName="antecedents" placeholder="Enter antecedents" required (input)="checkInput(i, 'antecedents')"/>
+                                  <small *ngIf="!isInputValid(i, 'antecedents')" class="text-danger d-block mt-1">
+                                    Please type 'NA' if there are no antecedents of the accused.
+                                </small>
+                              </div>
+                                <!-- <div class="col-md-6 mb-3">
                                   <label for="antecedents{{ i }}" class="form-label">
                                     48. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *
                                   </label>
@@ -805,17 +948,18 @@
                                     (input)="onInputChange(i, $event)"
                                   />
                                   <small class="text-danger" *ngIf="!antecedents[i]">Please type 'NA' if there are no antecedents of the accused.</small>
-                                </div>
+                                </div> -->
                                 
 
 
                                 <!-- L&O Issues -->
                                 <div class="col-md-6 mb-3">
-                                    <label for="landOIssues{{ i }}" class="form-label">49. L&O Issues (Pickets, Bandoust, etc) *</label>
-                                    <input type="text" [id]="'landOIssues' + i" class="form-control" 
-                                    formControlName="landOIssues" placeholder="Enter L&O issues" required (input)="onInputChangeee(i, $event)" />
-                                    <small class="text-danger" *ngIf="!landOIssues[i]">Please type 'NA' if there are no L&O Issues.</small>
-                                  </div>
+                                  <label for="landOIssues{{ i }}" class="form-label">49. L&O Issues (Pickets, Bandoust, etc) *</label>
+                                  <input type="text" [id]="'landOIssues' + i" class="form-control" formControlName="landOIssues" placeholder="Enter L&O issues" required (input)="checkInput(i, 'landOIssues')"/>
+                                  <small *ngIf="!isInputValid(i, 'landOIssues')" class="text-danger d-block mt-1">
+                                    Please type 'NA' if there are no L&O Issues.
+                                </small>
+                                </div>
 
                                 <!-- Gist of the Current Case -->
                                 <div class="col-md-12 mb-3">
@@ -839,7 +983,7 @@
                                 <!-- File Uploads -->
 
 
-                                <!-- <div class="col-md-6 mb-3">
+                                <div class="col-md-6 mb-3">
                                   <label for="uploadFIRCopy" class="form-label">51. Upload FIR Copy *</label>
                 
                                   <input
@@ -849,9 +993,9 @@
                                     (change)="onFileSelected($event, i)"
                                     required
                                   />
-                              </div> -->
+                              </div>
 
-                              <div class="col-md-6 mb-3">
+                              <!-- <div class="col-md-6 mb-3">
                                 <label class="form-label">51. Upload FIR Copy *</label>
                                 <input type="file" [id]="'uploadFIRCopy' + i" class="form-control" formControlName="uploadFIRCopy"
                                        required (change)="onFileSelected($event, i)"  multiple />
@@ -860,7 +1004,7 @@
                               <div *ngIf="uploadedFiles[i]; ">
                                 <img [src]="fileUrls[i]" class="img-thumbnail" alt="FIR Copy" style="max-width: 150px; margin-bottom: 10px;">
                                 <button class="btn btn-danger btn-sm mt-2" (click)="onDeleteFile(i)">Delete</button>
-                              </div>
+                              </div> -->
                               
                          
 
@@ -1043,11 +1187,10 @@
                     *ngIf="step === 5"
                     type="submit"
                     class="btn btn-primary"
+                    [disabled]="!isStep5Valid()"
                     (click)="submitStepFive()">
-                    <!-- [disabled]="!isStep5Valid()"/ -->
                     Submit
                   </button>
-
                 </div>
             </div>
 
@@ -1070,7 +1213,7 @@
                       <!-- Field: Court District -->
                       <div class="col-md-4">
                         <label for="courtDistrict" class="form-label">64. Court Division *</label>
-                        <select
+                        <!-- <select
                           id="courtDistrict"
                           class="form-select"
                           formControlName="courtDistrict"
@@ -1079,12 +1222,25 @@
                         >
                           <option value="" disabled>Select Court Division</option>
                           <option *ngFor="let division of courtDivisions" [value]="division">{{ division }}</option>
-                        </select>
+                        </select> -->
+                        <ng-select
+                          id="courtDistrict"
+                          class="form-select"
+                          [items]="courtDivisions"
+                          bindLabel="label" 
+                          bindValue="value" 
+                          formControlName="courtDistrict"
+                          [searchable]="true"
+                          [clearable]="false"
+                          [placeholder]="firForm.get('courtDistrict')?.value ? '' : 'Select Court Division'"
+                          (change)="onCourtDivisionChange($event)"
+                          required>
+                        </ng-select>
                       </div>
 
                       <div class="col-md-4">
                         <label for="courtName" class="form-label">65. Court Range *</label>
-                        <select
+                        <!-- <select
                           id="courtName"
                           class="form-select"
                           formControlName="courtName"
@@ -1092,7 +1248,19 @@
                         >
                           <option value="" disabled>Select Court Range</option>
                           <option *ngFor="let range of courtRanges" [value]="range">{{ range }}</option>
-                        </select>
+                        </select> -->
+                        <ng-select
+                          id="courtName"
+                          class="form-select"
+                          [items]="courtRanges"
+                          bindLabel="label"
+                          bindValue="value"
+                          formControlName="courtName"
+                          [searchable]="true"
+                          [clearable]="false"
+                          [placeholder]="firForm.get('courtName')?.value ? '' : 'Select Court Range'"
+                          required>
+                        </ng-select>
                       </div>
 
                     </div>
@@ -1322,9 +1490,10 @@
 
                 <!-- Navigation Buttons -->
                 <div class="mt-4">
-                    <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft_6()">Save as Draft</button>
-                    <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-                    <button type="submit" class="btn btn-primary" (click)="submitStepSix()" 
+                    <!-- <button type="button" class="btn btn-warning me-2">Save as Draft</button>  -->
+                    <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft_6()">Save as Draft</button> 
+                    <button type="button" class="btn btn-secondary me-2" (click)="previousMainStep()">Previous</button>
+                    <button type="submit" class="btn btn-primary" (click)="saveAsDraft_6()" 
                    
                     >
                         Submit
@@ -1342,14 +1511,28 @@
                       <h4 class="mb-4">Case Trial and Court Details</h4>
                       <div class="row">
                           <!-- Item 74 -->
-                        
+                          <div class="col-md-6 mb-3">
+                            <label class="form-label">80. Name of the Designated / Special court *</label>
+                            <input type="text" class="form-control" formControlName="Court_name" placeholder="Enter Name" required />
+                        </div>
                           <!-- Item 75 -->
                           <div class="col-md-6 mb-3">
                             <label class="form-label">80. District in which court is present *</label>
-                            <select class="form-select" formControlName="courtDistrict" required>
+                            <!-- <select class="form-select" formControlName="courtDistrict" required>
                               <option value="" disabled selected>Select District</option>
                               <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
-                            </select>
+                            </select> -->
+                            <ng-select
+                              class="form-select"
+                              [items]="courtDistricts"
+                              bindLabel="district"
+                              bindValue="district"
+                              formControlName="courtDistrict"
+                              [searchable]="true"
+                              [clearable]="false"
+                              [placeholder]="firForm.get('courtDistrict')?.value ? '' : 'Select District'"
+                              required>
+                            </ng-select>
                           </div>
 
                           <div class="col-md-6 mb-3">
@@ -2260,12 +2443,11 @@
                   <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft_7()">
                       Save as Draft
                   </button>
-                  <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">
+                  <button type="button" class="btn btn-secondary me-2" (click)="previousMainStep()">
                       Previous
                   </button>
                   <!-- (click)="submitStepSeven()" -->
-                  <button type="submit" class="btn btn-primary" 
-                  (click)="saveAsDraft_7()" >
+                  <button type="submit" class="btn btn-primary" (click)="submitStepSeven()" [disabled]="!isFormValid()" >
                       Submit
                   </button>
               </div>

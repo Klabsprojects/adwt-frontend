@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'; 
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FirListTestService } from 'src/app/services/fir-list-test.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
@@ -10,12 +10,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ReportsCommonService } from 'src/app/services/reports-common.service';
 
 @Component({
   selector: 'app-Monetary-relief',
   standalone: true,
   imports: [
-    CommonModule,  
+    CommonModule,
     MatFormFieldModule,
     MatSelectModule,
     MatCheckboxModule,
@@ -26,280 +27,314 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './Monetary-relief.component.html',
   styleUrls: ['./Monetary-relief.component.scss'],
 })
-export class MonetaryReliefComponent  implements OnInit {
+export class MonetaryReliefComponent implements OnInit {
   searchText: string = '';
-  firList: any[] = [];
+  reportData: Array<any> = [];
+  filteredData: Array<any> = [];
   page: number = 1;
   itemsPerPage: number = 10;
   isReliefLoading: boolean = true;
-
+  loading: boolean = false;
   // Filters
   selectedDistrict: string = '';
+  selectedColumns: string[] = [];
   selectedNatureOfOffence: string = '';
   selectedStatusOfCase: string = '';
   selectedStatusOfRelief: string = '';
-
-  // Filter options
-  districts: string[] = [
-    'Ariyalur',
-    'Chengalpattu',
-    'Chennai',
-    'Coimbatore',
-    'Cuddalore',
-    'Dharmapuri',
-    'Dindigul',
-    'Erode',
-    'Kallakurichi',
-    'Kanchipuram',
-    'Kanniyakumari',
-    'Karur',
-    'Krishnagiri',
-    'Madurai',
-    'Mayiladuthurai',
-    'Nagapattinam',
-    'Namakkal',
-    'Nilgiris',
-    'Perambalur',
-    'Pudukkottai',
-    'Ramanathapuram',
-    'Ranipet',
-    'Salem',
-    'Sivagangai',
-    'Tenkasi',
-    'Thanjavur',
-    'Theni',
-    'Thoothukudi (Tuticorin)',
-    'Tiruchirappalli (Trichy)',
-    'Tirunelveli',
-    'Tirupathur',
-    'Tiruppur',
-    'Tiruvallur',
-    'Tiruvannamalai',
-    'Tiruvarur',
-    'Vellore',
-    'Viluppuram',
-    'Virudhunagar',
-  ];
-
-  naturesOfOffence: string[] = [
-    'Theft',
-    'Assault',
-    'Fraud',
-    'Murder',
-    'Kidnapping',
-    'Cybercrime',
-    'Robbery',
-    'Arson',
-    'Cheating',
-    'Extortion',
-    'Dowry Harassment',
-    'Rape',
-    'Drug Trafficking',
-    'Human Trafficking',
-    'Domestic Violence',
-    'Burglary',
-    'Counterfeiting',
-    'Attempt to Murder',
-    'Hate Crime',
-    'Terrorism',
-  ];
+  districts: string[] = [];
+  naturesOfOffence: string[] = [];
 
   statusesOfCase: string[] = ['Just Starting', 'Pending', 'Completed'];
-  statusesOfRelief: string[] = ['FIR Stage', 'ChargeSheet Stage', 'Trial Stage'];
+  statusesOfRelief: string[] = [
+    'FIR Stage',
+    'ChargeSheet Stage',
+    'Trial Stage',
+  ];
 
   // Visible Columns Management
-    displayedColumns: { label: string; field: string; sortable: boolean; visible: boolean }[] = [
-      { label: 'Sl. No.', field: 'sl_no', sortable: false, visible: true },
-      { label: 'FIR No.', field: 'fir_id', sortable: true, visible: true },
-      { label: 'Police City/District', field: 'police_city', sortable: true, visible: true },
-      { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
-      { label: 'Created By', field: 'created_by', sortable: true, visible: true },
-      { label: 'Created At', field: 'created_at', sortable: true, visible: true },
-      { label: 'Status', field: 'status', sortable: false, visible: true },
-      { label: 'Nature of Offence', field: 'nature_of_offence', sortable: true, visible: true },
-      { label: 'Case Status', field: 'case_status', sortable: true, visible: true },
-      { label: 'Relief Status', field: 'relief_status', sortable: true, visible: true },
-      { label: 'Victim Name', field: 'victim_name', sortable: true, visible: true },
-      { label: 'Reason for Status (Previous Month)', field: 'reason_previous_month', sortable: false, visible: true },
-      { label: 'Reason for Status (Current Month)', field: 'reason_current_month', sortable: false, visible: true },
-    ];
+  displayedColumns: {
+    label: string;
+    field: string;
+    sortable: boolean;
+    visible: boolean;
+    sortDirection: 'asc' | 'desc' | null;
+  }[] = [
+    {
+      label: 'Sl. No.',
+      field: 'sl_no',
+      sortable: false,
+      visible: true,
+      sortDirection: null,
+    },
+    {
+      label: 'FIR No.',
+      field: 'fir_id',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Police City/District',
+      field: 'police_city',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Police Station Name',
+      field: 'police_station',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Status',
+      field: 'status',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Nature of Offence',
+      field: 'nature_of_offence',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Case Status',
+      field: 'case_status',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Relief Status',
+      field: 'relief_status',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Victim Name',
+      field: 'victim_name',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Reason for Status (Previous Month)',
+      field: 'reason_previous_month',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Reason for Status (Current Month)',
+      field: 'reason_current_month',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+  ];
 
-    caseStatusOptions: string[] = ['FIR Stage', 'Chargesheet Stage', 'Trial Stage'];
-    reliefStatusOptions: string[] = ['FIR Stage Relief Pending', 'Chargesheet Relief Pending', 'Trial Stage Relief Pending'];
-    selectedCaseStatus: string = '';
-    selectedReliefStatus: string = '';
+  caseStatusOptions: string[] = [
+    'FIR Stage',
+    'Chargesheet Stage',
+    'Trial Stage',
+  ];
+  reliefStatusOptions: string[] = [
+    'FIR Stage Relief Pending',
+    'Chargesheet Relief Pending',
+    'Trial Stage Relief Pending',
+  ];
+  selectedCaseStatus: string = '';
+  selectedReliefStatus: string = '';
 
-    selectedColumns: any[] = [...this.displayedColumns];
-    currentSortField: string = '';
-    isAscending: boolean = true;
+  currentSortField: string = '';
+  isAscending: boolean = true;
 
-    constructor(
-      private firService: FirListTestService,
-      private cdr: ChangeDetectorRef,
-      private router: Router
-    ) {}
+  constructor(
+    // private firService: FirListTestService,
+    private cdr: ChangeDetectorRef,
+    private reportsCommonService: ReportsCommonService,
+    private router: Router
+  ) {}
 
-    ngOnInit(): void {
-      this.loadFirList();
-      this.updateSelectedColumns();
+  ngOnInit(): void {
+    this.reportsCommonService
+      .getAllData()
+      .subscribe(({ districts, offences }) => {
+        this.districts = districts;
+        this.naturesOfOffence = offences;
+        this.generateDummyData();
+      });
+    this.filteredData = [...this.reportData];
+    this.selectedColumns = this.displayedColumns.map((column) => column.field);
+  }
+  onCaseStatusChange(fir: any): void {
+    if (fir.case_status === 'FIR Stage') {
+      fir.revenue_district = 'N/A';
+      fir.police_station_name = 'N/A';
+      fir.case_number = 'N/A';
     }
-    onCaseStatusChange(fir: any): void {
-      if (fir.case_status === 'FIR Stage') {
-        fir.revenue_district = 'N/A';
-        fir.police_station_name = 'N/A';
-        fir.case_number = 'N/A';
-      }
-    }
-    
+  }
 
-    updateSelectedColumns() {
-      this.selectedColumns = this.displayedColumns.filter((col) => col.visible);
-    }
-    onColumnSelectionChange(): void {
-      this.updateSelectedColumns(); 
-    }
-    
+  updateColumnVisibility(): void {
+    this.displayedColumns.forEach((column) => {
+      column.visible = this.selectedColumns.includes(column.field);
+    });
+  }
 
-    // Toggle column visibility
-    toggleColumnVisibility(column: any) {
-      column.visible = !column.visible; // Toggle visibility
-      this.updateSelectedColumns(); // Update selected columns
-    }
+  onColumnSelectionChange(): void {
+    this.updateColumnVisibility();
+  }
 
-    // Drag and drop for rearranging columns
-    dropColumn(event: CdkDragDrop<any[]>) {
-      // Perform the column reordering when an item is dropped
-      moveItemInArray(this.displayedColumns, event.previousIndex, event.currentIndex);
-      this.updateSelectedColumns();  // Make sure to update the selected columns
-    }
+  dropColumn(event: CdkDragDrop<any[]>): void {
+    moveItemInArray(
+      this.displayedColumns,
+      event.previousIndex,
+      event.currentIndex
+    );
+  }
 
-    // Load FIR list from the backend (dummy data for now)
-    loadFirList() {
-      this.firList = [
-        {
-          fir_id: 1,
-          police_city: 'Chennai',
-          police_station: 'Station A',
-          nature_of_offence: 'Theft',
-          case_status: 'FIR Stage',
-          relief_status: 'FIR Stage Relief Pending',
-          victim_name: 'John Doe',
-          reason_previous_month: 'Pending',
-          reason_current_month: 'In Progress',
-        },
-        {
-          fir_id: 2,
-          police_city: 'Coimbatore',
-          police_station: 'Station B',
-          nature_of_offence: 'Assault',
-          case_status: 'Chargesheet Stage',
-          relief_status: 'Chargesheet Relief Pending',
-          victim_name: 'Jane Doe',
-          reason_previous_month: 'Completed',
-          reason_current_month: 'Resolved',
-        },
-      ];
-      this.cdr.detectChanges();
-    }
-    
-
-    // Apply filters to the FIR list
-    applyFilters() {
-      this.page = 1; // Reset to the first page
-      this.cdr.detectChanges();
-    }
-
-    // Filtered FIR list based on search and filter criteria
-    filteredFirList() {
-      const searchLower = this.searchText.toLowerCase();
-
-      return this.firList.filter((fir) => {
-        // Apply search filter
-        const matchesSearch =
-          fir.fir_id.toString().includes(searchLower) ||
-          (fir.police_city || '').toLowerCase().includes(searchLower) ||
-          (fir.police_station || '').toLowerCase().includes(searchLower) ||
-          (fir.nature_of_offence || '').toLowerCase().includes(searchLower) ||
-          (fir.case_status || '').toLowerCase().includes(searchLower);
-
-        // Apply dropdown filters
-        const matchesDistrict =
-          this.selectedDistrict ? fir.district === this.selectedDistrict : true;
-        const matchesNatureOfOffence =
-          this.selectedNatureOfOffence
-            ? fir.nature_of_offence === this.selectedNatureOfOffence
-            : true;
-        const matchesStatusOfCase =
-          this.selectedStatusOfCase ? fir.status_of_case === this.selectedStatusOfCase : true;
-        const matchesStatusOfRelief =
-          this.selectedStatusOfRelief
-            ? fir.status_of_relief === this.selectedStatusOfRelief
-            : true;
-
-        return (
-          matchesSearch &&
-          matchesDistrict &&
-          matchesNatureOfOffence &&
-          matchesStatusOfCase &&
-          matchesStatusOfRelief
-        );
+  // Load FIR list from the backend (dummy data for now)
+  generateDummyData(): void {
+    for (let i = 1; i <= 15; i++) {
+      const caseStatusIndex = Math.floor(Math.random() * 8);
+      const caseStatus =
+        this.reportsCommonService.getCaseStatus(caseStatusIndex);
+      this.reportData.push({
+        sl_no: i,
+        fir_id: `FIR-${1000 + i}`,
+        police_city: this.districts[i % this.districts.length],
+        police_station: `Station ${i}`,
+        status: caseStatus,
+        nature_of_offence:
+          this.naturesOfOffence[i % this.naturesOfOffence.length],
+        case_status: this.caseStatusOptions[i % this.caseStatusOptions.length],
+        relief_status: 'Relief Pending',
+        victim_name: `Victim ${i}`,
+        reason_previous_month: 'Pending',
+        reason_current_month: 'In Progress',
       });
     }
+    this.filteredData = [...this.reportData]; // Update filteredData
+    this.cdr.detectChanges(); // Trigger change detection
+  }
 
-    // Sorting logic
-    sortTable(field: string) {
-      if (this.currentSortField === field) {
-        this.isAscending = !this.isAscending;
-      } else {
-        this.currentSortField = field;
-        this.isAscending = true;
-      }
+  // Applies filters, assigns serial numbers, and resets pagination
+  applyFilters(): void {
+    this.filteredData = this.reportsCommonService.applyFilters(
+      this.reportData,
+      this.searchText,
+      this.selectedDistrict,
+      this.selectedNatureOfOffence,
+      this.selectedStatusOfCase,
+      this.selectedStatusOfRelief,
+      'police_city',
+      'nature_of_offence',
+      'status'
+    );
+    this.filteredData = this.filteredData.map((report, index) => ({
+      ...report,
+      sl_no: index + 1,
+    })); // Assign sl_no starting from 1
+    this.page = 1; // Reset to the first page
+  }
 
-      this.firList.sort((a, b) => {
-        const valA = a[field]?.toString().toLowerCase() || '';
-        const valB = b[field]?.toString().toLowerCase() || '';
-        return this.isAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
-      });
-    }
+  // Filtered FIR list based on search and filter criteria
+  filteredFirList() {
+    const searchLower = this.searchText.toLowerCase();
 
-    // Get the sort icon class
-    getSortIcon(field: string): string {
-      return this.currentSortField === field
-        ? this.isAscending
-          ? 'fa-sort-up'
-          : 'fa-sort-down'
-        : 'fa-sort';
-    }
+    return this.filteredData.filter((fir) => {
+      // Apply search filter
+      const matchesSearch =
+        fir.fir_id.toString().includes(searchLower) ||
+        (fir.police_city || '').toLowerCase().includes(searchLower) ||
+        (fir.police_station || '').toLowerCase().includes(searchLower) ||
+        (fir.nature_of_offence || '').toLowerCase().includes(searchLower) ||
+        (fir.case_status || '').toLowerCase().includes(searchLower);
+
+      // Apply dropdown filters
+      const matchesDistrict = this.selectedDistrict
+        ? fir.district === this.selectedDistrict
+        : true;
+      const matchesNatureOfOffence = this.selectedNatureOfOffence
+        ? fir.nature_of_offence === this.selectedNatureOfOffence
+        : true;
+      const matchesStatusOfCase = this.selectedStatusOfCase
+        ? fir.status_of_case === this.selectedStatusOfCase
+        : true;
+      const matchesStatusOfRelief = this.selectedStatusOfRelief
+        ? fir.status_of_relief === this.selectedStatusOfRelief
+        : true;
+
+      return (
+        matchesSearch &&
+        matchesDistrict &&
+        matchesNatureOfOffence &&
+        matchesStatusOfCase &&
+        matchesStatusOfRelief
+      );
+    });
+  }
+
+  // Sorting logic
+  sortTable(field: string) {
+    const result = this.reportsCommonService.sortTable(
+      this.filteredData,
+      field,
+      this.currentSortField,
+      this.isAscending
+    );
+    this.filteredData = result.sortedData;
+    this.currentSortField = result.newSortField;
+    this.isAscending = result.newIsAscending;
+  }
+
+  // Get the sort icon class
+  getSortIcon(field: string): string {
+    return this.reportsCommonService.getSortIcon(
+      field,
+      this.currentSortField,
+      this.isAscending
+    );
+  }
 
   // Pagination controls
-  totalPagesArray(): number[] {
-    return Array(Math.ceil(this.filteredFirList().length / this.itemsPerPage))
-      .fill(0)
-      .map((_, i) => i + 1);
+  goToPage(page: number): void {
+    this.page = page;
   }
 
-  nextPage() {
-    if (this.hasNextPage()) this.page++;
-  }
-
-  previousPage() {
+  previousPage(): void {
     if (this.page > 1) this.page--;
   }
 
-  goToPage(pageNum: number) {
-    this.page = pageNum;
+  nextPage(): void {
+    if (this.page < this.totalPages()) this.page++;
   }
 
-  hasNextPage(): boolean {
-    return this.page * this.itemsPerPage < this.filteredFirList().length;
+  totalPages(): number {
+    return Math.ceil(this.filteredData.length / this.itemsPerPage);
   }
-  openEditPage(firId: number): void {
-    // Navigate to the 'edit-fir' page with the FIR id as a query parameter
-    this.router.navigate(['/widgets-examples/edit-fir'], { queryParams: { fir_id: firId } });
+
+  totalPagesArray(): number[] {
+    return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
   }
-  paginatedFirList() {
+
+  paginatedData(): any[] {
     const startIndex = (this.page - 1) * this.itemsPerPage;
-    const endIndex = this.page * this.itemsPerPage;
-    return this.firList.slice(startIndex, endIndex); // Returns the items for the current page
+    return this.filteredData.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+
+  // Download Reports
+  async onBtnExport(): Promise<void> {
+    this.loading = true;
+    await this.reportsCommonService.exportToExcel(
+      this.filteredData,
+      this.displayedColumns
+    );
+    this.loading = false;
   }
 }

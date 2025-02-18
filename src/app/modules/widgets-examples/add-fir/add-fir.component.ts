@@ -25,7 +25,7 @@ declare var $: any;
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
-
+import { NgSelectModule } from '@ng-select/ng-select';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -40,7 +40,8 @@ import { environment } from '../../../../environments/environment';
     MatSelectModule,
     MatFormFieldModule,
     MatRadioModule,
-    NgxFileDropModule
+    NgxFileDropModule,
+    NgSelectModule
   ],
 })
 export class AddFirComponent implements OnInit, OnDestroy {
@@ -141,7 +142,7 @@ export class AddFirComponent implements OnInit, OnDestroy {
   offenceOptions: string[] = [];
   offenceActsOptions: { offence_act_name: string; [key: string]: any }[] = [];
   courtDistricts: string[] = [];
-
+  offenceReliefDetails: any[] = []; 
   alphabetList: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   stationNumbers: number[] = Array.from({ length: 99 }, (_, k) => k + 1);
   firNumberOptions: number[] = Array.from({ length: 99 }, (_, k) => k + 1);
@@ -157,7 +158,7 @@ i: number;
     private modalService: NgbModal,
     private policeDivisionService :PoliceDivisionService
   ) {}
-
+  private wasVictimSame: boolean = false; // Track the previous state of on Victim same as Complainant
 
 
   triggerChangeDetection() {
@@ -180,8 +181,13 @@ i: number;
     this.loadCommunities();
     this.loadDistricts();
     this.updateValidationForCaseType();
+    this.loadAllOffenceReliefDetails();
 
-
+    // Listen for input changes and trigger UI update
+    this.firForm.valueChanges.subscribe(() => {
+      //console.log('Form Updated:', this.firForm.value); // Debugging log
+      this.cdr.detectChanges(); // Manually trigger UI update
+    });
 
     const preFilledDistrict = this.firForm.get('policeCity')?.value; // Get pre-filled district
     if (preFilledDistrict) {
@@ -227,7 +233,39 @@ i: number;
       }
     });
 
-this.loadPoliceDivision();
+  this.loadPoliceDivision();
+
+  // Listen for changes in isVictimSameAsComplainant
+  this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.valueChanges.subscribe(isVictimSame => {
+    this.onVictimSameAsComplainantChange(isVictimSame=== 'true');
+    this.wasVictimSame = isVictimSame=== 'true'; // Update the previous state
+    const victimGroup = this.victims.at(0) as FormGroup;
+    const ageControl = victimGroup.get('age');
+    const nameControl = victimGroup.get('name');
+    if (Number(ageControl?.value?.toString().replace(/\D/g, '')) < 18) {
+      nameControl?.disable({ emitEvent: false });
+      nameControl?.reset();
+    }
+  });
+  // Updates the victim's details if they are the same as the complainant.
+  const updateVictimDetails = (field: string, value: any) => {
+    const isVictimSame = this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.value;
+    const victimsArray = this.firForm.get('victims') as FormArray;
+    if (isVictimSame && victimsArray.length > 0 && this.wasVictimSame) {
+      victimsArray.at(0).get(field)?.setValue(value, { emitEvent: false });
+    }
+  };
+  ['nameOfComplainant', 'mobileNumberOfComplainant'].forEach(field => {
+    this.firForm.get(`complainantDetails.${field}`)?.valueChanges.subscribe(value => {
+      updateVictimDetails(field === 'nameOfComplainant' ? 'name' : 'mobileNumber', value);
+    });
+  });
+  }
+
+  // Handles the change in victim status relative to the complainant and updates the form accordingly.
+  onVictimSameAsComplainantChange(isVictimSame: boolean) {
+    this.firService.onVictimSameAsComplainantChange(isVictimSame, this.firForm, this.wasVictimSame);
+    this.wasVictimSame = isVictimSame; // Update the previous state
   }
 
   navigateToMainStep(stepNumber: number): void {
@@ -276,6 +314,7 @@ loadDistricts(): void {
   this.firService.getDistricts().subscribe(
     (districts: string[]) => {
       this.courtDistricts = districts; // Populate district options
+      this.policeCities = [...districts]; // To Load the District in Dropdown
     },
     (error) => {
       console.error('Error loading districts:', error);
@@ -405,6 +444,31 @@ updateValidationForCaseType() {
   this.firForm.get('rcsFileNumber')?.updateValueAndValidity();
   this.firForm.get('rcsFilingDate')?.updateValueAndValidity();
   this.firForm.get('mfCopy')?.updateValueAndValidity();
+}
+
+loadAllOffenceReliefDetails(): void {
+  this.firService.getOffenceReliefDetails().subscribe(
+    (offence_relief: any[]) => {
+      this.offenceReliefDetails = offence_relief; // Store data
+      console.log('Offence Relief Details:', this.offenceReliefDetails);
+    },
+    (error) => {
+      console.error('Error loading districts:', error);
+      Swal.fire('Error', 'Failed to load offence relief details.', 'error');
+    }
+  );
+}
+
+// Calls firService to update victim details based on selected offences
+onOffenceCommittedChange(event: any, index: number): void {
+  const selectedOffences = event.value; // Get selected values from the 30th field
+  this.firService.onOffenceCommittedChange(
+    selectedOffences,
+    index,
+    this.offenceReliefDetails,
+    this.victims
+  );
+  this.cdr.detectChanges();
 }
 
 onCaseTypeChange() {
@@ -589,31 +653,32 @@ onFileSelect_3(event: Event, controlName: string): void {
     const victimGroup = this.victims.at(index) as FormGroup;
     const ageControl = victimGroup.get('age');
     const nameControl = victimGroup.get('name');
-  
+
     if (ageControl) {
-      let ageValue = ageControl.value;
-  
-    
-      ageValue = ageValue.toString().replace(/^0+/, '');
-      
-  
-      if (!/^(?:[1-9][0-9]?|1[01][0-9]|120)$/.test(ageValue)) {
-        ageControl.setErrors({ invalidAge: true });
+      let ageValue = ageControl.value || ''; // Ensure it's always a string
+
+      // Remove any non-numeric characters
+      ageValue = ageValue.toString().replace(/\D/g, '');
+
+      // If input exceeds 3 digits, reset it
+      if (ageValue.length > 3) {
+          ageControl.setValue('');
       } else {
-        ageControl.setErrors(null);
-      }
-  
-  
-      ageControl.setValue(ageValue, { emitEvent: false });
-  
-      if (Number(ageValue) < 18) {
+          ageControl.setValue(ageValue);
+        }
+      // If age is below 18, disable the name field
+      if (ageValue < 18) {
         nameControl?.disable({ emitEvent: false });
         nameControl?.reset();
       } else {
         nameControl?.enable({ emitEvent: false });
+        if(index===0){
+          this.onVictimSameAsComplainantChange(this.wasVictimSame);
+          this.wasVictimSame && nameControl?.disable({ emitEvent: false });
+        }
       }
-  
-      this.cdr.detectChanges(); 
+
+      this.cdr.detectChanges(); // Trigger change detection
     }
   }
   getAgeErrorMessage(index: number): string {
@@ -659,7 +724,17 @@ onFileSelect_3(event: Event, controlName: string): void {
     const nameControl = accusedGroup.get('name');
 
     if (ageControl) {
-      const ageValue = ageControl.value;
+      let ageValue = ageControl.value || ''; // Ensure it's always a string
+
+      // Remove any non-numeric characters
+      ageValue = ageValue.toString().replace(/\D/g, '');
+
+      // If input exceeds 3 digits, reset it
+      if (ageValue.length > 3) {
+          ageControl.setValue('');
+      } else {
+          ageControl.setValue(ageValue);
+        }// Update the age value in the form group
 
       // If age is below 18, disable the name field
       if (ageValue < 18) {
@@ -687,6 +762,7 @@ onFileSelect_3(event: Event, controlName: string): void {
       stationName: ['', Validators.required],
       officerName: ['', [Validators.required, Validators.pattern('^[A-Za-z\\s]*$')]], // Name validation
       officerDesignation: ['', Validators.required], // Dropdown selection
+      otherOfficerDesignation: [''],  // Add this line
       officerPhone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]], // 10-digit phone validation
 
       attachments_1: this.fb.array([this.createAttachmentGroup()]),
@@ -888,6 +964,40 @@ advocateMobNumber:['', Validators.required],
     this.show97Onwards = selectedValue === 'Empanelled advocate' || selectedValue === 'Private advocate selected by the victim';
   }
   
+  // Validates the FIR Number values using the firValidationService.
+  isFirValid(fir: string, suffix: string): boolean {
+    return this.firService.isFirValid(fir, suffix, this.firForm);
+  }
+  
+  // This function checks the input field and hides/shows the warning text accordingly
+  isInputValid(index: number, field: string): boolean {
+    const inputValue = this.accuseds.at(index).get(field)?.value; // Get value properly from FormArray
+    return !!inputValue && inputValue.trim() !== ''; // Returns true if input is filled
+  }
+
+  // Function to log user input and update UI validation
+  checkInput(index: number, field: string) {  
+    const control = this.accuseds.at(index).get(field); // Access form control correctly
+
+    if (control) {
+      const value = control.value?.trim() || '';
+
+      console.log(`[INFO] Input detected - Field: ${field}, Index: ${index}, Value: "${value}"`);
+
+      if (value !== '') {  
+        console.log(`[SUCCESS] ${field} input filled for index ${index}: "${value}" - No error shown.`);
+        control.setErrors(null); // Clear errors if input is valid
+      } else {  
+        console.log(`[ERROR] ${field} input is empty for index ${index} - Showing error.`);
+        control.setErrors({ required: true }); // Set error if input is empty
+      }  
+
+      // Ensure UI updates properly
+      control.markAsTouched();
+      control.updateValueAndValidity(); // Force validation check
+      this.cdr.detectChanges();
+    }
+  }
 
   get hearingDetails(): FormArray {
     return this.firForm.get('hearingDetails') as FormArray;
@@ -1263,11 +1373,18 @@ onAdditionalReliefChange(event: Event, value: string): void {
   populateVictimsRelief(victimsReliefDetails: any[]): void {
     const victimsReliefArray = this.victimsRelief;
 
-console.log(victimsReliefArray.value,"victimsReliefArray")
+  // Ensure the value is retrieved as a number
+  let selectedVictimCount = Number(this.firForm.get('complainantDetails.numberOfVictims')?.value) || 0;
+  console.log("count ----------> ",selectedVictimCount);
+  console.log("Selected Number of Victims from Dropdown:", selectedVictimCount);
 
-    victimsReliefArray.clear(); // Clear existing form controls
+  console.log("Before Clearing: victimsRelief.controls.length =", victimsReliefArray.controls.length);
 
-    victimsReliefDetails.forEach((victim: any) => {
+  victimsReliefArray.clear(); // Clear existing form controls
+
+  for (let i = 0; i < selectedVictimCount; i++) {
+    const victim = victimsReliefDetails[i] || {}; // Use existing data if available
+      console.log(`Adding victim #${i + 1}:`, victim);
       const reliefGroup = this.createVictimReliefGroup();
 
       // Set initial values for each victim
@@ -1327,7 +1444,9 @@ console.log(victimsReliefArray.value,"victimsReliefArray")
       });
 
       victimsReliefArray.push(reliefGroup); // Add the relief group to the FormArray
-    });
+    }
+
+    console.log("After Adding: victimsRelief.controls.length =", this.victimsRelief.controls.length);
 
     // Perform initial calculation
     this.updateTotalCompensation();
@@ -1388,7 +1507,7 @@ console.log(victimsReliefArray.value,"victimsReliefArray")
 
 
 
-  handleSCSTSectionChange(event: any, index: number): void {
+  /* handleSCSTSectionChange(event: any, index: number): void {
     const selectedValues = event.value; // Selected SC/ST sections
     const victimGroup = this.victims.at(index) as FormGroup; // Access the victim's FormGroup
 
@@ -1447,7 +1566,7 @@ console.log(victimsReliefArray.value,"victimsReliefArray")
         reliefAmountFirstStage: '', // Reset the 1st stage relief amount
       });
     }
-  }
+  } */
 
 
 
@@ -1658,7 +1777,7 @@ createVictimGroup(): FormGroup {
     isNativeDistrictSame: ['', Validators.required],
     nativeDistrict: [''],
     offenceCommitted: ['', Validators.required],
-    scstSections: [[], Validators.required],
+    scstSections: ['', Validators.required],
     sectionsIPC: ['', Validators.required],
     fir_stage_as_per_act: [''],
     fir_stage_ex_gratia: [''],
@@ -1857,8 +1976,8 @@ handleCaseTypeChange() {
       (user: any) => {
         if (user && user.district) {
           const district = user.district;
-          // this.firForm.patchValue({ policeCity: district });
-          // this.loadPoliceDivisionDetails(district);
+           this.firForm.patchValue({ policeCity: district });
+           this.loadPoliceDivisionDetails(district);
 
           this.loadPoliceDivision();
         }
@@ -1873,15 +1992,13 @@ handleCaseTypeChange() {
     this.firService.getPoliceDivision(district).subscribe(
       (data: any) => {
         this.policeCities = [district];
-
-        console.log(data,"this.policeCities")
         this.policeZones = data.map((item: any) => item.police_zone_name);
         this.policeRanges = data.map((item: any) => item.police_range_name);
         this.revenueDistricts = data.map((item: any) => item.district_division_name);
         this.firForm.patchValue({
-          policeZone: '',
-          policeRange: '',
-          revenueDistrict:  '',
+          policeZone: this.policeZones[0] || '',
+          policeRange: this.policeRanges[0] || '',
+          revenueDistrict: this.revenueDistricts[0] || '',
         });
       },
       (error: any) => {
@@ -2002,7 +2119,7 @@ handleCaseTypeChange() {
       community: ['', Validators.required],
       caste: ['', Validators.required],
       guardianName: ['', Validators.required],
-      uploadFIRCopy: ['', Validators.required],
+      //uploadFIRCopy: ['', Validators.required],
       previousIncident: [false],
       customGender: [''],
       previousFIRNumber: [''],
@@ -2013,20 +2130,33 @@ handleCaseTypeChange() {
       antecedents: ['', Validators.required],
       landOIssues: ['', Validators.required],
       gistOfCurrentCase: ['', [Validators.required, Validators.maxLength(3000)]],
-      availableCastes: [[]]
-
+      availableCastes: [[]],
+      uploadFIRCopy: [null] // Add this field for File upload
     });
   }
 
 
   // Handle City Change
-  onCityChange(event: any) {
-    const selectedCity = event.target.value;
+  // onCityChange(event: any) {
+  //   const selectedCity = event.target.value;
+  onCityChange(selectedCity:string){
     if (selectedCity) {
       this.loadPoliceDivisionDetails(selectedCity);
+    }
+  }
 
-      // this.loadPoliceDivisionDetails(selectedCity);
+  showOtherDesignation = false;
+  otherDesignation = '';  // Local variable to store the custom input value
+  
+  onDesignationChange(event: any) {
+    const selectedValue = event.target.value;
 
+    if (selectedValue === 'Others') {
+      this.showOtherDesignation = true;
+      this.firForm.get('officerDesignation')?.setValue(''); // Clear the value when "Others" is selected
+      this.otherDesignation = ''; // Reset the other designation input field
+    } else {
+      this.showOtherDesignation = false;
     }
   }
 
@@ -2211,10 +2341,11 @@ console.log(firData,"firDatafirDatafirData")
 
 // Save Step 4 as Draft
 saveStepFourAsDraft(): void {
+  const accusedArray = this.firForm.get('accuseds')?.value || [];
   const firData = {
     firId: this.firId,
     numberOfAccused: this.firForm.get('numberOfAccused')?.value || '',
-    accuseds: this.firForm.get('accuseds')?.value.map((accused: any, index: number) => ({
+    accuseds: accusedArray.map((accused: any, index: number) => ({
       ...accused,
       accusedId: accused.accusedId || null,
       uploadFIRCopy: this.multipleFiles[index] || null
@@ -2485,10 +2616,10 @@ onProceedingsFileChange_1(event: Event): void {
 }
 
 saveAsDraft_6(isSubmit: boolean = false): void {
-  if (!this.firId) {
-    Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
-    return;
-  }
+  // if (!this.firId) {
+  //   Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
+  //   return;
+  // }
   this.victimsRelief.controls.forEach((control) => {
     control.get('reliefAmountSecondStage')?.enable(); // Temporarily enable
   });
@@ -2547,7 +2678,55 @@ saveAsDraft_6(isSubmit: boolean = false): void {
   );
 }
 
+isFormValid(): boolean {
+  const trialDetails: Record<string, any> = {
+      courtName: this.firForm.get('Court_name')?.value,
+      courtDistrict: this.firForm.get('courtDistrict')?.value,
+      trialCaseNumber: this.firForm.get('trialCaseNumber')?.value,
+      publicProsecutor: this.firForm.get('publicProsecutor')?.value,
+      prosecutorPhone: this.firForm.get('prosecutorPhone')?.value,
+      firstHearingDate: this.firForm.get('firstHearingDate')?.value,
+      judgementAwarded: this.firForm.get('judgementAwarded')?.value,
+      judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
+  };
 
+  const compensationDetails: Record<string, any> = {
+      totalCompensation: this.firForm.get('totalCompensation_2')?.value,
+      proceedingsFileNo: this.firForm.get('proceedingsFileNo_2')?.value,
+      proceedingsDate: this.firForm.get('proceedingsDate_2')?.value,
+      uploadProceedings: this.firForm.get('uploadProceedings_2')?.value
+  };
+
+  let missingFields: string[] = [];
+
+  // Check Trial Details
+  Object.entries(trialDetails).forEach(([key, value]) => {
+      if (!value) {
+          missingFields.push(`Trial Details: ${key} is missing`);
+      }
+  });
+
+  // Check Compensation Details
+  Object.entries(compensationDetails).forEach(([key, value]) => {
+      if (!value) {
+          missingFields.push(`Compensation Details: ${key} is missing`);
+      }
+  });
+
+  // Check Victims Details
+  const victimsMissing = this.victimsRelief.controls.some(control => !control.get('victimId')?.value);
+  if (victimsMissing) {
+      missingFields.push("At least one victim is missing victimId");
+  }
+
+  // Log missing fields
+  if (missingFields.length > 0) {
+      console.log("Missing Fields:", missingFields);
+      return false;
+  }
+
+  return true;
+}
 
 // saveAsDraft_7(): void {
 //   if (!this.firId) {
@@ -3256,9 +3435,10 @@ isStep3Valid(): boolean {
   const isDeceased = this.firForm.get('isDeceased')?.value;
   const isDeceasedValid = isDeceased !== '' &&
                           (isDeceased === 'no' || (this.firForm.get('deceasedPersonNames')?.valid === true));
+  const isValuePresent = this.firForm.get('deceasedPersonNames')?.value?.length !== 0;
 
   // Ensure all conditions return a boolean
-  return Boolean(isComplainantValid && victimsValid && isDeceasedValid);
+  return Boolean(isComplainantValid && victimsValid && isDeceasedValid && isValuePresent);
 }
 
 
@@ -3489,6 +3669,12 @@ isStep5Valid(): boolean {
       this.step = this.getLastStepOfMainStep(this.mainStep);
     }
     this.cdr.detectChanges(); 
+  }
+
+  previousMainStep() {
+    if (this.mainStep > 1) {
+      this.mainStep -= 1;
+    }
   }
 
   getLastStepOfMainStep(mainStep: number): number {
