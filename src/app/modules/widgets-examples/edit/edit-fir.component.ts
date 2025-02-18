@@ -1048,6 +1048,7 @@ onAccusedCommunityChange(selectedCommunity: string, index: number): void {
         }
         if(response.data.officer_designation){
           this.firForm.get('officerDesignation')?.setValue(response.data.officer_designation); 
+          this.checkAndUpdateDesignation();
         }
         if(response.data.officer_phone){
           this.firForm.get('officerPhone')?.setValue(response.data.officer_phone); 
@@ -2096,29 +2097,36 @@ onAccusedAgeChange(index: number): void {
     this.onNumberOfAccusedChange();
     // this.populateVictimsRelief([]);
 
-        // Get the pre-filled value in the edit screen
-        const selectedDesignation = this.firForm.get('officerDesignation')?.value;
-        console.log("Initial Designation:", selectedDesignation);
-      
-        if (!["DSP", "ACP", "ASP", "ADSP", "Others"].includes(selectedDesignation)) {
-          this.showOtherDesignation = true;
-          // Use setTimeout to allow Angular to detect changes
-          setTimeout(() => {
-          this.firForm.get('officerDesignation')?.setValue('Others');
-          this.otherDesignation = selectedDesignation;
-          
-          console.log("Custom Designation detected. Setting 'Others' as selected.");
-          console.log("Updated Dropdown Value:", this.firForm.get('officerDesignation')?.value);
-          console.log("Other Designation Input Value:", this.otherDesignation);
-          // Force UI update
-          this.cdr.detectChanges();
-        });
-        }
-    console.log(this.firForm.value,"firrrrrrrrrrrrrrrrrrrrrr");
-
+    // Call the function update officer designation
+    this.checkAndUpdateDesignation();
   }
 
   otherDesignation: string = ''; // Local variable for custom value (when 'Others' is selected)
+
+  // Function to check and update officer designation
+  checkAndUpdateDesignation() {
+    // Get the pre-filled value in the edit screen
+    const selectedDesignation = this.firForm.get('officerDesignation')?.value;
+    // console.log("Initial Designation:", selectedDesignation);
+    // console.log("Initial Designation 1:", ["DSP", "ACP", "ASP", "ADSP", "Others"].includes(selectedDesignation));
+    // console.log("Initial Designation: 2", !["DSP", "ACP", "ASP", "ADSP", "Others"].includes(selectedDesignation));
+  
+    if (selectedDesignation && (!["DSP", "ACP", "ASP", "ADSP", "Others"].includes(selectedDesignation))) {
+      this.showOtherDesignation = true;
+      // Use setTimeout to allow Angular to detect changes
+      setTimeout(() => {
+      this.firForm.get('officerDesignation')?.setValue('Others');
+      this.otherDesignation = selectedDesignation;
+      
+      // console.log("Custom Designation detected. Setting 'Others' as selected.");
+      // console.log("Updated Dropdown Value:", this.firForm.get('officerDesignation')?.value);
+      // console.log("Other Designation Input Value:", this.otherDesignation);
+      // Force UI update
+      this.cdr.detectChanges();
+    });
+    }
+    console.log(this.firForm.value,"firrrrrrrrrrrrrrrrrrrrrr");
+  }
 
   setDesignationToOthers() {
     if (this.otherDesignation) {
@@ -4200,7 +4208,7 @@ console.log(victimReliefDetail,"cretaieg")
           if (isUploadFIRCopyFilled === null) {
      
             isUploadFIRCopyFilled = isFilled;
-            this.fileName = uploadFIRCopyControl?.value?.startsWith('uploads\\') && this.multipleFiles.length===0
+            this.fileName[0] = uploadFIRCopyControl?.value?.startsWith('uploads\\') && this.multipleFiles.length===0
             ? uploadFIRCopyControl.value.replace('uploads\\', '') 
             : ''; 
           } else if (isUploadFIRCopyFilled !== isFilled) {
