@@ -913,524 +913,966 @@
           <button type="button" class="btn btn-primary" (click)="saveAsDraft_6(true)" [disabled]="!isStep6Valid()">Submit</button>
         </div>
       </div>
+     
       <div *ngIf="mainStep === 3 && step === 1" class="form-step">
+
+        <!-- Case Trial and Court Details -->
         <div class="card border-primary mb-4">
-          <div class="card-body">
-            <h4 class="mb-4">73. Case Trial and Court Details</h4>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label">74. Name of the Designated / Special court *</label>
-                <input type="text" class="form-control" formControlName="Court_name1" placeholder="Enter Name" required />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">75. District in which court is present *</label>
-                <select class="form-select" formControlName="trialCourtDistrict" required>
-                  <option value="" disabled selected>Select District</option>
-                  <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">76. Case Number Report (CNR) / Special SC number *</label>
-                <input type="text" class="form-control" formControlName="trialCaseNumber" placeholder="Enter Case Number" required />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">77. Special Public Prosecutor's Name *</label>
-                <input type="text" class="form-control" formControlName="publicProsecutor" placeholder="Enter Name" required />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">78. Special Public Prosecutor's Phone Number *</label>
-                <input type="text" class="form-control" formControlName="prosecutorPhone" placeholder="Enter Phone Number" required />
-              </div>
+            <div class="card-body">
+                <h4 class="mb-4">Case Trial and Court Details</h4>
+                <div class="row">
+                    <!-- Item 74 -->
+                  
+                    <!-- Item 75 -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">80. District in which court is present *</label>
+                      <select class="form-select" formControlName="trialCourtDistrict" required>
+                        <option value="" disabled selected>Select District</option>
+                        <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">81. Name of the Designated / Special court *</label>
+                      <input type="text" class="form-control" formControlName="Court_name1" placeholder="Enter Name" required />
+                  </div>
+                    <!-- Item 76 -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">82. Case Number Report (CNR) / Special SC number *</label>
+                        <input type="text" class="form-control" formControlName="trialCaseNumber" placeholder="Enter Case Number" required />
+                    </div>
+
+<!-- newly addaed item -->
+
+<div class="col-md-6 mb-3">
+<label class="form-label">82. A. Case is handled by *</label>
+<select class="form-select" formControlName="CaseHandledBy"(change)="onCaseHandledByChange($event)" required>
+<option value="" disabled selected>Select </option>
+<option *ngFor="let data of CaseHandledBy" [value]="data">{{ data }}</option>
+</select>
+</div>
+
+
+<div *ngIf="show94BAnd94C" class="col-md-6 mb-3">
+<label class="form-label">82. B. Name of the advocate *</label>
+<input type="text" class="form-control" formControlName="NameOfAdvocate" placeholder="Enter advocate name" required />
+</div>
+
+
+
+
+
+<div *ngIf="show94BAnd94C" class="col-md-6 mb-3">
+<label class="form-label">82. C. Phone Number of the advocate *</label>
+<input
+type="text"
+class="form-control"
+formControlName="advocateMobNumber"
+placeholder="Enter mobile Number"
+maxlength="10"
+(keypress)="allowOnlyNumbers($event)"
+/>
+<div *ngIf="firForm.get('advocateMobNumber')?.invalid && (firForm.get('advocateMobNumber')?.touched || firForm.get('advocateMobNumber')?.dirty)" class="text-danger">
+<div *ngIf="firForm.get('advocateMobNumber')?.errors?.['required']">Phone number is required.</div>
+<div *ngIf="firForm.get('advocateMobNumber')?.errors?.['pattern']">Phone number must contain only numbers.</div>
+<div *ngIf="firForm.get('advocateMobNumber')?.errors?.['minlength'] || firForm.get('advocateMobNumber')?.errors?.['maxlength']">Phone number must be exactly 10 digits.</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+                    <!-- Item 77 -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">83. Special Public Prosecutor's Name *</label>
+                        <input type="text" class="form-control" formControlName="publicProsecutor" placeholder="Enter Name" required />
+                    </div>
+                    <!-- Item 78 -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">84. Special Public Prosecutor's Phone Number *</label>
+                        <input type="text" class="form-control" formControlName="prosecutorPhone" placeholder="Enter Phone Number" required  (keypress)="allowOnlyNumbers($event)"
+                        maxlength="10">
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
+
+
+
+
+
+
+
+        <!-- Select Hearing Date -->
         <div class="card border-primary mb-4">
-          <div class="card-body">
-            <h4 class="mb-4">Select Hearing Date</h4>
-            <div class="row">
-              <div class="col-md-4 mb-3">
-                <label class="form-label">79. First Hearing Date *</label>
-                <input type="date" class="form-control" formControlName="firstHearingDate" required />
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">80. Has a Judgement been awarded in the case? *</label>
-                <select formControlName="judgementAwarded" class="form-select" (change)="onJudgementSelectionChange($event)">
-                  <option value="" disabled>Select One</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
+            <div class="card-body">
+                <h4 class="mb-4">Select Hearing Date</h4>
+                <div class="row">
+                    <!-- First Hearing Date -->
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">85. First Hearing Date *</label>
+                        <input type="date" class="form-control" formControlName="firstHearingDate" required />
+                    </div>
+
+                    <!-- Has a Judgement been awarded in the case? -->
+                    <div class="col-md-6">
+                        <label class="form-label">86. Has a Judgement been awarded in the case? *</label>
+                        <select formControlName="judgementAwarded" class="form-select" (change)="onJudgementSelectionChange($event)">
+                            <option value="" disabled>Select One</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                </div>
+
+
+
+
+
             </div>
-          </div>
         </div>
+
+
+
+
+
+
+
+
+        <!-- ........................................................... -->
+
+
+
         <div *ngIf="firForm.get('judgementAwarded')?.value === 'no'">
           <div class="border border-primary rounded p-3 mb-4">
             <div formArrayName="hearingDetails">
               <div *ngFor="let hearing of hearingDetails.controls; let i = index" [formGroupName]="i" class="row mb-3">
+                <!-- Next Hearing Date -->
                 <div class="col-md-4 mb-3">
-                  <label class="form-label">81. Next Hearing Date *</label>
-                  <input type="date" class="form-control" formControlName="nextHearingDate" placeholder="Select Next Hearing Date"/>
+                  <label class="form-label">87. Next Hearing Date *</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    formControlName="nextHearingDate"
+                    placeholder="Select Next Hearing Date"
+                  />
                 </div>
+
+                <!-- Reason for Next Hearing -->
                 <div class="col-md-4 mb-3">
-                  <label class="form-label">82. Reason for Next Hearing *</label>
-                  <input type="text" class="form-control" formControlName="reasonNextHearing" placeholder="Enter Reason"/>
+                  <label class="form-label">88. Reason for Next Hearing *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    formControlName="reasonNextHearing"
+                    placeholder="Enter Reason"
+                  />
                 </div>
+
+                <!-- Buttons for Add and Delete -->
                 <div class="col-md-4 d-flex align-items-end">
                   <button type="button" class="btn btn-primary me-2" (click)="addHearingDetail()">
                     <i class="bi bi-plus-circle"></i>
                   </button>
+
+                  <!-- Delete button will not be shown for the first index -->
                   <button *ngIf="i !== 0" type="button" class="btn btn-danger" (click)="removeHearingDetail(i)">
                     <i class="bi bi-trash"></i>
                   </button>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div *ngIf="firForm.get('judgementAwarded')?.value === 'yes' || firForm.get('judgementAwarded1')?.value === 'yes'" formGroupName="judgementDetails">
-          <div class="border border-primary rounded p-3 mb-4">
-            <h5 class="text-primary">Judgement Details</h5>
+
+
+
+
+            <!-- .......................... -->
             <div class="row align-items-center">
-              <div class="col-md-6">
-                <label class="form-label">83. Nature of Judgement *</label>
-                <select class="form-select" formControlName="judgementNature" (change)="onJudgementNatureChange()" required>
-                  <option value="" disabled selected>Select Nature of Judgement</option>
-                  <option value="Convicted">Accused person(s) has been Convicted</option>
-                  <option value="Acquitted">Accused person(s) have been Acquitted</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">84. Upload Judgement Copy *</label>
-                <input type="file" class="form-control" (change)="uploadJudgementSelect($event)"  id="uploadJudgement" formControlName="uploadJudgement" required/>
-              </div>
-            </div>
+            <div class="col-md-6">
+              <label class="form-label">89. Has a Judgement been awarded in the case? *</label>
+
           </div>
-          <div class="border border-primary rounded p-3 mb-4" *ngIf="showLegalOpinionObtained || showFiledBy || showDesignatedCourt">
-            <h5 class="text-primary">Appeal Details</h5>
-            <div class="row align-items-center">
-              <div class="col-md-6" *ngIf="showLegalOpinionObtained">
-                <label class="form-label">85. Has legal opinion obtained?</label>
-                <select class="form-select" formControlName="legalOpinionObtained" (change)="onLegalOpinionChange()">
-                  <option value="" disabled selected>Select Option</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-              <div *ngIf="showCaseFitForAppeal" class="col-md-6 mt-3">
-                <label class="form-label">86. Is the case fit for appeal?</label>
-                <select class="form-select" formControlName="caseFitForAppeal">
-                  <option value="" disabled selected>Select Option</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-              <div *ngIf="showCaseFitForAppeal" class="col-md-6 mt-3">
-                <label class="form-label">87. Has the government approved for appeal?</label>
-                <select class="form-select" formControlName="governmentApprovalForAppeal">
-                  <option value="" disabled selected>Select Option</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-              <div class="col-md-6 mt-3" *ngIf="showFiledBy">
-                <label class="form-label">88. Who has filed the appeal?</label>
-                <select class="form-select" formControlName="filedBy">
-                  <option value="" disabled selected>Select Option</option>
-                  <option value="victim">Victim</option>
-                  <option value="government">Government</option>
-                </select>
-              </div>
-              <div class="col-md-6 mt-3" *ngIf="showDesignatedCourt">
-                <label class="form-label">89. Name of the Designated/ Special court</label>
-                <select class="form-select" formControlName="designatedCourt" (change)="onDesignatedCourtChange($event)">
-                  <option value="" disabled selected>Select Option</option>
-                  <option value="highCourt">High Court</option>
-                  <option value="supremeCourt">Supreme Court</option>
-                </select>
-              </div>
-            </div>
+          <div class="col-md-3">
+            <select formControlName="judgementAwarded1" class="form-select" (change)="onJudgementSelectionChangehearing($event)">
+                <option value="" disabled>Select One</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        </div>
           </div>
         </div>
-        <div *ngIf="showDuplicateSection">
-          <div class="card border-primary">
-            <div class="card-body">
-              <h4 class="mb-4">73. 1 st Case Trial and Court Details</h4>
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">1. Name of the Designated / Special court *</label>
-                  <input type="text" class="form-control" formControlName="Court_one" placeholder="Enter Name" required />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">2. District in which court is present *</label>
-                  <select class="form-select" formControlName="courtDistrict_one" required>
-                    <option value="" disabled selected>Select District</option>
-                    <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
-                  </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">3. Case Number Report (CNR) / Special SC number *</label>
-                  <input type="text" class="form-control" formControlName="caseNumber_one" placeholder="Enter Case Number" required />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">4. Special Public Prosecutor's Name *</label>
-                  <input type="text" class="form-control" formControlName="publicProsecutor_one" placeholder="Enter Name" required />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">5. Special Public Prosecutor's Phone Number *</label>
-                  <input type="text" class="form-control" formControlName="prosecutorPhone_one" placeholder="Enter Phone Number" required />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card border-primary mb-4 mt-3">
-            <div class="card-body">
-              <h4 class="mb-4"> 1 . Select Hearing Date</h4>
-              <div class="row">
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">6. First Hearing Date *</label>
-                  <input type="date" class="form-control" formControlName="firstHearingDate_one" required />
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label">7. Has a Judgement been awarded in the case? *</label>
-                  <select formControlName="judgementAwarded_one" class="form-select" (change)="onJudgementSelectionChange_one($event)">
-                    <option value="" disabled>Select One</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div *ngIf="firForm.get('judgementAwarded_one')?.value === 'no'">
-            <div class="border border-primary rounded p-3 mb-4">
-              <div formArrayName="hearingDetails_one">
-                <div class="row mb-3" *ngFor="let hearing of hearingDetails_one.controls; let i = index" [formGroupName]="i">
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label">8. Next Hearing Date *</label>
-                    <input type="date" class="form-control" formControlName="nextHearingDate_one" placeholder="Select Next Hearing Date"/>
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label">9. Reason for Next Hearing *</label>
-                    <input type="text" class="form-control" formControlName="reasonNextHearing_one" placeholder="Enter Reason"/>
-                  </div>
-                  <div class="col-md-4 d-flex align-items-end">
-                    <button type="button" class="btn btn-primary me-2" (click)="addHearingDetail_one()">
-                      <i class="bi bi-plus-circle"></i>
-                    </button>
-                    <button type="button" class="btn btn-danger" (click)="removeHearingDetail_one(i)" *ngIf="i !== 0">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div class="row align-items-center">
-                <div class="col-md-6">
-                  <label class="form-label">80. Has a Judgement been awarded in the case? *</label>
-                </div>
-                <div class="col-md-3"> 
-                  <select formControlName="judgementAwarded2" class="form-select" (change)="onJudgementSelectionChangehearing1($event)">
-                    <option value="" disabled>Select One</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div *ngIf="firForm.get('judgementAwarded_one')?.value === 'yes' || firForm.get('judgementAwarded2')?.value === 'yes'" formGroupName="judgementDetails_one">
-            <div class="border border-primary rounded p-3 mb-4">
-              <h5 class="text-primary">Judgement Details</h5>
-              <div class="row align-items-center">
-                <div class="col-md-6">
-                  <label class="form-label">10. Nature of Judgement *</label>
-                  <select class="form-select" formControlName="judgementNature_one" (change)="onJudgementNatureChange_one()" required>
-                    <option value="" disabled>Select Nature of Judgement</option>
-                    <option value="Convicted_one">Accused person(s) has been Convicted</option>
-                    <option value="Acquitted_one">Accused person(s) have been Acquitted</option>
-                  </select>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">12. Upload Judgement Copy *</label>
-                  <input type="file" class="form-control" id="uploadJudgement_one" formControlName="uploadJudgement_one" />
-                </div>
-              </div>
-            </div>
-            <div class="border border-primary rounded p-3 mb-4" *ngIf="showLegalOpinionObtained_one || showFiledBy_one || showDesignatedCourt_one">
-              <h5 class="text-primary">Appeal Details</h5>
-              <div class="row align-items-center">
-                <div class="col-md-6" *ngIf="showLegalOpinionObtained_one">
-                  <label class="form-label">13. Has legal opinion obtained?</label>
-                  <select class="form-select" formControlName="legalOpinionObtained_one" (change)="onLegalOpinionChange_one()">
-                    <option value="" disabled>Select Option</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
-                </div>
-                <div class="col-md-6" *ngIf="showCaseFitForAppeal_one">
-                  <label class="form-label">15. Is the case fit for appeal?</label>
-                  <select class="form-select" formControlName="caseFitForAppeal_one">
-                    <option value="" disabled>Select Option</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
-                </div>
-                <div *ngIf="showCaseFitForAppeal_one" class="col-md-6 mt-3">
-                  <label class="form-label">16. Has the government approved for appeal?</label>
-                  <select class="form-select" formControlName="governmentApprovalForAppeal_one">
-                    <option value="" disabled selected>Select Option</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
-                </div>
-                <div class="col-md-6" *ngIf="showFiledBy_one">
-                  <label class="form-label">17. Who has filed the appeal?</label>
-                  <select class="form-select" formControlName="filedBy_one">
-                    <option value="" disabled>Select Option</option>
-                    <option value="victim_one">Victim</option>
-                    <option value="government_one">Government</option>
-                  </select>
-                </div>
-                <div class="col-md-6" *ngIf="showDesignatedCourt_one">
-                  <label class="form-label">18. Name of the Designated/Special Court</label>
-                  <select class="form-select" formControlName="designatedCourt_one" (change)="onDesignatedCourtChange_one($event)">
-                    <option value="" disabled>Select Option</option>
-                    <option value="highCourt_one">High Court</option>
-                    <option value="supremeCourt_one">Supreme Court</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div *ngIf="showDuplicateSection_1">
-          <div class="card border-primary">
-            <div class="card-body">
-              <h4 class="mb-4"> 73. 2nd Case Trial and Court Details</h4>
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">1. Name of the Designated / Special court *</label>
-                  <input type="text" class="form-control" formControlName="Court_three" placeholder="Enter Name" required />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">2. District in which court is present *</label>
-                  <select class="form-select" formControlName="courtDistrict_two" required>
-                    <option value="" disabled selected>Select District</option>
-                    <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
-                  </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">3. Case Number Report (CNR) / Special SC number *</label>
-                  <input type="text" class="form-control" formControlName="caseNumber_two" placeholder="Enter Case Number" required />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">4. Special Public Prosecutor's Name *</label>
-                  <input type="text" class="form-control" formControlName="publicProsecutor_two" placeholder="Enter Name" required />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">5. Special Public Prosecutor's Phone Number *</label>
-                  <input type="text" class="form-control" formControlName="prosecutorPhone_two" placeholder="Enter Phone Number" required />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card border-primary mb-4 mt-3">
-            <div class="card-body">
-              <h4 class="mb-4">Select Hearing Date</h4>
-              <div class="row">
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">6. First Hearing Date *</label>
-                  <input type="date" class="form-control" formControlName="firstHearingDate_two" required />
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label">7. Has a Judgement been awarded in the case? *</label>
-                  <select formControlName="judgementAwarded_two" class="form-select" (change)="onJudgementSelectionChange_two($event)">
-                    <option value="" disabled>Select One</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div *ngIf="firForm.get('judgementAwarded_two')?.value === 'no'">
-            <div class="border border-primary rounded p-3 mb-4">
-              <div formArrayName="hearingDetails_two">
-                <div class="row mb-3" *ngFor="let hearing of hearingDetails_two.controls; let i = index" [formGroupName]="i">
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label">8. Next Hearing Date *</label>
-                    <input type="date" class="form-control" formControlName="nextHearingDate_two" placeholder="Select Next Hearing Date"/>
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label">9. Reason for Next Hearing *</label>
-                    <input type="text" class="form-control" formControlName="reasonNextHearing_two" placeholder="Enter Reason"/>
-                  </div>
-                  <div class="col-md-4 d-flex align-items-end">
-                    <button type="button" class="btn btn-primary me-2" (click)="addHearingDetail_two()">
-                      <i class="bi bi-plus-circle"></i>
-                    </button>
-                    <button type="button" class="btn btn-danger" (click)="removeHearingDetail_two(i)" *ngIf="i !== 0">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div class="row align-items-center">
-                <div class="col-md-6">
-                  <label class="form-label">80. Has a Judgement been awarded in the case? *</label>    
-                </div>
-                <div class="col-md-3"> 
-                  <select formControlName="judgementAwarded3" class="form-select" (change)="onJudgementSelectionChangehearing2($event)">
-                    <option value="" disabled>Select One</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div *ngIf="firForm.get('judgementAwarded_two')?.value === 'yes' || firForm.get('judgementAwarded3')?.value === 'yes'" formGroupName="judgementDetails_two">
-            <div class="border border-primary rounded p-3 mb-4">
-              <h5 class="text-primary">Judgement Details</h5>
-              <div class="row align-items-center">
-                <div class="col-md-6">
-                  <label class="form-label">10. Nature of Judgement *</label>
-                  <select class="form-select" formControlName="judgementNature_two" (change)="onJudgementNatureChange_two()" required>
-                    <option value="" disabled>Select Nature of Judgement</option>
-                    <option value="Convicted_two">Accused person(s) has been Convicted</option>
-                    <option value="Acquitted_two">Accused person(s) have been Acquitted</option>
-                  </select>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">12. Upload Judgement Copy *</label>
-                  <input type="file" class="form-control" id="uploadJudgement_two" formControlName="uploadJudgement_two" />
-                </div>
-              </div>
-            </div>
-            <div class="border border-primary rounded p-3 mb-4" *ngIf="showLegalOpinionObtained_two || showFiledBy_two || showDesignatedCourt_two">
-              <h5 class="text-primary">Appeal Details</h5>
-              <div class="row align-items-center">
-                <div class="col-md-6" *ngIf="showLegalOpinionObtained_two">
-                  <label class="form-label">13. Has legal opinion obtained?</label>
-                  <select class="form-select" formControlName="legalOpinionObtained_two" (change)="onLegalOpinionChange_two()">
-                    <option value="" disabled>Select Option</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
-                </div>
-                <div class="col-md-6" *ngIf="showCaseFitForAppeal_two">
-                  <label class="form-label">15. Is the case fit for appeal?</label>
-                  <select class="form-select" formControlName="caseFitForAppeal_two">
-                    <option value="" disabled>Select Option</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
-                </div>
-                <div *ngIf="showCaseFitForAppeal_two" class="col-md-6 mt-3">
-                  <label class="form-label">16. Has the government approved for appeal?</label>
-                  <select class="form-select" formControlName="governmentApprovalForAppeal_two">
-                    <option value="" disabled selected>Select Option</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
-                </div>
-                <div class="col-md-6" *ngIf="showFiledBy_two">
-                  <label class="form-label">17. Who has filed the appeal?</label>
-                  <select class="form-select" formControlName="filedBy_two">
-                    <option value="" disabled>Select Option</option>
-                    <option value="victim_two">Victim</option>
-                    <option value="government_two">Government</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div  *ngIf="!hideCompensationSection">
-          <div *ngFor="let victimRelief of victimsRelief.controls; let i = index" [formGroupName]="i"  class="card border-primary mb-4">
-            <div class="card-body">
-              <h5 class="text-primary">Victim #{{ i + 1 }} Relief Details</h5>
-              <div class="mb-4 col-lg-4">
-                <label class="form-label">85. Name of the Victim *</label>
-                <input type="text" class="form-control mb-3" [value]="victimNames[i]" placeholder="Name of the Victim" disabled />
-              </div>
-              <div class="row mb-3">
-                <div class="col-8">
-                  <label class="form-label">86. Eligible relief amount for the victim as per the SC and ST Prevention of Atrocities Act (amended upto 2016) *</label>
-                </div>
-                <div class="col-4 text-end">
-                  <input type="text" class="form-control text-end" formControlName="reliefAmountScst" placeholder="₹ 100" readonly />
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-8">
-                  <label class="form-label">87. Eligible relief amount for the victim (ex-gratia) by the Govt. of Tamil Nadu *</label>
-                </div>
-                <div class="col-4 text-end">
-                  <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia" placeholder="₹ 100" readonly />
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-8">
-                  <label class="form-label">88. Eligible amount for the victim for the 3rd stage of relief *</label>
-                </div>
-                <div class="col-4 text-end">
-                  <input type="text" class="form-control text-end" formControlName="reliefAmountThirdStage" placeholder="₹ 100" readonly />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card border-primary mb-4">
-            <div class="card-body">
-              <div class="row mb-4">
-                <div class="col-8">
-                  <label class="form-label">89. Total amount for 3rd Stage of Compensation (Total across all victims) *</label>
-                </div>
-                <div class="col-4">
-                  <input type="text" class="form-control text-end" formControlName="totalCompensation" placeholder="₹ 300" />
-                </div>
-              </div>
-              <div class="row mb-4">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">90. Proceedings File No. *</label>
-                  <input type="text" class="form-control" formControlName="proceedingsFileNo" placeholder="Enter File No." />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">91. Proceedings Date *</label>
-                  <input type="date" class="form-control" formControlName="proceedingsDate" />
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">92. Upload Commissionerate / S.P. Office Proceedings *</label>
-                  <input type="file" class="form-control" (change)="onuploadproceedSelect($event)" formControlName="uploadProceedings" id="uploadProceedings" />
-                </div>
-              </div>
-              <div class="mb-4">
-                <label class="form-label">93. Upload Other Attachment (If any)</label>
-                <div class="file-drop-container">
-                  <ngx-dropzone (drop)="onDrop($event)" (fileOver)="onFileOver($event)" (click)="triggerFileInputClick()"  [accept]="'image/*'"  [multiple]="true" class="dropzone">
-                    <input #fileInput type="file" (change)="onChange($event)" multiple accept="image/*" class="file-input-hidden" />
-                    <div class="dropzone-content" [ngClass]="{'file-over': isFileOver}">
-                      <p *ngIf="!isFileOver">Drag and drop your files here or click to select</p>
-                      <p *ngIf="isFileOver">Release to drop the files!</p>
+
+
+
+                <div *ngIf="firForm.get('judgementAwarded')?.value === 'yes' || firForm.get('judgementAwarded1')?.value === 'yes'" formGroupName="judgementDetails">
+                  <!-- Nature of Judgement and Upload Judgement Copy Section -->
+                  <div class="border border-primary rounded p-3 mb-4">
+                    <h5 class="text-primary">Judgement Details</h5>
+                    <div class="row align-items-center">
+                      <!-- Nature of Judgement -->
+                      <div class="col-md-6">
+                        <label class="form-label">87. Nature of Judgement *</label>
+                        <select
+                          class="form-select"
+                          formControlName="judgementNature"
+                          (change)="onJudgementNatureChange()"
+                          required
+                        >
+                          <option value="" disabled selected>Select Nature of Judgement</option>
+                          <option value="Convicted">Accused person(s) has been Convicted</option>
+                          <option value="Acquitted">Accused person(s) have been Acquitted</option>
+                        </select>
+                      </div>
+
+                      <!-- Upload Judgement Copy -->
+                      <!-- <div class="col-md-6">
+                        <label class="form-label">88. Upload Judgement Copy *</label>
+                        <input
+                          type="file"
+                          class="form-control"
+                          id="uploadJudgement"
+                          (change)="uploadJudgementSelect($event)"
+                          formControlName="uploadJudgement"
+                          required
+                        />
+                      </div> -->
+
+                      <div class="col-md-6">
+                        <label class="form-label">88. Upload Judgement Copy *</label>
+                        <input
+                          type="file"
+                          class="form-control"
+                          id="uploadJudgement"
+                          (change)="uploadJudgementSelect($event)"
+                          formControlName="uploadJudgement"
+                          accept="image/*"
+                          required
+                        />
+                      
+                        <!-- Image Preview -->
+                        <div *ngIf="uploadJudgementPreview" class="mt-2">
+                          <img
+                            [src]="uploadJudgementPreview"
+                            alt="Judgement Copy Preview"
+                            class="img-thumbnail"
+                            style="max-width: 150px; max-height: 150px"
+                          />
+                        </div>
+                      </div>
+                      
                     </div>
-                  </ngx-dropzone>
-                  <div class="file-previews">
-                    <div *ngFor="let file of files; let i = index" class="file-preview">
-                      <img *ngIf="file.previewUrl" [src]="file.previewUrl" alt="file preview" class="file-preview-img" />
-                      <p>{{ file.name }}</p>
-                      <button class="remove-file" (click)="removeFile(i)">Remove</button>
+                  </div>
+
+                  <!-- Appeal Details Section -->
+                  <div class="border border-primary rounded p-3 mb-4" *ngIf="showLegalOpinionObtained || showFiledBy || showDesignatedCourt">
+                    <h5 class="text-primary">Appeal Details</h5>
+                    <div class="row align-items-center">
+                      <!-- Has legal opinion obtained -->
+                      <div class="col-md-6" *ngIf="showLegalOpinionObtained">
+                        <label class="form-label">97. Has legal opinion obtained?</label>
+                        <select
+                          class="form-select"
+                          formControlName="legalOpinionObtained"
+                          (change)="onLegalOpinionChange()"
+                        >
+                          <option value="" disabled selected>Select Option</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
+                      </div>
+
+                      <!-- Is the case fit for appeal -->
+                      <div *ngIf="showCaseFitForAppeal" class="col-md-6 mt-3">
+                        <label class="form-label">98. Is the case fit for appeal?</label>
+                        <select class="form-select" formControlName="caseFitForAppeal">
+                          <option value="" disabled selected>Select Option</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
+                      </div>
+
+                      <!-- Has the government approved for appeal -->
+                      <div *ngIf="showCaseFitForAppeal" class="col-md-6 mt-3">
+                        <label class="form-label">99. Has the government approved for appeal?</label>
+                        <select class="form-select" formControlName="governmentApprovalForAppeal">
+                          <option value="" disabled selected>Select Option</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
+                      </div>
+
+                      <!-- Who has filed the appeal -->
+                      <div class="col-md-6 mt-3" *ngIf="showFiledBy">
+                        <label class="form-label">100. Who has filed the appeal?</label>
+                        <select class="form-select" formControlName="filedBy">
+                          <option value="" disabled selected>Select Option</option>
+                          <option value="victim">Victim</option>
+                          <option value="government">Government</option>
+                        </select>
+                      </div>
+
+                      <!-- Name of the Designated/ Special court -->
+                      <div class="col-md-6 mt-3" *ngIf="showDesignatedCourt">
+                        <label class="form-label">101. Name of the Designated/ Special court</label>
+                        <select
+                        class="form-select"
+                        formControlName="designatedCourt"
+                        (change)="onDesignatedCourtChange($event)"
+                      >
+                          <option value="" disabled selected>Select Option</option>
+                          <option value="highCourt">High Court</option>
+                          <option value="supremeCourt">Supreme Court</option>
+                        </select>
+                      </div>
+
+
+
+
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="mt-4">
-          <button type="button" class="btn btn-warning me-2" (click)="UpdateAsDraft_7()">Save as Draft</button>
-          <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-          <button type="submit" class="btn btn-primary" (click)="submitStepSeven();UpdateAsDraft_7()">Submit</button>
-        </div>
+
+
+                <div *ngIf="showDuplicateSection">
+                  <div class="card border-primary">
+                    <div class="card-body">
+                        <h4 class="mb-4">Case Trial and Court Details</h4>
+                        <div class="row">
+                            <!-- Item 74 -->
+                            <!-- <div class="col-md-6 mb-3">
+                                <label class="form-label">1. Name of the Designated / Special court *</label>
+                                <input type="text" class="form-control" formControlName="Court_one" placeholder="Enter Name" required />
+                            </div> -->
+
+
+                            <div class="col-md-6 mb-3">
+                              <label class="form-label">1. District in which court is present *</label>
+                              <select class="form-select" formControlName="courtDistrict_one" required>
+                                <option value="" disabled selected>Select District</option>
+                                <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
+                              </select>
+                            </div>
+                            <!-- Item 76 -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">2. Case Number Report (CNR) / Special SC number *</label>
+                                <input type="text" class="form-control" formControlName="caseNumber_one" placeholder="Enter Case Number" required />
+                            </div>
+                            <!-- Item 77 -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">3. Special Public Prosecutor's Name *</label>
+                                <input type="text" class="form-control" formControlName="publicProsecutor_one" placeholder="Enter Name" required >
+                            </div>
+                            <!-- Item 78 -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">4. Special Public Prosecutor's Phone Number *</label>
+                                <input type="text" class="form-control" formControlName="prosecutorPhone_one" placeholder="Enter Phone Number" required  (keypress)="allowOnlyNumbers($event)"
+                                maxlength="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Select Hearing Date -->
+                <div class="card border-primary mb-4 mt-3">
+                    <div class="card-body">
+                        <h4 class="mb-4">Select Hearing Date</h4>
+                        <div class="row">
+                            <!-- First Hearing Date -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">5. First Hearing Date *</label>
+                                <input type="date" class="form-control" formControlName="firstHearingDate_one" required />
+                            </div>
+
+                            <!-- Has a Judgement been awarded in the case? -->
+                            <div class="col-md-4">
+                              <label class="form-label">6. Has a Judgement been awarded in the case? *</label>
+                              <select
+                                formControlName="judgementAwarded_one"
+                                class="form-select"
+                                (change)="onJudgementSelectionChange_one($event)"
+                              >
+                                <option value="" disabled>Select One</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                              </select>
+                            </div>
+
+                        </div>
+
+
+
+
+
+                    </div>
+                </div>
+
+
+
+                <div *ngIf="firForm.get('judgementAwarded_one')?.value === 'no'">
+                  <div class="border border-primary rounded p-3 mb-4">
+                    <!-- Wrap the entire section with formArrayName -->
+                    <div formArrayName="hearingDetails_one">
+                      <div
+                        class="row mb-3"
+                        *ngFor="let hearing of hearingDetails_one.controls; let i = index"
+                        [formGroupName]="i"
+                      >
+                        <!-- Next Hearing Date -->
+                        <div class="col-md-4 mb-3">
+                          <label class="form-label">9. Next Hearing Date *</label>
+                          <input
+                            type="date"
+                            class="form-control"
+                            formControlName="nextHearingDate_one"
+                            placeholder="Select Next Hearing Date"
+                          />
+                        </div>
+
+                        <!-- Reason for Next Hearing -->
+                        <div class="col-md-4 mb-3">
+                          <label class="form-label">10. Reason for Next Hearing *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            formControlName="reasonNextHearing_one"
+                            placeholder="Enter Reason"
+                          />
+                        </div>
+
+                        <!-- Add/Remove Buttons -->
+                        <div class="col-md-4 d-flex align-items-end">
+                          <button
+                            type="button"
+                            class="btn btn-primary me-2"
+                            (click)="addHearingDetail_one()"
+                          >
+                            <i class="bi bi-plus-circle"></i>
+                          </button>
+                          <button
+                            type="button"
+                            class="btn btn-danger"
+                            (click)="removeHearingDetail_one(i)"
+                             *ngIf="i !== 0"
+                          >
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row align-items-center">
+                      <div class="col-md-6">
+                        <label class="form-label">11. Has a Judgement been awarded in the case? *</label>
+
+                    </div>
+                    <div class="col-md-3">
+                      <select formControlName="judgementAwarded2" class="form-select" (change)="onJudgementSelectionChangehearing1($event)">
+                          <option value="" disabled>Select One</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                      </select>
+                  </div>
+                  </div>
+                  </div>
+                </div>
+
+
+
+      <div *ngIf="firForm.get('judgementAwarded_one')?.value === 'yes' || firForm.get('judgementAwarded2')?.value === 'yes'" formGroupName="judgementDetails_one">
+                          <!-- Nature of Judgement and Upload Judgement Copy Section -->
+                          <div class="border border-primary rounded p-3 mb-4">
+                            <h5 class="text-primary">Judgement Details</h5>
+                            <div class="row align-items-center">
+                              <!-- Nature of Judgement -->
+                              <div class="col-md-6">
+                                <label class="form-label">12. Nature of Judgement *</label>
+                                <select
+                                  class="form-select"
+                                  formControlName="judgementNature_one"
+                                  (change)="onJudgementNatureChange_one()"
+                                  required
+                                >
+                                  <option value="" disabled>Select Nature of Judgement</option>
+                                  <option value="Convicted_one">Accused person(s) has been Convicted</option>
+                                  <option value="Acquitted_one">Accused person(s) have been Acquitted</option>
+                                </select>
+                              </div>
+
+                              <!-- Upload Judgement Copy -->
+                              <div class="col-md-6">
+                                <label class="form-label">13. Upload Judgement Copy *</label>
+                                <input type="file" class="form-control" id="uploadJudgement_one" formControlName="uploadJudgement_one" />
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Appeal Details Section -->
+                          <div
+                            class="border border-primary rounded p-3 mb-4"
+                            *ngIf="showLegalOpinionObtained_one || showFiledBy_one || showDesignatedCourt_one"
+                          >
+                            <h5 class="text-primary">Appeal Details</h5>
+                            <div class="row align-items-center">
+                              <!-- Has legal opinion obtained -->
+                              <div class="col-md-6" *ngIf="showLegalOpinionObtained_one">
+                                <label class="form-label">13. Has legal opinion obtained?</label>
+                                <select
+                                  class="form-select"
+                                  formControlName="legalOpinionObtained_one"
+                                  (change)="onLegalOpinionChange_one()"
+                                >
+                                  <option value="" disabled>Select Option</option>
+                                  <option value="yes">Yes</option>
+                                  <option value="no">No</option>
+                                </select>
+                              </div>
+
+                              <!-- Is the case fit for appeal -->
+                              <div class="col-md-6" *ngIf="showCaseFitForAppeal_one">
+                                <label class="form-label">15. Is the case fit for appeal?</label>
+                                <select class="form-select" formControlName="caseFitForAppeal_one">
+                                  <option value="" disabled>Select Option</option>
+                                  <option value="yes">Yes</option>
+                                  <option value="no">No</option>
+                                </select>
+                              </div>
+
+
+                              <div *ngIf="showCaseFitForAppeal_one" class="col-md-6 mt-3">
+                                <label class="form-label">16. Has the government approved for appeal?</label>
+                                <select class="form-select" formControlName="governmentApprovalForAppeal_one">
+                                  <option value="" disabled selected>Select Option</option>
+                                  <option value="yes">Yes</option>
+                                  <option value="no">No</option>
+                                </select>
+                              </div>
+
+                              <!-- Who has filed the appeal -->
+                              <div class="col-md-6" *ngIf="showFiledBy_one">
+                                <label class="form-label">17. Who has filed the appeal?</label>
+                                <select class="form-select" formControlName="filedBy_one">
+                                  <option value="" disabled>Select Option</option>
+                                  <option value="victim">Victim</option>
+                                  <option value="government">Government</option>
+                                </select>
+                              </div>
+
+                              <!-- Name of the Designated/Special Court -->
+                              <div class="col-md-6" *ngIf="showDesignatedCourt_one">
+                                <label class="form-label">18. Name of the Designated/Special Court</label>
+                                <select class="form-select" formControlName="designatedCourt_one" (change)="onDesignatedCourtChange_one($event)">
+                                  <option value="" disabled>Select Option</option>
+                                  <!-- <option value="highCourt_one">High Court</option> -->
+                                  <option value="supremeCourt">Supreme Court</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
       </div>
+
+
+
+                </div>
+
+
+                <div *ngIf="showDuplicateSection_1">
+                  <div class="card border-primary">
+                    <div class="card-body">
+                        <h4 class="mb-4">Case Trial and Court Details</h4>
+                        <div class="row">
+
+
+                          <div class="col-md-6 mb-3">
+                            <label class="form-label">2. District in which court is present *</label>
+                            <select class="form-select" formControlName="courtDistrict_two" required>
+                              <option value="" disabled selected>Select District</option>
+                              <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
+                            </select>
+                          </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">3. Case Number Report (CNR) / Special SC number *</label>
+                                <input type="text" class="form-control" formControlName="caseNumber_two" placeholder="Enter Case Number" required />
+                            </div>
+                            <!-- Item 77 -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">4. Special Public Prosecutor's Name *</label>
+                                <input type="text" class="form-control" formControlName="publicProsecutor_two" placeholder="Enter Name" required />
+                            </div>
+                            <!-- Item 78 -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">5. Special Public Prosecutor's Phone Number *</label>
+                                <input type="text" class="form-control" formControlName="prosecutorPhone_two" placeholder="Enter Phone Number" required  (keypress)="allowOnlyNumbers($event)"
+                                maxlength="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Select Hearing Date -->
+                <div class="card border-primary mb-4 mt-3">
+                    <div class="card-body">
+                        <h4 class="mb-4">Select Hearing Date</h4>
+                        <div class="row">
+                            <!-- First Hearing Date -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">6. First Hearing Date *</label>
+                                <input type="date" class="form-control" formControlName="firstHearingDate_two" required />
+                            </div>
+
+                            <!-- Has a Judgement been awarded in the case? -->
+                            <div class="col-md-6">
+                              <label class="form-label">7. Has a Judgement been awarded in the case? *</label>
+                              <select
+                                formControlName="judgementAwarded_two"
+                                class="form-select"
+                                (change)="onJudgementSelectionChange_two($event)"
+                              >
+                                <option value="" disabled>Select One</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                              </select>
+                            </div>
+
+                        </div>
+
+
+
+
+
+                    </div>
+                </div>
+
+
+
+                <div *ngIf="firForm.get('judgementAwarded_two')?.value === 'no'">
+                  <div class="border border-primary rounded p-3 mb-4">
+                    <!-- Wrap the entire section with formArrayName -->
+                    <div formArrayName="hearingDetails_two">
+                      <div
+                        class="row mb-3"
+                        *ngFor="let hearing of hearingDetails_two.controls; let i = index"
+                        [formGroupName]="i"
+                      >
+                        <!-- Next Hearing Date -->
+                        <div class="col-md-4 mb-3">
+                          <label class="form-label">9. Next Hearing Date *</label>
+                          <input
+                            type="date"
+                            class="form-control"
+                            formControlName="nextHearingDate_two"
+                            placeholder="Select Next Hearing Date"
+                          />
+                        </div>
+
+                        <!-- Reason for Next Hearing -->
+                        <div class="col-md-4 mb-3">
+                          <label class="form-label">10. Reason for Next Hearing *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            formControlName="reasonNextHearing_two"
+                            placeholder="Enter Reason"
+                          />
+                        </div>
+
+                        <!-- Add/Remove Buttons -->
+                        <div class="col-md-4 d-flex align-items-end">
+                          <button
+                            type="button"
+                            class="btn btn-primary me-2"
+                            (click)="addHearingDetail_two()"
+                          >
+                            <i class="bi bi-plus-circle"></i>
+                          </button>
+                          <button
+                            type="button"
+                            class="btn btn-danger"
+                            (click)="removeHearingDetail_two(i)"
+                            *ngIf="i !== 0"
+                          >
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row align-items-center">
+                      <div class="col-lg-6">
+                        <label class="form-label">11. Has a Judgement been awarded in the case? *</label>
+
+                    </div>
+                    <div class="col-md-3">
+                      <select formControlName="judgementAwarded3" class="form-select" (change)="onJudgementSelectionChangehearing2($event)">
+                          <option value="" disabled>Select One</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                      </select>
+                  </div>
+                  </div>
+                  </div>
+                </div>
+
+
+
+                <div *ngIf="firForm.get('judgementAwarded_two')?.value === 'yes' || firForm.get('judgementAwarded3')?.value === 'yes'" formGroupName="judgementDetails_two">
+                          <!-- Nature of Judgement and Upload Judgement Copy Section -->
+                          <div class="border border-primary rounded p-3 mb-4">
+                            <h5 class="text-primary">Judgement Details</h5>
+                            <div class="row align-items-center">
+                              <!-- Nature of Judgement -->
+                              <div class="col-md-6">
+                                <label class="form-label">12. Nature of Judgement *</label>
+                                <select
+                                  class="form-select"
+                                  formControlName="judgementNature_two"
+                                  (change)="onJudgementNatureChange_two()"
+                                  required
+                                >
+                                  <option value="" disabled>Select Nature of Judgement</option>
+                                  <option value="Convicted_two">Accused person(s) has been Convicted</option>
+                                  <option value="Acquitted_two">Accused person(s) have been Acquitted</option>
+                                </select>
+                              </div>
+
+                              <!-- Upload Judgement Copy -->
+                              <div class="col-md-6">
+                                <label class="form-label">13. Upload Judgement Copy *</label>
+                                <input type="file" class="form-control" id="uploadJudgement_two" formControlName="uploadJudgement_two" />
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Appeal Details Section -->
+                          <div
+                            class="border border-primary rounded p-3 mb-4"
+                            *ngIf="showLegalOpinionObtained_two || showFiledBy_two || showDesignatedCourt_two"
+                          >
+                            <h5 class="text-primary">Appeal Details</h5>
+                            <div class="row align-items-center">
+                              <!-- Has legal opinion obtained -->
+                              <div class="col-md-6" *ngIf="showLegalOpinionObtained_two">
+                                <label class="form-label">1. Has legal opinion obtained?</label>
+                                <select
+                                  class="form-select"
+                                  formControlName="legalOpinionObtained_two"
+                                  (change)="onLegalOpinionChange_two()"
+                                >
+                                  <option value="" disabled>Select Option</option>
+                                  <option value="yes">Yes</option>
+                                  <option value="no">No</option>
+                                </select>
+                              </div>
+
+                              <!-- Is the case fit for appeal -->
+                              <div class="col-md-6" *ngIf="showCaseFitForAppeal_two">
+                                <label class="form-label">2. Is the case fit for appeal?</label>
+                                <select class="form-select" formControlName="caseFitForAppeal_two">
+                                  <option value="" disabled>Select Option</option>
+                                  <option value="yes">Yes</option>
+                                  <option value="no">No</option>
+                                </select>
+                              </div>
+
+
+                              <div *ngIf="showCaseFitForAppeal_two" class="col-md-6 mt-3">
+                                <label class="form-label">3. Has the government approved for appeal?</label>
+                                <select class="form-select" formControlName="governmentApprovalForAppeal_two">
+                                  <option value="" disabled selected>Select Option</option>
+                                  <option value="yes">Yes</option>
+                                  <option value="no">No</option>
+                                </select>
+                              </div>
+
+                              <!-- Who has filed the appeal -->
+                              <div class="col-md-6" *ngIf="showFiledBy_two">
+                                <label class="form-label">4. Who has filed the appeal?</label>
+                                <select class="form-select" formControlName="filedBy_two">
+                                  <option value="" disabled>Select Option</option>
+                                  <option value="victim_two">Victim</option>
+                                  <option value="government_two">Government</option>
+                                </select>
+                              </div>
+
+                              <!-- Name of the Designated/Special Court -->
+                              <!-- <div class="col-md-6" *ngIf="showDesignatedCourt_three">
+                                <label class="form-label">18. Name of the Designated/Special Court</label>
+                                <select class="form-select" formControlName="designatedCourt_two">
+                                  <option value="" disabled>Select Option</option>
+                                  <option value="highCourt_two">High Court</option>
+                                  <option value="supremeCourt_two">Supreme Court</option>
+                                </select>
+                              </div> -->
+                            </div>
+                          </div>
+                        </div>
+
+
+
+                </div>
+
+
+
+
+
+              <!-- <div  *ngIf="!hideCompensationSection">
+                    <div formArrayName="victimsRelief">
+                      <div *ngFor="let victimRelief of victimsRelief.controls; let i = index" [formGroupName]="i"  class="card border-primary mb-4">
+                         <div class="card-body">
+                  <h5 class="text-primary">Victim #{{ i + 1 }} Relief Details</h5>
+
+                 
+                  <div class="mb-4 col-lg-4">
+                      <label class="form-label">89. Name of the Victim *</label>
+                      <input type="text" class="form-control mb-3" [value]="victimNames[i]" placeholder="Name of the Victim" disabled />
+                  </div>
+
+                  <div class="row mb-3">
+                      <div class="col-8">
+                          <label class="form-label">86. Eligible third stage relief amount for the victim as per the SC and ST Prevention of Atrocities Act *</label>
+                      </div>
+                      <div class="col-4 text-end">
+                          <input type="text" class="form-control text-end" formControlName="reliefAmountScst_2"  />
+                      </div>
+                  </div>
+
+                  <div class="row mb-3">
+                      <div class="col-8">
+                          <label class="form-label">90. Eligible third stage relief amount for the victim (ex-gratia) by the Govt. of Tamil Nadu *</label>
+                      </div>
+                      <div class="col-4 text-end">
+                          <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia_2"  />
+                      </div>
+                  </div>
+
+                  <div class="row mb-3">
+                      <div class="col-8">
+                          <label class="form-label">91. Total Eligible amount for the victim for the Third stage of relief *</label>
+                      </div>
+                      <div class="col-4 text-end">
+                          <input type="text" class="form-control text-end" formControlName="reliefAmountThirdStage"  readonly />
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          </div>
+
+          <div class="card border-primary mb-4">
+              <div class="card-body">
+              
+                  <div class="row mb-4">
+                      <div class="col-8">
+                          <label class="form-label">92. Total amount for third stage of compensation (total of relief across all victims) *</label>
+                      </div>
+                      <div class="col-4">
+                          <input type="text" class="form-control text-end" formControlName="totalCompensation_2" readonly/>
+                      </div>
+                  </div>
+
+                
+                  <div class="row mb-4">
+                      <div class="col-md-6 mb-3">
+                          <label class="form-label">93. Proceedings File No. *</label>
+                          <input type="text" class="form-control" formControlName="proceedingsFileNo_2" placeholder="Enter File No." />
+                      </div>
+                      <div class="col-md-6 mb-3">
+                          <label class="form-label">94. Proceedings Date *</label>
+                          <input type="date" class="form-control" formControlName="proceedingsDate_2" [max]="today" />
+                      </div>
+               
+                      <div class="col-md-12 mb-3">
+                        <label class="form-label">95. Upload Commissionerate / S.P. Office Proceedings *</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          (change)="onuploadproceedSelect($event)"
+                          class="form-control"
+                          formControlName="uploadProceedings_2"
+                        />
+                      
+                   
+                        <div *ngIf="uploadedImageSrc" class="mt-3">
+                     
+                          <img [src]="uploadedImageSrc" alt="Uploaded Image" class="img-thumbnail" style="max-width: 200px; max-height: 200px;" />
+                        </div>
+                      </div>
+                      
+
+                  </div>
+
+         
+                  <div class="mb-4" formArrayName="attachments_2">
+                    <label class="form-label">96. Upload Other Attachments (If any)</label>
+                    <div
+                      class="mb-3"
+                      *ngFor="let attachment of attachments_2.controls; let j = index"
+                      [formGroupName]="j"
+                    >
+                      <div class="input-group">
+             
+                        <input
+                          type="file"
+                          class="form-control"
+                          (change)="onFileSelect_2($event, j)"
+                          formControlName="file_2"
+                          accept="image/*"
+                        />
+                 
+                        <button
+                          type="button"
+                          class="btn btn-danger btn-sm ms-2"
+                          (click)="removeAttachment_2(j)"
+                          *ngIf="attachments_2.length > 1"
+                          title="Remove Attachment"
+                        >
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
+                  
+                      <div *ngIf="filePreviews[j]" class="mt-2">
+                        <img
+                          [src]="filePreviews[j]"
+                          alt="Preview"
+                          class="img-thumbnail"
+                          style="max-width: 150px; max-height: 150px"
+                        />
+                      </div>
+                    </div>
+              
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-sm"
+                      (click)="addAttachment_2()"
+                    >
+                      Add Attachment
+                    </button>
+                  </div>
+                  
+                  
+
+              </div>
+          </div>
+</div> -->
+        <!-- Navigation Buttons -->
+        <div class="mt-4">
+            <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft_7()">
+                Save as Draft
+            </button>
+            <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">
+                Previous
+            </button>
+            <!-- (click)="submitStepSeven()" -->
+            <button type="submit" class="btn btn-primary" 
+            (click)="saveAsDraft_7()" >
+                Submit
+            </button>
+        </div>
+</div>
     </form>
   </div>
 </div>

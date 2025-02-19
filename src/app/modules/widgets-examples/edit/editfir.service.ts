@@ -128,10 +128,17 @@ saveStepFiveAsDraft(firData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/save-step-seven`, firData);
   }
 
-  editStepSevenAsDraft(firData: any): Observable<any> {
+  // editStepSevenAsDraft(firData: any): Observable<any> {
+  //   return this.http.post(`${this.baseUrl}/save-step-sevenedit`, firData);
+  // }
+
+
+  editStepSevenAsDraft(firData: any, hearingdetail: any): Observable<any> {
+    // Add hearingdetail directly to firData
+    firData.hearingdetail = hearingdetail;
+  
     return this.http.post(`${this.baseUrl}/save-step-sevenedit`, firData);
   }
-
 
   updateFirStatus(firId: string, status: number): Observable<any> {
     return this.http.put(`${this.baseUrl}/update-status`, { firId, status });
