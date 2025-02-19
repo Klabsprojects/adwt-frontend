@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { DistrictService } from './district.service';
 import { OffenceService } from './offence.service';
 import { Observable, forkJoin } from 'rxjs';
@@ -11,7 +12,9 @@ import * as xlsx from 'xlsx';
   providedIn: 'root',
 })
 export class ReportsCommonService {
+
   constructor(
+    private http: HttpClient,
     private districtService: DistrictService,
     private offenceService: OffenceService
   ) {}
@@ -151,6 +154,8 @@ export class ReportsCommonService {
       : caseStatusIndex === 5 ? 'Completed FIR Stage' 
       : caseStatusIndex === 6 ? 'Charge Sheet Completed'
       : caseStatusIndex === 7 ? 'Trial Stage Completed' 
+      : caseStatusIndex === 8 ? 'This Case is Altered Case' 
+      : caseStatusIndex === 9 ? 'Mistake Of Fact'
       : '';
   }
 

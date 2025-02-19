@@ -18,6 +18,11 @@ export class MonthlyReportService {
     return this.http.get(`${this.baseUrl}/districts`);
   }
 
+  // Fetches all monthly report details 
+  getMonthlyReportDetail(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/get-monthly-report-details`);
+  }
+
   // Get attendees for SDLVMC or DLVMC
   getAttendees(
     district: string,
