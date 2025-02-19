@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.prod';
-import { FormArray, FormGroup } from '@angular/forms';
 @Injectable({
   providedIn: 'root'
 })
@@ -43,11 +42,6 @@ export class FirService {
   // Get offence acts
  getOffenceActs(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/offence-acts`);
-  }
-
-  // Get offence relief details
-  getOffenceReliefDetails(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/offence/relief/details`);
   }
 
   getPoliceRevenue(): Observable<any> {
@@ -119,7 +113,7 @@ saveStepFourAsDraft(firData: any): Observable<any> {
 
 
   firData.accuseds.forEach((accused: any, index: number) => {
-    if (accused.uploadFIRCopy && accused.uploadFIRCopy.length > 0 && Array.isArray(accused.uploadFIRCopy)) {
+    if (accused.uploadFIRCopy && accused.uploadFIRCopy.length > 0) {
       accused.uploadFIRCopy.forEach((file: File) => {
         formData.append(`uploadFIRCopy[]`, file, file.name);
       });
@@ -326,138 +320,10 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/save-step-sevenedit`, firData)
   }
 
-  // saveStepSevenAsDraft(firData : any) :Observable<any> {
-    
-  //   return this.http.post(`${this.baseUrl}/save-step-seven`, firData)
-  // }
-
-
-  saveStepSevenAsDraft(firData: any, hearingdetail: any): Observable<any> {
-    // Add hearingdetail directly to firData
-    firData.hearingdetail = hearingdetail;
-  
-    return this.http.post(`${this.baseUrl}/save-step-seven`, firData);
-  }
-  
-  // Updates the victim's name and mobileNumber fields based on whether the victim is the same as the complainant.
-  onVictimSameAsComplainantChange(isVictimSame: boolean, firForm: FormGroup, wasVictimSame: boolean) {
-    const victimsArray = firForm.get('victims') as FormArray;
-    if (victimsArray && victimsArray.length > 0) {
-      const firstVictim = victimsArray.at(0);
-      console.log('firstVictim.get(mobileNumber) ',firstVictim.get('mobileNumber'));
-      if (isVictimSame) {
-        const complainantName = firForm.get('complainantDetails.nameOfComplainant')?.value;
-        const complainantMobile = firForm.get('complainantDetails.mobileNumberOfComplainant')?.value;
-        console.log('complainantMobile ',complainantMobile);
-        firstVictim.get('name')?.setValue(complainantName, { emitEvent: false });
-        firstVictim.get('name')?.disable(); // Disable the first control
-        firstVictim.get('mobileNumber')?.setValue(complainantMobile, { emitEvent: false });
-        firstVictim.get('mobileNumber')?.disable(); // Disable the first control
-      } else if (wasVictimSame) {
-        // Only reset the name if switching from "Yes" to "No"
-        firstVictim.get('name')?.reset();
-        firstVictim.get('name')?.enable(); // Enable the first control
-        firstVictim.get('mobileNumber')?.reset();
-        firstVictim.get('mobileNumber')?.enable(); // Enable the first control
-      }
-    }
+  saveStepSevenAsDraft(firData : any) :Observable<any> {
+    return this.http.post(`${this.baseUrl}/save-step-seven`, firData)
   }
 
-  // Validates if both the FIR number and its corresponding year are selected for the given field.
-  isFirValid(fir: string, suffix: string, firForm: FormGroup): boolean {
-    // If fir and suffix are 'firNumber' and 'firNumberSuffix', check directly in form values
-    if (fir === 'firNumber' && suffix === 'firNumberSuffix') {
-      return !!(firForm.get(fir)?.value && firForm.get(suffix)?.value);
-    }
-    // Extract numeric index as string
-    const index = fir.match(/\d+$/)?.[0]; 
-    if (!index) return false; // Return false if no index is found
-    // Convert index to number for array access
-    const accused = firForm.value.accuseds?.[parseInt(index, 10)];
-    if (!accused) return false;
-    // Remove index from keys
-    const firKey = fir.replace(index, ''); 
-    const suffixKey = suffix.replace(index, '');
-    return !!(accused[firKey] && accused[suffixKey]); // Check if both values exist
-  }
 
-  // Checks if a given field in the FormArray at a specific index has a valid (non-empty) value.
-  isInputValid(index: number, field: string, formArray: FormArray): boolean {
-    const inputValue = formArray.at(index).get(field)?.value; // Retrieve the field value from FormArray
-    return !!inputValue && inputValue.trim() !== ''; // Returns true if input is filled
-  }
 
-  /**
-  * Handles offence selection changes by updating victim details with relevant SC/ST sections, 
-  * FIR stages, and relief amounts based on selected offences.
-  */
-  onOffenceCommittedChange(
-    selectedOffences: any[],
-    index: number,
-    offenceReliefDetails: any[],
-    victims: FormArray
-  ): void {
-    const victimGroup = victims.at(index) as FormGroup; // Access the victim's FormGroup
-    // Filter to find matching poa_act_section values
-    const matchingSections = offenceReliefDetails
-      .filter(offence => selectedOffences.includes(offence.name_of_offence))
-      .map(offence => offence.poa_act_section);
-    // Set the 31st field with matching sections
-    if (matchingSections.length > 0) {
-      this.getOffenceActs().subscribe(
-        (response: any[]) => {
-          // Filter the offence acts based on selected values
-          const matchedActs = response.filter((act) =>
-            matchingSections.includes(act.offence_act_name)
-          );
-          if (matchedActs.length > 0) {
-            // Update the victim's FormGroup with the fetched values
-            victimGroup.patchValue({
-              scstSections: matchedActs.map(act => act.offence_act_name), // Auto-select field 31
-              fir_stage_as_per_act: matchedActs[0].fir_stage_as_per_act || '',
-              fir_stage_ex_gratia: matchedActs[0].fir_stage_ex_gratia || '',
-              chargesheet_stage_as_per_act: matchedActs[0].chargesheet_stage_as_per_act || '',
-              chargesheet_stage_ex_gratia: matchedActs[0].chargesheet_stage_ex_gratia || '',
-              final_stage_as_per_act: matchedActs[0].final_stage_as_per_act || '',
-              final_stage_ex_gratia: matchedActs[0].final_stage_ex_gratia || '',
-            });
-            // Calculate and update the 1st stage relief amount
-            const reliefAmountFirstStage =
-              parseFloat(matchedActs[0].fir_stage_as_per_act || '0') +
-              parseFloat(matchedActs[0].fir_stage_ex_gratia || '0');
-            victimGroup.patchValue({
-              reliefAmountFirstStage: reliefAmountFirstStage.toFixed(2),
-            });
-          } else {
-            // Reset the fields if no matched acts are found
-            victimGroup.patchValue({
-              scstSections: [],
-              fir_stage_as_per_act: '',
-              fir_stage_ex_gratia: '',
-              chargesheet_stage_as_per_act: '',
-              chargesheet_stage_ex_gratia: '',
-              final_stage_as_per_act: '',
-              final_stage_ex_gratia: '',
-              reliefAmountFirstStage: '', // Reset the 1st stage relief amount
-            });
-          }
-        },
-        (error) => {
-          console.error('Error fetching offence acts:', error);
-        }
-      );
-    } else {
-      // Reset the fields if no sections are selected
-      victimGroup.patchValue({
-        scstSections: [],
-        fir_stage_as_per_act: '',
-        fir_stage_ex_gratia: '',
-        chargesheet_stage_as_per_act: '',
-        chargesheet_stage_ex_gratia: '',
-        final_stage_as_per_act: '',
-        final_stage_ex_gratia: '',
-        reliefAmountFirstStage: '', // Reset the 1st stage relief amount
-      });
-    }
-  }  
 }
