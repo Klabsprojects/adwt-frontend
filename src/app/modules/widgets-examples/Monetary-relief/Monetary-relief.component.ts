@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MonetaryReliefService } from 'src/app/services/monetary-relief.service';
 import { ReportsCommonService } from 'src/app/services/reports-common.service';
 
 @Component({
@@ -158,6 +159,7 @@ export class MonetaryReliefComponent implements OnInit {
     // private firService: FirListTestService,
     private cdr: ChangeDetectorRef,
     private reportsCommonService: ReportsCommonService,
+    private monetaryReliefService: MonetaryReliefService,
     private router: Router
   ) {}
 
@@ -167,7 +169,7 @@ export class MonetaryReliefComponent implements OnInit {
       .subscribe(({ districts, offences }) => {
         this.districts = districts;
         this.naturesOfOffence = offences;
-        this.generateDummyData();
+        this.fetchMonetaryReliefDetails();
       });
     this.filteredData = [...this.reportData];
     this.selectedColumns = this.displayedColumns.map((column) => column.field);
@@ -198,31 +200,36 @@ export class MonetaryReliefComponent implements OnInit {
     );
   }
 
-  // Load FIR list from the backend (dummy data for now)
-  generateDummyData(): void {
-    for (let i = 1; i <= 15; i++) {
-      const caseStatusIndex = Math.floor(Math.random() * 8);
-      const caseStatus =
-        this.reportsCommonService.getCaseStatus(caseStatusIndex);
-      this.reportData.push({
-        sl_no: i,
-        fir_id: `FIR-${1000 + i}`,
-        police_city: this.districts[i % this.districts.length],
-        police_station: `Station ${i}`,
-        status: caseStatus,
-        nature_of_offence:
-          this.naturesOfOffence[i % this.naturesOfOffence.length],
-        case_status: this.caseStatusOptions[i % this.caseStatusOptions.length],
-        relief_status: 'Relief Pending',
-        victim_name: `Victim ${i}`,
-        reason_previous_month: 'Pending',
-        reason_current_month: 'In Progress',
-      });
-    }
-    this.filteredData = [...this.reportData]; // Update filteredData
-    this.cdr.detectChanges(); // Trigger change detection
+  // Load all monetaty relief reports details into UI
+  fetchMonetaryReliefDetails(): void {
+    this.monetaryReliefService.getMonetaryReliefDetails().subscribe({
+      next: (response) => {
+        console.log('Monetary Reliefs:', response.data); // Debugging
+        // Transform API response to match frontend structure
+        this.reportData = response.data.map((item: { fir_number: any; police_city: any; police_station: any; status: number; offence_committed: any; victim_name: any; previous_month_reason_for_status: any; current_month_reason_for_status: any; }, index: number) => ({
+          sl_no: index + 1,
+          fir_id: item.fir_number,
+          police_city:  item.police_city,
+          police_station: item.police_station,
+          status: this.reportsCommonService.getCaseStatus(item.status),
+          nature_of_offence: (item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, '')), 
+          case_status: this.reportsCommonService.getCaseStatus(item.status),
+          relief_status: (item.status >= 5 && item.status <= 7) 
+          ? this.reportsCommonService.getCaseStatus(item.status).replace(' Completed', '') 
+          : '',
+          victim_name: (item.victim_name === "NULL" ? '' : (item.victim_name || '')),
+          reason_previous_month: item.previous_month_reason_for_status || '',
+          reason_current_month: item.current_month_reason_for_status || '',
+        }));
+        // Update filteredData to reflect the API data
+        this.filteredData = [...this.reportData]; 
+        this.cdr.detectChanges(); // Trigger change detection
+      },
+      error: (error) => {
+        console.error('Error fetching reports:', error);
+      }
+    });
   }
-
   // Applies filters, assigns serial numbers, and resets pagination
   applyFilters(): void {
     this.filteredData = this.reportsCommonService.applyFilters(
@@ -320,8 +327,17 @@ export class MonetaryReliefComponent implements OnInit {
   }
 
   totalPagesArray(): number[] {
-    return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
-  }
+    const total = this.totalPages();
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, this.page - 2); // Ensure at least 5 pages are shown
+  
+    // Adjust if near the end
+    if (startPage + maxPagesToShow - 1 > total) {
+      startPage = Math.max(1, total - maxPagesToShow + 1);
+    }
+  
+    return Array.from({ length: Math.min(maxPagesToShow, total) }, (_, i) => startPage + i);
+  }  
 
   paginatedData(): any[] {
     const startIndex = (this.page - 1) * this.itemsPerPage;
@@ -333,7 +349,8 @@ export class MonetaryReliefComponent implements OnInit {
     this.loading = true;
     await this.reportsCommonService.exportToExcel(
       this.filteredData,
-      this.displayedColumns
+      this.displayedColumns,
+      'Monetary-Reports'
     );
     this.loading = false;
   }

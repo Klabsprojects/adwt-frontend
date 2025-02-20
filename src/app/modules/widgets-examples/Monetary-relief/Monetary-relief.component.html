@@ -88,7 +88,7 @@
         </tbody>
       </table>
       <!-- Show message if filtered data is empty -->
-      <div *ngIf="filteredData.length === 0 && reportData.length > 0" class="alert alert-warning">
+      <div *ngIf="filteredData.length === 0" class="alert alert-warning">
         No FIR data available.
       </div>
       <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button>

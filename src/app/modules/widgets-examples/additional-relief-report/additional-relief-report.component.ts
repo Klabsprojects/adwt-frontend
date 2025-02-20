@@ -543,7 +543,8 @@ export class AdditionalReliefReportComponent implements OnInit {
     this.loading = true;
     await this.reportsCommonService.exportToExcel(
       this.filteredData,
-      this.displayedColumns
+      this.displayedColumns,
+      'Additional-Reports'
     );
     this.loading = false;
   }

@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
 import * as FileSaver from 'file-saver';
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
-import { MonthlyReportService } from 'src/app/services/monthly-report.service.ts';
+import { MonthlyReportService } from 'src/app/services/monthly-report.service';
 import { ReportsCommonService } from 'src/app/services/reports-common.service';
 
 @Component({
@@ -193,7 +193,6 @@ export class MonthlyReportComponent implements OnInit {
       .subscribe(({ districts, offences }) => {
         this.districts = districts;
         this.natureOfOffences = offences;
-        //this.generateDummyData(); 
         this.fetchMonthlyReports();
       });
     this.filteredData = [...this.reportData];
@@ -214,32 +213,6 @@ export class MonthlyReportComponent implements OnInit {
     return this.caseStatusOptions;
   }
 
-  /* generateDummyData(): void {
-    for (let i = 1; i <= 50; i++) {
-      const caseStatusIndex = Math.floor(Math.random() * 8);
-      const caseStatus = this.reportsCommonService.getCaseStatus(caseStatusIndex);
-      this.reportData.push({
-        sl_no: i,
-        policeCity: this.districts[i % this.districts.length],
-        stationName: `Station ${i}`,
-        firNumber: `FIR-${1000 + i}`,
-        natureOfOffence: this.natureOfOffences[i % this.natureOfOffences.length],
-        poaSection: `Section ${(i % 10) + 1}`,
-        noOfVictim: Math.floor(Math.random() * 5) + 1,
-        courtDistrict: `Court District ${(i % 3) + 1}`,
-        courtName: `Court Name ${(i % 3) + 1}`,
-        caseNumber: `CC-${2000 + i}`,
-        caseStatus: caseStatus,
-        uiPendingDays: Math.floor(Math.random() * 100),
-        ptPendingDays: Math.floor(Math.random() * 100),
-        reasonPreviousMonth: '',
-        reasonCurrentMonth: '',
-      });
-    }
-    this.filteredData = [...this.reportData]; // Update filteredData
-    this.cdr.detectChanges(); // Trigger change detection
-  } */
-
   // Load all fir reports details into UI
   fetchMonthlyReports(): void {
       this.monthlyReportService.getMonthlyReportDetail().subscribe({
@@ -251,7 +224,7 @@ export class MonthlyReportComponent implements OnInit {
             policeCity: item.police_city,
             stationName: item.police_station,
             firNumber: item.fir_number,
-            natureOfOffence: (item.offence_committed || '').replace(/"/g, ''), // Remove double quotes
+            natureOfOffence: (item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, '')), 
             poaSection: (item.scst_sections || '').replace(/"/g, ''), // Remove double quotes
             noOfVictim: item.number_of_victim,
             courtDistrict: item.court_district || '',
@@ -410,7 +383,8 @@ export class MonthlyReportComponent implements OnInit {
     this.loading = true;
     await this.reportsCommonService.exportToExcel(
       this.filteredData,
-      this.displayedColumns
+      this.displayedColumns,
+      'UI&PT-Reports'
     );
     this.loading = false;
   }

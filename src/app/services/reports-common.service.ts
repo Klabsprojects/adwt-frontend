@@ -90,7 +90,8 @@ export class ReportsCommonService {
   // Exports filtered table data to an Excel file, considering only visible columns.
   async exportToExcel(
     filteredData: any[],
-    displayedColumns: any[]
+    displayedColumns: any[],
+    fileName: string
   ): Promise<void> {
     try {
       if (filteredData.length === 0) {
@@ -120,14 +121,14 @@ export class ReportsCommonService {
         return exportedItem;
       });
       // Export data to Excel
-      await this.exportExcel(exportData);
+      await this.exportExcel(exportData,fileName);
     } catch (error) {
       console.error('Export failed:', error);
     }
   }
 
   // Converts JSON data into an Excel worksheet and triggers the download.
-  private async exportExcel(list: any[]): Promise<void> {
+  private async exportExcel(list: any[],fileName: string): Promise<void> {
     const xlsx = await import('xlsx');
     const worksheet = xlsx.utils.json_to_sheet(list);
     const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
@@ -135,7 +136,7 @@ export class ReportsCommonService {
       bookType: 'xlsx',
       type: 'array',
     });
-    this.saveAsExcelFile(excelBuffer, 'All-Forms');
+    this.saveAsExcelFile(excelBuffer, fileName);
   }
 
   // Saves the provided Excel buffer as a downloadable file with the appropriate format.
@@ -144,7 +145,7 @@ export class ReportsCommonService {
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
     const EXCEL_EXTENSION = '.xlsx';
     const data: Blob = new Blob([buffer], { type: EXCEL_TYPE });
-    FileSaver.saveAs(data, fileName + '_' + EXCEL_EXTENSION);
+    FileSaver.saveAs(data, fileName + '' + EXCEL_EXTENSION);
   }
 
   // Returns the corresponding case status label based on the provided index.
@@ -178,13 +179,12 @@ export class ReportsCommonService {
       const district = report[districtKey];
       const offence = report[offenceKey];
       const caseStatus = report[caseStatusKey];
-      const matchesDistrict = selectedDistrict ? district === selectedDistrict : true;
-      const matchesNature = selectedNatureOfOffence ? offence === selectedNatureOfOffence : true;
+      const matchesDistrict = selectedDistrict ? district?.includes(selectedDistrict) : true;
+      const matchesNature = selectedNatureOfOffence ? offence?.includes(selectedNatureOfOffence) : true;
       const matchesStatus = selectedStatusOfCase
         ? (selectedStatusOfCase === 'Just Starting' && caseStatus === 'FIR Draft') ||
           (selectedStatusOfCase === 'Pending' && caseStatus.includes('Pending')) ||
-          (selectedStatusOfCase === 'Completed' && 
-            (caseStatus === 'FIR Draft' || caseStatus.includes('Completed')))
+          (selectedStatusOfCase === 'Completed' && caseStatus.includes('Completed'))
         : true;
       const matchesReliefStatus = selectedStatusOfRelief
         ? (selectedStatusOfRelief === 'FIR Stage' && caseStatus.includes('FIR Stage')) ||
