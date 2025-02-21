@@ -32,6 +32,6 @@ export class CityService {
 
   // New method to get all districts for city dropdown
   getAllDistricts(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/districts`);
+    return this.http.get(`${this.baseUrl}districts`);
   }
 }

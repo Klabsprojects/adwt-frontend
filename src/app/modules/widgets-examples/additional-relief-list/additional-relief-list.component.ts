@@ -115,8 +115,8 @@ export class AdditionalReliefListComponent implements OnInit {
   displayedColumns: { label: string; field: string; sortable: boolean; visible: boolean }[] = [
     { label: 'Sl.No', field: 'sl_no', sortable: false, visible: true },
     { label: 'FIR ID', field: 'fir_id', sortable: true, visible: true },
-    { label: 'Total Victims', field: 'victims_with_relief', sortable: true, visible: true },
-    { label: 'Victims with Relief', field: 'victim_relief', sortable: true, visible: true },
+    { label: 'Victim ID', field: 'victim_id', sortable: true, visible: true },
+    { label: 'Victim Name', field: 'victim_name', sortable: true, visible: true },
     // { label: 'Actions', field: 'created_by', sortable: true, visible: true },
     // { label: 'Created At', field: 'created_at', sortable: true, visible: true },
     // { label: 'Status', field: 'status', sortable: false, visible: true },
@@ -131,11 +131,12 @@ export class AdditionalReliefListComponent implements OnInit {
   // Fetch FIR data from the service
   fetchFIRList(): void {
     this.isLoading = true;
-    this.additionalreliefService.getFIRAdditionalReliefList().subscribe(
+    this.additionalreliefService.getFIRAdditionalReliefList_By_Victim().subscribe(
       (data) => {
         console.log('Raw API Response:', data);
         // Filter FIRs with at least one victim with relief
-        this.firList = (data || []).filter((fir) => fir.victims_with_relief > 0);
+        // this.firList = (data || []).filter((fir) => fir.victims_with_relief > 0);
+        this.firList = data;
         console.log('Filtered FIR List:', this.firList);
         this.updatePagination();
         this.isLoading = false;
@@ -186,9 +187,9 @@ export class AdditionalReliefListComponent implements OnInit {
   }
 
   // Navigate to the additional relief details page
-  navigateToRelief(firId: string): void {
+  navigateToRelief(firId: string, victimId : string): void {
     this.router.navigate(['widgets-examples/additional-relief'], {
-      queryParams: { fir_id: firId },
+      queryParams: { fir_id: firId , victim_id :  victimId},
     });
   }
 
@@ -234,42 +235,43 @@ export class AdditionalReliefListComponent implements OnInit {
   applyFilters() {
     this.page = 1; // Reset to the first page
     this.cdr.detectChanges();
+    this.filteredFirList();
   }
 
   // Filtered FIR list based on search and filter criteria
   filteredFirList() {
     const searchLower = this.searchText.toLowerCase();
 
-    return this.firList.filter((fir) => {
+    return this.displayedFirList = this.firList.filter((fir) => {
       // Apply search filter
       const matchesSearch =
-        fir.fir_id.toString().includes(searchLower) ||
-        (fir.police_city || '').toLowerCase().includes(searchLower) ||
-        (fir.police_station || '').toLowerCase().includes(searchLower);
+        fir.fir_id.toString().toLowerCase().includes(searchLower) ||
+        (fir.victim_id || '').toLowerCase().includes(searchLower) ||
+        (fir.victim_name || '').toLowerCase().includes(searchLower);
 
       // Apply dropdown filters
-      const matchesDistrict =
-        this.selectedDistrict ? fir.district === this.selectedDistrict : true;
-      const matchesNatureOfOffence =
-        this.selectedNatureOfOffence
-          ? fir.nature_of_offence === this.selectedNatureOfOffence
-          : true;
-      const matchesStatusOfCase =
-        this.selectedStatusOfCase ? fir.status_of_case === this.selectedStatusOfCase : true;
-      const matchesStatusOfRelief =
-        this.selectedStatusOfRelief
-          ? fir.status_of_relief === this.selectedStatusOfRelief
-          : true;
+      const matchesDistrict = this.selectedDistrict ? fir.fir_id === this.selectedDistrict : true;
+      const matchesNatureOfOffence = this.selectedNatureOfOffence ? fir.victim_id === this.selectedNatureOfOffence : true;
+      const matchesStatusOfCase = this.selectedStatusOfCase ? fir.victim_name === this.selectedStatusOfCase : true;
+      // const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status_of_relief === this.selectedStatusOfRelief : true;
 
       return (
         matchesSearch &&
         matchesDistrict &&
         matchesNatureOfOffence &&
-        matchesStatusOfCase &&
-        matchesStatusOfRelief
+        matchesStatusOfCase 
       );
     });
   }
+
+  clearfilter(){
+    this.searchText = '';
+    this.selectedDistrict = '';
+    this.selectedNatureOfOffence = '';
+    this.selectedStatusOfCase = '';
+    this.applyFilters();
+  }
+  
 
 
   // Sorting logic

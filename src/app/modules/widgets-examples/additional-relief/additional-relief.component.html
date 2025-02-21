@@ -86,7 +86,7 @@
           <!-- Upload Proceedings Document -->
           <div class="col-md-4 mb-3">
             <label for="uploadProceedings">Upload Proceedings Document *</label>
-            <input id="uploadProceedings" type="file" class="form-control" formControlName="uploadProceedings" (change)="onFileSelected($event)" required>
+            <input id="uploadProceedings" type="file" class="form-control" formControlName="uploadProceedings" (change)="uploadProceedingsDocument($event)" required>
           </div>
         </div>
 
@@ -215,8 +215,8 @@
               formControlName="officeDistrict"
               required>
               <option value="" disabled>Select District</option>
-              <option *ngFor="let district of districts" [value]="district">
-                {{ district }}
+              <option *ngFor="let district of districts" [value]="district?.district_name">
+                {{ district?.district_name }}
               </option>
             </select>
           </div>
@@ -507,7 +507,7 @@
                     />
                   </div>
                   <!-- Upload Proceedings Document -->
-                  <div class="col-md-4 mb-3">
+                  <!-- <div class="col-md-4 mb-3">
                     <label for="uploadProceedings{{i}}">Upload Proceedings Document *</label>
                     <input
                       type="file"
@@ -515,7 +515,7 @@
                       formControlName="uploadProceedings"
                       required
                     />
-                  </div>
+                  </div> -->
                 </div>
               </div>
             </div>
@@ -598,7 +598,9 @@
             <input
               type="file"
               class="form-control"
+              id="uploadFile"
               formControlName="uploadFile"
+              (change)="uploadDocument($event)"
               required
             />
           </div>
@@ -668,21 +670,29 @@
             />
           </div>
           <!-- Upload Proceedings Document -->
-          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('compensationGivenStatus')?.value === 'Yes'">
+          <!-- <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('compensationGivenStatus')?.value === 'Yes'">
             <label for="compensationuploadProceedings">Upload Proceedings Document *</label>
             <input
               type="file"
               class="form-control"
               formControlName="compensationuploadProceedings"
+              id="compensationuploadProceedings"
+              (change)="uploadProceedingsDocumentcompensation($event)"
               required
             />
+          </div> -->
+
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('compensationGivenStatus')?.value === 'Yes'">
+            <label for="compensationuploadProceedings">Upload Proceedings Document *</label>
+            <input id="compensationuploadProceedings" type="file" class="form-control" formControlName="compensationuploadProceedings" (change)="uploadProceedingsDocumentcompensation($event)" required>
           </div>
         </div>
       </div>
 
 
       <!-- Submit Button -->
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <button (click)="BackToList()" type="button" class="btn btn-primary">Back</button>
+      <button style="margin-left: 10px;" type="submit" class="btn btn-primary">Submit</button>
     </form>
 
   </div>

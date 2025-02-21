@@ -20,13 +20,19 @@ export class AdditionalReliefService {
     return this.http.get<any[]>(this.apiUrl);
   }
 
-
-  getVictimsByFirId(firId: string): Observable<any[]> {
-    return this.http.get<any[]>(environment.apiUrl+`/victims?fir_id=${firId}`);
+  getFIRAdditionalReliefList_By_Victim(): Observable<any[]> {
+    return this.http.get<any[]>(this.baseUrl+`fir-additional-relief-ByVictim`);
   }
 
+  getVictimsByFirId(firId: string, victimId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}victims?fir_id=${firId}&victim_id=${victimId}`);
+  }
   saveAdditionalRelief(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/save-additional-relief`, data);
+    return this.http.post(`${this.baseUrl}save-additional-relief`, data);
+  }
+
+  getAdditionalReliefByFirId(firId: string,victimId: string): Observable<any[]> {
+    return this.http.get<any[]>(this.baseUrl+`get-additional-relief-details?fir_id=${firId}&victim_id=${victimId}`);
   }
 
 }

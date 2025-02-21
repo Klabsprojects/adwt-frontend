@@ -16,8 +16,7 @@
         />
       </div>
 
-    <div class="card-toolbar d-flex align-items-center gap-3">
-      <!-- Visible Columns with Drag-and-Drop -->
+    <!-- <div class="card-toolbar d-flex align-items-center gap-3">
       <mat-form-field appearance="outline" class="w-250px">
         <mat-label>Selected Columns</mat-label>
         <mat-select>
@@ -36,7 +35,7 @@
           </div>
         </mat-select>
       </mat-form-field>
-    </div>
+    </div> -->
 
   </div>
 <div class="p-10">
@@ -44,25 +43,27 @@
    <div class="d-flex gap-3 mb-3">
     <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
       <option value="" selected disabled>Select One</option>
-      <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
+      <option *ngFor="let item of firList" [value]="item.fir_id">{{ item.fir_id }}</option>
     </select>
 
     <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
       <option value="" selected disabled>Select One</option>
-      <option *ngFor="let nature of naturesOfOffence" [value]="nature">{{ nature }}</option>
+      <option *ngFor="let item of firList" [value]="item.victim_id">{{ item.victim_id }}</option>
     </select>
 
     <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
       <option value="" selected disabled>Select One</option>
-      <option *ngFor="let status of statusesOfCase" [value]="status">{{ status }}</option>
+      <option *ngFor="let item of firList" [value]="item.victim_name">{{ item.victim_name }}</option>
     </select>
 
-    <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
+    <button style="width: 40% !important;" (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
+
+    <!-- <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
       <option value="" selected disabled>Select One</option>
       <option *ngFor="let reliefStatus of statusesOfRelief" [value]="reliefStatus">
         {{ reliefStatus }}
       </option>
-    </select>
+    </select> -->
   </div>
 </div>
 
@@ -83,8 +84,8 @@
         <tr>
           <th>#</th>
           <th>FIR ID</th>
-          <th>Total Victims</th>
-          <th>Victims with Relief</th>
+          <th>Victim ID</th>
+          <th>Victim Name</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -92,10 +93,10 @@
         <tr *ngFor="let fir of displayedFirList; let i = index">
           <td>{{ (page - 1) * itemsPerPage + i + 1 }}</td>
           <td>{{ fir.fir_id }}</td>
-          <td>{{ fir.number_of_victims }}</td>
-          <td>{{ fir.victims_with_relief }}</td>
+          <td>{{ fir.victim_id }}</td>
+          <td>{{ fir.victim_name }}</td>
           <td>
-            <button class="btn btn-primary btn-sm" (click)="navigateToRelief(fir.fir_id)">
+            <button class="btn btn-primary btn-sm" (click)="navigateToRelief(fir.fir_id,fir.victim_id)">
               View
             </button>
           </td>
