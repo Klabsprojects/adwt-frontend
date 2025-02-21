@@ -11,7 +11,7 @@ export const environment = {
   // apiUrl: 'http://localhost:3010/', 
   // image_access:'http://localhost:3010/uploadedfile/',
 
-  file_access:'https://adwatrocity.onlinetn.com/api/v1/',
+  file_access:'https://adwatrocity.onlinetn.com/api/v1/CommonFileUpload',
   apiUrl: 'https://adwatrocity.onlinetn.com/api/v1/',
   image_access:'https://adwatrocity.onlinetn.com/api/v1/uploadedfile/',
 
