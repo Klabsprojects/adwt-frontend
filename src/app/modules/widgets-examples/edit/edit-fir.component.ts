@@ -28,7 +28,7 @@ import { FirServiceAPI } from './editfir.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { environment } from '../../../../environments/environment';
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
-
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 declare var $: any;
@@ -71,7 +71,8 @@ interface ImagePreview {
     MatSelectModule,
     MatFormFieldModule,
     MatRadioModule,
-    NgxDropzoneModule
+    NgxDropzoneModule,
+    NgSelectModule
   ],
   templateUrl: './edit-fir.component.html',
   styleUrl: './edit-fir.component.scss'
@@ -101,7 +102,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   firForm: FormGroup;
   firId: string | null = null;
   chargesheet_id: string | null = null;
-
+  accusedCommunitiesOptions: string[] = []; // Stores all accused community options
 
   case_id: string | undefined = '';
         case_id1: string | undefined = '';
@@ -172,7 +173,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   policeRanges: string[] = [];
   revenueDistricts: string[] = [];
 
-
+  offenceReliefDetails: any[] = []; 
   offenceOptions: string[] = [];
   offenceActsOptions: string[] = [];
   scstSectionsOptions: any;
@@ -197,6 +198,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private police_district :PoliceDivisionService
    ) {}
+   private wasVictimSame: boolean = false; // Track the previous state of on Victim same as Complainant
 
   onDrop1(event: DragEvent): void {
     if (event.dataTransfer?.files) {
@@ -368,7 +370,60 @@ export class EditFirComponent implements OnInit, OnDestroy {
     this.isClickTriggered1 = false;
   }
 
+loadAccusedCommunities(): void {
+  this.firService.getAllAccusedCommunities().subscribe(
+    (communities: string[]) => {
+      this.accusedCommunitiesOptions = communities; 
+      
+      
+      // Populate accused community options
+    },
+    (error) => {
+      console.error('Error loading accused communities:', error);
+      Swal.fire('Error', 'Failed to load accused communities.', 'error');
+    }
+  );
+}
 
+// onCommunityChange(event: any, index: number): void {
+//   const selectedCommunity = event.target.value;
+onCommunityChange(selectedCommunity: string, index: number): void {
+ console.log(selectedCommunity,"wssss")
+    if (selectedCommunity) {
+      this.firService.getCastesByCommunity(selectedCommunity).subscribe(
+        (castes: string[]) => {
+          const victimGroup = this.victims.at(index) as FormGroup;
+          victimGroup.patchValue({ caste: '' }); // Reset caste selection
+          victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+          this.cdr.detectChanges();
+        },
+        (error) => {
+          console.error('Error fetching castes:', error);
+          Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+        }
+      );
+    }
+}
+
+// onAccusedCommunityChange(event: any, index: number): void {
+//   const selectedCommunity = event.target.value;
+onAccusedCommunityChange(selectedCommunity: string, index: number): void {
+  if (selectedCommunity) {
+    this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
+      (castes: string[]) => {
+        const accusedGroup = this.accuseds.at(index) as FormGroup;
+        accusedGroup.patchValue({ caste: '' }); // Reset caste selection
+        accusedGroup.get('availableCastes')?.setValue(castes);
+        // console.log(accusedGroup.get('availableCastes')?.value,"datdadadadada"); 
+        this.cdr.detectChanges();
+      },
+      (error) => {
+        console.error('Error fetching accused castes:', error);
+        Swal.fire('Error', 'Failed to load castes for the selected accused community.', 'error');
+      }
+    );
+  }
+}
 
   // onFileSelect_1(event: any, index: number): void {
   //   const file = event.target.files[0];
@@ -596,6 +651,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
 
     this.loadDistricts();
     this.updateValidationForCaseType(); 
+    this.loadAllOffenceReliefDetails();
     if (this.firId) {
       console.log("aaaaaaaaaaaaaaaaaaaaaaa",this.firId)
       this.loadFirDetails(this.firId);
@@ -644,8 +700,31 @@ export class EditFirComponent implements OnInit, OnDestroy {
       this.loadPoliceStations(district);
     });
 
-
-
+    // Listen for changes in isVictimSameAsComplainant
+    this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.valueChanges.subscribe(isVictimSame => {
+      this.onVictimSameAsComplainantChange(isVictimSame=== 'true');
+      this.wasVictimSame = isVictimSame=== 'true'; // Update the previous state
+      const victimGroup = this.victims.at(0) as FormGroup;
+      const ageControl = victimGroup.get('age');
+      const nameControl = victimGroup.get('name');
+      if (Number(ageControl?.value?.toString().replace(/\D/g, '')) < 18) {
+        nameControl?.disable({ emitEvent: false });
+        nameControl?.reset();
+      }
+    });
+    // Updates the victim's details if they are the same as the complainant.
+    const updateVictimDetails = (field: string, value: any) => {
+      const isVictimSame = this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.value;
+      const victimsArray = this.firForm.get('victims') as FormArray;
+      if (isVictimSame && victimsArray.length > 0 && this.wasVictimSame) {
+        victimsArray.at(0).get(field)?.setValue(value, { emitEvent: false });
+      }
+    };
+    ['nameOfComplainant', 'mobileNumberOfComplainant'].forEach(field => {
+      this.firForm.get(`complainantDetails.${field}`)?.valueChanges.subscribe(value => {
+        updateVictimDetails(field === 'nameOfComplainant' ? 'name' : 'mobileNumber', value);
+      });
+    });
 
     // this.setVictimData();
   }
@@ -663,6 +742,12 @@ export class EditFirComponent implements OnInit, OnDestroy {
   //     this.victimsRelief.push(victimGroup);
   //   });
   // }
+
+  // Handles the change in victim status relative to the complainant and updates the form accordingly.
+  onVictimSameAsComplainantChange(isVictimSame: boolean) {
+    this.firService.onVictimSameAsComplainantChange(isVictimSame, this.firForm, this.wasVictimSame);
+    this.wasVictimSame = isVictimSame; // Update the previous state
+  }
 
   navigateToMainStep(stepNumber: number): void {
     this.mainStep = stepNumber; // Update mainStep
@@ -749,6 +834,31 @@ export class EditFirComponent implements OnInit, OnDestroy {
         Swal.fire('Error', 'Failed to load communities.', 'error');
       }
     );
+  }
+
+  loadAllOffenceReliefDetails(): void {
+    this.firService.getOffenceReliefDetails().subscribe(
+      (offence_relief: any[]) => {
+        this.offenceReliefDetails = offence_relief; // Store data
+        console.log('Offence Relief Details:', this.offenceReliefDetails);
+      },
+      (error) => {
+        console.error('Error loading districts:', error);
+        Swal.fire('Error', 'Failed to load offence relief details.', 'error');
+      }
+    );
+  }
+  
+  // Calls firService to update victim details based on selected offences
+  onOffenceCommittedChange(event: any, index: number): void {
+    const selectedOffences = event.value; // Get selected values from the 30th field
+    this.firService.onOffenceCommittedChange(
+      selectedOffences,
+      index,
+      this.offenceReliefDetails,
+      this.victims
+    );
+    this.cdr.detectChanges();
   }
 
   selectedCourtName: string = '';
@@ -1868,31 +1978,30 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
     const victimGroup = this.victims.at(index) as FormGroup;
     const ageControl = victimGroup.get('age');
     const nameControl = victimGroup.get('name');
-  
+
     if (ageControl) {
-      let ageValue = ageControl.value;
-  
-    
-      ageValue = ageValue.toString().replace(/^0+/, '');
-      
-  
-      if (!/^(?:[1-9][0-9]?|1[01][0-9]|120)$/.test(ageValue)) {
-        ageControl.setErrors({ invalidAge: true });
+      let ageValue = ageControl.value || ''; // Ensure it's always a string
+      // Remove any non-numeric characters
+      ageValue = ageValue.toString().replace(/\D/g, '');
+      // If input exceeds 3 digits, reset it
+      if (ageValue.length > 3) {
+          ageControl.setValue('');
       } else {
-        ageControl.setErrors(null);
+          ageControl.setValue(ageValue);
       }
-  
-  
-      ageControl.setValue(ageValue, { emitEvent: false });
-  
-      if (Number(ageValue) < 18) {
+      // If age is below 18, disable the name field
+      if (ageValue < 18) {
         nameControl?.disable({ emitEvent: false });
         nameControl?.reset();
       } else {
         nameControl?.enable({ emitEvent: false });
+        if(index===0){
+          this.onVictimSameAsComplainantChange(this.wasVictimSame);
+          this.wasVictimSame && nameControl?.disable({ emitEvent: false });
+        }
       }
-  
-      this.cdr.detectChanges(); 
+
+      this.cdr.detectChanges(); // Trigger change detection
     }
   }
   getAgeErrorMessage(index: number): string {
@@ -1927,25 +2036,32 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
 }
 
 
-  onAccusedAgeChange(index: number): void {
-    const accusedGroup = this.accuseds.at(index) as FormGroup;
-    const ageControl = accusedGroup.get('age');
-    const nameControl = accusedGroup.get('name');
+onAccusedAgeChange(index: number): void {
+  const accusedGroup = this.accuseds.at(index) as FormGroup;
+  const ageControl = accusedGroup.get('age');
+  const nameControl = accusedGroup.get('name');
 
-    if (ageControl) {
-      const ageValue = ageControl.value;
-
-      // If age is below 18, disable the name field
-      if (ageValue < 18) {
-        nameControl?.disable({ emitEvent: false });
-        nameControl?.reset();
-      } else {
-        nameControl?.enable({ emitEvent: false });
-      }
-
-      this.cdr.detectChanges(); // Trigger change detection
+  if (ageControl) {
+    let ageValue = ageControl.value || ''; // Ensure it's always a string
+    // Remove any non-numeric characters
+    ageValue = ageValue.toString().replace(/\D/g, '');
+    // If input exceeds 3 digits, reset it
+    if (ageValue.length > 3) {
+        ageControl.setValue('');
+    } else {
+        ageControl.setValue(ageValue);
     }
+    // If age is below 18, disable the name field
+    if (ageValue < 18) {
+      nameControl?.disable({ emitEvent: false });
+      nameControl?.reset();
+    } else {
+      nameControl?.enable({ emitEvent: false });
+    }
+
+    this.cdr.detectChanges(); // Trigger change detection
   }
+}
   CaseHandledBy = [
     'Special Public Prosecutor',
     'Empanelled advocate',
@@ -1987,7 +2103,7 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
       timeOfRegistration: ['', Validators.required],
       // natureOfOffence: [[], Validators.required],
       sectionsIPC: ['trerterterterter'],
-      scstSections: [[],Validators.required],
+      scstSections: [[]],
 
       // Step 3 Fields - Complainant and Victim Details
       complainantDetails: this.fb.group({
@@ -2214,8 +2330,16 @@ filePreviews: { [key: number]: string | ArrayBuffer | null } = {};
     }
   }
 
+  // Validates the FIR Number values using the firValidationService.
+  isFirValid(fir: string, suffix: string): boolean {
+    return this.firService.isFirValid(fir, suffix, this.firForm);
+  }
 
-
+  // This function checks the input field and hides/shows the warning text accordingly
+  isInputValid(index: number, field: string): boolean {
+    const inputValue = this.accuseds.at(index).get(field)?.value; // Get value properly from FormArray
+    return !!inputValue && inputValue.trim() !== ''; // Returns true if input is filled
+  }
 
   onJudgementNatureChange_one(): void {
     const judgementNature = this.firForm.get('judgementDetails_one.judgementNature_one')?.value;
@@ -4336,9 +4460,10 @@ console.log(formFields,"formDataObject")
     const isDeceased = this.firForm.get('isDeceased')?.value;
     const isDeceasedValid = isDeceased !== '' &&
       (isDeceased === 'no' || (this.firForm.get('deceasedPersonNames')?.valid === true));
+    const isValuePresent = this.firForm.get('deceasedPersonNames')?.value?.length !== 0;
 
     // Ensure all conditions return a boolean
-    return Boolean(isComplainantValid && victimsValid && isDeceasedValid);
+    return Boolean(isComplainantValid && victimsValid && isDeceasedValid && isValuePresent);
   }
 
 
@@ -4502,6 +4627,12 @@ console.log(formFields,"formDataObject")
   previousStep() {
     if (this.step > 1) {
       this.step--;
+    }
+  }
+
+  previousMainStep() {
+    if (this.mainStep > 1) {
+      this.mainStep -= 1;
     }
   }
 
