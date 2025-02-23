@@ -195,7 +195,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
     private router: Router,
     private firServiceAPI : FirServiceAPI,
     private sanitizer: DomSanitizer,
-    private police_district :PoliceDivisionService
+    private police_district :PoliceDivisionService,
+  
    ) {}
 
   onDrop1(event: DragEvent): void {
@@ -2131,7 +2132,7 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
   show97Onwards = false;
 uploadJudgementPreview: any | ArrayBuffer;
 uploadedImageSrc: any | ArrayBuffer;
-filePreviews: { [key: number]: string | ArrayBuffer | null } = {}; 
+// filePreviews: { [key: number]: string | ArrayBuffer | null } = {}; 
   
   onCaseHandledByChange(event: Event) {
     const selectedValue = (event.target as HTMLSelectElement).value;
@@ -3087,6 +3088,7 @@ console.log(victimReliefDetail,"cretaieg")
 
     addAttachment_2(): void {
       this.attachments_2.push(this.createAttachmentGroup());
+      
     } 
 
       
@@ -3227,22 +3229,14 @@ console.log(victimReliefDetail,"cretaieg")
       });
     }
   }
+ 
+  
 
-  onFileSelect_2(event: any, index: number): void {
-    const file = event.target.files[0];
-    if (file) {
-      const attachmentGroup = this.attachments_2.at(index) as FormGroup;
-      attachmentGroup.patchValue({
-        file_2: file,
-        fileName_2: file.name,
-      });
-    }
-  }
-
-
+  filePreviews: string[] = []; 
   removeAttachment_2(index: number): void {
     if (this.attachments_2.length > 1) {
       this.attachments_2.removeAt(index);
+      this.filePreviews.splice(index, 1); // Remove corresponding preview
     }
   }
   createAttachmentGroup_2(): FormGroup {
@@ -3837,7 +3831,40 @@ console.log(formFields,"formFieldsformFields")
   // }
 
 
+  fileObjects: { [index: number]: File[] } = {};
+  uploadedPaths: { [key: string]: string } = {};
+  
+  onFileSelect_2(event: any, index: number): void {
+    const files: FileList = event.target.files;
+    console.log(files, "Selected Files");
+  
+    if (!files || files.length === 0) return;
+  
+    const attachmentGroup = this.attachments_2.at(index) as FormGroup;
+    console.log(attachmentGroup);
+  
+    const selectedFiles: File[] = [];
+  
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      console.log("File selected:", file.name, file);
+  
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.filePreviews[index] = e.target.result; // Store preview per index
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+  
+      selectedFiles.push(file);
+    }
+  
+    // ✅ Store actual files separately
+    this.fileObjects[index] = selectedFiles;
+  
+    console.log(this.fileObjects, "Stored File Objects");
 
+  }
   
  async UpdateAsDraft_7() {
   if (!this.firId) {
@@ -3845,40 +3872,13 @@ console.log(formFields,"formFieldsformFields")
       return;
   }
 
-  let uploadJudgementPath: string | undefined;
-  // const uploadJudgementFile = this.firForm.get('judgementDetails.uploadJudgement')?.value;
-  const uploadJudgementFile = this.firForm.get('judgementDetails.uploadJudgement')?.value;
-  if (uploadJudgementFile) {
-      const paths = await this.uploadMultipleFiles([uploadJudgementFile]);
-      uploadJudgementPath = paths[0];
-  }
 
-  let uploadProceedingPath: string | undefined;
-  const proceedingFile = this.firForm.get('uploadProceedings')?.value;
-  if (proceedingFile) {
-      const paths = await this.uploadMultipleFiles([proceedingFile]);
-      uploadProceedingPath = paths[0];
-  }
-
-  const allFiles: File[] = [];
-  Object.values(this.fileStorage).forEach(files => {
-      allFiles.push(...files);
-  });
-
-  let attachments: string[] = [];
-  if (allFiles.length > 0) {
-      try {
-          attachments = await this.uploadMultipleFiles(allFiles);
-      } catch (error) {
-          console.error('Error uploading files:', error);
-          Swal.fire('Error', 'Failed to upload one or more files.', 'error');
-          return;
-      }
-  }
 
   const formData = new FormData();
   const formDatavalues = this.firForm.value
-  const formFields = {
+
+  const formFields: any = {
+    // data : this.fileObjects,
       firId: this.firId,
       trialDetails: {
           courtName: this.firForm.get('Court_name1')?.value,
@@ -3894,7 +3894,7 @@ console.log(formFields,"formFieldsformFields")
           judgementAwarded1:this.firForm.get('judgementAwarded1')?.value,
       
           judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
-          uploadJudgement: uploadJudgementPath,
+          uploadJudgement: this.firForm.get('judgementDetails.uploadJudgement')?.value,
       },
       // judgementAwarded_one
       trialDetails_one: {
@@ -3908,7 +3908,7 @@ console.log(formFields,"formFieldsformFields")
         judgementAwarded:this.firForm.get('judgementAwarded_one')?.value,
    
         judgementNature: this.firForm.get('judgementDetails_one.judgementNature_one')?.value,
-        uploadJudgement: uploadJudgementPath,
+        uploadJudgement: this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value,
     },
     trialDetails_two: {
       courtName: this.firForm.get('Court_name1')?.value,
@@ -3922,13 +3922,13 @@ console.log(formFields,"formFieldsformFields")
       judgementAwarded:this.firForm.get('judgementAwarded2')?.value,
  
       judgementNature: this.firForm.get('judgementDetails_two.judgementNature_two')?.value,
-      uploadJudgement: uploadJudgementPath,
+      uploadJudgement: this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value,
   },
       compensationDetails: {
           totalCompensation: this.firForm.get('totalCompensation')?.value,
           proceedingsDate: this.firForm.get('proceedingsDate')?.value,
           proceedingsFileNo: this.firForm.get('proceedingsFileNo')?.value,
-          uploadProceedings: uploadProceedingPath ? uploadProceedingPath : this.firForm.get('uploadProceedings')?.value
+          uploadProceedings: this.firForm.get('uploadProceedings')?.value
       },
 
       hearingdetail : {
@@ -3961,19 +3961,39 @@ console.log(formFields,"formFieldsformFields")
         filed_by: this.firForm.get('judgementDetails_two.filedBy_two')?.value,
           judgementNature: this.firForm.get('judgementDetails_two.judgementNature_two')?.value,
       },
-  };
 
+attachment:this.attachments_2.value
+   
+      
+  };
   Object.keys(formFields).forEach((key) => {
-      const value = formFields[key as keyof typeof formFields];
-      if (value !== null && value !== undefined) {
-          formData.append(key, JSON.stringify(value));
-      } 
+    const value = formFields[key as keyof typeof formFields];
+    if (value !== null && value !== undefined) {
+      formData.append(key, JSON.stringify(value));
+    }
   });
- 
-  const formDataObject = this.formDataToObject(formData);
-  formDataObject.attachments = attachments;
-  // formDataObject.hearingdetail = hearingdetail;
-console.log(formFields,"formDataObject")
+  // this.attachments_2.value.forEach((attachmentGroup: any, index: number) => {
+  //   const files = this.fileObjects[index];
+
+  //   if (files && files.length > 0) {
+  //     files.forEach((file: File) => {
+  //       formData.append(`attachments[${index}]`, file); 
+  //     });
+  //   }
+  // });
+  console.log(this.attachments_2.value,"this.attachments_2.value")
+
+
+    
+  // ✅ Debugging: Convert FormData to an Object
+  const formDataObject: any = {};
+  formData.forEach((value, key) => {
+    formDataObject[key] = value;
+  });
+  
+  
+
+  console.log(formDataObject, '📝 Final formDataObject');
   this.firService.UpdateStepSevenAsDraft(formDataObject).subscribe({
       next: (response: any) => Swal.fire('Success', 'Draft data saved successfully.', 'success'),
       error: (error: any) => Swal.fire('Error', 'Failed to save draft data.', 'error')
@@ -3985,8 +4005,8 @@ console.log(formFields,"formDataObject")
     if (selectedDivision) {
       this.firService.getCourtRangesByDivision(selectedDivision).subscribe(
         (ranges: string[]) => {
-          this.courtRanges = ranges; // Populate court range options based on division
-          this.firForm.patchValue({ courtName: '' }); // Reset court range selection
+          this.courtRanges = ranges; 
+          this.firForm.patchValue({ courtName: '' }); 
         },
         (error) => {
           console.error('Error fetching court ranges:', error);
@@ -4593,10 +4613,11 @@ console.log(formFields,"formDataObject")
     
     // If no valid files remain, stop execution
     if (validFiles.length === 0) return [];
+    console.log(files,"filefile")
   
     // Upload each valid file
     const uploadPromises = validFiles.map(file => this.uploadFile(file));
-  
+  console.log(uploadPromises,"dskjdskdjsds")
     return Promise.all(uploadPromises);
   }
 
@@ -4639,21 +4660,151 @@ console.log(formFields,"formDataObject")
     }
   }
 
+  // uploadJudgementSelect(event: any): void {
+  //   const file = event.target.files[0];  
+  
+  //   if (file) {
+   
+    
+  //     this.firForm.patchValue({
+  //       uploadJudgement: file,  
+  //     });
+  
+      
+  //     console.log('File selected:', file.name,file);
+  //   } else {
+  //     console.log('No file selected');
+  //   }
+  // }
+
+  // uploadJudgementPreview: string | null = null; // To store the image preview
+
   uploadJudgementSelect(event: any): void {
-    const file = event.target.files[0];  // Get the first selected file
+    const file = event.target.files?.[0];
   
     if (file) {
-   
-      // Patch the file into the form (this assumes you have the form control set up correctly)
-      this.firForm.patchValue({
-        uploadJudgement: file,  // Storing the file in the form control
-      });
+      console.log('File selected:', file.name, file);
   
-      // Optionally, display the file name
-      console.log('File selected:', file.name);
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.uploadJudgementPreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+  
+      this.uploadMultipleFiles(file)
+        .then(paths => {
+          console.log('Uploaded file path:', paths[0]);
+  
+          this.firForm.patchValue({
+            judgementDetails: {
+              uploadJudgement: paths[0]  
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error uploading file:', error);
+        });
     } else {
       console.log('No file selected');
+      this.uploadJudgementPreview = null; 
+    }
+  }
+  uploadJudgementPreview_one: any | ArrayBuffer;
+  uploadJudgementSelect_one(event: any): void {
+    const file = event.target.files?.[0];
+  
+    if (file) {
+      console.log('File selected:', file.name, file);
+  
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.uploadJudgementPreview_one = e.target.result;
+      };
+      reader.readAsDataURL(file);
+  
+      this.uploadMultipleFiles(file)
+        .then(paths => {
+          console.log('Uploaded file path:', paths[0]);
+  
+          this.firForm.patchValue({
+            judgementDetails_one: {
+              uploadJudgement_one: paths[0]  
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error uploading file:', error);
+        });
+    } else {
+      console.log('No file selected');
+      this.uploadJudgementPreview_one = null; 
     }
   }
 
+
+  uploadJudgementPreview_two: any | ArrayBuffer;
+  uploadJudgementSelect_two(event: any): void {
+    const file = event.target.files?.[0];
+  
+    if (file) {
+      console.log('File selected:', file.name, file);
+  
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.uploadJudgementPreview_two = e.target.result;
+      };
+      reader.readAsDataURL(file);
+  
+      this.uploadMultipleFiles(file)
+        .then(paths => {
+          console.log('Uploaded file path:', paths[0]);
+  
+          this.firForm.patchValue({
+            judgementDetails_two: {
+              uploadJudgement_two: paths[0]  
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error uploading file:', error);
+        });
+    } else {
+      console.log('No file selected');
+      this.uploadJudgementPreview_two = null; 
+    }
+  }
+  // .... thisis for proceeeding file 
+  uploadProceedings_2_preview: string | ArrayBuffer | null = null; 
+
+  uploadProceedings_2(event: any): void {
+    const file = event.target.files?.[0];
+  
+    if (file) {
+      console.log('File selected:', file.name, file);
+
+   
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.uploadProceedings_2_preview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+  
+      this.uploadMultipleFiles(file)
+        .then(paths => {
+          console.log('Uploaded file path:', paths[0]);
+  
+      
+          this.firForm.patchValue({
+            uploadProceedings: paths[0] 
+          });
+        })
+        .catch(error => {
+          console.error('Error uploading file:', error);
+        });
+    } else {
+      console.log('No file selected');
+      this.uploadProceedings_2_preview = null;
+    }
+  }
+  
 }

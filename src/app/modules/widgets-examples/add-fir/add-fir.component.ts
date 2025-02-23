@@ -2433,10 +2433,10 @@ onProceedingsFileChange_1(event: Event): void {
 }
 
 saveAsDraft_6(isSubmit: boolean = false): void {
-  if (!this.firId) {
-    Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
-    return;
-  }
+  // if (!this.firId) {
+  //   Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
+  //   return;
+  // }
   this.victimsRelief.controls.forEach((control) => {
     control.get('reliefAmountSecondStage')?.enable(); // Temporarily enable
   });
@@ -2651,13 +2651,112 @@ saveAsDraft_6(isSubmit: boolean = false): void {
 // }
 
 
+uploadJudgementPreview_one: any | ArrayBuffer;
+uploadJudgementSelect_one(event: any): void {
+  const file = event.target.files?.[0];
 
+  if (file) {
+    console.log('File selected:', file.name, file);
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.uploadJudgementPreview_one = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    this.uploadMultipleFiles(file)
+      .then(paths => {
+        console.log('Uploaded file path:', paths[0]);
+
+        this.firForm.patchValue({
+          judgementDetails_one: {
+            uploadJudgement_one: paths[0]  
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Error uploading file:', error);
+      });
+  } else {
+    console.log('No file selected');
+    this.uploadJudgementPreview_one = null; 
+  }
+}
+
+
+uploadJudgementPreview_two: any | ArrayBuffer;
+uploadJudgementSelect_two(event: any): void {
+  const file = event.target.files?.[0];
+
+  if (file) {
+    console.log('File selected:', file.name, file);
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.uploadJudgementPreview_two = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    this.uploadMultipleFiles(file)
+      .then(paths => {
+        console.log('Uploaded file path:', paths[0]);
+
+        this.firForm.patchValue({
+          judgementDetails_two: {
+            uploadJudgement_two: paths[0]  
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Error uploading file:', error);
+      });
+  } else {
+    console.log('No file selected');
+    this.uploadJudgementPreview_two = null; 
+  }
+}
+// .... thisis for proceeeding file 
+uploadProceedings_2_preview: string | ArrayBuffer | null = null; 
+
+uploadProceedings_2(event: any): void {
+  const file = event.target.files?.[0];
+
+  if (file) {
+    console.log('File selected:', file.name, file);
+
+ 
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.uploadProceedings_2_preview = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    this.uploadMultipleFiles(file)
+      .then(paths => {
+        console.log('Uploaded file path:', paths[0]);
+
+    
+        this.firForm.patchValue({
+          uploadProceedings: paths[0] 
+        });
+      })
+      .catch(error => {
+        console.error('Error uploading file:', error);
+      });
+  } else {
+    console.log('No file selected');
+    this.uploadProceedings_2_preview = null;
+  }
+}
 
 async saveAsDraft_7(isSubmit: boolean = false)  {
    if (!this.firId) {
       Swal.fire('Error', 'FIR ID is missing. Unable to save draft.', 'error');
       return;
    }
+
+   const formData = new FormData();
+   const formDatavalues = this.firForm.value
   const judgementNature = this.firForm.get('judgementDetails')?.value; 
   console.log("Judgement Nature:", judgementNature);
   
@@ -2709,50 +2808,60 @@ async saveAsDraft_7(isSubmit: boolean = false)  {
   //   console.log(key + ": " + value);
   // });
   // const hearingdetail = this.hearingDetails.value
-  const formDatavalues = this.firForm.value
+  // const formDatavalues = this.firForm.value
   const formFields = {
     firId: this.firId,
 
     // Trial Details
     trialDetails: {
-      courtName: this.firForm.get('Court_name')?.value,
-      courtDistrict: this.firForm.get('courtDistrict')?.value,
-      trialCaseNumber: this.firForm.get('caseNumber')?.value,
-      publicProsecutor: this.firForm.get('publicProsecutor')?.value,
-      prosecutorPhone: this.firForm.get('prosecutorPhone')?.value,
-      firstHearingDate: this.firForm.get('firstHearingDate')?.value,
 
+   
 
+courtName: this.firForm.get('Court_name')?.value,
+courtDistrict: this.firForm.get('courtDistrict')?.value,
+trialCaseNumber: this.firForm.get('caseNumber')?.value,
+publicProsecutor: this.firForm.get('publicProsecutor')?.value,
+prosecutorPhone: this.firForm.get('prosecutorPhone')?.value,
+firstHearingDate: this.firForm.get('firstHearingDate')?.value,
+CaseHandledBy: this.firForm.get('CaseHandledBy')?.value,
+NameOfAdvocate: this.firForm.get('NameOfAdvocate')?.value,
+advocateMobNumber: this.firForm.get('advocateMobNumber')?.value,
+judgementAwarded: this.firForm.get('judgementAwarded')?.value,
+judgementAwarded1:this.firForm.get('judgementAwarded1')?.value,
 
-      CaseHandledBy:this.firForm.get('CaseHandledBy')?.value,
-// b
-NameOfAdvocate:this.firForm.get('NameOfAdvocate')?.value,
-
-// c
-
-advocateMobNumber:this.firForm.get('advocateMobNumber')?.value,
-
-
-      judgementAwarded: [
-        this.firForm.get('judgementAwarded')?.value,
-      
-      ].filter(Boolean), 
-      
-      judgementAwarded1: [
-        this.firForm.get('judgementAwarded1')?.value,
-      
-      ].filter(Boolean), 
-      judgementAwarded2: [
-        this.firForm.get('judgementAwarded2')?.value,
-      
-      ].filter(Boolean), 
-      judgementAwarded3: [
-        this.firForm.get('judgementAwarded3')?.value,
-      
-      ].filter(Boolean), 
-      judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
-      uploadJudgement: this.firForm.get('uploadJudgement')?.value,
+judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
+uploadJudgement: this.firForm.get('judgementDetails.uploadJudgement')?.value,
     },
+
+
+    trialDetails_one: {
+      courtName: this.firForm.get('Court_name')?.value,
+      courtDistrict: this.firForm.get('courtDistrict_one')?.value,
+      trialCaseNumber: this.firForm.get('caseNumber_one')?.value,
+      publicProsecutor: this.firForm.get('publicProsecutor_one')?.value,
+      prosecutorPhone: this.firForm.get('prosecutorPhone_one')?.value,
+      firstHearingDate: this.firForm.get('firstHearingDate_one')?.value,
+
+      judgementAwarded:this.firForm.get('judgementAwarded_one')?.value,
+ 
+      judgementNature: this.firForm.get('judgementDetails_one.judgementNature_one')?.value,
+      uploadJudgement: this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value,
+  },
+  trialDetails_two: {
+    courtName: this.firForm.get('Court_name')?.value,
+    courtDistrict: this.firForm.get('courtDistrict_two')?.value,
+    trialCaseNumber: this.firForm.get('caseNumber_two')?.value,
+    publicProsecutor: this.firForm.get('publicProsecutor_two')?.value,
+    prosecutorPhone: this.firForm.get('prosecutorPhone_two')?.value,
+    firstHearingDate: this.firForm.get('firstHearingDate_two')?.value,
+
+ 
+    judgementAwarded:this.firForm.get('judgementAwarded2')?.value,
+
+    judgementNature: this.firForm.get('judgementDetails_two.judgementNature_two')?.value,
+    uploadJudgement: this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value,
+},
+
     
     // Compensation Details
     compensationDetails: {
@@ -2761,7 +2870,13 @@ advocateMobNumber:this.firForm.get('advocateMobNumber')?.value,
       proceedingsFileNo: this.firForm.get('proceedingsFileNo')?.value,
       uploadProceedings: this.firForm.get('uploadProceedings')?.value,
     },
-    
+    hearingdetail : {
+     
+      hearingDetails: formDatavalues.hearingDetails,
+      hearingDetails_one: formDatavalues.hearingDetails_one,
+      hearingDetails_two: formDatavalues.hearingDetails_two,
+
+    },
     // Appeal Details
     appealDetails: {
       legalOpinionObtained: this.firForm.get('judgementDetails.legalOpinionObtained')?.value,
@@ -2773,13 +2888,7 @@ advocateMobNumber:this.firForm.get('advocateMobNumber')?.value,
 
     },
     
-    hearingdetail : {
-     
-      hearingDetails: formDatavalues.hearingDetails,
-      hearingDetails_one: formDatavalues.hearingDetails_one,
-      hearingDetails_two: formDatavalues.hearingDetails_two,
-
-    },
+   
     // Appeal Details One
     appealDetailsOne: {
       legalOpinionObtained: this.firForm.get('judgementDetails_one.legalOpinionObtained_one')?.value,
@@ -2822,24 +2931,21 @@ advocateMobNumber:this.firForm.get('advocateMobNumber')?.value,
     }
   }
 
+  Object.keys(formFields).forEach((key) => {
+    const value = formFields[key as keyof typeof formFields];
+    if (value !== null && value !== undefined) {
+      formData.append(key, JSON.stringify(value));
+    }
+  });
+  const formDataObject: any = {};
+  formData.forEach((value, key) => {
+    formDataObject[key] = value;
+  });
+  console.log(formDataObject, '📝 Final formDataObject');
+  
 
-  const victimsDetails = this.victimsRelief.value.map((relief: any, index: number) => ({
-      victimId: relief.victimId || null,
-      victimName: this.victimNames[index] || '',
-      reliefAmountAct: parseFloat(relief.reliefAmountScst || '0.00'),
-      reliefAmountGovernment: parseFloat(relief.reliefAmountExGratia || '0.00'),
-      reliefAmountFinalStage: parseFloat(relief.reliefAmountThirdStage || '0.00')
-  }));
 
-  const formData = {
-      firId: this.firId,
-      trialDetails,
-      compensationDetails,
-      attachments,
-      victimsDetails
-  };
-
-  this.firService.saveStepSevenAsDraft(formData).subscribe({
+  this.firService.saveStepSevenAsDraft(formDataObject).subscribe({
       next: (response) => {
           Swal.fire('Success', 'Draft data saved successfully.', 'success');
       },
