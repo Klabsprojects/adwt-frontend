@@ -387,43 +387,43 @@ loadAccusedCommunities(): void {
 
 // onCommunityChange(event: any, index: number): void {
 //   const selectedCommunity = event.target.value;
-onCommunityChange(selectedCommunity: string, index: number): void {
- console.log(selectedCommunity,"wssss")
-    if (selectedCommunity) {
-      this.firService.getCastesByCommunity(selectedCommunity).subscribe(
-        (castes: string[]) => {
-          const victimGroup = this.victims.at(index) as FormGroup;
-          victimGroup.patchValue({ caste: '' }); // Reset caste selection
-          victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
-          this.cdr.detectChanges();
-        },
-        (error) => {
-          console.error('Error fetching castes:', error);
-          Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
-        }
-      );
-    }
-}
+// onCommunityChange(selectedCommunity: string, index: number): void {
+//  console.log(selectedCommunity,"wssss")
+//     if (selectedCommunity) {
+//       this.firService.getCastesByCommunity(selectedCommunity).subscribe(
+//         (castes: string[]) => {
+//           const victimGroup = this.victims.at(index) as FormGroup;
+//           victimGroup.patchValue({ caste: '' }); // Reset caste selection
+//           victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+//           this.cdr.detectChanges();
+//         },
+//         (error) => {
+//           console.error('Error fetching castes:', error);
+//           Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+//         }
+//       );
+//     }
+// }
 
-// onAccusedCommunityChange(event: any, index: number): void {
-//   const selectedCommunity = event.target.value;
-onAccusedCommunityChange(selectedCommunity: string, index: number): void {
-  if (selectedCommunity) {
-    this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
-      (castes: string[]) => {
-        const accusedGroup = this.accuseds.at(index) as FormGroup;
-        accusedGroup.patchValue({ caste: '' }); // Reset caste selection
-        accusedGroup.get('availableCastes')?.setValue(castes);
-        // console.log(accusedGroup.get('availableCastes')?.value,"datdadadadada"); 
-        this.cdr.detectChanges();
-      },
-      (error) => {
-        console.error('Error fetching accused castes:', error);
-        Swal.fire('Error', 'Failed to load castes for the selected accused community.', 'error');
-      }
-    );
-  }
-}
+// // onAccusedCommunityChange(event: any, index: number): void {
+// //   const selectedCommunity = event.target.value;
+// onAccusedCommunityChange(selectedCommunity: string, index: number): void {
+//   if (selectedCommunity) {
+//     this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
+//       (castes: string[]) => {
+//         const accusedGroup = this.accuseds.at(index) as FormGroup;
+//         accusedGroup.patchValue({ caste: '' }); // Reset caste selection
+//         accusedGroup.get('availableCastes')?.setValue(castes);
+//         // console.log(accusedGroup.get('availableCastes')?.value,"datdadadadada"); 
+//         this.cdr.detectChanges();
+//       },
+//       (error) => {
+//         console.error('Error fetching accused castes:', error);
+//         Swal.fire('Error', 'Failed to load castes for the selected accused community.', 'error');
+//       }
+//     );
+//   }
+// }
 
   // onFileSelect_1(event: any, index: number): void {
   //   const file = event.target.files[0];
@@ -2950,6 +2950,7 @@ filePreviews: { [key: number]: string | ArrayBuffer | null } = {};
       offenceCommitted: ['', Validators.required],
       scstSections:  ['', Validators.required], // Ensure this field exists for multi-select
       sectionsIPC:  ['',Validators.required],
+      availableCastes: [[]],
     });
   }
 
@@ -3074,6 +3075,46 @@ console.log(victimReliefDetail,"cretaieg")
   //   );
   // }
 
+  onCommunityChange(event: any, index: number): void {
+    const selectedCommunity = event.target.value;
+  // console.log(selectedCommunity,"wssss")
+      if (selectedCommunity) {
+        this.firService.getCastesByCommunity(selectedCommunity).subscribe(
+          (castes: string[]) => {
+            const victimGroup = this.victims.at(index) as FormGroup;
+            victimGroup.patchValue({ caste: '' }); // Reset caste selection
+            victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+            this.cdr.detectChanges();
+          },
+          (error) => {
+            console.error('Error fetching castes:', error);
+            Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+          }
+        );
+      }
+  }
+
+  onAccusedCommunityChange(event: any, index: number): void {
+    const selectedCommunity = event.target.value;
+    console.log(selectedCommunity)
+  
+    if (selectedCommunity) {
+      this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
+        (castes: string[]) => {
+          const accusedGroup = this.accuseds.at(index) as FormGroup;
+          accusedGroup.patchValue({ caste: '' }); // Reset caste selection
+          accusedGroup.get('availableCastes')?.setValue(castes);
+          // console.log(accusedGroup.get('availableCastes')?.value,"datdadadadada"); 
+          this.cdr.detectChanges();
+        },
+        (error) => {
+          console.error('Error fetching accused castes:', error);
+          Swal.fire('Error', 'Failed to load castes for the selected accused community.', 'error');
+        }
+      );
+    }
+  }
+
   // loadUserData() {
   //   this.firService.getUserDetails(this.userId).subscribe(
   //     (user: any) => {
@@ -3177,7 +3218,8 @@ console.log(victimReliefDetail,"cretaieg")
       antecedents: ['', Validators.required],
       landOIssues: ['', Validators.required],
       gistOfCurrentCase: ['', Validators.required],
-      uploadFIRCopy: ['', Validators.required]
+      uploadFIRCopy: ['', Validators.required],
+      availableCastes: [[]],
     });
   }
 
