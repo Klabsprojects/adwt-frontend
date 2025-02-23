@@ -1862,10 +1862,34 @@
                                     </div>
 
                                     <!-- Upload Judgement Copy -->
-                                    <div class="col-md-6">
+                                    <!-- <div class="col-md-6">
                                       <label class="form-label">13. Upload Judgement Copy *</label>
                                       <input type="file" class="form-control" id="uploadJudgement_one" formControlName="uploadJudgement_one" />
+                                    </div> -->
+
+                                    <div class="col-md-6">
+                                      <label class="form-label">13. Upload Judgement Copy *</label>
+                                      <input
+                                        type="file"
+                                        class="form-control"
+                                        id="uploadJudgement_one"
+                                        (change)="uploadJudgementSelect_one($event)"
+                                        formControlName="uploadJudgement_one"
+                                        accept="image/*"
+                                        required
+                                      />
+                                    
+                                      <!-- Image Preview -->
+                                      <div *ngIf="uploadJudgementPreview_one" class="mt-2">
+                                        <img
+                                          [src]="uploadJudgementPreview_one"
+                                          alt="Judgement Copy Preview"
+                                          class="img-thumbnail"
+                                          style="max-width: 150px; max-height: 150px"
+                                        />
+                                      </div>
                                     </div>
+
                                   </div>
                                 </div>
 
@@ -1943,7 +1967,13 @@
                           <div class="card-body">
                               <h4 class="mb-4">Case Trial and Court Details</h4>
                               <div class="row">
-
+                                <div class="col-md-6 mb-3">
+                                  <label class="form-label">2. District in which court is present *</label>
+                                  <select class="form-select" formControlName="courtDistrict_two" required>
+                                    <option value="" disabled selected>Select District</option>
+                                    <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
+                                  </select>
+                                </div>
                                   <div class="col-md-6 mb-3">
                                       <label class="form-label">3. Case Number Report (CNR) / Special SC number *</label>
                                       <input type="text" class="form-control" formControlName="caseNumber_two" placeholder="Enter Case Number" required />
@@ -2089,10 +2119,34 @@
                                     </div>
 
                                     <!-- Upload Judgement Copy -->
-                                    <div class="col-md-6">
+                                    <!-- <div class="col-md-6">
                                       <label class="form-label">13. Upload Judgement Copy *</label>
                                       <input type="file" class="form-control" id="uploadJudgement_two" formControlName="uploadJudgement_two" />
+                                    </div> -->
+
+                                    <div class="col-md-6">
+                                      <label class="form-label">13. Upload Judgement Copy *</label>
+                                      <input
+                                        type="file"
+                                        class="form-control"
+                                        id="uploadJudgement_two"
+                                        (change)="uploadJudgementSelect_two($event)"
+                                        formControlName="uploadJudgement_two"
+                                        accept="image/*"
+                                        required
+                                      />
+                                    
+                                      <!-- Image Preview -->
+                                      <div *ngIf="uploadJudgementPreview_two" class="mt-2">
+                                        <img
+                                          [src]="uploadJudgementPreview_two"
+                                          alt="Judgement Copy Preview"
+                                          class="img-thumbnail"
+                                          style="max-width: 150px; max-height: 150px"
+                                        />
+                                      </div>
                                     </div>
+
                                   </div>
                                 </div>
 
