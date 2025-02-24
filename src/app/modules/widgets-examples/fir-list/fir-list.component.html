@@ -1854,7 +1854,7 @@
             </div>
           </div>
 
-          <div class="card border-primary mb-4 mt-3">
+          <!-- <div class="card border-primary mb-4 mt-3">
             <div class="card-body">
               <h4 class="mb-4">Select Hearing Date</h4>
               <div *ngFor="let hearingdetailone of hearingdetailonedata; let i = index" class="row">
@@ -1884,12 +1884,52 @@
                 </div>
               </div>
             </div>
+          </div> -->
+
+          <div class="card border-primary mb-4 mt-3">
+            <div class="card-body">
+              <h4 class="mb-4">Select Hearing Date</h4>
+          
+              <div class="row">
+                <!-- First Hearing Date -->
+                <div class="col-md-4 mb-3">
+                  <label for="firstHearingDate" class="form-label">
+                    6. First Hearing Date *
+                  </label>
+                  <input
+                    readonly
+                    name="firstHearingDate"
+                    id="firstHearingDate"
+                    type="text"
+                    class="form-control"
+                    [value]="courtDetails?.second_hearing_date| date:'dd/MM/yyyy'"
+                    placeholder="Enter Date"
+                  />
+                </div>
+          
+                <!-- Judgement Awarded -->
+                <div class="col-md-4 mb-3">
+                  <label for="judgementAwarded" class="form-label">
+                    7. Has a Judgement been awarded in the case? *
+                  </label>
+                  <input
+                    readonly
+                    name="judgementAwarded"
+                    id="judgementAwarded"
+                    type="text"
+                    class="form-control"
+                    [value]="courtDetails?.judgement_awarded"
+                    placeholder="Enter Yes or No"
+                  />
+                </div>
+          
+              </div>
+            </div>
           </div>
+          
 
 
-
-
-          <ng-container *ngIf="hearingdetailonedata[0]?.judgement_awarded?.toLowerCase() === 'no'">
+          <ng-container *ngIf="courtDetails?.judgement_awarded?.toLowerCase() === 'no'">
             <!-- Loop through `Judgementdata` -->
             <div  class="card border-primary mb-4">
               <div class="card-body">
@@ -1946,14 +1986,14 @@
               </div>
             </div>
           </ng-container>
-
-          <div *ngIf="hearingdetailonedata[0]?.judgement_awarded?.toLowerCase() === 'yes'|| judgementBeenAwardednxt1?.toLowerCase() === 'yes'"
+<!-- 
+          <div *ngIf="courtDetails?.judgement_awarded?.toLowerCase() === 'yes'|| judgementBeenAwardednxt1?.toLowerCase() === 'yes'"
            class="card border-primary mb-4">
             <div *ngFor="let hearingdetailone of hearingdetailonedata; let i = index" class="card border-primary mb-4">
               <div class="card-body">
                 <h5>Judgement Details</h5>
                 <div class="row align-items-center">
-                  <!-- Item 90: Nature of Judgement -->
+               
                   <div class="col-md-6">
                     <label for="judgementNature_1stAccquitted{{i}}" class="form-label">11. Nature of Judgement *</label>
                     <input
@@ -1966,8 +2006,7 @@
                       placeholder="Enter Nature of Judgement"
                     />
                   </div>
-
-                  <!-- Item 91: Upload Judgement Copy -->
+>
                   <div class="col-md-6">
                     <label for="judgementNature_1stAccquitted{{i}}" class="form-label">12. Upload Judgement Copy *</label>
                     <input
@@ -1984,7 +2023,49 @@
               </div>
 
             </div>
-          </div>
+          </div> -->
+
+
+
+          <div *ngIf="courtDetails?.judgement_awarded?.toLowerCase() === 'yes' || judgementBeenAwardednxt1?.toLowerCase() === 'yes'"
+          class="card border-primary mb-4">
+       <div class="card border-primary mb-4">
+         <div class="card-body">
+           <h5>Judgement Details</h5>
+           <div class="row align-items-center">
+        
+            <div class="col-md-6">
+              <label for="judgementNature_1stAccquitted" class="form-label">11. Nature of Judgement *</label>
+              <input
+                readonly
+                name="judgementNature_1stAccquitted"
+                id="judgementNature_1stAccquitted"
+                type="text"
+                class="form-control"
+                [value]="courtDetails?.judgementNature === 'Convicted_one' ? 'Accused person(s) has been Convicted' : 
+                          courtDetails?.judgementNature === 'Acquitted_one' ? 'Accused person(s) have been Acquitted' : ''"
+                placeholder="Enter Nature of Judgement"
+              />
+            </div>
+            
+  
+             <div class="col-md-6">
+               <label for="judgementCopy" class="form-label">12. Upload Judgement Copy *</label>
+               <input
+                 readonly
+                 name="judgementCopy"
+                 id="judgementCopy"
+                 type="text"
+                 class="form-control"
+                 [value]=""
+                 placeholder="Enter Judgement Copy Details"
+               />
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+     
         </div>
 
 
@@ -2182,7 +2263,7 @@
 
         <!--2nd accquitted -->
         <!-- Appeal Details Section -->
-        <div *ngIf="hearingdetailonedata[0]?.nature_of_judgement === 'Acquitted'" class="card border-primary mb-4">
+        <div *ngIf="courtDetails?.judgementNature === 'Acquitted_one'" class="card border-primary mb-4">
           <div class="card border-primary mb-4">
             <div class="card-body">
               <h5>2nd Acquitted</h5>
@@ -2748,16 +2829,19 @@
                    />
                  </div>
                  <div class="col-md-6 mb-3">
-                   <label for="proceedingsDate2_1stConvicted{{i}}" class="form-label">98. Proceedings Date *</label>
-                   <input
-                     readonly
-                     name="proceedingsDate2_1stConvicted{{i}}"
-                     id="proceedingsDate2_1stConvicted{{i}}"
-                     type="text"
-                     class="form-control"
-                     [value]="firtrail.proceedings_date"
-                   />
-                 </div>
+                  <label for="proceedingsDate2_1stConvicted{{i}}" class="form-label">
+                    98. Proceedings Date *
+                  </label>
+                  <input
+                    readonly
+                    name="proceedingsDate2_1stConvicted{{i}}"
+                    id="proceedingsDate2_1stConvicted{{i}}"
+                    type="text"
+                    class="form-control"
+                    [value]="firtrail?.proceedings_date | date:'dd-MM-yyyy'"
+                  />
+                </div>
+                
                 
                </div>
                <div class="col-md-12 mb-3">

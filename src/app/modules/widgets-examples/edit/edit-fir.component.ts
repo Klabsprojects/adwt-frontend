@@ -1019,7 +1019,7 @@ console.log(response.casedetail_one,"casedetail_onee")
                             totalCompensation_2: item.total_compensation,
                             proceedingsFileNo_2: item.proceedings_file_no,
                             proceedingsDate_2: item.proceedings_date  ? formatDate(item.proceedings_date, 'yyyy-MM-dd', 'en') : '',
-                            // uploadProceedings_2: `${this.image_access}${item.upload_proceedings}`
+                            uploadProceedings_2: item.upload_proceedings
 
                           });
                           if (item.upload_proceedings) {

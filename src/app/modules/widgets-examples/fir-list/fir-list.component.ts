@@ -472,6 +472,7 @@ export class FirListComponent implements OnInit {
   showPreview() {
     this.isPreviewVisible = !this.isPreviewVisible;
   }  
+  courtDetails: any = {};
   // funtions
   fetchFirDetails(firId:any): void {
 
@@ -500,6 +501,9 @@ export class FirListComponent implements OnInit {
           // step 7
           this.casedetailsdata =data.queryResults4;
           this.hearingdetaildata =data.queryResults6;
+
+console.log(  this.hearingdetaildata,"  this.hearingdetaildata")
+
           this.Judgementdata =data.queryResults7;
           this.Judgementdata = data.queryResults7.map((judgement: any) => ({
             ...judgement,
@@ -507,12 +511,13 @@ export class FirListComponent implements OnInit {
           }));
           
           this.hearingdetailonedata =data.queryResults11;
+console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
           this.trialreliefdata =data.queryResults8;
 
 
           this.firtraildata =data.queryResults5;
           this.compensation_details_2 =data.compensation_details_2;
-          console.log( this.firtraildata,"firtraildata")
+          // console.log( this.firtraildata,"firtraildata")
 
           if (data.compensation_details_2 && data.compensation_details_2.length > 0) {
             this.uploadProceedingsUrl = `${this.image_access2}${data.compensation_details_2[0].upload_proceedings}`;
@@ -524,6 +529,14 @@ export class FirListComponent implements OnInit {
           this.casedetailstwodata =data.queryResults13;
           this.courtdetailstwodata =data.queryResults14;
           this.hearingdetailsdata =data.queryResults15;
+      
+            this.courtDetails =  data.courtDetails.caseCourtDetailOne;
+            console.log( this.courtDetails," this.courtDetails")
+           
+        
+          
+      
+
           this.hearingdetailtwodata =data.queryResults16;
           this.caseappealdetailstwodata =data.queryResults17;
           this.hearingdetailstwodata =data.queryResults18;
