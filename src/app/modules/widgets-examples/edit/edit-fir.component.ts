@@ -2152,7 +2152,13 @@ onAccusedAgeChange(index: number): void {
       judgementAwarded3: ['', Validators.required],
 
 
+      totalCompensation_2: [''],
+      proceedingsFileNo_2: [''], 
+      proceedingsDate_2: [''], 
+      uploadProceedings_2: [''], 
 
+      
+   
 
       judgementDetails: this.fb.group({
         judgementNature: ['', Validators.required],
@@ -2230,7 +2236,9 @@ onAccusedAgeChange(index: number): void {
       proceedingsFileNo: ['', Validators.required],
       proceedingsDate: ['', Validators.required],
       uploadProceedings: ['', Validators.required],
-      attachments: this.fb.array([]) // Dynamic attachments array
+      attachments: this.fb.array([]), // Dynamic attachments array
+
+
     });
 
     // Other setup functions
