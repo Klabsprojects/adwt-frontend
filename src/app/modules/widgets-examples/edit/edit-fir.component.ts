@@ -2448,8 +2448,8 @@ uploadedImageSrc: any | ArrayBuffer;
   onDesignatedCourtChange_one_fromapi() {
     const selectedValue = this.firForm.get('judgementDetails_one.designatedCourt_one')?.value;
 
-
-    this.showDuplicateSection_1 = selectedValue === 'highCourt_one' || selectedValue === 'supremeCourt_one'; 
+console.log(selectedValue,"selectedValue")
+    this.showDuplicateSection_1 = selectedValue === 'highCourt_one' || selectedValue === 'supremeCourt'; 
   }
   onDesignatedCourtChange_one(event: Event): void {
     const target = event.target as HTMLSelectElement;
