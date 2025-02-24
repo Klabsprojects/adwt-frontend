@@ -386,7 +386,7 @@ loadCourtDivisions(): void {
   }
 
   onCourtDivisionChange(event: any): void {
-    const selectedDivision = event.target.value;
+    const selectedDivision = event;
 
     if (selectedDivision) {
       this.firService.getCourtRangesByDivision(selectedDivision).subscribe(
