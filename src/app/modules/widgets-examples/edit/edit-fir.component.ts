@@ -143,6 +143,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   showCaseFitForAppeal_one = false;
 
   image_access = environment.image_access;
+  image_access2 = environment.image_access2;
 
   reliefValues: any;
 
@@ -188,6 +189,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   firCopyValue: any;
   uploadedFIRCopy: any;
   attachmentss_1: any;
+  uploadProceedings_2_preview: string;
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -909,6 +911,7 @@ loadAccusedCommunities(): void {
   //   }
   // }
   // imagePaths: string[] = [];
+
   loadFirDetails(firId: string): void {
 
     this.firService.getFirDetails(firId).subscribe(
@@ -1005,6 +1008,31 @@ console.log(response.casedetail_one,"casedetail_onee")
                   
                 });
               }
+
+
+              if (response.compensation_details_2 && response.compensation_details_2.length > 0) {
+                console.log(response.compensation_details_2,"compensation_details_2")
+                        response.compensation_details_2.forEach((item:any) => {
+                    
+                        
+                          this.firForm.patchValue({
+                            totalCompensation_2: item.total_compensation,
+                            proceedingsFileNo_2: item.proceedings_file_no,
+                            proceedingsDate_2: item.proceedings_date  ? formatDate(item.proceedings_date, 'yyyy-MM-dd', 'en') : '',
+                            // uploadProceedings_2: `${this.image_access}${item.upload_proceedings}`
+
+                          });
+                          if (item.upload_proceedings) {
+                            this.uploadProceedings_2_preview = `${this.image_access2}${item.upload_proceedings}`;
+
+                            console.log( this.uploadProceedings_2_preview," this.uploadProceedings_2_preview")
+                          }
+                          
+                        });
+                        
+                      }
+
+
 
       if (response.hearingDetails_one && response.hearingDetails_one.length > 0) {
         console.log(response.hearingDetails_one, "response.hearingDetails_one");
@@ -4970,37 +4998,36 @@ attachment:this.attachments_2.value
     }
   }
   // .... thisis for proceeeding file 
-  uploadProceedings_2_preview: string | ArrayBuffer | null = null; 
+ uploadProceedings_2(event: any): void {
+  const file = event.target.files?.[0];
 
-  uploadProceedings_2(event: any): void {
-    const file = event.target.files?.[0];
-  
-    if (file) {
-      console.log('File selected:', file.name, file);
+  if (file) {
+    console.log('File selected:', file.name, file);
 
-   
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.uploadProceedings_2_preview = e.target.result;
-      };
-      reader.readAsDataURL(file);
-  
-      this.uploadMultipleFiles(file)
-        .then(paths => {
-          console.log('Uploaded file path:', paths[0]);
-  
-      
-          this.firForm.patchValue({
-            uploadProceedings: paths[0] 
-          });
-        })
-        .catch(error => {
-          console.error('Error uploading file:', error);
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.uploadProceedings_2_preview = e.target.result;  // Set preview from uploaded file
+    };
+    reader.readAsDataURL(file);
+
+    this.uploadMultipleFiles(file)
+      .then(paths => {
+        console.log('Uploaded file path:', paths[0]);
+
+        // Update form control and preview with uploaded file path
+        this.firForm.patchValue({
+          uploadProceedings_2: paths[0]
         });
-    } else {
-      console.log('No file selected');
-      this.uploadProceedings_2_preview = null;
-    }
+
+        this.uploadProceedings_2_preview = paths[0]; // Set preview for uploaded file
+      })
+      .catch(error => {
+        console.error('Error uploading file:', error);
+      });
+  } else {
+    console.log('No file selected');
+    this.uploadProceedings_2_preview = '';
   }
+}
   
 }
