@@ -341,6 +341,8 @@ export class FirListComponent implements OnInit {
   page: number = 1;
   itemsPerPage: number = 10;
   isLoading: boolean = true;
+  compensation_details_2: any;
+  uploadProceedingsUrl: string;
   get progressPercentage(): number {
     return ((this.currentStep + 1) / this.steps.length) * 100;
   }
@@ -466,7 +468,10 @@ export class FirListComponent implements OnInit {
       });    
     }, 2000);
   }
-
+  isPreviewVisible = false;
+  showPreview() {
+    this.isPreviewVisible = !this.isPreviewVisible;
+  }  
   // funtions
   fetchFirDetails(firId:any): void {
 
@@ -506,8 +511,12 @@ export class FirListComponent implements OnInit {
 
 
           this.firtraildata =data.queryResults5;
+          this.compensation_details_2 =data.compensation_details_2;
           console.log( this.firtraildata,"firtraildata")
 
+          if (data.compensation_details_2 && data.compensation_details_2.length > 0) {
+            this.uploadProceedingsUrl = `${this.image_access2}${data.compensation_details_2[0].upload_proceedings}`;
+          }
 
           this.appealdata =data.queryResults9;
           this.casedetailsonedata =data.queryResults10;
