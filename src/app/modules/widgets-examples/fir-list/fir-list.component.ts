@@ -17,7 +17,7 @@ export class FirListComponent implements OnInit {
 
   firId: number;
   image_access = environment.image_access;
-
+  image_access2 = environment.image_access2;
 
   policeCity: string = '';
   policeZone: string = '';
@@ -488,14 +488,29 @@ export class FirListComponent implements OnInit {
           }));
           this.accusedsdata =data.queryResults2;
           this.reliefsdata =data.queryResults3;
+
+
+
+
+          // step 7
           this.casedetailsdata =data.queryResults4;
-          this.firtraildata =data.queryResults5;
           this.hearingdetaildata =data.queryResults6;
           this.Judgementdata =data.queryResults7;
+          this.Judgementdata = data.queryResults7.map((judgement: any) => ({
+            ...judgement,
+            judgement_copy: `${this.image_access2}${judgement.judgement_copy}`
+          }));
+          
+          this.hearingdetailonedata =data.queryResults11;
           this.trialreliefdata =data.queryResults8;
+
+
+          this.firtraildata =data.queryResults5;
+          console.log( this.firtraildata,"firtraildata")
+
+
           this.appealdata =data.queryResults9;
           this.casedetailsonedata =data.queryResults10;
-          this.hearingdetailonedata =data.queryResults11;
           this.appealonedata =data.queryResults12;
           this.casedetailstwodata =data.queryResults13;
           this.courtdetailstwodata =data.queryResults14;
