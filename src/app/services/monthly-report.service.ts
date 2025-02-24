@@ -23,6 +23,11 @@ export class MonthlyReportService {
     return this.http.get(`${this.baseUrl}/get-monthly-report-details`);
   }
 
+  // Update status and reason for current month to given fir report details
+  updateMonthlyReportDetail(data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/update-monthly-report-details`, data);
+  }
+
   // Get attendees for SDLVMC or DLVMC
   getAttendees(
     district: string,

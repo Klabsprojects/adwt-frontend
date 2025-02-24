@@ -23,14 +23,15 @@ import { ReportsCommonService } from 'src/app/services/reports-common.service';
     MatSelectModule,
     MatFormFieldModule,
   ],
-  templateUrl: './monthly-report.component.html',
-  styleUrls: ['./monthly-report.component.scss'],
+  templateUrl: './edit-monthly-report.component.html',
+  styleUrls: ['./edit-monthly-report.component.scss'],
 })
-export class MonthlyReportComponent implements OnInit {
+export class EditMonthlyReportComponent implements OnInit {
   // Variable Declarations
   reportData: Array<any> = [];
   filteredData: Array<any> = [];
   searchText: string = '';
+  saveChangesData: Array<any> = [];
   selectedDistrict: string = '';
   selectedColumns: string[] = [];
   selectedNatureOfOffence: string = '';
@@ -174,7 +175,7 @@ export class MonthlyReportComponent implements OnInit {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private reportsCommonService: ReportsCommonService,
+    public reportsCommonService: ReportsCommonService,
     private monthlyReportService: MonthlyReportService
   ) {}
 
@@ -209,7 +210,8 @@ export class MonthlyReportComponent implements OnInit {
         next: (response) => {
           //console.log('Monthly Reports:', response.data); // Debugging
           // Transform API response to match frontend structure
-          this.reportData = response.data.map((item: { police_city: any; police_station: any; fir_number: any; offence_committed: any; scst_sections: any; number_of_victim: any; court_district: any; court_name: any; case_number: any; status: number; under_investigation_case_days: any; pending_trial_case_days: any; previous_month_reason_for_status: any; current_month_reason_for_status: any; }, index: number) => ({
+          this.reportData = response.data.map((item: { fir_id: any; police_city: any; police_station: any; fir_number: any; offence_committed: any; scst_sections: any; number_of_victim: any; court_district: any; court_name: any; case_number: any; status: number; under_investigation_case_days: any; pending_trial_case_days: any; previous_month_reason_for_status: any; current_month_reason_for_status: any; }, index: number) => ({
+            fir_id: item.fir_id,
             sl_no: index + 1,
             policeCity: item.police_city,
             stationName: item.police_station,
@@ -220,7 +222,8 @@ export class MonthlyReportComponent implements OnInit {
             courtDistrict: item.court_district || '',
             courtName: item.court_name || '',
             caseNumber: item.case_number || '',
-            caseStatus: this.reportsCommonService.caseStatusOptions.find(option => option.value === item.status)?.label || '',
+            caseStatus: item.status,
+            statusText: this.reportsCommonService.caseStatusOptions.find(option => option.value === item.status)?.label || '',
             uiPendingDays: item.under_investigation_case_days || '',
             ptPendingDays: item.pending_trial_case_days || '',
             reasonPreviousMonth: item.previous_month_reason_for_status || '',
@@ -238,6 +241,46 @@ export class MonthlyReportComponent implements OnInit {
       });
   }
 
+  // Handles the change in casestatus for a specific report record.
+  onStatusChange(event: Event, record: any): void {
+    const firId = record.fir_id;
+    const selectedStatus = record.caseStatus;
+    this.updateStatus(firId, selectedStatus);
+  }
+
+  // Handles the change in reason for the current month for a specific report.
+  onReasonChange(event: Event, report: any) {
+    const firId = report.fir_id;
+    const reason = report.reasonCurrentMonth;
+    this.updateReason(firId, reason);
+  }
+
+  // Updates the status of a report in the saveChangesData array.
+  updateStatus(firId: string, status: string) {
+    // Check if the FIR ID already exists in the array
+    const existingEntryIndex = this.saveChangesData.findIndex(entry => entry.fir_id === firId);
+    if (existingEntryIndex > -1) {
+      // Update existing entry's status
+      this.saveChangesData[existingEntryIndex].status = status;
+    } else {
+      // Add new entry with status
+      this.saveChangesData.push({ fir_id: firId, status });
+    }
+  }
+
+  // Updates the reason for the current month of a report in the saveChangesData array.
+  updateReason(firId: string, reason: string) {
+    // Check if the FIR ID already exists in the array
+    const existingEntryIndex = this.saveChangesData.findIndex(entry => entry.fir_id === firId);
+    if (existingEntryIndex > -1) {
+      // Update existing entry's reason
+      this.saveChangesData[existingEntryIndex].reason_current_month = reason;
+    } else {
+      // Add new entry with reason
+      this.saveChangesData.push({ fir_id: firId, reason_current_month: reason });
+    }
+  }
+  
   // Updates the visibility of columns based on the selected columns.
   updateColumnVisibility(): void {
     this.displayedColumns.forEach((column) => {
@@ -259,7 +302,7 @@ export class MonthlyReportComponent implements OnInit {
       this.selectedNatureOfOffence,
       this.selectedStatusOfCase,
       this.selectedStatusOfRelief,
-      'policeCity', 'natureOfOffence', 'caseStatus'
+      'policeCity', 'natureOfOffence', 'statusText'
     );
     this.filteredData = this.filteredData.map((report, index) => ({...report, sl_no: index + 1 })); // Assign sl_no starting from 1
     this.page = 1; // Reset to the first page
@@ -325,12 +368,40 @@ export class MonthlyReportComponent implements OnInit {
     return this.filteredData.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
-  // Download Reports
-  async onBtnExport(): Promise<void> {
-    await this.reportsCommonService.exportToExcel(
-      this.filteredData,
-      this.displayedColumns,
-      'UI&PT-Reports'
+// Saves the changes made to the reports, including user ID and missing values.
+  saveData(): void {
+    const userId = sessionStorage.getItem('userId'); // Retrieve userId from session storage
+    // Iterate over each entry in saveChangesData
+    this.saveChangesData.forEach(entry => {
+      // Add created_by to each entry
+      entry.created_by = userId;
+      // Check if status or reason_current_month is missing
+      if (!entry.status || !entry.reason_current_month) {
+        // Find the corresponding report data using fir_id
+        const reportDataEntry = this.reportData.find(report => report.fir_id === entry.fir_id);
+        // If found, fill in missing values
+        if (reportDataEntry) {
+          if (!entry.status) {
+            entry.status = reportDataEntry.caseStatus; // Assuming caseStatus is the correct field
+          }
+          if (!entry.reason_current_month) {
+            entry.reason_current_month = reportDataEntry.reasonCurrentMonth; // Assuming reasonCurrentMonth is the correct field
+          }
+        }
+      }
+    });
+    // Call the update API with the modified saveChangesData
+    this.monthlyReportService.updateMonthlyReportDetail(this.saveChangesData).subscribe(
+      response => {
+        //console.log('API response:', response);
+        alert('Data saved successfully!');
+        this.saveChangesData = []; // Clear the changes after saving
+        this.cdr.detectChanges();
+      },
+      error => {
+        //console.error('Error saving data:', error);
+        alert('Failed to save data.');
+      }
     );
   }
 }

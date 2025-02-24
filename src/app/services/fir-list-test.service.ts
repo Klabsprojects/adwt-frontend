@@ -36,6 +36,6 @@ export class FirListTestService {
   //   return this.http.get('http://localhost:3010/additionalreport/getadditionalreportdetail');
   // }
   getReportdata(): Observable<any> {
-    return this.http.get(`${environment.apiUrl}/additionalreport/getadditionalreportdetail`);
+    return this.http.get(`${environment.apiUrl}/additionalreport/getadditionalreportdetails`);
   }
 }

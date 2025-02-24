@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MonetaryReliefComponent  } from './Monetary-relief.component';
+import { MonetaryReliefComponent  } from './monetary-relief.component';
 
 describe('MonetaryReliefComponent ', () => {
   let component: MonetaryReliefComponent ;

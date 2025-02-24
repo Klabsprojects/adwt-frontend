@@ -13,9 +13,13 @@ export class MonetaryReliefService {
 
   constructor(private http: HttpClient) {}
 
-  // Fetches all monthly report details 
+  // Fetches all monetary report details 
   getMonetaryReliefDetails(): Observable<any> {
     return this.http.get(`${this.baseUrl}/get-monetary-relief-details`);
   }
   
+  // Update status and reason for current month to given fir report details
+  updateMonetaryReliefDetails(data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/update-monetary-relief-details`, data);
+  }
 }

@@ -25,14 +25,15 @@ import { ReportsCommonService } from 'src/app/services/reports-common.service';
     DragDropModule,
   ],
   providers: [FirListTestService], // Provide the service here
-  templateUrl: './monetary-relief.component.html',
-  styleUrls: ['./monetary-relief.component.scss'],
+  templateUrl: './edit-monetary-relief.component.html',
+  styleUrls: ['./edit-monetary-relief.component.scss'],
 })
-export class MonetaryReliefComponent implements OnInit {
+export class EditMonetaryReliefComponent implements OnInit {
   // Variable Declarations
   searchText: string = '';
   reportData: Array<any> = [];
   filteredData: Array<any> = [];
+  saveChangesData: Array<any> = [];
   page: number = 1;
   itemsPerPage: number = 10;
   isReliefLoading: boolean = true;
@@ -145,7 +146,7 @@ export class MonetaryReliefComponent implements OnInit {
   constructor(
     // private firService: FirListTestService,
     private cdr: ChangeDetectorRef,
-    private reportsCommonService: ReportsCommonService,
+    public reportsCommonService: ReportsCommonService,
     private monetaryReliefService: MonetaryReliefService,
     private router: Router
   ) {}
@@ -182,15 +183,16 @@ export class MonetaryReliefComponent implements OnInit {
       next: (response) => {
         //console.log('Monetary Reliefs:', response.data); // Debugging
         // Transform API response to match frontend structure
-        this.reportData = response.data.map((item: { fir_number: any; police_city: any; police_station: any; status: number; offence_committed: any; victim_name: any; previous_month_reason_for_status: any; current_month_reason_for_status: any; relief_status: any;}, index: number) => ({
+        this.reportData = response.data.map((item: { fir_id: any; fir_number: any; police_city: any; police_station: any; status: number; relief_status: number; offence_committed: any; victim_name: any; previous_month_reason_for_status: any; current_month_reason_for_status: any; }, index: number) => ({
+          id: item.fir_id,
           sl_no: index + 1,
           fir_id: item.fir_number,
           police_city:  item.police_city,
           police_station: item.police_station,
           status: this.reportsCommonService.caseStatusOptions.find(option => option.value === item.status)?.label || '',
           nature_of_offence: (item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, '')), 
-          case_status: this.reportsCommonService.caseStatusOptions.find(option => option.value === item.status)?.label || '',
-          relief_status: this.reportsCommonService.reliefStatusOptions.find(option => option.value === item.relief_status)?.label || '',
+          case_status: item.status,
+          relief_status: item.relief_status,
           victim_name: (item.victim_name === "NULL" ? '' : (item.victim_name || '')),
           reason_previous_month: item.previous_month_reason_for_status || '',
           reason_current_month: item.current_month_reason_for_status || '',
@@ -287,12 +289,104 @@ export class MonetaryReliefComponent implements OnInit {
     return this.filteredData.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
-  // Download Reports
-  async onBtnExport(): Promise<void> {
-    await this.reportsCommonService.exportToExcel(
-      this.filteredData,
-      this.displayedColumns,
-      'Monetary-Reports'
+  // Handles the change in status for a specific report record.
+  onStatusChange(event: Event, record: any): void {
+    const firId = record.id;
+    const selectedStatus = record.case_status;
+    this.updateStatus(firId, selectedStatus);
+  }
+
+  // Handles the change in relief status for a specific report record.
+  onReliefStatusChange(event: Event, record: any): void {
+    const firId = record.id;
+    const selectedStatus = record.relief_status;
+    this.updateReliefStatus(firId, selectedStatus);
+  }
+
+  // Handles the change in reason for the current month for a specific report.
+  onReasonChange(event: Event, report: any) {
+    const firId = report.id;
+    const reason = report.reason_current_month;
+    this.updateReason(firId, reason);
+  }
+
+  // Updates the status of a report in the saveChangesData array.
+  updateStatus(firId: string, status: string) {
+    // Check if the FIR ID already exists in the array
+    const existingEntryIndex = this.saveChangesData.findIndex(entry => entry.fir_id === firId);
+    if (existingEntryIndex > -1) {
+      // Update existing entry's status
+      this.saveChangesData[existingEntryIndex].status = status;
+    } else {
+      // Add new entry with status
+      this.saveChangesData.push({ fir_id: firId, status });
+    }
+    console.log('s save changes',this.saveChangesData);
+  }
+
+  // Updates the relief status of a report in the saveChangesData array.
+  updateReliefStatus(firId: string, relief_status: string) {
+    // Check if the FIR ID already exists in the array
+    const existingEntryIndex = this.saveChangesData.findIndex(entry => entry.fir_id === firId);
+    if (existingEntryIndex > -1) {
+      // Update existing entry's relief_status
+      this.saveChangesData[existingEntryIndex].relief_status = relief_status;
+    } else {
+      // Add new entry with relief_status
+      this.saveChangesData.push({ fir_id: firId, relief_status });
+    }
+  }
+
+  // Updates the reason for the current month of a report in the saveChangesData array.
+  updateReason(firId: string, reason: string) {
+    // Check if the FIR ID already exists in the array
+    const existingEntryIndex = this.saveChangesData.findIndex(entry => entry.fir_id === firId);
+    if (existingEntryIndex > -1) {
+      // Update existing entry's reason
+      this.saveChangesData[existingEntryIndex].reason_current_month = reason;
+    } else {
+      // Add new entry with reason
+      this.saveChangesData.push({ fir_id: firId, reason_current_month: reason });
+    }
+  }
+
+  // Saves the changes made to the reports, including user ID and missing values.
+  saveData(): void {
+    const userId = sessionStorage.getItem('userId'); // Retrieve userId from session storage
+    // Iterate over each entry in saveChangesData
+    this.saveChangesData.forEach(entry => {
+      // Add created_by to each entry
+      entry.created_by = userId;
+      // Check if status, relief_status or reason_current_month is missing
+      if (!entry.status || !entry.relief_status || !entry.reason_current_month) {
+        // Find the corresponding report data using fir_id
+        const reportDataEntry = this.reportData.find(report => report.fir_id === entry.fir_id);
+        // If found, fill in missing values
+        if (reportDataEntry) {
+          if (!entry.status) {
+            entry.status = reportDataEntry.case_status; 
+          }
+          if (!entry.relief_status) {
+            entry.relief_status = reportDataEntry.relief_status; 
+          }
+          if (!entry.reason_current_month) {
+            entry.reason_current_month = reportDataEntry.reason_current_month; 
+          }
+        }
+      }
+    });
+    // Call the update API with the modified saveChangesData
+    this.monetaryReliefService.updateMonetaryReliefDetails(this.saveChangesData).subscribe(
+      response => {
+        //console.log('API response:', response);
+        alert('Data saved successfully!');
+        this.saveChangesData = []; // Clear the changes after saving
+        this.cdr.detectChanges();
+      },
+      error => {
+        //console.error('Error saving data:', error);
+        alert('Failed to save data.');
+      }
     );
   }
 }

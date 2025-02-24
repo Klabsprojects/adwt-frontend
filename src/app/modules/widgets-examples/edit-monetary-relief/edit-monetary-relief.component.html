@@ -63,23 +63,23 @@
               <ng-container [ngSwitch]="column.field">
 
                 <!-- Case Status Dropdown -->
-                <!-- <span *ngSwitchCase="'case_status'">
-                  <select class="form-select" [(ngModel)]="report.case_status" (change)="onCaseStatusChange(report)">
-                    <option *ngFor="let status of caseStatusOptions" [value]="status">{{ status }}</option>
+                <span *ngSwitchCase="'case_status'">
+                  <select class="form-select" [(ngModel)]="report.case_status" [attr.data-id]="report.id" (change)="onStatusChange($event, report)" style="min-width: 150px;">
+                    <option *ngFor="let status of reportsCommonService.caseStatusOptions" [value]="status.value">{{ status.label }}</option>
                   </select>
-                </span> -->
+                </span>
 
                 <!-- Relief Status Dropdown -->
-                <!-- <span *ngSwitchCase="'relief_status'">
-                  <select class="form-select" [(ngModel)]="report.relief_status">
-                    <option *ngFor="let relief of reliefStatusOptions" [value]="relief">{{ relief }}</option>
+                <span *ngSwitchCase="'relief_status'">
+                  <select class="form-select" [(ngModel)]="report.relief_status" [attr.data-id]="report.id" (change)="onReliefStatusChange($event, report)" style="min-width: 150px;">
+                    <option *ngFor="let relief of reportsCommonService.reliefStatusOptions" [value]="relief.value">{{ relief.label }}</option>
                   </select>
-                </span> -->
+                </span>
                 <!-- Reason for Status Current Month -->
-                <!-- <span *ngSwitchCase="'reason_current_month'">
-                  <input type="text" class="form-control" [(ngModel)]="report.reason_current_month"
-                    placeholder="Enter reason for current month" />
-                </span> -->
+                <span *ngSwitchCase="'reason_current_month'">
+                  <input type="text" class="form-control" [(ngModel)]="report.reason_current_month" [attr.data-id]="report.id" (input)="onReasonChange($event, report)"
+                    placeholder="Enter reason for current month" style="min-width: 200px;" />
+                </span>
                 <!-- Default Case -->
                 <span *ngSwitchDefault>{{ report[column.field] }}</span>
               </ng-container>
@@ -91,7 +91,8 @@
       <div *ngIf="loading" class="alert alert-warning">Loading...</div>
       <!-- Show message if filtered data is empty -->
       <div *ngIf="filteredData.length === 0 && !loading" class="alert alert-warning">No FIR data available.</div>
-      <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button>
+      <button class="btn btn-primary mt-3" (click)="saveData()" [disabled]="saveChangesData.length === 0">Save Changes</button>
+      <!-- <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()" [disabled]="saveChangesData.length > 0">Download as Excel</button> -->
       <nav *ngIf="filteredData.length > itemsPerPage" class="d-flex justify-content-end mt-3">
         <ul class="pagination">
           <li class="page-item" [class.disabled]="page === 1">

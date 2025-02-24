@@ -148,17 +148,26 @@ export class ReportsCommonService {
     FileSaver.saveAs(data, fileName + '' + EXCEL_EXTENSION);
   }
 
-  // Returns the corresponding case status label based on the provided index.
-  getCaseStatus(caseStatusIndex: number): string {
-    return caseStatusIndex === 0 ? 'FIR Draft' 
-      : caseStatusIndex <= 4 ? 'Pending FIR Stage' 
-      : caseStatusIndex === 5 ? 'Completed FIR Stage' 
-      : caseStatusIndex === 6 ? 'Charge Sheet Completed'
-      : caseStatusIndex === 7 ? 'Trial Stage Completed' 
-      : caseStatusIndex === 8 ? 'This Case is Altered Case' 
-      : caseStatusIndex === 9 ? 'Mistake Of Fact'
-      : '';
-  }
+  // To Return the corresponding case status label based on the provided index.
+  caseStatusOptions = [
+      { value: 0, label: 'FIR Draft' },
+      { value: 1, label: 'Pending | FIR Stage | Step 1 Completed' },
+      { value: 2, label: 'Pending | FIR Stage | Step 2 Completed' },
+      { value: 3, label: 'Pending | FIR Stage | Step 3 Completed' },
+      { value: 4, label: 'Pending | FIR Stage | Step 4 Completed' },
+      { value: 5, label: 'Completed | FIR Stage' },
+      { value: 6, label: 'Charge Sheet Completed' },
+      { value: 7, label: 'Trial Stage Completed' },
+      { value: 8, label: 'This Case is Altered Case' },
+      { value: 9, label: 'Mistake Of Fact' }
+  ];
+
+  // To Return the corresponding case relief status label based on the provided index.
+  reliefStatusOptions = [
+    { value: 1, label: 'FIR Stage' },
+    { value: 2, label: 'Charge Sheet' },
+    { value: 3, label: 'Trial Stage' }
+  ];
 
   // Filters report data based on search text, district, nature of offense, case status, and relief status
   applyFilters(
@@ -178,7 +187,10 @@ export class ReportsCommonService {
       );
       const district = report[districtKey];
       const offence = report[offenceKey];
-      const caseStatus = report[caseStatusKey];
+      let caseStatus = report[caseStatusKey];
+      if (caseStatus.includes('Pending |') && caseStatus.includes('Completed')) { // Check if caseStatus contains both 'Pending' and 'Completed'
+        caseStatus = caseStatus.replace('Completed', '').trim(); // Remove 'Completed' from caseStatus
+      }
       const matchesDistrict = selectedDistrict ? district?.includes(selectedDistrict) : true;
       const matchesNature = selectedNatureOfOffence ? offence?.includes(selectedNatureOfOffence) : true;
       const matchesStatus = selectedStatusOfCase

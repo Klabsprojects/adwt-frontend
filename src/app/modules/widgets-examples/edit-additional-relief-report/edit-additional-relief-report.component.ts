@@ -25,14 +25,15 @@ import { AdditionalReportService } from 'src/app/services/additional-report.serv
     DragDropModule,
   ],
   providers: [FirListTestService],
-  templateUrl: './additional-relief-report.component.html',
-  styleUrl: './additional-relief-report.component.scss',
+  templateUrl: './edit-additional-relief-report.component.html',
+  styleUrl: './edit-additional-relief-report.component.scss',
 })
-export class AdditionalReliefReportComponent implements OnInit {
+export class EditAdditionalReliefReportComponent implements OnInit {
   // Variable Declarations
   searchText: string = '';
   reportData: Array<any> = [];
   filteredData: Array<any> = [];
+  saveChangesData: Array<any> = [];
   page: number = 1;
   selectedtypeOfAdditionalReleif: string = '';
   itemsPerPage: number = 10;
@@ -44,7 +45,6 @@ export class AdditionalReliefReportComponent implements OnInit {
   selectedNatureOfOffence: string = '';
   selectedStatusOfCase: string = '';
   selectedStatusOfRelief: string = '';
-  // selectedtypeOfAdditionalReleif: string = '';
   // Filter options
   districts: string[] = [];
   naturesOfOffence: string[] = [];
@@ -68,6 +68,7 @@ export class AdditionalReliefReportComponent implements OnInit {
     visible: boolean;
     sortDirection: 'asc' | 'desc' | null;
   }[] = [];
+
   // Default Columns
   defaultColumns: {
     label: string;
@@ -305,7 +306,7 @@ export class AdditionalReliefReportComponent implements OnInit {
   constructor(
     // private firService: FirListTestService,
     private cdr: ChangeDetectorRef,
-    private reportsCommonService: ReportsCommonService,
+    public reportsCommonService: ReportsCommonService,
     private additionalReportService: AdditionalReportService,
     private router: Router
   ) {}
@@ -323,7 +324,7 @@ export class AdditionalReliefReportComponent implements OnInit {
     this.filteredData = [...this.reportData];
     this.selectedColumns = this.displayedColumns.map((column) => column.field);
   }
-  
+
   // Updates the displayed columns based on the selected type of additional relief.
   updateDisplayedColumns(): void {
     console.log('Selected Type:', this.selectedtypeOfAdditionalReleif); // Debugging log
@@ -373,7 +374,7 @@ export class AdditionalReliefReportComponent implements OnInit {
       column.visible = this.selectedColumns.includes(column.field);
     });
   }
-
+  
   // Handles changes in column selection and updates column visibility.
   onColumnSelectionChange(): void {
     this.updateColumnVisibility();
@@ -496,12 +497,9 @@ export class AdditionalReliefReportComponent implements OnInit {
     return this.filteredData.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
-  // Download Reports
-  async onBtnExport(): Promise<void> {
-    await this.reportsCommonService.exportToExcel(
-      this.filteredData,
-      this.displayedColumns,
-      'Additional-Reports'
-    );
+  // Save Reports
+  saveData(): void {
+    console.log('Updated Report Data:', this.reportData);
+    alert('Data saved successfully!');
   }
 }

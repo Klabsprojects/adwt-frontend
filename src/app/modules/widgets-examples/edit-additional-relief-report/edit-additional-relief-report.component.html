@@ -12,20 +12,6 @@
           />
         </div>
       </div>
-     <!-- Drop List for columns -->
-     <!-- <div cdkDropList (cdkDropListDropped)="dropColumn($event)">
-      <mat-option *ngFor="let column of displayedColumns" cdkDrag>
-        <div class="d-flex align-items-center gap-2">
-          <mat-checkbox
-            [checked]="column.visible"
-            (change)="toggleColumnVisibility(column)"
-          >
-            {{ column.label }}
-          </mat-checkbox>
-          <i class="fas fa-bars drag-handle" cdkDragHandle></i>
-        </div>
-      </mat-option>
-    </div> -->
     <div class="toolbar mb-3">
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Select Columns</mat-label>
@@ -98,7 +84,8 @@
       <div *ngIf="loading" class="alert alert-warning">Loading...</div>
       <!-- Show message if filtered data is empty -->
       <div *ngIf="filteredData.length === 0 && !loading" class="alert alert-warning">No FIR data available.</div>
-      <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button>
+      <button class="btn btn-primary mt-3" (click)="saveData()" [disabled]="saveChangesData.length === 0">Save Changes</button>
+      <!-- <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()" [disabled]="saveChangesData.length > 0">Download as Excel</button> -->
         <nav *ngIf="filteredData.length > itemsPerPage" class="d-flex justify-content-end mt-3">
           <ul class="pagination">
             <li class="page-item" [class.disabled]="page === 1">
