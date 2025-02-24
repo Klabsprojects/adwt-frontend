@@ -291,8 +291,8 @@ onCommunityChange(selectedCommunity: any, index: number): void {
     this.firService.getCastesByCommunity(selectedCommunity).subscribe(
       (castes: string[]) => {
         const victimGroup = this.victims.at(index) as FormGroup;
-        victimGroup.patchValue({ caste: '' }); // Reset caste selection
-        victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+        victimGroup.patchValue({ caste: '' }); 
+        victimGroup.get('availableCastes')?.setValue(castes); 
         this.cdr.detectChanges();
       },
       (error) => {
@@ -345,7 +345,7 @@ onInputChangeee(index: number, event: Event) {
 
 
 onAccusedCommunityChange(event: any, index: number): void {
-  const selectedCommunity = event.target.value;
+  const selectedCommunity = event;
 
   if (selectedCommunity) {
     this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
