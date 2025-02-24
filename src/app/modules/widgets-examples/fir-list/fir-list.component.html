@@ -1690,17 +1690,22 @@
 
                 <!-- Item 91: Upload Judgement Copy -->
                 <div class="col-md-6">
-                  <label for="judgementCopy_1stConvicted{{i}}" class="form-label">91. Upload Judgement Copy *</label>
-                  <input
-                    readonly
-                    name="judgementCopy_1stConvicted{{i}}"
-                    id="judgementCopy_1stConvicted{{i}}"
-                    type="text"
-                    class="form-control"
-                    [value]="Judgement.judgement_copy"
-                    placeholder="Enter Judgement Copy Details"
-                  />
+                  <label for="judgementCopy_1stConvicted{{i}}" class="form-label">
+                    91. Upload Judgement Copy *
+                  </label>
+              
+
+                  <div *ngIf="Judgement.judgement_copy" class="mt-2">
+                    <img
+                      [src]="Judgement.judgement_copy"
+                      alt="Uploaded Judgement Copy"
+                      class="img-thumbnail"
+                      style="max-width: 200px; max-height: 200px;"
+                    />
+                  </div>
+                  
                 </div>
+                
               </div>
             </div>
           </div>
