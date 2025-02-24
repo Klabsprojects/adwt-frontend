@@ -3021,6 +3021,19 @@ uploadJudgement: this.firForm.get('judgementDetails.uploadJudgement')?.value,
       proceedingsFileNo: this.firForm.get('proceedingsFileNo')?.value,
       uploadProceedings: this.firForm.get('uploadProceedings')?.value,
     },
+
+    compensationDetails_1: {
+      totalCompensation: this.firForm.get('totalCompensation_1')?.value,
+      proceedingsDate: this.firForm.get('proceedingsDate_1')?.value,
+      proceedingsFileNo: this.firForm.get('proceedingsFileNo_1')?.value,
+      uploadProceedings: this.firForm.get('uploadProceedings_1')?.value,
+    },
+    compensationDetails_2: {
+      totalCompensation: this.firForm.get('totalCompensation_2')?.value,
+      proceedingsDate: this.firForm.get('proceedingsDate_2')?.value,
+      proceedingsFileNo: this.firForm.get('proceedingsFileNo_2')?.value,
+      uploadProceedings: this.firForm.get('uploadProceedings_2')?.value,
+    },
     hearingdetail : {
      
       hearingDetails: formDatavalues.hearingDetails,
