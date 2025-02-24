@@ -286,24 +286,23 @@ loadCommunities(): void {
   );
 }
 
-onCommunityChange(event: any, index: number): void {
-  const selectedCommunity = event.target.value;
-// console.log(selectedCommunity,"wssss")
-    if (selectedCommunity) {
-      this.firService.getCastesByCommunity(selectedCommunity).subscribe(
-        (castes: string[]) => {
-          const victimGroup = this.victims.at(index) as FormGroup;
-          victimGroup.patchValue({ caste: '' }); // Reset caste selection
-          victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
-          this.cdr.detectChanges();
-        },
-        (error) => {
-          console.error('Error fetching castes:', error);
-          Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
-        }
-      );
-    }
+onCommunityChange(selectedCommunity: any, index: number): void {
+  if (selectedCommunity) {
+    this.firService.getCastesByCommunity(selectedCommunity).subscribe(
+      (castes: string[]) => {
+        const victimGroup = this.victims.at(index) as FormGroup;
+        victimGroup.patchValue({ caste: '' }); // Reset caste selection
+        victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+        this.cdr.detectChanges();
+      },
+      (error) => {
+        console.error('Error fetching castes:', error);
+        Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+      }
+    );
+  }
 }
+
 
 loadDistricts(): void {
   this.firService.getDistricts().subscribe(
