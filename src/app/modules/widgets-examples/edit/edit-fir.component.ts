@@ -710,6 +710,7 @@ loadAccusedCommunities(): void {
       const victimGroup = this.victims.at(0) as FormGroup;
       const ageControl = victimGroup.get('age');
       const nameControl = victimGroup.get('name');
+      this.updateVictimNames()
       if (Number(ageControl?.value?.toString().replace(/\D/g, '')) < 18) {
         nameControl?.disable({ emitEvent: false });
         nameControl?.reset();
@@ -1479,6 +1480,7 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
           victimsFormArray.clear(); // Clear any existing victims data
 
           response.data1.forEach((victim: any, index: number) => {
+
             const victimGroup = this.createVictimGroup();
             let offence_committed_data: any[] = [];
             let scst_sections_data: any[] = [];
@@ -1508,6 +1510,16 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
               sectionsIPC: victim.sectionsIPC
             });
         
+            this.firService.getCastesByCommunity(victim.community).subscribe(
+              (castes: string[]) => {
+                victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+              },
+              (error) => {
+                console.error('Error fetching castes:', error);
+                Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+              }
+            );
+
             victimsFormArray.push(victimGroup);
 
             this.onVictimAgeChange(index)

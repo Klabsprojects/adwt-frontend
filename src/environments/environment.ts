@@ -11,7 +11,9 @@ export const environment = {
   // apiUrl: 'http://localhost:3010/',
   // apiUrl: 'http://localhost:3010/api/v1/',
 // image_access:'http://localhost:3010/uploadedfile/',
+// image_access2:'http://localhost:3010/CommonFileUpload',
 image_access:'https://adwatrocity.onlinetn.com/api/v1/uploadedfile/',
+image_access2:'https://adwatrocity.onlinetn.com/api/v1/CommonFileUpload/',
   
   appThemeName: 'ADWT',
   appPurchaseUrl: 'https://1.envato.market/EA4JP',

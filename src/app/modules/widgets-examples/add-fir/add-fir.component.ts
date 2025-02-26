@@ -237,6 +237,7 @@ this.loadPoliceDivision();
     const victimGroup = this.victims.at(0) as FormGroup;
     const ageControl = victimGroup.get('age');
     const nameControl = victimGroup.get('name');
+    this.updateVictimNames()
     if (Number(ageControl?.value?.toString().replace(/\D/g, '')) < 18) {
       nameControl?.disable({ emitEvent: false });
       nameControl?.reset();

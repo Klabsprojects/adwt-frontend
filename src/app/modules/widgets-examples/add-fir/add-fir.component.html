@@ -578,7 +578,7 @@
     formControlName="scstSections"
     multiple
   >
-  <mat-option *ngFor="let act of offenceActsOptions" [value]="act.offence_act_name" [disabled]="true">
+  <mat-option *ngFor="let act of offenceActsOptions" [value]="act.offence_act_name" >
       {{ act.offence_act_name }}
     </mat-option>
   </mat-select>

@@ -378,7 +378,7 @@
                   <mat-form-field appearance="outline" class="w-100">
                     <mat-label>Offence Acts</mat-label>
                     <mat-select formControlName="scstSections" multiple>
-                      <mat-option *ngFor="let act of offenceActsOptions" [value]="act" [disabled]="true">{{ act }}</mat-option>
+                      <mat-option *ngFor="let act of offenceActsOptions" [value]="act" >{{ act }}</mat-option>
                     </mat-select>
                   </mat-form-field>
                 </div>

@@ -569,7 +569,14 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
 
           this.nameOfComplainant=data.queryResults[0].name_of_complainant;
           this.mobileNumberOfComplainant=data.queryResults[0].mobile_number_of_complainant;
-          this.isVictimSameAsComplainant=data.queryResults[0].is_victim_same_as_complainant;
+            // this.isVictimSameAsComplainant=data.queryResults[0].is_victim_same_as_complainant;
+            if(data && data.queryResults[0] && data.queryResults[0].is_victim_same_as_complainant){
+            if(data.queryResults[0].is_victim_same_as_complainant == 'true'){
+              this.isVictimSameAsComplainant= 'Yes';
+            } else {
+              this.isVictimSameAsComplainant= 'No';
+            }
+          }
           this.numberOfVictims=data.queryResults[0].number_of_victim;
 
 
