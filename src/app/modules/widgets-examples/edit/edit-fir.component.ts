@@ -707,34 +707,34 @@ loadAccusedCommunities(): void {
       this.loadPoliceStations(district);
     });
 
-    // Listen for changes in isVictimSameAsComplainant
-    this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.valueChanges.subscribe(isVictimSame => {
-      this.onVictimSameAsComplainantChange(isVictimSame=== 'true');
-      this.wasVictimSame = isVictimSame=== 'true'; // Update the previous state
-      const victimGroup = this.victims.at(0) as FormGroup;
-      const ageControl = victimGroup.get('age');
-      const nameControl = victimGroup.get('name');
-      this.updateVictimNames()
-      if (Number(ageControl?.value?.toString().replace(/\D/g, '')) < 18) {
-        nameControl?.disable({ emitEvent: false });
-        nameControl?.reset();
-      }
-    });
-    // Updates the victim's details if they are the same as the complainant.
-    const updateVictimDetails = (field: string, value: any) => {
-      const isVictimSame = this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.value;
-      const victimsArray = this.firForm.get('victims') as FormArray;
-      if (isVictimSame && victimsArray.length > 0 && this.wasVictimSame) {
-        victimsArray.at(0).get(field)?.setValue(value, { emitEvent: false });
-      }
-    };
-    ['nameOfComplainant', 'mobileNumberOfComplainant'].forEach(field => {
-      this.firForm.get(`complainantDetails.${field}`)?.valueChanges.subscribe(value => {
-        updateVictimDetails(field === 'nameOfComplainant' ? 'name' : 'mobileNumber', value);
-      });
-    });
+    // // Listen for changes in isVictimSameAsComplainant
+    // this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.valueChanges.subscribe(isVictimSame => {
+    //   this.onVictimSameAsComplainantChange(isVictimSame=== 'true');
+    //   this.wasVictimSame = isVictimSame=== 'true'; // Update the previous state
+    //   const victimGroup = this.victims.at(0) as FormGroup;
+    //   const ageControl = victimGroup.get('age');
+    //   const nameControl = victimGroup.get('name');
+    //   this.updateVictimNames()
+    //   if (Number(ageControl?.value?.toString().replace(/\D/g, '')) < 18) {
+    //     nameControl?.disable({ emitEvent: false });
+    //     // nameControl?.reset();
+    //   }
+    // });
+    // // Updates the victim's details if they are the same as the complainant.
+    // const updateVictimDetails = (field: string, value: any) => {
+    //   const isVictimSame = this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.value;
+    //   const victimsArray = this.firForm.get('victims') as FormArray;
+    //   if (isVictimSame && victimsArray.length > 0 && this.wasVictimSame) {
+    //     victimsArray.at(0).get(field)?.setValue(value, { emitEvent: false });
+    //   }
+    // };
+    // ['nameOfComplainant', 'mobileNumberOfComplainant'].forEach(field => {
+    //   this.firForm.get(`complainantDetails.${field}`)?.valueChanges.subscribe(value => {
+    //     updateVictimDetails(field === 'nameOfComplainant' ? 'name' : 'mobileNumber', value);
+    //   });
+    // });
 
-    // this.setVictimData();
+    // // this.setVictimData();
   }
 
   // setVictimData() {
@@ -1264,8 +1264,11 @@ console.log(hearingDetailsControl,"hearingDetailsControl")
           this.firForm.get('complainantDetails.mobileNumberOfComplainant')?.setValue(response.data.mobile_number_of_complainant); 
         }
         if(response.data.is_victim_same_as_complainant){
-          const isVictimSameAsComplainant = response.data.is_victim_same_as_complainant === 1;
-          this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.setValue(isVictimSameAsComplainant);
+          if(response.data.is_victim_same_as_complainant == 'true'){
+            this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.setValue(response.data.is_victim_same_as_complainant);
+          } else {
+            this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.setValue('false');
+          }
         }
 
 
@@ -4717,11 +4720,11 @@ attachment:this.attachments_2.value
     // Check if the 'isDeceased' and 'deceasedPersonNames' fields are valid
     const isDeceased = this.firForm.get('isDeceased')?.value;
     const isDeceasedValid = isDeceased !== '' &&
-      (isDeceased === 'no' || (this.firForm.get('deceasedPersonNames')?.valid === true));
+      (isDeceased == 'no' || (this.firForm.get('deceasedPersonNames')?.valid === true));
     const isValuePresent = this.firForm.get('deceasedPersonNames')?.value?.length !== 0;
 
     // Ensure all conditions return a boolean
-    return Boolean(isComplainantValid && victimsValid && isDeceasedValid && isValuePresent);
+    return Boolean(isComplainantValid && victimsValid && isDeceasedValid);
   }
 
 
