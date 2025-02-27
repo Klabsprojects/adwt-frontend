@@ -144,7 +144,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
 
   image_access = environment.image_access;
   image_access2 = environment.image_access2;
-
+  apiUrl = "http://localhost:3010/";
+  apiUrl1 = "http://localhost:3010/uploads/";
   reliefValues: any;
 
   additionalReliefOptions = [
@@ -190,6 +191,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
   uploadedFIRCopy: any;
   attachmentss_1: any;
   uploadProceedings_2_preview: string;
+  filePath_attachment: any;
+  demo_proceeecing: any;
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -199,6 +202,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
     private firServiceAPI : FirServiceAPI,
     private sanitizer: DomSanitizer,
     private police_district :PoliceDivisionService,
+   
   
    ) {}
    private wasVictimSame: boolean = false; // Track the previous state of on Victim same as Complainant
@@ -1360,14 +1364,32 @@ console.log(hearingDetailsControl,"hearingDetailsControl")
           // 3. Proceeding File (judgement file URL)
           if (response && response.data3 && response.data3.proceedings_file) {
 
-            console.log("response.data3:", response.data3 );
 
-            const filePath = response.data3.proceedings_file.startsWith('uploads/') 
-            ? response.data3.proceedings_file 
-            : 'uploads/' + response.data3.proceedings_file;
-    
-        this.firForm.get('proceedingsFile')?.setValue(filePath);
-    
+const data = response.data3.proceedings_file
+
+
+this.firForm.get('proceedingsFile')?.setValue(data);
+
+
+this.filePath_attachment = response.data3.file_paths?.length
+? response.data3.file_paths.map((file:any) => `${this.apiUrl}uploads/${file}`)
+: [];
+
+
+
+if (!this.attachmentss_1) {
+  this.attachmentss_1 = [];
+}
+
+
+this.filePath_attachment.forEach((filePath: any) => {
+  this.attachmentss_1.push({ id: "", path: filePath, file: filePath });
+});
+
+console.log("Updated attachmentss_1:", this.attachmentss_1);
+
+
+
           }
 
           // 4. Proceedings Date
@@ -1808,61 +1830,119 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
     this.accuseds.get('uploadFIRCopy')?.setValue(null);
   }
 
-  
-
-  onFileChangee(event: any, index: number, fileControl: string, fileNameControl: string): void {
+  sanitizeImage(base64Image: string): SafeUrl {
+    return this.sanitizer.bypassSecurityTrustUrl(base64Image);
+  }
+ 
+ 
+  onFileChangee(event: any, index: number): void {
     const file = event.target.files[0];
   
     if (file) {
       const reader = new FileReader();
-  
-      reader.onload = () => {
-        const filePath = reader.result as string; 
-  
-        if (!this.attachmentss_1) {
-          this.attachmentss_1 = [];
-        }
-  
-        if (!this.attachmentss_1[index]) {
-          this.attachmentss_1[index] = { id: "", path: "", file: null };
-        }
-  
-        this.attachmentss_1[index].path = filePath;
-        this.attachmentss_1[index].file = file;
-  
-        console.log(this.attachmentss_1, "Updated Attachments List");
-  
-   
-        this.cdr.detectChanges();
+      reader.onload = (e: any) => {
+        this.attachmentss_1[index].path = e.target.result; // Direct Base64 conversion
       };
+      reader.readAsDataURL(file); // Convert file to Base64 for direct preview
   
-      reader.readAsDataURL(file);
+      if (!this.attachmentss_1) {
+        this.attachmentss_1 = [];
+      }
   
-    
-      const attachment = this.attachments_1.at(index);
-      if (!attachment) {
+      while (this.attachmentss_1.length <= index) {
+        this.attachmentss_1.push({ id: "", path: "", file: null });
+      }
+  
+      this.attachmentss_1[index].file = file;
+  
+      // Update FormArray
+      const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
+      if (attachmentsControl.length <= index) {
+        attachmentsControl.push(this.fb.group({
+          file: [null],
+          filePath: [''],
+          fileName: ['']
+        }));
+      }
+  
+      const attachmentControl = attachmentsControl.at(index);
+      if (!attachmentControl) {
         console.error(`Form control at index ${index} is undefined`);
         return;
       }
   
-      attachment.patchValue({
-        [fileControl]: file,
-        [fileNameControl]: file.name,
+      attachmentControl.patchValue({
+        file: file,
+        filePath: file,
+        fileName: file.name
       });
     }
   }
   
   
-  
-  
-  removeAttachment_1(index: number): void {
-    if (this.attachmentss_1.length > 1) {
-      this.attachmentss_1.splice(index, 1); // Remove from UI array
-      this.attachments_1.removeAt(index); // Remove from FormArray
-    } else {
-      console.warn("At least one attachment is required");
+  isImage(filePath: string | File | null): boolean {
+    if (!filePath) return false;
+    
+    if (typeof filePath === 'string') {
+      return filePath.match(/\.(jpeg|jpg|png|gif|bmp)$/i) !== null;
     }
+
+    if (filePath instanceof File) {
+      return filePath.type.startsWith('image/');
+    }
+
+    return false;
   }
+  
+  
+  removeAttachment_1(index: number) {
+    const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
+  
+    if (!attachmentsControl || attachmentsControl.length <= index) {
+      console.error("Attempted to remove an undefined attachment at index", index);
+      return;
+    }
+  
+
+    attachmentsControl.removeAt(index);
+  
+ 
+    if (this.attachmentss_1 && index < this.attachmentss_1.length) {
+      this.attachmentss_1.splice(index, 1);
+    }
+  
+   
+    if (this.filePath_attachment && index < this.filePath_attachment.length) {
+      this.filePath_attachment.splice(index, 1);
+    }
+  
+   
+    if (this.attachmentss_1.length > 0) {
+      this.attachmentss_1 = this.attachmentss_1.map((item:any, i:any) => ({
+        id: item.id,
+        path: item.path,
+        file: item.file,
+      }));
+  
+    
+      while (attachmentsControl.length > 0) {
+        attachmentsControl.removeAt(0);
+      }
+  
+      this.attachmentss_1.forEach((attachment:any, i:any) => {
+        attachmentsControl.push(this.fb.group({
+          filePath: [attachment.path]
+        }));
+      });
+    }
+  
+    // Refresh UI
+    setTimeout(() => {
+      this.cdr.detectChanges();
+    }, 0);
+  }
+  
+  
   
   
 
@@ -1904,7 +1984,7 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
       Swal.fire('Error', 'FIR ID is missing. Unable to proceed.', 'error');
       return;
     }
-  
+    const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
     const firData = {
       firId: this.firId,
       victimsRelief: this.victimsRelief.value.map((relief: any) => ({
@@ -1923,11 +2003,11 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
       // uploadFIRCopy: this.multipleFiles[index] || null
       // this.multipleFilesForproceeding[i]
       proceedingsFile: this.multipleFilesForproceeding || '',
-      attachments: this.attachmentss_1.value || this.attachmentss_1,
+      attachments:this.attachmentss_1,
       status: isSubmit ? 5 : undefined,
     };
   console.log(firData,"firDatafirDatafirData")
-  console.log(this.attachmentss_1,"attachmentss_1attachmentss_1")
+
     this.firService.updatestep5(firData).subscribe(
       (response) => {
         if (isSubmit) {
@@ -3316,14 +3396,14 @@ console.log(victimReliefDetail,"cretaieg")
     return this.firForm.get('attachments_2') as FormArray;
   }
 
-    // Create a FormGroup for a single attachment
+   
     createAttachmentGroup(): FormGroup {
       return this.fb.group({
-        fileName: [''], // Holds the file name
-        file: [null, Validators.required], // Holds the file itself
-        file_1: [null, Validators.required], // File control
+        fileName: [''], 
+        file: [null, Validators.required],
+        file_1: [null, Validators.required], 
         fileName_1: [''],
-        file_2: [null, Validators.required], // File control
+        file_2: [null, Validators.required], 
         fileName_2: [''],
       });
     }
@@ -3334,12 +3414,31 @@ console.log(victimReliefDetail,"cretaieg")
     } 
 
       
-    addAttachment_1(): void {
-      // this.attachmentss_1.push({ id: '', path: '', file: null });
-      this.attachments_1.push(this.createAttachmentGroup());
+    addAttachment_1() {
+      const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
+    
+      if (!attachmentsControl) {
+        console.error("attachments_1 FormArray is undefined.");
+        return;
+      }
+    
+      
+      attachmentsControl.push(this.fb.group({
+        file: [null],       
+        filePath: [''],     
+        fileName: ['']      
+      }));
+    
+    
+      if (!this.attachmentss_1) {
+        this.attachmentss_1 = [];
+      }
+    
+      this.attachmentss_1.push({ id: "", path: "", file: null });
+    
+      // console.log("Updated Attachments List:", this.attachmentss_1);
     }
     
-
   // isStep6Valid(): boolean { 
 
   //   const controls = [

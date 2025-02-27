@@ -721,80 +721,58 @@
           />
         </div> -->
 
-
         <div class="col-md-6 mb-3">
           <label class="form-label">61. Upload Commissionerate / S.P. Office Proceedings *</label>
-          <input type="file" [id]="'proceedingsFile' + i" class="form-control" 
-                 formControlName="proceedingsFile" required 
-                 (change)="onProceedingsFileChange($event, i)" multiple />
-        </div>
+          <input type="file" class="form-control" formControlName="proceedingsFile" 
+                 (change)="onProceedingsFileChange($event, i)" required />
+        
+         
+          <div *ngIf="fileUrls_proceding[i]; else existingFile_proceding">
+            <img [src]="fileUrls_proceding[i]" class="img-thumbnail" 
+                 alt="Proceedings File" style="max-width: 150px; margin-bottom: 10px;">
+          </div>
         
      
-        <div *ngIf="fileUrls_proceding[i]; else existingFile_proceding">
-          <img [src]="fileUrls_proceding[i]" class="img-thumbnail" 
-               alt="Proceedings File" style="max-width: 150px; margin-bottom: 10px;">
-          <!-- <button class="btn btn-danger btn-sm mt-2" (click)="onDeleteFile_proceding(i)">Delete</button> -->
+          <ng-template #existingFile_proceding>
+            <div *ngIf="firForm.get('proceedingsFile')?.value">
+              <img [src]="apiUrl1 + firForm.get('proceedingsFile')?.value" 
+                   class="img-thumbnail" alt="Proceedings File" 
+                   style="max-width: 150px; margin-bottom: 10px;">
+            </div>
+          </ng-template>
         </div>
         
-
-        <ng-template #existingFile_proceding>
-          <div *ngIf="firForm.get('proceedingsFile')?.value">
-            <img [src]="image_access + firForm.get('proceedingsFile')?.value" 
-                 class="img-thumbnail" alt="FIR Copy" style="max-width: 150px; margin-bottom: 10px;">
-          </div>
-        </ng-template>
         
-        <div class="mb-4" formArrayName="attachments_1">
+        <div class="mb-4">
           <label class="form-label">62. Upload Key Attachments *</label>
         
-          <div class="mb-3" *ngFor="let attachment of attachments_1.controls; let j = index" [formGroupName]="j">
-            
-        
+          <div class="mb-3" *ngFor="let attachment of attachmentss_1; let j = index">
             <input type="file" class="form-control w-100 mb-2"
-                   (change)="onFileChangee($event, j, 'file', 'fileName')"
+                   (change)="onFileChangee($event, j)"
                    style="max-width: 400px;" />
         
-          
-            <div *ngIf="!attachmentss_1[j]?.file &&attachmentss_1[j]?.path">
-              <img [src]="image_access + attachmentss_1[j]?.path"
-                   width="120" height="120"
-                   alt="Attachment Image"
-                   class="border rounded mb-2" />
-                   
-        
-              <br />
-        
-          
-              <button type="button" class="btn btn-danger btn-sm mt-1"
-                      (click)="removeAttachment_1(j)"
-                      title="Remove Attachment">
-                <i class="bi bi-trash"></i> Remove
-              </button>
-            </div>
-            <div *ngIf="attachmentss_1[j]?.file">
-              <img [src]="attachmentss_1[j]?.path"
-                   width="120" height="120"
-                   alt="Attachment Image"
-                   class="border rounded mb-2" />
-                   
-        
-              <br />
-        
-              <!-- Delete Button -->
-              <button type="button" class="btn btn-danger btn-sm mt-1"
-                      (click)="removeAttachment_1(j)"
-                      title="Remove Attachment">
-                <i class="bi bi-trash"></i> Remove
-              </button>
+            <div *ngIf="attachment.path">
+              <img [src]="attachment.path" 
+                   class="img-thumbnail" alt="Preview" 
+                   style="max-width: 150px;">
             </div>
         
+            <button type="button" class="btn btn-danger btn-sm mt-1"
+                    (click)="removeAttachment_1(j)"
+                    title="Remove Attachment">
+              <i class="bi bi-trash"></i> Remove
+            </button>
           </div>
         
-          <!-- Add More Attachments Button -->
           <button type="button" class="btn btn-primary btn-sm mt-3" (click)="addAttachment_1()">
             Add Attachment
           </button>
         </div>
+
+        
+      
+        
+        
         
         
         
@@ -827,7 +805,7 @@
           <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
           <button *ngIf="step === 5" type="submit" class="btn btn-primary"
-          [disabled]="!isSubmitButtonEnabled()"
+         
            (click)="submitStepFive()">Submit</button>
         </div>
       </div>
