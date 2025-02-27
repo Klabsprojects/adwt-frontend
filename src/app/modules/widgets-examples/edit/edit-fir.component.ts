@@ -2902,43 +2902,48 @@ console.log(selectedValue,"selectedValue")
 
 
 
-
-
   populateVictimsRelief(victimsReliefDetails: any[]): void {
     const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
-    victimsReliefArray.clear(); // Clear existing FormArray
+    victimsReliefArray.clear();
   
-    console.log(victimsReliefDetails, "victimsReliefDetails");
+    // console.log(victimsReliefDetails, "victimsReliefDetails");
   
-    let totalReliefFirstStage = 0; // Initialize total compensation calculation
+    let totalReliefFirstStage = 0; 
   
     victimsReliefDetails.forEach((victimReliefDetail) => {
       const additionalRelief = victimReliefDetail.additional_relief
         ? JSON.parse(victimReliefDetail.additional_relief)
         : [];
   
-      // Sum up relief_amount_first_stage for total compensation
-      const reliefFirstStage = parseFloat(victimReliefDetail.relief_amount_first_stage) || 0;
-      totalReliefFirstStage += reliefFirstStage;
+   
+      const reliefAmountFirstStage = (
+        (parseFloat(victimReliefDetail.fir_stage_as_per_act || '0') || 0) + 
+        (parseFloat(victimReliefDetail.fir_stage_ex_gratia || '0') || 0)
+      );
+  
+      totalReliefFirstStage += reliefAmountFirstStage;
   
       const victimGroup = this.fb.group({
         victimId: [victimReliefDetail.victim_id || ''],
         victimName: [victimReliefDetail.victim_name || ''],
         communityCertificate: [victimReliefDetail.community_certificate || ''],
-        reliefAmountScst: [victimReliefDetail.relief_amount_scst || '0.00'],
-        reliefAmountExGratia: [victimReliefDetail.relief_amount_exgratia || '0.00'],
-        reliefAmountFirstStage: [reliefFirstStage.toFixed(2)], 
+        reliefAmountScst: [victimReliefDetail.relief_amount_scst || victimReliefDetail.fir_stage_as_per_act],
+        reliefAmountExGratia: [victimReliefDetail.relief_amount_exgratia || victimReliefDetail.fir_stage_ex_gratia],
+        reliefAmountFirstStage: [reliefAmountFirstStage.toFixed(2)], 
         additionalRelief: [additionalRelief]
       });
   
       victimsReliefArray.push(victimGroup);
     });
   
-    // Set total compensation separately at form level
+  
     this.firForm.patchValue({ totalCompensation: totalReliefFirstStage.toFixed(2) });
   
-    console.log(`Total Compensation (Sum of relief_amount_first_stage): ${totalReliefFirstStage.toFixed(2)}`);
+    // console.log(`Total Comp ${totalReliefFirstStage.toFixed(2)}`);
   }
+  
+
+
   get totalCompensationControl(): FormControl {
     return this.firForm.get('totalCompensation') as FormControl;
   }
