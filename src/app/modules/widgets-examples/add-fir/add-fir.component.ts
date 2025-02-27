@@ -1226,26 +1226,32 @@ removeAttachment_1(index: number): void {
 
 
 
-onAdditionalReliefChange(event: Event, value: string): void {
+
+onAdditionalReliefChange(event: Event, value: string, index: number): void {
   const checked = (event.target as HTMLInputElement).checked;
 
-  // Iterate over victimsRelief FormArray to find and update the correct group
-  this.victimsRelief.controls.forEach((group, index) => {
-    const additionalReliefControl = group.get('additionalRelief') as FormControl;
 
-    let currentValues = additionalReliefControl.value || [];
+  const additionalReliefControl = this.victimsRelief.at(index).get('additionalRelief') as FormControl;
 
-    if (checked && !currentValues.includes(value)) {
-      currentValues.push(value);
-    } else if (!checked) {
-      currentValues = currentValues.filter((item: string) => item !== value);
+
+  let currentValues = additionalReliefControl.value || [];
+
+  if (checked) {
+
+    if (!currentValues.includes(value)) {
+      currentValues = [...currentValues, value];
     }
+  } else {
 
-    additionalReliefControl.setValue(currentValues); // Update form control
-    additionalReliefControl.markAsDirty(); // Mark as dirty for form submission
-  });
+    currentValues = currentValues.filter((item: string) => item !== value);
+  }
 
-  this.cdr.detectChanges(); // Trigger UI updates
+  
+  additionalReliefControl.setValue(currentValues);
+  additionalReliefControl.markAsDirty(); 
+console.log(additionalReliefControl,"additionalReliefControl")
+
+  this.cdr.detectChanges();
 }
 
 
@@ -2350,6 +2356,7 @@ fileUrls_proceding: { [key: number]: string } = {};
     this.fileUrls_proceding[i] = URL.createObjectURL(selectedFile);
     
     this.proceedingsFile= selectedFile
+    this.firForm.get('proceedingsFile')?.setValue(selectedFile);
    
     this.uploadedFiles_proceding[i] = true;
   }
@@ -2379,8 +2386,8 @@ saveStepFiveAsDraft(isSubmit: boolean = false): void {
     firId: this.firId,
     victimsRelief: this.victimsRelief.value.map((relief: any, index: number) => ({
       victimId: relief.victimId || null,
-      reliefId: relief.reliefId || null, // Use backend-generated ID if not present
-      victimName: this.victimNames[index] || '', // Ensure victim name is mapped correctly
+      reliefId: relief.reliefId || null, 
+      victimName: this.victimNames[index] || '',
       communityCertificate: relief.communityCertificate || 'no',
       reliefAmountScst: relief.reliefAmountScst || '0.00',
       reliefAmountExGratia: relief.reliefAmountExGratia || '0.00',
@@ -2389,25 +2396,25 @@ saveStepFiveAsDraft(isSubmit: boolean = false): void {
         parseFloat(relief.reliefAmountExGratia || '0')
       ).toFixed(2),
       totalCompensation: relief.totalCompensation || '0.00',
-      additionalRelief: relief.additionalRelief || [], // Include the additionalRelief field
+      additionalRelief: relief.additionalRelief || [],
     })),
     totalCompensation: this.firForm.get('totalCompensation')?.value || '0.00',
     proceedingsFileNo: this.firForm.get('proceedingsFileNo')?.value || '',
     proceedingsDate: this.firForm.get('proceedingsDate')?.value || null,
     proceedingsFile: this.proceedingsFile || '',
     attachments: this.attachments.value || '',
-    status: isSubmit ? 5 : null, // Include status if this is a submission
+    status: isSubmit ? 5 : null, 
   };
 
 
 
-// console.log(firData, "firDatafirDatafirDatafirData")
+console.log(firData, "firDatafirDatafirDatafirData")
 
-  // Call the service to save the data
+
   this.firService.saveStepFiveAsDraft(firData).subscribe(
     (response) => {
       if (isSubmit) {
-        // Show success message and navigate to the next step
+   
         Swal.fire({
           title: 'Success',
           text: 'Step 5 data submitted successfully.',
@@ -2416,12 +2423,12 @@ saveStepFiveAsDraft(isSubmit: boolean = false): void {
           this.navigateToChargesheetPage();
         });
       } else {
-        // Show success message for draft save
+       
         Swal.fire('Success', 'Step 5 data saved as draft.', 'success');
       }
     },
     (error) => {
-      // Log error and show error message
+     
       console.error('Error saving Step 5 data:', error);
       Swal.fire('Error', 'Failed to save Step 5 data.', 'error');
     }
@@ -3682,53 +3689,56 @@ isStep4Valid(): boolean {
   const numberOfAccusedValid = !!this.firForm.get('numberOfAccused')?.valid;
   const accusedsArray = this.firForm.get('accuseds') as FormArray;
 
-  // Check if all accused form groups are valid
+ 
   const accusedsValid = accusedsArray.controls.every((accusedGroup) => !!accusedGroup.valid);
 
-  // Return true only if both conditions are satisfied
+
   return numberOfAccusedValid && accusedsValid;
 }
 
-isStep5Valid(): boolean {
-  // Validate mandatory fields directly
-  const mandatoryFields = [
-    'communityCertificate',
-    'proceedingsFileNo',
-    'proceedingsDate',
-    'proceedingsFile',
-  ];
 
-  // Check each field's validity
-  let isFormValid = true;
-  mandatoryFields.forEach((field) => {
+
+// mahi changes 
+isStep5Valid(): boolean {
+  const mandatoryFields = ['proceedingsFileNo', 'proceedingsDate'];
+
+  const isFormValid = mandatoryFields.every((field) => {
     const control = this.firForm.get(field);
     const value = control?.value;
-    const isValid = control?.disabled || (control?.valid === true && value !== null && value !== '');
+    const isValid = control?.disabled || (control?.valid && value !== null && value !== '');
+
     console.log(`Field: ${field}, Value: ${value}, Valid: ${isValid}`);
-
-    if (!isValid) {
-      isFormValid = false;
-    }
-  });
-
-  // Validate attachments
-  const areAttachmentsValid = this.attachments.controls.every((control, index) => {
-    const fileControl = control.get('file');
-    const value = fileControl?.value;
-    const isValid = value === null || (fileControl?.valid === true && value !== '');
-
-    console.log(`Attachment ${index + 1} - Value: ${value}, Valid: ${isValid}`);
 
     return isValid;
   });
 
-  console.log(`Attachments Valid: ${areAttachmentsValid}`);
 
-  // Final validation status
-  const finalStatus = isFormValid && areAttachmentsValid;
-  console.log(`Step 5 Form Valid: ${finalStatus}`);
-  return finalStatus;
+  const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
+  const isCommunityCertificateValid = victimsReliefArray.controls.every((victimGroup: any, index: any) => {
+    const control = victimGroup.get('communityCertificate');
+    const value = control?.value;
+    const isValid = control?.disabled || (control?.valid && value !== null && value !== '');
+
+    console.log(`Victim ${index + 1} - Community Certificate: ${value}, Valid: ${isValid}`);
+
+    return isValid;
+  });
+
+
+  const hasAttachments = Array.isArray(this.attachments?.value) && this.attachments.value.length > 0;
+
+ 
+  const hasProceedingsFile = this.proceedingsFile instanceof File;
+
+  return isFormValid && isCommunityCertificateValid && hasAttachments && hasProceedingsFile;
 }
+
+
+isSubmitButtonEnabled(): boolean {
+  return this.isStep5Valid();
+}
+
+
 
 
 

@@ -684,8 +684,15 @@
             <label class="form-label">58. Total Amount for 1st Stage of Compensation (Total across all victims) *</label>
           </div>
           <div class="col-4">
-            <input type="text" class="form-control text-end" formControlName="totalCompensation" placeholder="₹ 300" />
+            <input 
+            type="text" 
+            class="form-control text-end" 
+            [formControl]="totalCompensationControl" 
+            readonly />
+          
+          
           </div>
+          
         </div>
       </div>
       
@@ -737,29 +744,45 @@
           </div>
         </ng-template>
         
-        
-        <div class="mb-4" formArrayName="attachments">
+        <div class="mb-4" formArrayName="attachments_1">
           <label class="form-label">62. Upload Key Attachments *</label>
         
-          <div class="mb-3" *ngFor="let attachment of attachmentss_1; let j = index" [formGroupName]="j">
+          <div class="mb-3" *ngFor="let attachment of attachments_1.controls; let j = index" [formGroupName]="j">
+            
         
-            <!-- File Input -->
-            <input type="file" class="form-control w-100 mb-2" 
-                   (change)="onFileChangee($event, j, 'file', 'fileName')" 
+            <input type="file" class="form-control w-100 mb-2"
+                   (change)="onFileChangee($event, j, 'file', 'fileName')"
                    style="max-width: 400px;" />
         
-            <!-- Display Image Preview -->
-            <div *ngIf="attachment.path">
-              <img [src]="image_access + attachment.path" 
-                   width="120" height="120" 
-                   alt="Attachment Image" 
+          
+            <div *ngIf="!attachmentss_1[j]?.file &&attachmentss_1[j]?.path">
+              <img [src]="image_access + attachmentss_1[j]?.path"
+                   width="120" height="120"
+                   alt="Attachment Image"
                    class="border rounded mb-2" />
+                   
+        
+              <br />
+        
+          
+              <button type="button" class="btn btn-danger btn-sm mt-1"
+                      (click)="removeAttachment_1(j)"
+                      title="Remove Attachment">
+                <i class="bi bi-trash"></i> Remove
+              </button>
+            </div>
+            <div *ngIf="attachmentss_1[j]?.file">
+              <img [src]="attachmentss_1[j]?.path"
+                   width="120" height="120"
+                   alt="Attachment Image"
+                   class="border rounded mb-2" />
+                   
         
               <br />
         
               <!-- Delete Button -->
-              <button type="button" class="btn btn-danger btn-sm mt-1" 
-                      (click)="removeAttachment_1(j)" 
+              <button type="button" class="btn btn-danger btn-sm mt-1"
+                      (click)="removeAttachment_1(j)"
                       title="Remove Attachment">
                 <i class="bi bi-trash"></i> Remove
               </button>
@@ -768,10 +791,11 @@
           </div>
         
           <!-- Add More Attachments Button -->
-          <button type="button" class="btn btn-primary btn-sm mt-3" (click)="addAttachment()">
+          <button type="button" class="btn btn-primary btn-sm mt-3" (click)="addAttachment_1()">
             Add Attachment
           </button>
         </div>
+        
         
         
 <!-- 
@@ -802,9 +826,16 @@
         <div class="mt-4">
           <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-          <button *ngIf="step === 5" type="submit" class="btn btn-primary" [disabled]="!isStep5Valid()" (click)="submitStepFive()">Submit</button>
+          <button *ngIf="step === 5" type="submit" class="btn btn-primary"
+          [disabled]="!isSubmitButtonEnabled()"
+           (click)="submitStepFive()">Submit</button>
         </div>
       </div>
+
+
+
+
+
       <div *ngIf="mainStep === 2 && step === 1" class="form-step">
         <div class="card border-primary mb-4">
           <div class="card-body">

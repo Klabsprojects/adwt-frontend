@@ -1004,6 +1004,13 @@ console.log(response.casedetail_one,"casedetail_onee")
                   const judgementAwardedValue = item.judgement_awarded || '';
                   this.firForm.patchValue({
                     judgementAwarded3: judgementAwardedValue,
+
+                    courtDistrict_two : item.court_district,
+                    caseNumber_two:item.case_number,
+                    publicProsecutor_two:item.public_prosecutor,
+                    prosecutorPhone_two:item.prosecutor_phone,
+
+                    firstHearingDate_two:item.second_hearing_date ? formatDate(item.second_hearing_date, 'yyyy-MM-dd', 'en') : '',
                   });
                   this.applyJudgementAwardedValidators(judgementAwardedValue);
                   
@@ -1803,24 +1810,6 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
 
   
 
-  
-  // onFileChangee(event: any, index: number, fileControl: string, fileNameControl: string): void {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     const attachment = this.attachments.at(index);
-  //     attachment.patchValue({
-  //       [fileControl]: file,
-  //       [fileNameControl]: file.name,
-  //     });
-  //   }
-  // }
- 
-  // removeAttachment_1(index: number): void {
-  //   if (this.attachmentss_1.length > 1) {
-  //     this.attachmentss_1.removeAt(index);
-  //   }
-  // }
-
   onFileChangee(event: any, index: number, fileControl: string, fileNameControl: string): void {
     const file = event.target.files[0];
   
@@ -1828,20 +1817,33 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
       const reader = new FileReader();
   
       reader.onload = () => {
-        const uniqueId = Math.random().toString(36).substr(2, 9);
+        const filePath = reader.result as string; 
   
-        this.attachmentss_1[index] = {
-          id: this.attachmentss_1[index]?.id || "", 
-          path:"", 
-          file: file 
-        };
+        if (!this.attachmentss_1) {
+          this.attachmentss_1 = [];
+        }
+  
+        if (!this.attachmentss_1[index]) {
+          this.attachmentss_1[index] = { id: "", path: "", file: null };
+        }
+  
+        this.attachmentss_1[index].path = filePath;
+        this.attachmentss_1[index].file = file;
+  
+        console.log(this.attachmentss_1, "Updated Attachments List");
+  
+   
+        this.cdr.detectChanges();
       };
   
       reader.readAsDataURL(file);
   
-      const attachment = this.attachmentss_1.at(index);
-      
-      console.log(attachment, "on file change");
+    
+      const attachment = this.attachments_1.at(index);
+      if (!attachment) {
+        console.error(`Form control at index ${index} is undefined`);
+        return;
+      }
   
       attachment.patchValue({
         [fileControl]: file,
@@ -1851,12 +1853,17 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
   }
   
   
+  
+  
   removeAttachment_1(index: number): void {
     if (this.attachmentss_1.length > 1) {
-      this.attachmentss_1.splice(index, 1); // Remove from array
-      this.attachments.removeAt(index); // Remove from FormArray
+      this.attachmentss_1.splice(index, 1); // Remove from UI array
+      this.attachments_1.removeAt(index); // Remove from FormArray
+    } else {
+      console.warn("At least one attachment is required");
     }
   }
+  
   
 
   
@@ -2285,7 +2292,7 @@ onAccusedAgeChange(index: number): void {
     this.trackStep1FormValidity();
     this.onNumberOfVictimsChange();
     this.onNumberOfAccusedChange();
-    // this.populateVictimsRelief([]);
+    this.populateVictimsRelief([]);
 
     console.log(this.firForm.value,"firrrrrrrrrrrrrrrrrrrrrr");
 
@@ -2817,34 +2824,55 @@ console.log(selectedValue,"selectedValue")
 
 
 
-
   populateVictimsRelief(victimsReliefDetails: any[]): void {
-    const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray; // Ensure you access the FormArray correctly
+    const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
     victimsReliefArray.clear(); // Clear existing FormArray
   
     console.log(victimsReliefDetails, "victimsReliefDetails");
+  
+    let totalReliefFirstStage = 0; // Initialize total compensation calculation
+  
     victimsReliefDetails.forEach((victimReliefDetail) => {
-
       const additionalRelief = victimReliefDetail.additional_relief
-      ? JSON.parse(victimReliefDetail.additional_relief)
-      : [];
-
-
+        ? JSON.parse(victimReliefDetail.additional_relief)
+        : [];
+  
+      // Sum up relief_amount_first_stage for total compensation
+      const reliefFirstStage = parseFloat(victimReliefDetail.relief_amount_first_stage) || 0;
+      totalReliefFirstStage += reliefFirstStage;
+  
       const victimGroup = this.fb.group({
         victimId: [victimReliefDetail.victim_id || ''],
         victimName: [victimReliefDetail.victim_name || ''],
         communityCertificate: [victimReliefDetail.community_certificate || ''],
         reliefAmountScst: [victimReliefDetail.relief_amount_scst || '0.00'],
         reliefAmountExGratia: [victimReliefDetail.relief_amount_exgratia || '0.00'],
-        reliefAmountFirstStage: [victimReliefDetail.relief_amount_first_stage || '0.00'],
-        totalCompensation: [victimReliefDetail.final_stage_as_per_act || '0.00'],
+        reliefAmountFirstStage: [reliefFirstStage.toFixed(2)], 
         additionalRelief: [additionalRelief]
       });
-      victimsReliefArray.push(victimGroup); 
+  
+      victimsReliefArray.push(victimGroup);
     });
+  
+    // Set total compensation separately at form level
+    this.firForm.patchValue({ totalCompensation: totalReliefFirstStage.toFixed(2) });
+  
+    console.log(`Total Compensation (Sum of relief_amount_first_stage): ${totalReliefFirstStage.toFixed(2)}`);
   }
+  get totalCompensationControl(): FormControl {
+    return this.firForm.get('totalCompensation') as FormControl;
+  }
+  
 
 
+  updateTotalCompensation(): void {
+    let total = 0;
+    this.victimsRelief.controls.forEach((group) => {
+      const firstStage = parseFloat(group.get('reliefAmountFirstStage')?.value || '0');
+      total += firstStage;
+    });
+    this.firForm.patchValue({ totalCompensation: total.toFixed(2) });
+  }
 
 
 
@@ -3306,10 +3334,11 @@ console.log(victimReliefDetail,"cretaieg")
     } 
 
       
-  addAttachment_1(): void {
-    this.attachments_1.push(this.createAttachmentGroup());
-  }
-
+    addAttachment_1(): void {
+      // this.attachmentss_1.push({ id: '', path: '', file: null });
+      this.attachments_1.push(this.createAttachmentGroup());
+    }
+    
 
   // isStep6Valid(): boolean { 
 
@@ -4528,7 +4557,7 @@ attachment:this.attachments_2.value
     } else if (this.step === 4) {
       return this.isStep4Valid();
     } else if (this.step === 5) {
-      return this.isStep5Valid();
+      return this.isSubmitButtonEnabled();
     }
     return false;
   }
@@ -4612,7 +4641,7 @@ attachment:this.attachments_2.value
       this.saveStepFourAsDraft();
       this.updateFirStatus(4); // Update status for step 4
       this.step++;
-    } else if (this.step === 5 && this.isStep5Valid()) {
+    } else if (this.step === 5 && this.isSubmitButtonEnabled()) {
       this.submitStepFive(); // Final submission for Step 5
       this.updateFirStatus(5); // Update status for step 5 on submission
     } else {
@@ -4714,39 +4743,81 @@ attachment:this.attachments_2.value
   }
   
 
+  // isStep5Valid(): boolean {
+  //   const victimsReliefArray = this.victimsRelief as FormArray;
+
+  //   // Helper function to check validity of each control, even if disabled
+  //   const checkAllControlsValid = (group: FormGroup): boolean => {
+  //     return Object.keys(group.controls).every((controlName) => {
+  //       const control = group.get(controlName);
+  //       return control?.disabled || control?.valid; // Allow disabled fields to be considered valid
+  //     });
+  //   };
+
+  //   // Validate each FormGroup in victimsRelief array using the helper function
+  //   const victimsReliefValid = victimsReliefArray.controls.every((reliefGroup) =>
+  //     checkAllControlsValid(reliefGroup as FormGroup)
+  //   );
+
+  //   // Additional fields validation
+  //   const isTotalCompensationValid = this.firForm.get('totalCompensation')?.valid || false;
+  //   const isProceedingsFileNoValid = this.firForm.get('proceedingsFileNo')?.valid || false;
+  //   const isProceedingsDateValid = this.firForm.get('proceedingsDate')?.valid || false;
+  //   const isProceedingsFileValid = this.firForm.get('proceedingsFile')?.valid || false;
+  //   const areAttachmentsValid = this.attachmentss_1.valid;
+
+  //   // Ensure all conditions are true before enabling the button
+  //   return (
+  //     victimsReliefValid &&
+  //     isTotalCompensationValid &&
+  //     isProceedingsFileNoValid &&
+  //     isProceedingsDateValid &&
+  //     isProceedingsFileValid &&
+  //     areAttachmentsValid
+  //   );
+  // }
+
+
   isStep5Valid(): boolean {
-    const victimsReliefArray = this.victimsRelief as FormArray;
-
-    // Helper function to check validity of each control, even if disabled
-    const checkAllControlsValid = (group: FormGroup): boolean => {
-      return Object.keys(group.controls).every((controlName) => {
-        const control = group.get(controlName);
-        return control?.disabled || control?.valid; // Allow disabled fields to be considered valid
-      });
-    };
-
-    // Validate each FormGroup in victimsRelief array using the helper function
-    const victimsReliefValid = victimsReliefArray.controls.every((reliefGroup) =>
-      checkAllControlsValid(reliefGroup as FormGroup)
-    );
-
-    // Additional fields validation
-    const isTotalCompensationValid = this.firForm.get('totalCompensation')?.valid || false;
-    const isProceedingsFileNoValid = this.firForm.get('proceedingsFileNo')?.valid || false;
-    const isProceedingsDateValid = this.firForm.get('proceedingsDate')?.valid || false;
-    const isProceedingsFileValid = this.firForm.get('proceedingsFile')?.valid || false;
-    const areAttachmentsValid = this.attachmentss_1.valid;
-
-    // Ensure all conditions are true before enabling the button
-    return (
-      victimsReliefValid &&
-      isTotalCompensationValid &&
-      isProceedingsFileNoValid &&
-      isProceedingsDateValid &&
-      isProceedingsFileValid &&
-      areAttachmentsValid
-    );
+    const mandatoryFields = ['proceedingsFileNo', 'proceedingsDate'];
+  
+    const isFormValid = mandatoryFields.every((field) => {
+      const control = this.firForm.get(field);
+      const value = control?.value;
+      const isValid = control?.disabled || (control?.valid && value !== null && value !== '');
+  
+      console.log(`Field: ${field}, Value: ${value}, Valid: ${isValid}`);
+  
+      return isValid;
+    });
+  
+  
+    const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
+    const isCommunityCertificateValid = victimsReliefArray.controls.every((victimGroup: any, index: any) => {
+      const control = victimGroup.get('communityCertificate');
+      const value = control?.value;
+      const isValid = control?.disabled || (control?.valid && value !== null && value !== '');
+  
+      console.log(`Victim ${index + 1} - Community Certificate: ${value}, Valid: ${isValid}`);
+  
+      return isValid;
+    });
+  
+  
+    const hasAttachments = Array.isArray(this.attachments?.value) && this.attachments.value.length > 0;
+  
+   
+    const hasProceedingsFile = this.proceedingsFile instanceof File;
+  
+    return isFormValid && isCommunityCertificateValid && hasAttachments && hasProceedingsFile;
   }
+  
+
+
+  isSubmitButtonEnabled(): boolean {
+    return this.isStep5Valid();
+  }
+  
 
 
   previousStep() {

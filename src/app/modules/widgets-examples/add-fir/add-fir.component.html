@@ -1018,17 +1018,27 @@
                             </div>
                         </div>
 
-                        <!-- Additional Relief Options -->
+    
                         <div class="mb-4">
-                            <label class="form-label d-block mb-2">57. Eligible additional relief for the legal heir of the person died *</label>
-                            <div class="d-flex flex-wrap gap-3">
-                                <div class="form-check" *ngFor="let option of additionalReliefOptions; let i = index">
-                                    <input type="checkbox" class="form-check-input" [value]="option.value" [id]="'additionalRelief-' + option.value + '-' + i" (change)="onAdditionalReliefChange($event, option.value)" />
-                                    <label class="form-check-label ms-2" [for]="'additionalRelief-' + option.value + '-' + i" [ngClass]="{ 'selected-text': selectedAdditionalReliefs.includes(option.value) }">
-                                        {{ option.label }}
-                                    </label>
-                                </div>
+                          <label class="form-label d-block mb-2">57. Eligible additional relief for the legal heir of the person died *</label>
+                          <div class="d-flex flex-wrap gap-3">
+                            <div class="form-check" *ngFor="let option of additionalReliefOptions">
+                              <input 
+                                type="checkbox" 
+                                class="form-check-input" 
+                                [value]="option.value" 
+                                [id]="'additionalRelief-' + option.value + '-' + i" 
+                                (change)="onAdditionalReliefChange($event, option.value, i)" 
+                              />
+                              <label 
+                                class="form-check-label ms-2" 
+                                [for]="'additionalRelief-' + option.value + '-' + i" 
+                                [ngClass]="{ 'selected-text': (victimsRelief.controls[i].get('additionalRelief')?.value || []).includes(option.value) }"
+                                >
+                                {{ option.label }}
+                              </label>
                             </div>
+                          </div>
                         </div>
                     </div>
                 </div>
@@ -1118,7 +1128,7 @@
                     *ngIf="step === 5"
                     type="submit"
                     class="btn btn-primary"
-                    [disabled]="!isStep5Valid()"
+                    [disabled]="!isSubmitButtonEnabled()"
                     (click)="submitStepFive()">
                     Submit
                   </button>
