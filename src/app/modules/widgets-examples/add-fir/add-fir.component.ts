@@ -230,34 +230,45 @@ i: number;
 
 this.loadPoliceDivision();
 
-  // Listen for changes in isVictimSameAsComplainant
+
   this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.valueChanges.subscribe(isVictimSame => {
-    this.onVictimSameAsComplainantChange(isVictimSame=== 'true');
-    this.wasVictimSame = isVictimSame=== 'true'; // Update the previous state
-    const victimGroup = this.victims.at(0) as FormGroup;
-    const ageControl = victimGroup.get('age');
-    const nameControl = victimGroup.get('name');
-    this.updateVictimNames()
-    if (Number(ageControl?.value?.toString().replace(/\D/g, '')) < 18) {
-      nameControl?.disable({ emitEvent: false });
-      nameControl?.reset();
-    }
+    const isSame = isVictimSame === 'true';
+    this.onVictimSameAsComplainantChange(isSame);
+    this.wasVictimSame = isSame;
+    
+    this.updateAllVictims();
   });
-  // Updates the victim's details if they are the same as the complainant.
-  const updateVictimDetails = (field: string, value: any) => {
-    const isVictimSame = this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.value;
-    const victimsArray = this.firForm.get('victims') as FormArray;
-    if (isVictimSame && victimsArray.length > 0 && this.wasVictimSame) {
-      victimsArray.at(0).get(field)?.setValue(value, { emitEvent: false });
-    }
-  };
+  
   ['nameOfComplainant', 'mobileNumberOfComplainant'].forEach(field => {
     this.firForm.get(`complainantDetails.${field}`)?.valueChanges.subscribe(value => {
-      updateVictimDetails(field === 'nameOfComplainant' ? 'name' : 'mobileNumber', value);
+      this.updateAllVictims();
     });
   });
+  
   }
-
+  updateAllVictims() {
+    const isVictimSame = this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.value === 'true';
+    const complainantDetails = this.firForm.get('complainantDetails')?.value || {};
+    const victimsArray = this.firForm.get('victims') as FormArray;
+  
+    victimsArray.controls.forEach((victimGroup: AbstractControl) => {
+      victimGroup.patchValue({
+        name: isVictimSame ? complainantDetails.nameOfComplainant : victimGroup.get('name')?.value,
+        mobileNumber: isVictimSame ? complainantDetails.mobileNumberOfComplainant : victimGroup.get('mobileNumber')?.value
+      }, { emitEvent: false });
+  
+     
+      if (isVictimSame) {
+        victimGroup.get('name')?.disable({ emitEvent: false });
+        victimGroup.get('mobileNumber')?.disable({ emitEvent: false });
+      } else {
+        victimGroup.get('name')?.enable({ emitEvent: false });
+        victimGroup.get('mobileNumber')?.enable({ emitEvent: false });
+      }
+    });
+  }
+  
+  
   // Handles the change in victim status relative to the complainant and updates the form accordingly.
   onVictimSameAsComplainantChange(isVictimSame: boolean) {
     this.firService.onVictimSameAsComplainantChange(isVictimSame, this.firForm, this.wasVictimSame);
@@ -2157,33 +2168,51 @@ handleCaseTypeChange() {
   
 
   saveStepThreeAsDraft() {
+    const victimsArray = this.firForm.get('victims') as FormArray;
+
+    const firFormValues = this.firForm.value;
+const complainantDetails = firFormValues.complainantDetails || {};
+
+
+console.log(complainantDetails,"sasa")
+const isVictimSameAsComplainant = complainantDetails.isVictimSameAsComplainant === "true";
+
+console.log(isVictimSameAsComplainant,"sasa")
+
+
     const firData = {
       firId: this.firId,
       complainantDetails: this.firForm.get('complainantDetails')?.value,
-      victims: this.victims.value.map((victim: any) => ({
-        victimId: victim.victimId || null,
-        name: victim.name || '',
-        age: victim.age || '',
-        gender: victim.gender || '',
-        customGender: victim.gender === 'Other' ? victim.customGender || null : null,
-        mobileNumber: victim.mobileNumber || null,
-        address: victim.address || null,
-        victimPincode: victim.victimPincode || null,
-        community: victim.community || '',
-        caste: victim.caste || '',
-        guardianName: victim.guardianName || '',
-        isNativeDistrictSame: victim.isNativeDistrictSame || '',
-        nativeDistrict: victim.nativeDistrict || null,
-        offenceCommitted: victim.offenceCommitted || [],
-        scstSections: victim.scstSections || [],
-        sectionsIPC: victim.sectionsIPC || '',
-        fir_stage_as_per_act: victim.fir_stage_as_per_act || null,
-        fir_stage_ex_gratia: victim.fir_stage_ex_gratia || null,
-        chargesheet_stage_as_per_act: victim.chargesheet_stage_as_per_act || null,
-        chargesheet_stage_ex_gratia: victim.chargesheet_stage_ex_gratia || null,
-        final_stage_as_per_act: victim.final_stage_as_per_act || null,
-        final_stage_ex_gratia: victim.final_stage_ex_gratia || null,
-      })),
+
+      victims: victimsArray.controls.map((victimControl: AbstractControl) => {
+        const victim = victimControl.value; 
+        return {
+          victimId: victim.victimId || null,
+          name: isVictimSameAsComplainant ? complainantDetails.nameOfComplainant : victim?.name?.trim() || '', 
+          age: victim.age || '',
+          gender: victim.gender || '',
+          customGender: victim.gender === 'Other' ? victim.customGender || null : null,
+          mobileNumber: isVictimSameAsComplainant ? complainantDetails.mobileNumberOfComplainant : victim?.mobileNumber?.trim() || '', 
+          address: victim.address || null,
+          victimPincode: victim.victimPincode || null,
+          community: victim.community || '',
+          caste: victim.caste || '',
+          guardianName: victim.guardianName || '',
+          isNativeDistrictSame: victim.isNativeDistrictSame || '',
+          nativeDistrict: victim.nativeDistrict || null,
+          offenceCommitted: victim.offenceCommitted || [],
+          scstSections: victim.scstSections || [],
+          sectionsIPC: victim.sectionsIPC || '',
+          fir_stage_as_per_act: victim.fir_stage_as_per_act || null,
+          fir_stage_ex_gratia: victim.fir_stage_ex_gratia || null,
+          chargesheet_stage_as_per_act: victim.chargesheet_stage_as_per_act || null,
+          chargesheet_stage_ex_gratia: victim.chargesheet_stage_ex_gratia || null,
+          final_stage_as_per_act: victim.final_stage_as_per_act || null,
+          final_stage_ex_gratia: victim.final_stage_ex_gratia || null,
+        };
+      }),
+    
+     
       isDeceased: this.firForm.get('isDeceased')?.value,
       deceasedPersonNames: this.firForm.get('deceasedPersonNames')?.value || [],
     };
@@ -2208,26 +2237,6 @@ console.log(firData,"firDatafirDatafirData")
       }
     );
   }
-
-
-
-
-  // mahiiii coded.........////////////////////////////////
-  // onFileSelected(event: any, i: number): void {
-  //   const selectedFile = event.target.files[0]; 
-  
-  
-  //   if (!this.multipleFiles[i]) {
-  //     this.multipleFiles[i] = [];  
-  //   }
-  
-
-  //   this.multipleFiles[i].push(selectedFile);
-  
-  //   // console.log('Updated files for accused index:', this.multipleFiles[i]);
-  // }
-  
-
 
 
 

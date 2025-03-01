@@ -393,26 +393,6 @@
                                     <input type="number" id="victimAge-{{i}}" class="form-control" formControlName="age" placeholder="Enter victim's age" (input)="onVictimAgeChange(i)" required />
                                   </div>
 
-                                <!-- <div class="col-md-4 mb-3">
-                                  <label for="victimAge-{{i}}" class="form-label">19. Age of the Victim *</label>
-                                  <input 
-                                    type="number"
-                                    id="victimAge-{{i}}"
-                                    class="form-control"
-                                    formControlName="age"
-                                    placeholder="Enter victim's age"
-                                    (input)="onVictimAgeChange(i)"
-                                    min="1" 
-                                    required />
-                                
-                                 
-                                  <small 
-                                    class="text-danger d-block mt-1" 
-                                    *ngIf="victims.at(i).get('age')?.invalid && victims.at(i).get('age')?.touched">
-                                      {{ getAgeErrorMessage(i) }}
-                                  </small>
-                                </div> -->
-                                
                               
 
                                 <div class="col-md-4 mb-3">
@@ -640,7 +620,7 @@
                 <div class="mt-4">
                     <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
                     <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-                    <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid()">
+                    <button type="button" class="btn btn-primary" (click)="nextStep()" >
                         Next
                     </button>
                 </div>
