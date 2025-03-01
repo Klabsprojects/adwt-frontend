@@ -64,7 +64,7 @@
 
                         <div class="col-md-6 col-lg-3 mb-3">
                             <label for="policeZone" class="form-label">2. Police Zone *</label>
-                            <select id="policeZone" class="form-select" formControlName="policeZone" required>
+                            <select id="policeZone" class="form-select" formControlName="policeZone" [disabled]="firForm.get('policeZone')?.value" required>
                                 <option value="" disabled>Select one</option>
                                 <option *ngFor="let zone of policeZones" [value]="zone">{{ zone }}</option>
                             </select>
@@ -72,7 +72,7 @@
 
                         <div class="col-md-6 col-lg-3 mb-3">
                             <label for="policeRange" class="form-label">3. Police Range *</label>
-                            <select id="policeRange" class="form-select" formControlName="policeRange" required>
+                            <select id="policeRange" class="form-select" formControlName="policeRange" [disabled]="firForm.get('policeRange')?.value" required>
                                 <option value="" disabled>Select one</option>
                                 <option *ngFor="let range of policeRanges" [value]="range">{{ range }}</option>
                             </select>
@@ -80,7 +80,7 @@
 
                         <div class="col-md-6 col-lg-3 mb-3">
                             <label for="revenueDistrict" class="form-label">4. Revenue District *</label>
-                            <select id="revenueDistrict" class="form-select" formControlName="revenueDistrict" required>
+                            <select id="revenueDistrict" class="form-select" formControlName="revenueDistrict" [disabled]="firForm.get('revenueDistrict')?.value" required>
                                 <option value="" disabled>Select one</option>
                                 <option *ngFor="let district of revenueDistricts" [value]="district">{{ district }}</option>
                             </select>
@@ -133,6 +133,7 @@
                           <option value="ACP">ACP</option>
                           <option value="ASP">ASP</option>
                           <option value="ADSP">ADSP</option>
+                          <option value="Others">Others</option>
                         </select>
                         <small class="text-danger" *ngIf="firForm.get('officerDesignation')?.invalid && firForm.get('officerDesignation')?.touched">
                           Please select a designation.
@@ -167,7 +168,7 @@
 
 
                 <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
-                <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid()">
+                <button type="button" class="btn btn-primary" (click)="nextStep()" >
                     Next
                 </button>
 

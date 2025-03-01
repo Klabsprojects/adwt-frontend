@@ -506,13 +506,14 @@ onCaseTypeChange() {
 
   // Save Step 1 and track officer IDs after the first save
   saveStepOneAsDraft() {
+    this.firForm.enable();
     const firData = {
       ...this.firForm.value,
 
 
     };
-
-    //console.log('Saving Step 1 data as draft:', firData);
+    // this.firForm.disable();
+    console.log('Saving Step 1 data as draft:', firData);
 
     this.firService.handleStepOne(this.firId, firData).subscribe(
       (response: any) => {
@@ -1967,11 +1968,20 @@ handleCaseTypeChange() {
         this.policeZones = data.map((item: any) => item.police_zone_name);
         this.policeRanges = data.map((item: any) => item.police_range_name);
         this.revenueDistricts = data.map((item: any) => item.district_division_name);
+      
+        const policeZoneValue = this.policeZones.length > 0 ? this.policeZones[0] : '';
+        const policeRangeValue = this.policeRanges.length > 0 ? this.policeRanges[0] : '';
+        const revenueDistrictValue = this.revenueDistricts.length > 0 ? this.revenueDistricts[0] : '';
+
         this.firForm.patchValue({
-          policeZone: '',
-          policeRange: '',
-          revenueDistrict:  '',
+          policeZone: policeZoneValue,
+          policeRange: policeRangeValue,
+          revenueDistrict: revenueDistrictValue,
         });
+
+        if (policeZoneValue) this.firForm.get('policeZone')?.disable();
+        if (policeRangeValue) this.firForm.get('policeRange')?.disable();
+        if (revenueDistrictValue) this.firForm.get('revenueDistrict')?.disable();
       },
       (error: any) => {
         Swal.fire('Error', 'Failed to load division details.', 'error');
@@ -2111,14 +2121,24 @@ handleCaseTypeChange() {
   // Handle City Change
   onCityChange(event: any) {
     const selectedCity = event.target.value;
+  
     if (selectedCity) {
       this.loadPoliceDivisionDetails(selectedCity);
-
-      // this.loadPoliceDivisionDetails(selectedCity);
-
+    } else {
+      this.resetPoliceFields();
     }
   }
-
+  resetPoliceFields() {
+    this.firForm.patchValue({
+      policeZone: '',
+      policeRange: '',
+      revenueDistrict: '',
+    });
+  
+    this.firForm.get('policeZone')?.enable();
+    this.firForm.get('policeRange')?.enable();
+    this.firForm.get('revenueDistrict')?.enable();
+  }
     // Create a FormGroup for a single attachment
     createAttachmentGroup(): FormGroup {
       return this.fb.group({
@@ -3645,7 +3665,7 @@ nextStep(): void {
   this.nextButtonClicked = true; // Indicate 'Next' button clicked
 
   // Check if the current step is valid before moving to the next
-  if (this.step === 1 && this.isStep1Valid()) {
+  if (this.step === 1 ) {
     this.saveStepOneAsDraft();
     this.updateFirStatus(1); // Update status for step 1
     this.step++;
