@@ -185,32 +185,22 @@
                         <div class="col-md-5 mb-3">
                             <label for="firNumber" class="form-label">9. FIR Number *</label>
                             <div class="input-group">
-                                <!-- FIR Number (Select dropdown from 1 to 99) -->
-                                <!-- <select id="firNumber" class="form-select" formControlName="firNumber" required>
-                                    <option value="" disabled selected>Select FIR Number</option>
-                                    <option *ngFor="let num of firNumberOptions" [value]="num">{{ num }}</option>
-                                </select> -->
-                                <ng-select 
-                                  id="firNumber" 
-                                  class="form-select" 
-                                  [items]="firNumberOptions" 
-                                  bindLabel="num" 
-                                  bindValue="num"
-                                  formControlName="firNumber" 
-                                  [searchable]="true"
-                                  [clearable]="false"
-                                  [placeholder]="firForm.get('firNumber')?.value ? '' : 'Select FIR Number'"
-                                  required>
-                              </ng-select>
+                            
+                              <input 
+                              type="text" 
+                              id="firNumber" 
+                              class="form-control"
+                              formControlName="firNumber"
+                              placeholder="Enter FIR Number"
+                              required
+                              (keypress)="validateFirNumber($event)"
+                          />
 
                                 <!-- Separator -->
                                 <span class="input-group-text">/</span>
 
 
-                                <!-- <select id="firNumberSuffix" class="form-select" formControlName="firNumberSuffix" required>
-                                    <option value="" disabled selected>Select Year</option>
-                                    <option *ngFor="let year of yearOptions" [value]="year">{{ year }}</option>
-                                </select> -->
+                           
                                 <ng-select 
                                   id="firNumberSuffix" 
                                   class="form-select" 
@@ -228,14 +218,6 @@
                               Please Follow the format "12/2024".
                             </small>
                         </div>
-
-
-
-
-
-
-
-
 
                     </div>
 

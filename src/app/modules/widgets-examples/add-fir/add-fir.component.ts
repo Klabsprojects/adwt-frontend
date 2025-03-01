@@ -772,7 +772,8 @@ onFileSelect_3(event: Event, controlName: string): void {
       attachments_1: this.fb.array([this.createAttachmentGroup()]),
       attachments_2: this.fb.array([this.createAttachmentGroup_2()]),
       // Step 2 Fields - FIR Details
-      firNumber: ['', Validators.required],
+      // firNumber: ['', Validators.required],
+      firNumber: ['', [Validators.required, Validators.pattern(/^[1-9][0-9]*$/)]], 
       firNumberSuffix: ['', Validators.required],
       dateOfOccurrence: ['', [Validators.required, this.maxDateValidator()]],
       timeOfOccurrence: ['', Validators.required],
@@ -942,6 +943,18 @@ onFileSelect_3(event: Event, controlName: string): void {
 
 
   }
+
+
+  validateFirNumber(event: KeyboardEvent) {
+    const char = event.key;
+    const inputValue = (event.target as HTMLInputElement).value;
+  
+   
+    if (!/^\d$/.test(char) || (inputValue.length === 0 && char === '0')) {
+      event.preventDefault();
+    }
+  }
+  
 
   // Validates the FIR Number values using the firValidationService.
   isFirValid(fir: string, suffix: string): boolean {

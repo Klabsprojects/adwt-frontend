@@ -157,23 +157,15 @@
             <div class="col-md-5 mb-3">
               <label for="firNumber" class="form-label">9. FIR Number *</label>
               <div class="input-group">
-                <!-- <select id="firNumber" class="form-select" formControlName="firNumber" required>
-                  <option value="" disabled selected>Select FIR Number</option>
-                  <option *ngFor="let num of firNumberOptions" [value]="num">{{ num }}</option>
-                </select> -->
-                <!-- FIR Number (ng-select dropdown from 1 to 99) -->
-                 <ng-select 
-                    id="firNumber" 
-                    class="form-select" 
-                    [items]="firNumberOptions" 
-                    bindLabel="num" 
-                    bindValue="num"
-                    formControlName="firNumber" 
-                    [searchable]="true"
-                    [clearable]="false"
-                    [placeholder]="firForm.get('firNumber')?.value ? '' : 'Select FIR Number'"
-                    required>
-                </ng-select>
+                <input 
+                type="text" 
+                id="firNumber" 
+                class="form-control"
+                formControlName="firNumber"
+                placeholder="Enter FIR Number"
+                required
+                (keypress)="validateFirNumber($event)"
+            />
                 <span class="input-group-text">/</span>
                 <!-- <select id="firNumberSuffix" class="form-select" formControlName="firNumberSuffix" required>
                   <option value="" disabled selected>Select Year</option>
