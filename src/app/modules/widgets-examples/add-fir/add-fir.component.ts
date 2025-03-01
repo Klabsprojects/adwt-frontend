@@ -368,7 +368,7 @@ onAccusedCommunityChange(event: any, index: number): void {
 loadCourtDivisions(): void {
   this.firService.getCourtDivisions().subscribe(
     (divisions: string[]) => {
-      this.courtDivisions = divisions; // Populate court division options
+      this.courtDivisions = divisions.sort((a, b) => a.localeCompare(b));// Populate court division options
     },
     (error) => {
       console.error('Error loading court divisions:', error);
