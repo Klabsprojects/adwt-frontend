@@ -820,11 +820,11 @@
               </div>
               <div class="col-md-4">
                 <label for="courtDivision" class="form-label">64. Court Division *</label>
-                <!-- <select id="courtDivision" class="form-select" formControlName="courtDivision" required (change)="onCourtDivisionChange($event)">
+                <select id="courtDivision" class="form-select" formControlName="courtDivision" required (change)="onCourtDivisionChange($event)">
                   <option value="" disabled>Select Court Division</option>
                   <option *ngFor="let division of courtDivisions" [value]="division">{{ division }}</option>
-                </select> -->
-                <ng-select
+                </select>
+                <!-- <ng-select
                   id="courtDistrict"
                   class="form-select"
                   [items]="courtDivisions"
@@ -836,15 +836,15 @@
                   [placeholder]="firForm.get('courtDistrict')?.value ? '' : 'Select Court Division'"
                   (change)="onCourtDivisionChange($event)"
                   required>
-              </ng-select>
+              </ng-select> -->
               </div>
               <div class="col-md-4">
                 <label for="courtName" class="form-label">65. Court Range *</label>
-                <!-- <select id="courtName" class="form-select" formControlName="courtName" required>
+                <select id="courtName" class="form-select" formControlName="courtName" required>
                   <option value="" disabled>Select Court Range</option>
                   <option *ngFor="let range of courtRanges" [value]="range">{{ range }}</option>
-                </select> -->
-                <ng-select
+                </select>
+                <!-- <ng-select
                 id="courtName"
                 class="form-select"
                 [items]="courtRanges"
@@ -855,7 +855,7 @@
                 [clearable]="false"
                 [placeholder]="firForm.get('courtName')?.value ? '' : 'Select Court Range'"
                 required>
-              </ng-select>
+              </ng-select> -->
               </div>
             </div>
             <div class="row mb-3">

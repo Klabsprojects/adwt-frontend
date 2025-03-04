@@ -115,6 +115,12 @@ export class AddFirComponent implements OnInit, OnDestroy {
     { label: 'FIR Stage(MRF) Details' },
   ];
 
+  CaseHandledBy = [
+    'Special Public Prosecutor',
+    'Empanelled advocate',
+    'Private advocate selected by the victim'
+  ];
+
 
   @HostListener('window:scroll', [])
   onWindowScroll(): void {
@@ -144,6 +150,9 @@ export class AddFirComponent implements OnInit, OnDestroy {
   selectedAdditionalReliefs: string[] = [];
   policeStations: string[] = [];
   victimCountArray: number[] = [];
+  show94BAnd94C = false;
+  show95Onwards = false;
+  show97Onwards = false;
 i: number;
   constructor(
     private fb: FormBuilder,
@@ -4193,5 +4202,12 @@ isSubmitButtonEnabled(): boolean {
     }
   }
   
+
+  onCaseHandledByChange(event: Event) {
+    const selectedValue = (event.target as HTMLSelectElement).value;
+    this.show94BAnd94C = selectedValue === 'Empanelled advocate' || selectedValue === 'Private advocate selected by the victim';
+    this.show95Onwards = selectedValue === 'Special Public Prosecutor';
+    this.show97Onwards = selectedValue === 'Empanelled advocate' || selectedValue === 'Private advocate selected by the victim';
+  }
 
 }
