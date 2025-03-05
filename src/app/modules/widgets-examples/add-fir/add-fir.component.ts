@@ -114,7 +114,8 @@ export class AddFirComponent implements OnInit, OnDestroy {
     { label: 'Accused Information' },
     { label: 'FIR Stage(MRF) Details' },
   ];
-
+  showOtherDesignation = false;
+  otherDesignation: string = "";
   CaseHandledBy = [
     'Special Public Prosecutor',
     'Empanelled advocate',
@@ -140,7 +141,7 @@ export class AddFirComponent implements OnInit, OnDestroy {
   policeZones: string[] = [];
   policeRanges: string[] = [];
   revenueDistricts: string[] = [];
-  offenceOptions: string[] = [];
+  offenceOptions: any[] = [];
   offenceActsOptions: { offence_act_name: string; [key: string]: any }[] = [];
   courtDistricts: string[] = [];
   offenceReliefDetails: any[] = []; 
@@ -476,11 +477,18 @@ loadAllOffenceReliefDetails(): void {
 // Calls firService to update victim details based on selected offences
 onOffenceCommittedChange(event: any, index: number): void {
   const selectedOffences = event.value; // Get selected values from the 30th field
+  console.log(this.victimsRelief);
+  // const getId = selectedOffences.map((ele:any)=>ele.id);
+  const getId = this.offenceOptions
+    .filter(option => selectedOffences.includes(option.offence_name))
+    .map(option => option.id);
   this.firService.onOffenceCommittedChange(
     selectedOffences,
     index,
     this.offenceReliefDetails,
-    this.victims
+    this.victims,
+    this.victimsRelief,
+    getId
   );
   this.cdr.detectChanges();
 }
@@ -1897,7 +1905,8 @@ handleCaseTypeChange() {
   loadOptions() {
     this.firService.getOffences().subscribe(
       (offences: any) => {
-        this.offenceOptions = offences.map((offence: any) => offence.offence_name);
+        console.log(offences);
+        this.offenceOptions = offences.map((offence: any) => offence);
       },
       (error: any) => {
         Swal.fire('Error', 'Failed to load offence options.', 'error');
@@ -2666,7 +2675,7 @@ saveAsDraft_6(isSubmit: boolean = false): void {
 
 isFormValid(): boolean {
   const trialDetails: Record<string, any> = {
-      courtName: this.firForm.get('Court_name')?.value,
+      courtName: this.firForm.get('Court_name1')?.value,
       courtDistrict: this.firForm.get('courtDistrict')?.value,
       trialCaseNumber: this.firForm.get('trialCaseNumber')?.value,
       publicProsecutor: this.firForm.get('publicProsecutor')?.value,
@@ -2985,7 +2994,7 @@ async saveAsDraft_7(isSubmit: boolean = false)  {
   }
 
     const trialDetails = {
-        courtName: this.firForm.get('Court_name')?.value,
+        courtName: this.firForm.get('Court_name1')?.value,
         courtDistrict: this.firForm.get('courtDistrict')?.value,
         trialCaseNumber: this.firForm.get('trialCaseNumber')?.value,
         publicProsecutor: this.firForm.get('publicProsecutor')?.value,
@@ -3027,7 +3036,7 @@ async saveAsDraft_7(isSubmit: boolean = false)  {
 
    
 
-courtName: this.firForm.get('Court_name')?.value,
+courtName: this.firForm.get('Court_name1')?.value,
 courtDistrict: this.firForm.get('courtDistrict')?.value,
 trialCaseNumber: this.firForm.get('caseNumber')?.value,
 publicProsecutor: this.firForm.get('publicProsecutor')?.value,
@@ -3045,7 +3054,7 @@ uploadJudgement: this.firForm.get('judgementDetails.uploadJudgement')?.value,
 
 
     trialDetails_one: {
-      courtName: this.firForm.get('Court_name')?.value,
+      courtName: this.firForm.get('Court_name1')?.value,
       courtDistrict: this.firForm.get('courtDistrict_one')?.value,
       trialCaseNumber: this.firForm.get('caseNumber_one')?.value,
       publicProsecutor: this.firForm.get('publicProsecutor_one')?.value,
@@ -3058,7 +3067,7 @@ uploadJudgement: this.firForm.get('judgementDetails.uploadJudgement')?.value,
       uploadJudgement: this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value,
   },
   trialDetails_two: {
-    courtName: this.firForm.get('Court_name')?.value,
+    courtName: this.firForm.get('Court_name1')?.value,
     courtDistrict: this.firForm.get('courtDistrict_two')?.value,
     trialCaseNumber: this.firForm.get('caseNumber_two')?.value,
     publicProsecutor: this.firForm.get('publicProsecutor_two')?.value,
@@ -4208,6 +4217,24 @@ isSubmitButtonEnabled(): boolean {
     this.show94BAnd94C = selectedValue === 'Empanelled advocate' || selectedValue === 'Private advocate selected by the victim';
     this.show95Onwards = selectedValue === 'Special Public Prosecutor';
     this.show97Onwards = selectedValue === 'Empanelled advocate' || selectedValue === 'Private advocate selected by the victim';
+  }
+
+  getDesignation(event:any){
+    console.log(event.target.value);
+    const designationValue = event.target.value;
+    if(designationValue  == "Others"){
+      this.showOtherDesignation = true;
+    }
+    else{
+      this.showOtherDesignation = false;
+    }
+  }
+
+  getDesignationName(event: any) {
+    this.otherDesignation = event.target.value;
+    // console.log(this.otherDesignation);
+    this.firForm.patchValue({ officerDesignation: `Others - ${this.otherDesignation}` });
+    // console.log(this.firForm.get('officerDesignation')?.value);
   }
 
 }

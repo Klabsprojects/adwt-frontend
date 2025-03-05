@@ -128,7 +128,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   courtRanges: string[] = [];
 
   showDuplicateSection_1: boolean = false;
-  showLegalOpinionObtained_two: boolean = false;
+  showLegalOpinionObtained_two: boolean = false;  
   showFiledBy_two: boolean = false;
   showDesignatedCourt_two: boolean = false;
   showCaseFitForAppeal_two: boolean = false;
@@ -144,8 +144,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
 
   image_access = environment.image_access;
   image_access2 = environment.image_access2;
-  apiUrl = "http://localhost:3010/";
-  apiUrl1 = "http://localhost:3010/uploads/";
+  apiUrl = environment.apiUrl;
+  apiUrl1 = environment.apiUrl + "uploads/";
   reliefValues: any;
 
   additionalReliefOptions = [
@@ -176,7 +176,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
   revenueDistricts: string[] = [];
 
   offenceReliefDetails: any[] = []; 
-  offenceOptions: string[] = [];
+  offenceOptions: any[] = [];
+  offenceOptionData:any[]=[];
   offenceActsOptions: string[] = [];
   scstSectionsOptions: any;
   // alphabetList: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -860,11 +861,16 @@ loadAccusedCommunities(): void {
   // Calls firService to update victim details based on selected offences
   onOffenceCommittedChange(event: any, index: number): void {
     const selectedOffences = event.value; // Get selected values from the 30th field
+    const getId = this.offenceOptionData
+    .filter(option => selectedOffences.includes(option.offence_name))
+    .map(option => option.id);
     this.firService.onOffenceCommittedChange(
       selectedOffences,
       index,
       this.offenceReliefDetails,
-      this.victims
+      this.victims,
+      this.victimsRelief,
+      getId
     );
     this.cdr.detectChanges();
   }
@@ -2412,7 +2418,7 @@ uploadedImageSrc: any | ArrayBuffer;
 
     this.firService.getVictimsReliefDetails(this.firId).subscribe(
       (response: any) => {
-        console.log('Victim Relief Details:', response.victimsReliefDetails); // Log response data
+        console.log('Victim Relief Details 1:', response.victimsReliefDetails); // Log response data
         if (response && response.victimsReliefDetails) {
           this.populateVictimsRelief(response.victimsReliefDetails);
         } else {
@@ -2434,10 +2440,11 @@ uploadedImageSrc: any | ArrayBuffer;
 
     this.firService.getVictimsReliefDetails(this.firId).subscribe(
       (response: any) => {
-        console.log('Victim Relief Details:', response.victimsReliefDetails);
+        console.log('Victim Relief Details 2:', response.victimsReliefDetails);
         this.numberOfVictims = response.numberOfVictims;
         this.victimNames = response.victimNames;
           this.victimsReliefDetails = response.victimsReliefDetails;
+          console.log("Victime Data" , this.victimsReliefDetails);
           // Initialize victimsRelief array based on the number of victims
         // this.populateVictimsRelief();
       },
@@ -2922,12 +2929,14 @@ console.log(selectedValue,"selectedValue")
     // console.log(victimsReliefDetails, "victimsReliefDetails");
   
     let totalReliefFirstStage = 0; 
+    let totalReliefSecondStage = 0;
+    let totalReliefThirdStage = 0;
   
     victimsReliefDetails.forEach((victimReliefDetail) => {
       const additionalRelief = victimReliefDetail.additional_relief
         ? JSON.parse(victimReliefDetail.additional_relief)
         : [];
-  
+      console.log("v details", victimReliefDetail);
    
       const reliefAmountFirstStage = (
         (parseFloat(victimReliefDetail.fir_stage_as_per_act || '0') || 0) + 
@@ -2936,6 +2945,20 @@ console.log(selectedValue,"selectedValue")
   
       totalReliefFirstStage += reliefAmountFirstStage;
   
+      const reliefAmountSecondStage = (
+        (parseFloat(victimReliefDetail.chargesheet_stage_as_per_act || '0') || 0) + 
+        (parseFloat(victimReliefDetail.chargesheet_stage_ex_gratia || '0') || 0)
+      );
+  
+      totalReliefSecondStage += reliefAmountSecondStage;
+
+      const reliefAmountThirdStage = (
+        (parseFloat(victimReliefDetail.final_stage_as_per_act || '0') || 0) + 
+        (parseFloat(victimReliefDetail.final_stage_ex_gratia || '0') || 0)
+      );
+  
+      totalReliefThirdStage += reliefAmountThirdStage;
+  
       const victimGroup = this.fb.group({
         victimId: [victimReliefDetail.victim_id || ''],
         victimName: [victimReliefDetail.victim_name || ''],
@@ -2943,8 +2966,15 @@ console.log(selectedValue,"selectedValue")
         reliefAmountScst: [victimReliefDetail.relief_amount_scst || victimReliefDetail.fir_stage_as_per_act],
         reliefAmountExGratia: [victimReliefDetail.relief_amount_exgratia || victimReliefDetail.fir_stage_ex_gratia],
         reliefAmountFirstStage: [reliefAmountFirstStage.toFixed(2)], 
+        reliefAmountScst_1: [victimReliefDetail.chargesheet_stage_as_per_act],
+        reliefAmountExGratia_1: [victimReliefDetail.chargesheet_stage_ex_gratia],
+        reliefAmountSecondStage: [reliefAmountSecondStage.toFixed(2)], 
+        reliefAmountScst_2: [victimReliefDetail.final_stage_as_per_act],
+        reliefAmountExGratia_2: [victimReliefDetail.final_stage_ex_gratia],
+        reliefAmountThirdStage: [reliefAmountThirdStage.toFixed(2)], 
         additionalRelief: [additionalRelief]
       });
+      console.log("amount data", victimGroup);
   
       victimsReliefArray.push(victimGroup);
     });
@@ -2968,6 +2998,7 @@ console.log(selectedValue,"selectedValue")
     this.victimsRelief.controls.forEach((group) => {
       const firstStage = parseFloat(group.get('reliefAmountFirstStage')?.value || '0');
       total += firstStage;
+      console.log("total value",firstStage);
     });
     this.firForm.patchValue({ totalCompensation: total.toFixed(2) });
   }
@@ -3210,6 +3241,7 @@ console.log(victimReliefDetail,"cretaieg")
     this.firService.getOffences().subscribe(
       (offences: any) => {
         this.offenceOptions = offences.map((offence: any) => offence.offence_name);
+        this.offenceOptionData = offences.map((offence: any) => offence);
       },
       (error: any) => {
         Swal.fire('Error', 'Failed to load offence options.', 'error');

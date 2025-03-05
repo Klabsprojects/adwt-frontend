@@ -45,6 +45,16 @@ export class FirService {
     return this.http.get<any[]>(`${this.baseUrl}/offence-acts`);
   }
 
+getOffenceActsWithId(offenceIds: any[]): Observable<any[]> {
+  console.log(offenceIds,"idvalue");
+  if (!offenceIds || offenceIds.length === 0) {
+    return this.http.get<any[]>(`${this.baseUrl}/offence-acts`);
+  }
+  const queryParams = offenceIds.map(id => `offence[]=${id}`).join('&');
+  const url = `${this.baseUrl}/offence-acts?${queryParams}`;
+  return this.http.get<any[]>(url);
+}
+
   // Get offence relief details
   getOffenceReliefDetails(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/offence/relief/details`);
@@ -397,25 +407,32 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     selectedOffences: any[],
     index: number,
     offenceReliefDetails: any[],
-    victims: FormArray
+    victims: FormArray,
+    victimsRelief:FormArray,
+    getId:any
   ): void {
     const victimGroup = victims.at(index) as FormGroup; // Access the victim's FormGroup
+    const victimsReliefGroup = victimsRelief.at(index) as FormGroup;
+    console.log(victimsReliefGroup);
     // Filter to find matching poa_act_section values
     const matchingSections = offenceReliefDetails
       .filter(offence => selectedOffences.includes(offence.name_of_offence))
       .map(offence => offence.poa_act_section);
-    // Set the 31st field with matching sections
     if (matchingSections.length > 0) {
-      this.getOffenceActs().subscribe(
+      this.getOffenceActsWithId(getId).subscribe(
         (response: any[]) => {
-          // Filter the offence acts based on selected values
-          const matchedActs = response.filter((act) =>
-            matchingSections.includes(act.offence_act_name)
-          );
+          console.log(response);
+          let responseArray = Array.isArray(response) ? response : [response];
+          const matchedActs = responseArray.filter((act) => {
+            const actNamesArray = act.offence_act_names.split(',');
+            console.log(actNamesArray, matchingSections);
+            return actNamesArray.some((name: any) => matchingSections.includes(name)); 
+          });
           if (matchedActs.length > 0) {
             // Update the victim's FormGroup with the fetched values
             victimGroup.patchValue({
-              scstSections: matchedActs.map(act => act.offence_act_name), // Auto-select field 31
+              scstSections: matchedActs[0].offence_act_names || '',
+             // scstSections: matchedActs.map(act => act.offence_act_name), // Auto-select field 31
               fir_stage_as_per_act: matchedActs[0].fir_stage_as_per_act || '',
               fir_stage_ex_gratia: matchedActs[0].fir_stage_ex_gratia || '',
               chargesheet_stage_as_per_act: matchedActs[0].chargesheet_stage_as_per_act || '',
@@ -423,14 +440,27 @@ saveStepFourAsDraft(firData: any): Observable<any> {
               final_stage_as_per_act: matchedActs[0].final_stage_as_per_act || '',
               final_stage_ex_gratia: matchedActs[0].final_stage_ex_gratia || '',
             });
-            // Calculate and update the 1st stage relief amount
-            const reliefAmountFirstStage =
-              parseFloat(matchedActs[0].fir_stage_as_per_act || '0') +
-              parseFloat(matchedActs[0].fir_stage_ex_gratia || '0');
-            victimGroup.patchValue({
-              reliefAmountFirstStage: reliefAmountFirstStage.toFixed(2),
-            });
-          } else {
+            victimsReliefGroup.patchValue({
+              reliefAmountScst:matchedActs[0].fir_stage_as_per_act || '',
+              reliefAmountExGratia:matchedActs[0].fir_stage_ex_gratia || '',
+              reliefAmountFirstStage: (
+                (parseFloat(matchedActs[0].fir_stage_as_per_act) || 0) +
+                (parseFloat(matchedActs[0].fir_stage_ex_gratia) || 0)
+              ).toFixed(2),
+              reliefAmountScst_1:matchedActs[0].chargesheet_stage_as_per_act || '',
+              reliefAmountExGratia_1:matchedActs[0].chargesheet_stage_ex_gratia || '',
+              reliefAmountSecondStage : (
+                (parseFloat(matchedActs[0].chargesheet_stage_as_per_act) || 0) +
+                (parseFloat(matchedActs[0].chargesheet_stage_ex_gratia) || 0)
+              ).toFixed(2),
+              reliefAmountScst_2:matchedActs[0].final_stage_as_per_act || '',
+              reliefAmountExGratia_2:matchedActs[0].final_stage_ex_gratia || '',
+              reliefAmountThirdStage : (
+                (parseFloat(matchedActs[0].final_stage_as_per_act) || 0) +
+                (parseFloat(matchedActs[0].final_stage_ex_gratia) || 0)
+              ).toFixed(2),
+            })
+        } else {
             // Reset the fields if no matched acts are found
             victimGroup.patchValue({
               scstSections: [],

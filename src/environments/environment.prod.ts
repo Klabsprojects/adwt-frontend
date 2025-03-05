@@ -14,6 +14,7 @@ export const environment = {
   file_access:'https://adwatrocity.onlinetn.com/api/v1/CommonFileUpload',
   apiUrl: 'https://adwatrocity.onlinetn.com/api/v1/',
   image_access:'https://adwatrocity.onlinetn.com/api/v1/uploadedfile/',
+  image_access2:'https://adwatrocity.onlinetn.com/api/v1/CommonFileUpload/',
 
   appThemeName: 'ADWT',
   appPurchaseUrl: 'https://1.envato.market/EA4JP',
