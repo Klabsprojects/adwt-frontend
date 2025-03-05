@@ -131,7 +131,7 @@
             </div>
             <div class="col-md-6 col-lg-4 mb-3">
               <label for="officerDesignation" class="form-label">Designation of the Investigating Officer *</label>
-              <select id="officerDesignation" class="form-select" formControlName="officerDesignation" required (change)="getDesignation($event)">
+              <select id="officerDesignation" class="form-select" formControlName="officerDesignation" required>
                 <option value="" disabled>Select Designation</option>
                 <option value="DSP">DSP</option>
                 <option value="ACP">ACP</option>
@@ -141,12 +141,6 @@
               </select>
               <small class="text-danger" *ngIf="firForm.get('officerDesignation')?.invalid && firForm.get('officerDesignation')?.touched">Please select a designation.</small>
             </div>
-
-            <div class="col-md-6 col-lg-4 mb-3" *ngIf="showOtherDesignation">
-              <label for="officerPhone" class="form-label">7a. Designation Name</label>
-              <input  id="otherDesignation" type="text" class="form-control" placeholder="Enter Designation Name" (input)="getDesignationName($event)" />
-            </div>
-
             <div class="col-md-6 col-lg-4 mb-3">
               <label for="officerPhone" class="form-label">Phone Number of the Investigating Officer *</label>
               <input id="officerPhone" type="text" class="form-control" formControlName="officerPhone" placeholder="Enter Phone Number" (keypress)="allowOnlyNumbers($event)" maxlength="10" required/>
