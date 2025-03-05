@@ -2554,10 +2554,11 @@ uploadedImageSrc: any | ArrayBuffer;
     this.showCaseFitForAppeal_one = legalOpinion === 'yes';
   }
 
-
+  public selectedCourtType:string="";
   onDesignatedCourtChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     const selectedValue = target.value;
+    this.selectedCourtType = target.value;
 
     this.showDuplicateSection = selectedValue === 'highCourt' || selectedValue === 'supremeCourt'; 
   }

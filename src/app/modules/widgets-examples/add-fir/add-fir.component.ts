@@ -1179,10 +1179,11 @@ removeAttachment_1(index: number): void {
     this.showCaseFitForAppeal_one = legalOpinion === 'yes';
   }
 
-
+  public selectedCourtType:string="";
   onDesignatedCourtChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     const selectedValue = target.value;
+    this.selectedCourtType = target.value;
 
     this.showDuplicateSection = selectedValue === 'highCourt' || selectedValue === 'supremeCourt';
 
@@ -1200,7 +1201,7 @@ removeAttachment_1(index: number): void {
     // console.log('Show Duplicate Section:', this.showDuplicateSection);
   }
 
-
+  is_show_trail_details:boolean = false;
   onJudgementNatureChange(): void {
     const judgementNature = this.firForm.get('judgementDetails.judgementNature')?.value;
 
@@ -1212,6 +1213,7 @@ removeAttachment_1(index: number): void {
       this.showDesignatedCourt = false;
 
       this.hideCompensationSection = false;
+      this.is_show_trail_details = false;
 
       // Set validators for Upload Judgement Copy
       this.firForm.get('judgementDetails.uploadJudgement')?.setValidators(Validators.required);
@@ -1223,6 +1225,7 @@ removeAttachment_1(index: number): void {
       this.showFiledBy = true;
       this.showDesignatedCourt = true;
       this.hideCompensationSection = true;
+      this.is_show_trail_details = true
       // Set validators for Upload Judgement Copy
       this.firForm.get('judgementDetails.uploadJudgement')?.setValidators(Validators.required);
       this.firForm.get('judgementDetails.uploadJudgement')?.updateValueAndValidity();

@@ -1425,13 +1425,17 @@
                       <label class="form-label">80. District in which court is present *</label>
                       <ng-select class="form-select" [items]="courtDistricts" bindLabel="district" bindValue="district"
                         formControlName="courtDistrict" [searchable]="true" [clearable]="false"
-                        [placeholder]="firForm.get('courtDistrict')?.value ? '' : 'Select District'" required>
+                        [placeholder]="firForm.get('courtDistrict')?.value ? '' : 'Select District'" (change)="onCourtDivisionChange($event)" required>
                       </ng-select>
                     </div>
               
                     <div class="col-md-6 mb-3">
                       <label class="form-label">81. Name of the Designated / Special court *</label>
-                      <input type="text" class="form-control" formControlName="Court_name1" placeholder="Enter Name" required />
+                      <!-- <input type="text" class="form-control" formControlName="Court_name1" placeholder="Enter Name" required /> -->
+                      <ng-select class="form-select" [items]="courtRanges" bindLabel="label" bindValue="value"
+                        formControlName="Court_name1" [searchable]="true" [clearable]="false"
+                        [placeholder]="firForm.get('Court_name1')?.value ? '' : 'Select Court Range'" required>
+                      </ng-select>
                     </div>
                     <!-- Item 76 -->
                     <div class="col-md-6 mb-3">
@@ -1697,7 +1701,7 @@
                       </div>
 
 
-                      <div *ngIf="showDuplicateSection">
+                      <div *ngIf="showDuplicateSection && is_show_trail_details">
                         <div class="card border-primary">
                           <div class="card-body">
                               <h4 class="mb-4">Case Trial and Court Details</h4>
@@ -1709,11 +1713,13 @@
                                   </div> -->
 
 
-                                  <div class="col-md-6 mb-3">
+                                  <div class="col-md-6 mb-3" *ngIf="selectedCourtType==='highCourt'">
                                     <label class="form-label">1. District in which court is present *</label>
                                     <select class="form-select" formControlName="courtDistrict_one" required>
                                       <option value="" disabled selected>Select District</option>
-                                      <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
+                                      <option value="Chennai">Chennai</option>
+                                      <option value="Madurai">Madurai</option>
+                                      <!-- <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option> -->
                                     </select>
                                   </div>
                                   <!-- Item 76 -->

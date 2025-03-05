@@ -1369,11 +1369,13 @@ maxlength="10"
                             </div> -->
 
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-3" *ngIf="selectedCourtType==='highCourt'">
                               <label class="form-label">1. District in which court is present *</label>
                               <select class="form-select" formControlName="courtDistrict_one" required>
                                 <option value="" disabled selected>Select District</option>
-                                <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
+                                <option value="Chennai">Chennai</option>
+                                <option value="Madurai">Madurai</option>
+                                <!-- <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option> -->
                               </select>
                             </div>
                             <!-- Item 76 -->
