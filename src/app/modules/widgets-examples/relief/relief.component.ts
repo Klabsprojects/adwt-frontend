@@ -825,6 +825,14 @@ export class ReliefComponent implements OnInit {
         }
         console.log('fetchFirDetails', details);
         this.patchFirDetailsToForm(this.firDetails);
+
+        if(this.firDetails && this.firDetails.data && this.firDetails.data.status){
+        if (this.firDetails.data.status >= 5) this.enabledTabs[0] = true; // Enable First Installment
+        if (this.firDetails.data.status >= 6) this.enabledTabs[1] = true; // Enable Second Installment
+        if (this.firDetails.data.status >= 7) this.enabledTabs[2] = true; 
+        }
+
+
       }),
       catchError((err) => {
         console.error('Error fetching FIR details:', err);

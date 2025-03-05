@@ -1988,7 +1988,7 @@ handleCaseTypeChange() {
         console.log(data,"this.policeCities")
         this.policeZones = data.map((item: any) => item.police_zone_name);
         this.policeRanges = data.map((item: any) => item.police_range_name);
-        this.revenueDistricts = data.map((item: any) => item.district_division_name);
+        this.revenueDistricts = data.map((item: any) => item.revenue_district_name);
       
         const policeZoneValue = this.policeZones.length > 0 ? this.policeZones[0] : '';
         const policeRangeValue = this.policeRanges.length > 0 ? this.policeRanges[0] : '';
@@ -2022,7 +2022,7 @@ handleCaseTypeChange() {
         console.log( data)
         this.policeZones = data.map((item: any) => item.police_zone_name);
         this.policeRanges = data.map((item: any) => item.police_range_name);
-        this.revenueDistricts = data.map((item: any) => item.district_division_name);
+        this.revenueDistricts = data.map((item: any) => item.revenue_district_name);
         // this.firForm.patchValue({
         //   policeZone: this.policeZones ,
         //   policeRange: this.policeRanges ,

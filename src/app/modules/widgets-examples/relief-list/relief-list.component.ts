@@ -96,6 +96,26 @@ export class ReliefListComponent implements OnInit {
 
   // Get badge classes for the status
  // Get badge classes for the status
+// getStatusBadgeClass(status: number): string {
+//   const badgeClassMap = {
+//     0: 'badge bg-info text-white',
+//     1: 'badge bg-warning text-dark',
+//     2: 'badge bg-warning text-dark',
+//     3: 'badge bg-warning text-dark',
+//     4: 'badge bg-warning text-dark',
+//     5: 'badge bg-danger text-white', // Red for FIR Stage pending
+//     6: 'badge bg-danger text-white', // Red for Chargesheet Stage pending
+//     7: 'badge bg-danger text-white',
+//     // 8: 'badge bg-danger text-white',
+//     // 9: 'badge bg-danger text-white', // Red for Trial Stage pending
+//     11: 'badge bg-primary text-white', // On completion of Disbursement of FIR Stage Relief
+//     12: 'badge bg-success text-white', // Chargesheet Stage completed
+//     13: 'badge bg-success text-white', // Completed
+//   } as { [key: number]: string };
+
+//   return badgeClassMap[status] || 'badge bg-secondary text-white';
+// }
+
 getStatusBadgeClass(status: number): string {
   const badgeClassMap = {
     0: 'badge bg-info text-white',
@@ -103,14 +123,12 @@ getStatusBadgeClass(status: number): string {
     2: 'badge bg-warning text-dark',
     3: 'badge bg-warning text-dark',
     4: 'badge bg-warning text-dark',
-    5: 'badge bg-danger text-white', // Red for FIR Stage pending
-    6: 'badge bg-danger text-white', // Red for Chargesheet Stage pending
-    7: 'badge bg-danger text-white',
-    // 8: 'badge bg-danger text-white',
-    // 9: 'badge bg-danger text-white', // Red for Trial Stage pending
-    11: 'badge bg-primary text-white', // On completion of Disbursement of FIR Stage Relief
-    12: 'badge bg-success text-white', // Chargesheet Stage completed
-    13: 'badge bg-success text-white', // Completed
+    5: 'badge bg-success text-white',
+    6: 'badge bg-success text-white',
+    7: 'badge bg-success text-white',
+    8: 'badge bg-danger text-white',
+    9: 'badge bg-danger text-white',
+    10: 'badge bg-danger text-white', // Add this entry for status 12
   } as { [key: number]: string };
 
   return badgeClassMap[status] || 'badge bg-secondary text-white';
