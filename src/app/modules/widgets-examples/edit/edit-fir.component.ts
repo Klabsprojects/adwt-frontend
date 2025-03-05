@@ -202,7 +202,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
     private router: Router,
     private firServiceAPI : FirServiceAPI,
     private sanitizer: DomSanitizer,
-    private police_district :PoliceDivisionService,
+    private policeDivisionService :PoliceDivisionService
    
   
    ) {}
@@ -655,7 +655,9 @@ loadAccusedCommunities(): void {
     this.loadCourtDivisions();
     this.loadCommunities();
 
-    this.loadPoliceDivisionDetails();
+    // this.loadPoliceDivisionDetails();
+
+    this.loadPoliceDivision();
 
     this.loadDistricts();
     this.updateValidationForCaseType(); 
@@ -698,15 +700,7 @@ loadAccusedCommunities(): void {
     });
 
 
-    const preFilledDistrict = this.firForm.get('policeCity')?.value; // Get pre-filled district
-    if (preFilledDistrict) {
-      this.loadPoliceStations(preFilledDistrict); // Load stations for the pre-filled district
-    }
-
-    // Watch for district changes and reload stations dynamically
-    this.firForm.get('policeCity')?.valueChanges.subscribe((district) => {
-      this.loadPoliceStations(district);
-    });
+    
 
     // // Listen for changes in isVictimSameAsComplainant
     // this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.valueChanges.subscribe(isVictimSame => {
@@ -1202,6 +1196,16 @@ console.log(hearingDetailsControl,"hearingDetailsControl")
         if(response.data.police_city){
           this.firForm.get('policeCity')?.setValue(response.data.police_city);
         }
+        const preFilledDistrict = this.firForm.get('policeCity')?.value; // Get pre-filled district
+        if (preFilledDistrict) {
+          this.populatePoliceDivisionDetails(preFilledDistrict);
+          this.loadPoliceStations(preFilledDistrict,response.data.police_station); 
+        }
+
+        this.firForm.get('policeCity')?.valueChanges.subscribe((district) => {
+          this.loadPoliceStations(district,'');
+        });
+
         if(response.data.police_range){
           this.firForm.get('policeRange')?.setValue(response.data.police_range); 
         }
@@ -1211,9 +1215,9 @@ console.log(hearingDetailsControl,"hearingDetailsControl")
         if(response.data.revenue_district){
           this.firForm.get('revenueDistrict')?.setValue(response.data.revenue_district); 
         }
-        if(response.data.police_station){
-          this.firForm.get('stationName')?.setValue(response.data.police_station); 
-        }
+        // if(response.data.police_station){
+        //   this.firForm.get('stationName')?.setValue(response.data.police_station); 
+        // }
         if(response.data.officer_name){
           this.firForm.get('officerName')?.setValue(response.data.officer_name); 
         }
@@ -2169,11 +2173,18 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
     return '';
   }
 
-  loadPoliceStations(district: string): void {
+  loadPoliceStations(district: string , station_name: string ,): void {
     if (district) {
         this.firService.getPoliceStations(district).subscribe(
             (stations: string[]) => {
+              if(stations){
                 this.policeStations = stations;
+                console.log(this.policeStations,'assssssssssssssssssssssssssssssssssssssssssssss')
+                console.log(station_name)
+                if(station_name){
+                  this.firForm.get('stationName')?.setValue(station_name);
+                }
+              }
             },
             (error) => {
                 console.error('Error fetching police stations:', error);
@@ -3354,6 +3365,29 @@ console.log(victimReliefDetail,"cretaieg")
     );
   }
 
+   loadPoliceDivision() {
+      this.policeDivisionService.getAllPoliceDivisions().subscribe(
+        (data: any) => {
+          // this.police_Cities_data =data;
+  
+          this.policeCities = data.map((item: any) => item.district_division_name);
+  
+          console.log( data)
+          this.policeZones = data.map((item: any) => item.police_zone_name);
+          this.policeRanges = data.map((item: any) => item.police_range_name);
+          this.revenueDistricts = data.map((item: any) => item.district_division_name);
+          // this.firForm.patchValue({
+          //   policeZone: this.policeZones ,
+          //   policeRange: this.policeRanges ,
+          //   revenueDistrict: this.revenueDistricts,
+          // });
+        },
+        (error: any) => {
+          // Swal.fire('Error', 'Failed to load division details.', 'error');
+        }
+      );
+    }
+
 
 
 
@@ -3431,13 +3465,6 @@ console.log(victimReliefDetail,"cretaieg")
   }
 
 
-  // Handle City Change
-  onCityChange(event: any) {
-    const selectedCity = event.target.value;
-    // if (selectedCity) {
-    //   this.loadPoliceDivisionDetails();
-    // }
-  }
   get attachments_1(): FormArray {
     return this.firForm.get('attachments_1') as FormArray;
   }
@@ -5261,5 +5288,57 @@ attachment:this.attachments_2.value
     this.uploadProceedings_2_preview = '';
   }
 }
+
+
+onCityChange(event: any) {
+  const selectedCity = event.target.value;
+
+  if (selectedCity) {
+    this.populatePoliceDivisionDetails(selectedCity);
+  } else {
+    this.resetPoliceFields();
+  }
+}
+resetPoliceFields() {
+  this.firForm.patchValue({
+    policeZone: '',
+    policeRange: '',
+    revenueDistrict: '',
+  });
+
+  this.firForm.get('policeZone')?.enable();
+  this.firForm.get('policeRange')?.enable();
+  this.firForm.get('revenueDistrict')?.enable();
+}
+
+ populatePoliceDivisionDetails(district: string) {
+    this.firService.getPoliceDivision(district).subscribe(
+      (data: any) => {
+        // this.policeCities = [district];
+
+        console.log(data,"this.policeCities")
+        this.policeZones = data.map((item: any) => item.police_zone_name);
+        this.policeRanges = data.map((item: any) => item.police_range_name);
+        this.revenueDistricts = data.map((item: any) => item.district_division_name);
+      
+        const policeZoneValue = this.policeZones.length > 0 ? this.policeZones[0] : '';
+        const policeRangeValue = this.policeRanges.length > 0 ? this.policeRanges[0] : '';
+        const revenueDistrictValue = this.revenueDistricts.length > 0 ? this.revenueDistricts[0] : '';
+
+        this.firForm.patchValue({
+          policeZone: policeZoneValue,
+          policeRange: policeRangeValue,
+          revenueDistrict: revenueDistrictValue,
+        });
+
+        if (policeZoneValue) this.firForm.get('policeZone')?.disable();
+        if (policeRangeValue) this.firForm.get('policeRange')?.disable();
+        if (revenueDistrictValue) this.firForm.get('revenueDistrict')?.disable();
+      },
+      (error: any) => {
+        Swal.fire('Error', 'Failed to load division details.', 'error');
+      }
+    );
+  }
   
 }

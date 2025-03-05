@@ -89,6 +89,7 @@
           <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
             <ng-container [ngSwitch]="column.field">
               <span *ngSwitchCase="'sl_no'">{{ (page - 1) * itemsPerPage + i + 1 }}</span>
+              <span *ngSwitchCase="'fir_number'">{{ fir.fir_number }}</span>
               <span *ngSwitchCase="'fir_id'">{{ fir.fir_id }}</span>
               <span *ngSwitchCase="'police_city'">{{ fir.police_city }}</span>
               <span *ngSwitchCase="'police_station'">{{ fir.police_station }}</span>

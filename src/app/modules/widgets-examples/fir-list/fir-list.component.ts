@@ -426,7 +426,8 @@ export class FirListComponent implements OnInit {
 
   displayedColumns: { label: string; field: string; sortable: boolean; visible: boolean }[] = [
     { label: 'Sl.No', field: 'sl_no', sortable: false, visible: true },
-    { label: 'FIR No.', field: 'fir_id', sortable: true, visible: true },
+    { label: 'FIR No.', field: 'fir_number', sortable: true, visible: true },
+    { label: 'FIR ID.', field: 'fir_id', sortable: true, visible: true },
     { label: 'Police City', field: 'police_city', sortable: true, visible: true },
     { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
     { label: 'Created By', field: 'created_by', sortable: true, visible: true },
@@ -902,10 +903,14 @@ console.log(this.firList,"loadfirst")
   getStatusText(status: number): string {
     const statusTextMap = {
       0: 'FIR Draft',
-      1: 'Pending | FIR Stage | Step 1 Completed',
-      2: 'Pending | FIR Stage | Step 2 Completed',
-      3: 'Pending | FIR Stage | Step 3 Completed',
-      4: 'Pending | FIR Stage | Step 4 Completed',
+      // 1: 'Pending | FIR Stage | Step 1 Completed',
+      // 2: 'Pending | FIR Stage | Step 2 Completed',
+      // 3: 'Pending | FIR Stage | Step 3 Completed',
+      // 4: 'Pending | FIR Stage | Step 4 Completed',
+      1: 'FIR Draft',
+      2: 'FIR Draft',
+      3: 'FIR Draft',
+      4: 'FIR Draft',
       5: 'Completed | FIR Stage',
       6: 'Charge Sheet Completed',
       7: 'Trial Stage Completed',
@@ -921,10 +926,14 @@ console.log(this.firList,"loadfirst")
 getStatusBadgeClass(status: number): string {
   const badgeClassMap = {
     0: 'badge bg-info text-white',
-    1: 'badge bg-warning text-dark',
-    2: 'badge bg-warning text-dark',
-    3: 'badge bg-warning text-dark',
-    4: 'badge bg-warning text-dark',
+    // 1: 'badge bg-warning text-dark',
+    // 2: 'badge bg-warning text-dark',
+    // 3: 'badge bg-warning text-dark',
+    // 4: 'badge bg-warning text-dark',
+    1: 'badge bg-info text-white',
+    2: 'badge bg-info text-white',
+    3: 'badge bg-info text-white',
+    4: 'badge bg-info text-white',
     5: 'badge bg-success text-white',
     6: 'badge bg-success text-white',
     7: 'badge bg-success text-white',
