@@ -490,8 +490,8 @@ export class FirListComponent implements OnInit {
           this.victimsdata =data.queryResults1;
           this.victimsdata = this.victimsdata.map((victim) => ({
             ...victim, // Keep all existing properties
-            scst_sections: victim.scst_sections ? this.formatedata(victim.scst_sections) : victim.scst_sections ,
-            offence_committed: victim.offence_committed ? this.formatedata(victim.offence_committed) : victim.offence_committed
+            scst_sections: victim.scst_sections ? victim.scst_sections : victim.scst_sections ,
+            offence_committed: victim.offence_committed ? victim.offence_committed : victim.offence_committed
           }));
           this.accusedsdata =data.queryResults2;
           this.reliefsdata =data.queryResults3;
