@@ -194,6 +194,9 @@ export class EditFirComponent implements OnInit, OnDestroy {
   uploadProceedings_2_preview: string;
   filePath_attachment: any;
   demo_proceeecing: any;
+  showOtherDesignation = false;
+  otherDesignation: string = ""; 
+  showRelief = false;
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -634,6 +637,19 @@ loadAccusedCommunities(): void {
       if (firId) {
         sessionStorage.setItem('firId', firId); // Save FIR ID to session storage
       }
+      this.initializeForm();
+      this.cdr.detectChanges();
+
+      const stepNumber = Number(params['step']);
+      if (stepNumber > 5) {
+        this.navigateToMainStep(stepNumber > 7 ? 3 : stepNumber - 4);
+      }
+      else{
+        this.navigateToStep(stepNumber);
+      }
+
+      console.log("Navigating to step:", stepNumber);
+
     });
 
 
@@ -646,7 +662,7 @@ loadAccusedCommunities(): void {
       this.clearSession();
     } 
     this.loadOptions();
-    this.loadOffenceActs();
+    // this.loadOffenceActs();
     // this.loadScstSections();
     this.generateYearOptions();
     // this.loadnativedistrict();
@@ -866,6 +882,17 @@ loadAccusedCommunities(): void {
       this.victimsRelief,
       getId
     );
+    selectedOffences.forEach((ele:any) => {
+      const selectedValue = ele.trim(); 
+      const validValues = ['Rape, etc., or unnatural Offences', 'Gang rape', 'Murder or Death'];
+    
+    if (validValues.includes(selectedValue)) {
+      this.showRelief = true;
+    }
+    else{
+      this.showRelief = false;
+    }
+    });
     this.cdr.detectChanges();
   }
 
@@ -3110,11 +3137,13 @@ console.log(selectedValue,"selectedValue")
       // If "Yes", make the deceased person names field required
       deceasedPersonNamesControl?.setValidators([Validators.required]);
       deceasedPersonNamesControl?.enable();
+      this.showRelief = true;
     } else {
       // If "No", reset and disable the deceased person names field
       deceasedPersonNamesControl?.clearValidators();
       deceasedPersonNamesControl?.reset();
       deceasedPersonNamesControl?.disable();
+      this.showRelief = false;
     }
 
     deceasedPersonNamesControl?.updateValueAndValidity();
@@ -5341,5 +5370,24 @@ resetPoliceFields() {
       }
     );
   }
+
+  getDesignation(event:any){
+    console.log(event.target.value);
+    const designationValue = event.target.value;
+    if(designationValue  == "Others"){
+      this.showOtherDesignation = true;
+    }
+    else{
+      this.showOtherDesignation = false;
+    }
+  }
+  
+  getDesignationName(event: any) {
+    this.otherDesignation = event.target.value;
+    // console.log(this.otherDesignation);
+    this.firForm.patchValue({ officerDesignation: `Others - ${this.otherDesignation}` });
+    // console.log(this.firForm.get('officerDesignation')?.value);
+  } 
+  
   
 }

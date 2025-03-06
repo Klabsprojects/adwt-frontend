@@ -116,6 +116,7 @@ export class AddFirComponent implements OnInit, OnDestroy {
   ];
   showOtherDesignation = false;
   otherDesignation: string = "";
+  showRelief = false;
   CaseHandledBy = [
     'Special Public Prosecutor',
     'Empanelled advocate',
@@ -176,7 +177,7 @@ i: number;
     this.initializeForm();
     this.firId = this.getFirIdFromSession(); // Get FIR ID from session storage
     this.loadOptions();
-    this.loadOffenceActs();
+    // this.loadOffenceActs();
     this.loadAccusedCommunities();
     // this.loadScstSections();
     this.generateYearOptions();
@@ -490,6 +491,18 @@ onOffenceCommittedChange(event: any, index: number): void {
     this.victimsRelief,
     getId
   );
+  selectedOffences.forEach((ele:any) => {
+    const selectedValue = ele.trim(); 
+    const validValues = ['Rape, etc., or unnatural Offences', 'Gang rape', 'Murder or Death'];
+  
+  if (validValues.includes(selectedValue)) {
+    this.showRelief = true;
+  }
+  else{
+    this.showRelief = false;
+  }
+  });
+  this.cdr.detectChanges();
   this.cdr.detectChanges();
 }
 
@@ -1711,11 +1724,13 @@ onIsDeceasedChangeOutside(): void {
     // If "Yes", make the deceased person names field required
     deceasedPersonNamesControl?.setValidators([Validators.required]);
     deceasedPersonNamesControl?.enable();
+    this.showRelief = true;
   } else {
     // If "No", reset and disable the deceased person names field
     deceasedPersonNamesControl?.clearValidators();
     deceasedPersonNamesControl?.reset();
     deceasedPersonNamesControl?.disable();
+    this.showRelief = false;
   }
 
   deceasedPersonNamesControl?.updateValueAndValidity();

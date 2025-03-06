@@ -831,27 +831,27 @@ console.log(this.firList,"loadfirst")
     this.filteredFirList();
   }
 
-  // Filtered FIR list based on search and filter criteria
   filteredFirList() {
-    const searchLower = this.searchText.toLowerCase();
-
-    // console.log(this.selectedDistrict,'this.selectedDistrict')
-    // console.log(this.selectedNatureOfOffence,'this.selectedNatureOfOffence')
-    // console.log(this.selectedStatusOfCase,'this.selectedStatusOfCase')
-    // console.log(this.selectedStatusOfRelief,'this.selectedStatusOfRelief')
-
+    const searchLower = this.searchText.trim().toLowerCase();
+  
     return this.firList.filter((fir) => {
-      // Apply search filter
       const matchesSearch =
-        fir.fir_id.toString().includes(searchLower) ||
-        (fir.police_city || '').toLowerCase().includes(searchLower) ||
-        (fir.police_station || '').toLowerCase().includes(searchLower);
-
-      // Apply dropdown filters
+      (fir.fir_id?.toString().toLowerCase() || '').includes(searchLower) ||
+      (fir.fir_number?.toString().toLowerCase() || '').includes(searchLower) ||
+      (fir.police_city || '').toLowerCase().includes(searchLower) ||
+      (fir.police_station || '').toLowerCase().includes(searchLower);
+  
       const matchesDistrict = this.selectedDistrict ? fir.police_city === this.selectedDistrict : true;
-      const matchesNatureOfOffence = this.selectedNatureOfOffence? fir.nature_of_offence === this.selectedNatureOfOffence: true;
+      const matchesNatureOfOffence = this.selectedNatureOfOffence ? fir.nature_of_offence === this.selectedNatureOfOffence : true;
       const matchesStatusOfCase = this.selectedStatusOfCase ? fir.relief_status == this.selectedStatusOfCase : true;
-      const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status == this.selectedStatusOfRelief : true;
+      // const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status == this.selectedStatusOfRelief : true;
+      const selectedStatus = Number(this.selectedStatusOfRelief);
+const matchesStatusOfRelief =
+  this.selectedStatusOfRelief !== null && this.selectedStatusOfRelief !== undefined
+    ? selectedStatus === 0
+      ? fir.status >= 0 && fir.status <= 5 // If selectedStatus is 0, match FIR status 0 to 5
+      : fir.status === selectedStatus // Otherwise, match exact value
+    : true; // If no filter is selected, return all results
 
       return (
         matchesSearch &&
@@ -862,6 +862,7 @@ console.log(this.firList,"loadfirst")
       );
     });
   }
+  
 
   clearfilter(){
     this.selectedDistrict = '';
@@ -870,8 +871,6 @@ console.log(this.firList,"loadfirst")
     this.selectedStatusOfRelief = '';
     this.applyFilters();
   }
-
-
 
   // Sorting logic
   sortTable(field: string) {
@@ -1009,8 +1008,9 @@ getStatusBadgeClass(status: number): string {
   //   this.router.navigate(['/widgets-examples/fir-view'], { queryParams: { fir_id: firId } });
   // }
 
-  openEditPage(firId: number) {
-    this.router.navigate(['/fir-edit-module'], { queryParams: { fir_id: firId } });
+  openEditPage(firId: number,step:number) {
+    this.router.navigate(['/fir-edit-module'], { queryParams: { fir_id: firId,step:step+1 } });
+    console.log(step,"step");
   }
 
   navigateToMistakeOfFact(firId: number) {

@@ -646,7 +646,7 @@
                 <input type="text" class="form-control text-end" formControlName="reliefAmountFirstStage" placeholder="₹ 100" readonly />
               </div>
             </div>
-            <div class="mb-4">
+            <div class="mb-4" *ngIf="showRelief">
               <label class="form-label d-block mb-2">
                 57. Eligible additional relief for the legal heir of the person died (Victim {{ i + 1 }}) *
               </label>

@@ -112,7 +112,7 @@
                     <!-- For status 0 to 7 -->
                     <ng-container *ngIf="fir.status >= 0 && fir.status <= 8">
                       <button ngbDropdownItem (click)="openModal(fir)">View</button>
-                      <button ngbDropdownItem (click)="openEditPage(fir.fir_id)">Edit</button>
+                      <button ngbDropdownItem (click)="openEditPage(fir.fir_id,fir.status)">Edit</button>
                       <button ngbDropdownItem (click)="navigateToAlteredCase(fir.fir_id)">Altered Case</button>
                       <button ngbDropdownItem (click)="deleteFIR(i, fir.fir_id)">Delete</button>
                     </ng-container>
