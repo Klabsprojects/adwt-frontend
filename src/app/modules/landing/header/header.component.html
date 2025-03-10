@@ -1,0 +1,45 @@
+<header class="header">
+  <div class="container">
+    <div class="logo-section">
+      <img src="assets/images/logo3.png" alt="Secondary Logo" class="logo small" />
+      <div class="divider"></div>
+      <h1 class="title">CMRF</h1>
+      <div class="extra-logos">
+        <a routerLink="/">
+          <img src="assets/images/logo1.png" alt="Primary Logo" class="logo large" />
+        </a>
+        <img src="assets/images/logo2.png" alt="Secondary Logo" class="logo medium" />
+      </div>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <nav class="nav-links desktop-only">
+      <a *ngFor="let item of menuItems" 
+         [routerLink]="item.isExternal ? null : item.to" 
+         [href]="item.isExternal ? item.to : null"
+         [class.active]="isActive(item.to)"
+         target="{{ item.isExternal ? '_blank' : '_self' }}">
+        {{ item.label }}
+      </a>
+    </nav>
+
+    <!-- Mobile Menu Button -->
+    <button class="menu-button mobile-only" (click)="toggleMenu()">
+      <span *ngIf="!isMenuOpen">&#9776;</span>  <!-- Hamburger Icon -->
+      <span *ngIf="isMenuOpen">&#10005;</span>  <!-- Close Icon -->
+    </button>
+  </div>
+
+  <!-- Mobile Navigation Menu -->
+  <div *ngIf="isMenuOpen" class="mobile-overlay" (click)="toggleMenu()"></div>
+  <div class="mobile-menu" [class.open]="isMenuOpen">
+    <a *ngFor="let item of menuItems" 
+       [routerLink]="item.isExternal ? null : item.to" 
+       [href]="item.isExternal ? item.to : null"
+       class="mobile-link"
+       (click)="toggleMenu()"
+       target="{{ item.isExternal ? '_blank' : '_self' }}">
+      {{ item.label }}
+    </a>
+  </div>
+</header>
