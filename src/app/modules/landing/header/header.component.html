@@ -1,45 +1,113 @@
 <header class="header">
-  <div class="container">
+  <div class="header-container">
     <div class="logo-section">
-      <img src="assets/images/logo3.png" alt="Secondary Logo" class="logo small" />
+      <img src="assets/images/image.png" alt="Secondary Logo" class="logo small" />
       <div class="divider"></div>
-      <h1 class="title">CMRF</h1>
-      <div class="extra-logos">
+      <div class="titles">
+        <h1 class="title sk">Samaththuvam Kaanbom</h1>
+        <h2 class="title adtw">Adi Dravidar and Tribal Welfare Department</h2>
+        <h3 class="title gov">Government of Tamil Nadu</h3>
+      </div>
+      <!-- <div class="extra-logos">
         <a routerLink="/">
           <img src="assets/images/logo1.png" alt="Primary Logo" class="logo large" />
         </a>
         <img src="assets/images/logo2.png" alt="Secondary Logo" class="logo medium" />
-      </div>
+      </div> -->
     </div>
 
     <!-- Desktop Navigation -->
     <nav class="nav-links desktop-only">
-      <a *ngFor="let item of menuItems" 
-         [routerLink]="item.isExternal ? null : item.to" 
-         [href]="item.isExternal ? item.to : null"
-         [class.active]="isActive(item.to)"
-         target="{{ item.isExternal ? '_blank' : '_self' }}">
-        {{ item.label }}
-      </a>
+      <ng-container *ngFor="let item of menuItems">
+        <!-- Normal links -->
+        <a *ngIf="item.label !== 'News & Events' && item.label !== 'Login'"
+           [routerLink]="item.isExternal ? null : item.to"
+           [href]="item.isExternal ? item.to : null"
+           class="nav-link"
+           target="{{ item.isExternal ? '_blank' : '_self' }}">
+          {{ item.label }}
+        </a>
+    
+        <!-- Dropdown for News & Events -->
+        <div class="dropdown nav-item" *ngIf="item.label === 'News & Events'">
+          <a href="#" class="nav-link dropdown-toggle"
+             id="newsDropdown"
+             role="button"
+             data-bs-toggle="dropdown">
+            News & Events
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">Gallery</a></li>
+            <li><a class="dropdown-item" href="#">Press Releases</a></li>
+          </ul>
+        </div>
+    
+        <!-- Login (Opens Modal) -->
+        <a *ngIf="item.label === 'Login'"
+           href="#"
+           class="nav-link" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          Login
+        </a>
+      </ng-container>
     </nav>
+
+
 
     <!-- Mobile Menu Button -->
     <button class="menu-button mobile-only" (click)="toggleMenu()">
-      <span *ngIf="!isMenuOpen">&#9776;</span>  <!-- Hamburger Icon -->
-      <span *ngIf="isMenuOpen">&#10005;</span>  <!-- Close Icon -->
+      <span *ngIf="!isMenuOpen">&#9776;</span> <!-- Hamburger Icon -->
+      <span *ngIf="isMenuOpen">&#10005;</span> <!-- Close Icon -->
     </button>
   </div>
 
   <!-- Mobile Navigation Menu -->
   <div *ngIf="isMenuOpen" class="mobile-overlay" (click)="toggleMenu()"></div>
   <div class="mobile-menu" [class.open]="isMenuOpen">
-    <a *ngFor="let item of menuItems" 
-       [routerLink]="item.isExternal ? null : item.to" 
-       [href]="item.isExternal ? item.to : null"
-       class="mobile-link"
-       (click)="toggleMenu()"
-       target="{{ item.isExternal ? '_blank' : '_self' }}">
-      {{ item.label }}
-    </a>
+    <ng-container *ngFor="let item of menuItems">
+      <!-- Normal links -->
+      <a *ngIf="item.label !== 'News & Events' && item.label !== 'Login'"
+         [routerLink]="item.isExternal ? null : item.to"
+         [href]="item.isExternal ? item.to : null"
+         class="mobile-link">
+        {{ item.label }}
+      </a>
+  
+      <!-- News & Events Dropdown -->
+      <div class="mobile-dropdown" *ngIf="item.label === 'News & Events'">
+        <a href="#" class="mobile-link dropdown-toggle"
+           (click)="toggleDropdown($event)">
+          News & Events
+        </a>
+        <ul class="dropdown-menu" [class.show]="isDropdownOpen">
+          <li><a class="dropdown-item" href="#">Gallery</a></li>
+          <li><a class="dropdown-item" href="#">Press Releases</a></li>
+        </ul>
+      </div>
+  
+      <!-- Login (Opens Modal) -->
+      <a *ngIf="item.label === 'Login'"
+         href="#"
+         role="button" class="mobile-link" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Login
+      </a>
+    </ng-container>
   </div>
 </header>
+
+<!-- Login Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1> -->
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <app-login (loginSuccess)="closeModal()"/>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+

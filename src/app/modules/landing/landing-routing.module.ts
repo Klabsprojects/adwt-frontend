@@ -5,6 +5,7 @@ import { HomeComponent } from './home/home.component';
 import { AboutComponent } from './about/about.component';
 import { DownloadsComponent } from './downloads/downloads.component';
 import { ContactComponent } from './contact/contact.component';
+import { POAComponent } from './poa/poa.component';
 
 const routes: Routes = [
   {
@@ -15,6 +16,7 @@ const routes: Routes = [
       { path: 'about', component: AboutComponent },
       { path: 'services', component: DownloadsComponent },
       { path: 'contact', component: ContactComponent },
+      { path: 'poa',component:POAComponent},
       { path: '**', redirectTo: '', pathMatch: 'full' }, // Redirect unknown paths to Home
     ],
   },

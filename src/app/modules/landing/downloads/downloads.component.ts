@@ -8,31 +8,52 @@ import { Component } from '@angular/core';
 export class DownloadsComponent {
   documents = [
     {
-      title: "G.O. (Ms). No.53 Higher Education (G1) Department Dated 27.02.2023",
+      title: "1. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act, 1989",
      
       fileType: "PDF",
-      downloadUrl: "assets/pdf/pdf3.pdf"
+      downloadUrl: "assets/pdf/1. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act, 1989.pdf"
     },
     {
-      title: "G.O. (Ms). No.56 Higher Education (G1) Department Dated 29.02.2024",
+      title: "2. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Act, 2015",
      
       
       fileType: "PDF",
-      downloadUrl: "assets/pdf/pdf2.pdf"
+      downloadUrl: "assets/pdf/2. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Act, 2015.pdf"
     },
     {
-      title: "G.O. (Ms). No.175 Higher Education (G1) Department Dated 30.09.2024",
+      title: "3. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Act, 2018",
      
 
       fileType: "PDF",
-      downloadUrl: "assets/pdf/pdf1.pdf"
+      downloadUrl: "assets/pdf/3. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Act, 2018.pdf"
     },
     {
-      title: "TRB Notification for CMRF Eligibility Test 2023 Dated 16.10.2023",
+      title: "4. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Rules, 1995",
      
 
       fileType: "PDF",
-      downloadUrl: "assets/pdf/pdf4.pdf"
+      downloadUrl: "assets/pdf/4. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Rules, 1995.pdf"
+    },
+    {
+      title: "5. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Rules, 2016",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/5. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Rules, 2016.pdf"
+    },
+    {
+      title: "6. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Rules, 2018",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/6. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Rules, 2018.pdf"
+    },
+    {
+      title: "7. Model Contingency Plan Tamil Nadu, 2017",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/7. Model Contingency Plan Tamil Nadu, 2017.pdf"
     }
   ];
   downloadPdf(pdfPath: string) {

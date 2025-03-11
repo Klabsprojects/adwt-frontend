@@ -8,7 +8,8 @@ import { DownloadsComponent } from './downloads/downloads.component';
 import { ContactComponent } from './contact/contact.component';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
-
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { AuthModule } from '../auth/auth.module';
 @NgModule({
   declarations: [
     LandingComponent,
@@ -19,6 +20,6 @@ import { FooterComponent } from './footer/footer.component';
     HeaderComponent,
     FooterComponent,
   ],
-  imports: [CommonModule, LandingRoutingModule],
+  imports: [CommonModule, LandingRoutingModule,NgbModule,AuthModule],
 })
 export class LandingModule {}
