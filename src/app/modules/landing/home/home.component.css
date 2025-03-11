@@ -135,6 +135,7 @@ h2{
   transition: all 0.3s ease-in-out;
   opacity: 1; 
   transform: none;
+  height: 100%;
 }
 .initiatives-box:hover {
   box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.2), 0 6px 8px -2px rgba(0, 0, 0, 0.1); /* Tailwind hover:shadow-xl */
