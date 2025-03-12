@@ -96,7 +96,7 @@ export class FirListComponent implements OnInit {
   reliefAmountFirstStage: string = ''; // Default: ₹20,000
   additionalRelief: string = ''; // Default: Text
 
-  totalCompensation: string = ''; // Default: ₹100,000
+  totalCompensation = 0; // Default: ₹100,000
   proceedingsFileNo: string = ''; // Default: Proceedings file number
   proceedingsDate: string = ''; // Default: YYYY-MM-DD
   proceedingsFile: string = ''; // Default: Text
@@ -477,7 +477,7 @@ export class FirListComponent implements OnInit {
   // funtions
   fetchFirDetails(firId:any): void {
 
-
+    this.totalCompensation = 0;
     console.log(firId)
     this.firService.getFirView(firId).subscribe(
       (data) => {
@@ -488,6 +488,13 @@ export class FirListComponent implements OnInit {
         } else {
           console.log(data.queryResults);
           this.victimsdata =data.queryResults1;
+
+          if(data && data.queryResults && data.queryResults.length > 0){
+            data.queryResults.map((victim : any) => {
+              this.totalCompensation = ((this.totalCompensation) + (victim.relief_amount_first_stage || 0));
+          })
+          }
+
           this.victimsdata = this.victimsdata.map((victim) => ({
             ...victim, // Keep all existing properties
             scst_sections: victim.scst_sections ? victim.scst_sections : victim.scst_sections ,
@@ -637,7 +644,7 @@ console.log( data.queryResults[0],"vire ")
           // this.reliefAmountExGratia=data.queryResults3[0].relief_amount_exgratia;
           // this.reliefAmountFirstStage=data.queryResults3[0].relief_amount_first_stage;
           // this.additionalRelief=data.queryResults[0].additional_relief;
-          this.totalCompensation=data.queryResults[0].total_amount_third_stage;
+          // this.totalCompensation=data.queryResults[0].total_amount_third_stage;
           this.proceedingsFileNo=data.queryResults[0].proceedings_file_no;
           this.proceedingsDate= data.queryResults[0].proceedings_date ? this.convertToNormalDate(data.queryResults[0].proceedings_date) : data.queryResults[0].proceedings_date;
           //need to check
