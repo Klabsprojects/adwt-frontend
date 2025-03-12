@@ -1,0 +1,248 @@
+/* Header Styles */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.mobile-only {
+  display: none;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo Section */
+.logo-section {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  object-fit: contain;
+}
+
+.logo.small {
+  height: 7.4rem;
+}
+
+.logo.large {
+  height: 5.5rem;
+}
+
+.logo.medium {
+  height: 3.2rem;
+}
+
+.divider {
+  width: 2px;
+  height: 90px;
+  background: #374151;
+  margin: 0 10px;
+}
+
+.titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.title {
+  /* font-size: 1.8rem; */
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+/* Enable hover dropdown */
+.nav-item:hover .dropdown-menu {
+  display: block;
+}
+
+/* Ensure proper positioning */
+.dropdown-menu {
+  margin-top: 0; /* Remove any unnecessary space */
+}
+
+
+/* Navigation */
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  font-size: 1.425rem;
+  font-weight: 500;
+  color: #374151;
+  position: relative;
+  transition: color 0.2s ease-in-out;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: teal;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: teal;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after {
+  transform: scaleX(1);
+}
+
+/* Mobile Menu */
+.menu-button {
+  font-size: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+/* Hide dropdown by default */
+.dropdown-menu {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  width: 130%;
+}
+
+/* Show dropdown when active */
+.dropdown-menu.show {
+  display: block;
+}
+
+/* Mobile link styling */
+.mobile-link {
+  display: block;
+  padding: 10px;
+  color: #333;
+  text-decoration: none;
+}
+
+/* Dropdown item styling */
+.dropdown-item {
+  padding: 8px 15px;
+  display: block;
+}
+
+
+
+@media (max-width:1201px) {
+  .logo.small {
+    height: 5.4rem;
+  }
+  .sk {
+    font-size: 1.3rem;
+  }
+
+  .adtw {
+    font-size: 1rem;
+  }
+
+  .gov {
+    font-size: 0.9rem;
+  }
+  .nav-links a{
+    font-size: 1.125rem;
+  }
+}
+
+/* Hide Desktop Menu on Mobile */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+}
+
+@media (max-width: 426px) {
+  .logo.small {
+    height: 3.4rem;
+  }
+
+  .title {
+    font-size: 1rem;
+  }
+
+  .logo.large {
+    height: 4.5rem;
+  }
+
+  .logo.medium {
+    height: 2.2rem;
+  }
+
+  .header-container {
+    padding: 0;
+  }
+
+  .header {
+    padding: 15px 5px;
+  }
+}
+
+/* Mobile Menu Styles */
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 900;
+}
+
+.mobile-menu {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 250px;
+  height: 100%;
+  background: white;
+  box-shadow: -4px 0 6px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+.mobile-menu.open {
+  transform: translateX(0);
+}
+
+.mobile-link {
+  display: block;
+  padding: 15px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  color: #374151;
+  border-bottom: 1px solid #ddd;
+}
+
+.mobile-link:hover {
+  background: #f4f4f4;
+  color: teal;
+}

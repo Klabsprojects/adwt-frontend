@@ -1,0 +1,107 @@
+<section class="home" style="margin-top: 9.5rem;">
+  <div class="row">
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+    
+      <!-- Indicators -->
+      <div class="carousel-indicators">
+        <button *ngFor="let slide of slides; let i = index"
+                type="button" 
+                data-bs-target="#carouselExampleIndicators"
+                [attr.data-bs-slide-to]="i"
+                [class.active]="i === 0"
+                [attr.aria-current]="i === 0 ? 'true' : null"
+                [attr.aria-label]="'Slide ' + (i + 1)">
+        </button>
+      </div>    
+  
+      <!-- Carousel Items -->
+      <div class="carousel-inner">
+        <ng-container *ngFor="let slide of slides; let i = index">
+          <div class="carousel-item" [class.active]="i === 0">
+            <img [src]="slide.url" class="d-block w-100" alt="Slide Image">
+            <div class="overlay"></div>
+          </div>
+        </ng-container>
+      </div>      
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2 px-4">
+      <video src="assets/videos/video1.mp4" class="d-block w-100 br-11" controls></video>
+    </div>
+    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 px-4">
+      <div class="row">
+        <ng-container *ngFor="let image of imageUrls; let i = index">
+          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2 px-2">
+            <img [src]="image" alt="" class="d-block w-100 br-11">
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-5 emerging-trends">
+    <h2>Emerging Trends</h2>
+    <div class="relative">
+      <div class="scroll-wrapper">
+        <div class="overflow-container-top">
+          <div class="scroll-content">
+            <ng-container *ngFor="let trend of trendData">
+              <div class="trend-box" [ngClass]="trend.color">
+                <p class="icon">{{trend.icon}}</p>
+                <h3 class="title">{{trend.title}}</h3>
+                <p class="description">{{trend.description}}</p>
+              </div>
+            </ng-container>
+            <!-- Duplicate content for seamless effect -->
+            <ng-container *ngFor="let trend of trendData">
+              <div class="trend-box" [ngClass]="trend.color">
+                <p class="icon">{{trend.icon}}</p>
+                <h3 class="title">{{trend.title}}</h3>
+                <p class="description">{{trend.description}}</p>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+      
+      <div class="scroll-wrapper">
+        <div class="overflow-container-bottom">
+          <div class="scroll-content">
+            <ng-container *ngFor="let trend of trendData">
+              <div class="trend-box" [ngClass]="trend.color">
+                <p class="icon">{{trend.icon}}</p>
+                <h3 class="title">{{trend.title}}</h3>
+                <p class="description">{{trend.description}}</p>
+              </div>
+            </ng-container>
+            <!-- Duplicate content for seamless effect -->
+            <ng-container *ngFor="let trend of trendData">
+              <div class="trend-box" [ngClass]="trend.color">
+                <p class="icon">{{trend.icon}}</p>
+                <h3 class="title">{{trend.title}}</h3>
+                <p class="description">{{trend.description}}</p>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+      
+      <div class="gradient-box-left"></div>
+      <div class="gradient-box-right"></div>
+    </div>
+  </div>
+  <div class="row intiatives">
+    <h2>Key Initiatives</h2>
+    <div class="row">
+      <ng-container *ngFor="let item of initiatives;let i=index">
+        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 px-3">
+          <div class="initiatives-box">
+            <p class="icon">{{item.icon}}</p>
+            <h3 class="title">{{item.title}}</h3>
+            <p class="description">{{item.description}}</p>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</section>

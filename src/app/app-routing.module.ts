@@ -4,6 +4,11 @@ import { AuthGuard } from './modules/auth/services/auth.guard';
 
 export const routes: Routes = [
   {
+    path: 'landing',
+    loadChildren: () =>
+      import('./modules/landing/landing.module').then((m) => m.LandingModule),
+  },
+  {
     path: 'auth',
     loadChildren: () =>
       import('./modules/auth/auth.module').then((m) => m.AuthModule),

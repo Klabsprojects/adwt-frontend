@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Subscription, Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
@@ -11,6 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit, OnDestroy {
+  @Output() loginSuccess = new EventEmitter<void>();
   defaultAuth: any = null; // Remove or set it to null
 
   loginForm: FormGroup;
@@ -120,7 +121,11 @@ export class LoginComponent implements OnInit, OnDestroy {
               this.router.navigate(['/dadtwo-dashboard']);
             } else {
               //console.log('Redirecting to main dashboard');
-              this.router.navigate(['/dashboard']);
+              // this.router.navigate(['/dashboard']);
+              setTimeout(() => {
+                this.loginSuccess.emit();  // Notify parent component
+                this.router.navigate(['/dashboard']);  // Redirect after login
+              }, 1000);
             }
           } else {
             // If the response does not contain the expected user data, show error
