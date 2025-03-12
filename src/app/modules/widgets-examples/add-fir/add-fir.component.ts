@@ -27,6 +27,7 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, FormsM
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { environment } from '../../../../environments/environment';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-add-fir',
@@ -51,7 +52,8 @@ export class AddFirComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
 
  
-
+  victimChangeSubscription: any;
+  complainantChangeSubscription: Subscription | undefined;
   remainingCharacters: number[] = [];
   showOtherGender: boolean[] = [];
   mainStep: number = 1;
@@ -156,6 +158,9 @@ export class AddFirComponent implements OnInit, OnDestroy {
   show95Onwards = false;
   show97Onwards = false;
 i: number;
+isStepOneModified = false;
+isStepTwoModified = false; 
+isStepThreeModified = false;
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -175,6 +180,9 @@ i: number;
     this.clearSession();
     //console.log('Session cleared on component initialization');
     this.initializeForm();
+    this.trackStepOneChanges();
+    this.trackStepTwoChanges();
+    this.trackStepThreeChanges();
     this.firId = this.getFirIdFromSession(); // Get FIR ID from session storage
     this.loadOptions();
     // this.loadOffenceActs();
@@ -539,39 +547,20 @@ onCaseTypeChange() {
     this.firForm.enable();
     const firData = {
       ...this.firForm.value,
-
-
     };
-    // this.firForm.disable();
-    console.log('Saving Step 1 data as draft:', firData);
-
     this.firService.handleStepOne(this.firId, firData).subscribe(
       (response: any) => {
-        //console.log('Response from backend after saving Step 1:', response);
-
-        // Save FIR ID to session storage
         this.firId = response.fir_id;
         if (this.firId) {
           sessionStorage.setItem('firId', this.firId);
-          //console.log('Saved FIR ID to session:', this.firId);
         }
-
         Swal.fire('Success', 'FIR saved as draft for step 1.', 'success');
       },
       (error) => {
-        //console.error('Error saving FIR for step 1:', error);
         Swal.fire('Error', 'Failed to save FIR as draft for step 1.', 'error');
       }
     );
   }
-
-
-
-
-
-
-
-
 
 // Method to save step 2 as draft
 saveStepTwoAsDraft() {
@@ -595,7 +584,6 @@ saveStepTwoAsDraft() {
       Swal.fire('Success', 'FIR saved as draft for step 2.', 'success');
     },
     (error) => {
-      //console.error('Error saving FIR for step 2:', error);
       Swal.fire('Error', 'Failed to save FIR as draft for step 2.', 'error');
     }
   );
@@ -739,10 +727,9 @@ onFileSelect_3(event: Event, controlName: string): void {
     if (district) {
       this.firService.getPoliceStations(district).subscribe(
         (stations: string[]) => {
-          // Format station names
           this.policeStations = stations.map(station =>
             station.replace(/\s+/g, '-')); // Replace spaces with "-"
-          this.firForm.get('stationName')?.setValue(''); // Reset selected station if district changes
+          // this.firForm.get('stationName')?.setValue(''); // Reset selected station if district changes
           this.cdr.detectChanges(); // Trigger UI update
         },
         (error) => {
@@ -825,8 +812,6 @@ onFileSelect_3(event: Event, controlName: string): void {
         numberOfVictims: [1, Validators.required],
       }),
       victims: this.fb.array([this.createVictimGroup()]),
-      // victims_1: this.fb.array([this.createVictimGroup()]),
-      // victims_2: this.fb.array([this.createVictimGroup()]),
       isDeceased: ['', Validators.required],
       deceasedPersonNames: [[]],
 
@@ -2601,18 +2586,28 @@ navigateToNextPage(): void {
 
 // Update the saveAsDraft() method to include Step 4
 saveAsDraft(): void {
-
-
   if (this.step === 1) {
-    this.saveStepOneAsDraft();
+    if (this.validateStepOne('draft')) {
+      this.saveStepOneAsDraft();
+    } else {
+      Swal.fire('Error', 'Please fill at least one field to save as draft.', 'error');
+    }
   } else if (this.step === 2) {
-    this.saveStepTwoAsDraft();
+    if (this.validateStepTwo('draft')) {
+      this.saveStepTwoAsDraft();
+    } else {
+      Swal.fire('Error', 'Please fill at least one field to save as draft.', 'error');
+    }
   } else if (this.step === 3) {
+    // if (this.validateStepThree('draft')) {
     this.saveStepThreeAsDraft();
+    // }else {
+    //   Swal.fire('Error', 'Please fill at least one field to save as draft.', 'error');
+    // }
   } else if (this.step === 4) {
     this.saveStepFourAsDraft();
   } else if (this.step === 5) {
-    this.saveStepFiveAsDraft(); // Calls Step 5 draft save without submission
+    this.saveStepFiveAsDraft();
   }
 }
 
@@ -3694,24 +3689,227 @@ resetFields(fields: string[]): void {
 
 
 
+// validateStepOne(): boolean {
+//   const stepOneFields = ['policeCity', 'policeZone', 'policeRange', 'revenueDistrict', 'stationName', 'officerName', 'officerDesignation', 'officerPhone'];
+//   let isValid = true;
+//   stepOneFields.forEach(field => {
+//     if (this.firForm.get(field)?.invalid) {
+//       this.firForm.get(field)?.markAsTouched();
+//       isValid = false;
+//     }
+//   });
+//   return isValid;
+// }
+
+validateStepOne(mode: 'next' | 'draft'): boolean {
+  const stepOneFields = ['policeCity', 'policeZone', 'policeRange', 'revenueDistrict', 'stationName', 'officerName', 'officerDesignation', 'officerPhone'];
+
+  if (mode === 'draft') {
+    return stepOneFields.some(field => {
+      const control = this.firForm.get(field);
+      return control && control.value !== null && control.value !== undefined && control.value !== '';
+    });
+  } else {
+    let isValid = true;
+    stepOneFields.forEach(field => {
+      if (this.firForm.get(field)?.invalid) {
+        this.firForm.get(field)?.markAsTouched();
+        isValid = false;
+      }
+    });
+    return isValid;
+  }
+}
+
+trackStepOneChanges() {
+  const stepOneFields = ['policeCity', 'policeZone', 'policeRange', 'revenueDistrict', 'stationName', 'officerName', 'officerDesignation', 'officerPhone'];
+
+  stepOneFields.forEach(field => {
+    this.firForm.get(field)?.valueChanges.subscribe(() => {
+      this.isStepOneModified = true;
+    });
+  });
+}
+
+validateStepTwo(mode: 'next' | 'draft'): boolean {
+  const stepOneFields = ['firNumber', 'firNumberSuffix', 'dateOfOccurrence', 'timeOfOccurrence', 'placeOfOccurrence', 'dateOfRegistration', 'timeOfRegistration'];
+
+  if (mode === 'draft') {
+    return stepOneFields.some(field => {
+      const control = this.firForm.get(field);
+      return control && control.value !== null && control.value !== undefined && control.value !== '';
+    });
+  } else {
+    let isValid = true;
+    stepOneFields.forEach(field => {
+      if (this.firForm.get(field)?.invalid) {
+        this.firForm.get(field)?.markAsTouched();
+        isValid = false;
+      }
+    });
+    return isValid;
+  }
+}
+
+trackStepTwoChanges() {
+  const stepOneFields = ['firNumber', 'firNumberSuffix', 'dateOfOccurrence', 'timeOfOccurrence', 'placeOfOccurrence', 'dateOfRegistration', 'timeOfRegistration'];
+
+  stepOneFields.forEach(field => {
+    this.firForm.get(field)?.valueChanges.subscribe(() => {
+      this.isStepTwoModified = true;
+    });
+  });
+}
+
+// validateStepThree(mode: 'next' | 'draft'): boolean {
+//   const victimArray = this.firForm.get('victims') as FormArray;
+//   console.log("victim array",victimArray);
+
+//   if (!victimArray || !(victimArray instanceof FormArray)) {
+//     return false; 
+//   }
+
+//   if (mode === 'draft') {
+//     return victimArray.controls.some(control => 
+//       Object.values(control.value).some(val => val !== null && val !== undefined && val !== '')
+//     );
+//   } else {
+//     let isValid = true;
+
+//     // Validate each victim
+//     victimArray.controls.forEach((control) => {
+//       if (control instanceof FormGroup) {
+//         Object.keys(control.controls).forEach(field => {
+//           const fieldControl = control.get(field);
+//           if (fieldControl?.invalid) {
+//             fieldControl.markAsTouched();
+//             isValid = false;
+//           }
+//         });
+//       }
+//     });
+
+//     return isValid;
+//   }
+// }
+
+validateStepThree(mode: 'next' | 'draft'): boolean {
+  const victimArray = this.firForm.get('victims') as FormArray;
+  const complainantDetails = this.firForm.get('complainantDetails') as FormGroup;
+
+  console.log("Victim Array:", victimArray);
+  console.log("Complainant Details:", complainantDetails);
+
+  if (!victimArray || !(victimArray instanceof FormArray) || !complainantDetails || !(complainantDetails instanceof FormGroup)) {
+    return false; // Ensure both are valid
+  }
+
+  if (mode === 'draft') {
+    // Check if at least one field in "victims" FormArray has a value
+    const hasVictimData = victimArray.controls.some(control =>
+      Object.values(control.value).some(val => val !== null && val !== undefined && val !== '')
+    );
+
+    // Check if at least one field in "complainantDetails" has a value
+    const hasComplainantData = Object.values(complainantDetails.value).some(val =>
+      val !== null && val !== undefined && val !== ''
+    );
+
+    return hasVictimData || hasComplainantData; // Allow draft if any field has a value
+  } else {
+    let isValid = true;
+
+    // Validate each victim in the "victims" FormArray
+    victimArray.controls.forEach((control) => {
+      if (control instanceof FormGroup) {
+        Object.keys(control.controls).forEach(field => {
+          const fieldControl = control.get(field);
+          if (fieldControl?.invalid) {
+            fieldControl.markAsTouched();
+            isValid = false;
+          }
+        });
+      }
+    });
+
+    // Validate each field in "complainantDetails"
+    Object.keys(complainantDetails.controls).forEach(field => {
+      const fieldControl = complainantDetails.get(field);
+      if (fieldControl?.invalid) {
+        fieldControl.markAsTouched();
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  }
+}
+
+trackStepThreeChanges() {
+  const victimArray = this.firForm.get('victims') as FormArray;
+  const complainantDetails = this.firForm.get('complainantDetails') as FormGroup;
+
+  if (!victimArray || !complainantDetails) {
+    return;
+  }
+
+  // Unsubscribe previous subscriptions to avoid duplicate listeners
+  if (this.victimChangeSubscription) {
+    this.victimChangeSubscription.forEach((sub:any) => sub.unsubscribe());
+  }
+  this.complainantChangeSubscription?.unsubscribe();
+
+  // Initialize subscription array
+  this.victimChangeSubscription = [];
+
+  // Track changes for each victim field individually
+  victimArray.controls.forEach((control, index) => {
+    if (control instanceof FormGroup) {
+      Object.keys(control.controls).forEach(field => {
+        const sub = control.get(field)?.valueChanges.subscribe(() => {
+          console.log(`Victim ${index} - Field ${field} changed`);
+          this.isStepThreeModified = true;
+        });
+        this.victimChangeSubscription.push(sub);
+      });
+    }
+  });
+
+  // Track changes in complainantDetails FormGroup
+  this.complainantChangeSubscription = complainantDetails.valueChanges.subscribe(() => {
+    console.log(`ComplainantDetails changed`);
+    this.isStepThreeModified = true;
+  });
+}
 
 
 
 nextStep(): void {
-  this.nextButtonClicked = true; // Indicate 'Next' button clicked
-
-  // Check if the current step is valid before moving to the next
+  this.nextButtonClicked = true; 
   if (this.step === 1 ) {
-    this.saveStepOneAsDraft();
-    this.updateFirStatus(1); // Update status for step 1
+    if (!this.validateStepOne('next')) {
+      Swal.fire('Error', 'Please fill in all required fields before proceeding.', 'error');
+      return;
+    }
+    if (this.isStepOneModified) {
+      this.saveStepOneAsDraft();
+      this.updateFirStatus(1);
+      this.isStepOneModified = false;
+    }
     this.step++;
   } else if (this.step === 2 && this.isStep2Valid()) {
+    if (this.isStepTwoModified) {
     this.saveStepTwoAsDraft();
-    this.updateFirStatus(2); // Update status for step 2
+    this.updateFirStatus(2);
+    this.isStepTwoModified = false;
+    }
     this.step++;
   } else if (this.step === 3 && this.isStep3Valid()) {
+    if (this.isStepThreeModified) {
     this.saveStepThreeAsDraft();
-    this.updateFirStatus(3); // Update status for step 3
+    this.updateFirStatus(3);
+    this.isStepThreeModified = false;
+    }
     this.step++;
   } else if (this.step === 4 && this.isStep4Valid()) {
     this.saveStepFourAsDraft();
@@ -3740,7 +3938,6 @@ updateFirStatus(status: number): void {
   if (this.firId) {
     this.firService.updateFirStatus(this.firId, status).subscribe(
       (response: any) => {
-        //console.log('FIR status updated to:', status);
       },
       (error) => {
         //console.error('Error updating FIR status:', error);
@@ -3839,9 +4036,11 @@ isSubmitButtonEnabled(): boolean {
   previousStep() {
     if (this.step > 1) {
       this.step--; 
+      console.log("if");
     } else if (this.mainStep > 1 && this.step === 1) {
       this.mainStep--;
       this.step = this.getLastStepOfMainStep(this.mainStep);
+      console.log("else");
     }
     this.cdr.detectChanges(); 
   }

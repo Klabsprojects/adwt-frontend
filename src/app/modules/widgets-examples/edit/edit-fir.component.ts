@@ -29,6 +29,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { environment } from '../../../../environments/environment';
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { auditTime, distinctUntilChanged, skip } from 'rxjs';
 
 
 declare var $: any;
@@ -197,6 +198,12 @@ export class EditFirComponent implements OnInit, OnDestroy {
   showOtherDesignation = false;
   otherDesignation: string = ""; 
   showRelief = false;
+  otherDesignationValue: string = "";
+  isStepOneModified:boolean=false;
+  isStepTwoModified:boolean=false;
+  isStepThreeModified:boolean = false;
+  isStepFourModified:boolean = false;
+  isStepFiveModified:boolean = false;
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -638,7 +645,12 @@ loadAccusedCommunities(): void {
         sessionStorage.setItem('firId', firId); // Save FIR ID to session storage
       }
       this.initializeForm();
-      this.cdr.detectChanges();
+      this.trackStepOneChanges();
+      this.trackStepTwoChanges();
+      this.trackStepThreeChanges();
+      this.trackStepFourChanges();
+      this.trackStepFiveChanges();
+      // this.cdr.detectChanges();
 
       const stepNumber = Number(params['step']);
       if (stepNumber > 5) {
@@ -652,10 +664,10 @@ loadAccusedCommunities(): void {
 
     });
 
-
+   
 
     this.generateVictimCount();  
-    this.initializeForm();
+    // this.initializeForm();
     this.firId = this.getFirIdFromSession(); // Get FIR ID from session storage 
     if(!this.firId)
     { 
@@ -679,7 +691,6 @@ loadAccusedCommunities(): void {
     this.updateValidationForCaseType(); 
     this.loadAllOffenceReliefDetails();
     if (this.firId) {
-      console.log("aaaaaaaaaaaaaaaaaaaaaaa",this.firId)
       this.loadFirDetails(this.firId);
       this.loadVictimsReliefDetails();
       //console.log(`Using existing FIR ID: ${this.firId}`);
@@ -779,9 +790,7 @@ loadAccusedCommunities(): void {
     this.victimCountArray = Array.from({ length: 50 }, (_, i) => i + 1);
   }
 
-
-
-  // Dynamically adjust validators based on caseType
+ // Dynamically adjust validators based on caseType
   updateValidationForCaseType() {
     const caseType = this.firForm.get('caseType')?.value;
 
@@ -859,7 +868,6 @@ loadAccusedCommunities(): void {
     this.firService.getOffenceReliefDetails().subscribe(
       (offence_relief: any[]) => {
         this.offenceReliefDetails = offence_relief; // Store data
-        console.log('Offence Relief Details:', this.offenceReliefDetails);
       },
       (error) => {
         console.error('Error loading districts:', error);
@@ -898,14 +906,10 @@ loadAccusedCommunities(): void {
 
   selectedCourtName: string = '';
   onCourtDivisionChange1(value: any): void {
-    console.log(value, "dadadada");
-
     if (value) {
       this.firService.getCourtRangesByDivision(value).subscribe(
         (ranges: string[]) => {
           this.courtRanges = ranges; // Populate court range options based on division
-          console.log(this.courtRanges, "xa");
-
           // Check if the selected court name exists in the fetched court ranges
           if (this.selectedCourtName && this.courtRanges.includes(this.selectedCourtName)) {
             // Set the court name value in the form
@@ -949,7 +953,7 @@ loadAccusedCommunities(): void {
     this.firService.getFirDetails(firId).subscribe(
       (response) => {
 
-        console.log("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",response);
+        console.log("response",response);
 
         this.showDuplicateSection = false;
         this.showDuplicateSection_1 = false;
@@ -1223,16 +1227,6 @@ console.log(hearingDetailsControl,"hearingDetailsControl")
         if(response.data.police_city){
           this.firForm.get('policeCity')?.setValue(response.data.police_city);
         }
-        const preFilledDistrict = this.firForm.get('policeCity')?.value; // Get pre-filled district
-        if (preFilledDistrict) {
-          this.populatePoliceDivisionDetails(preFilledDistrict);
-          this.loadPoliceStations(preFilledDistrict,response.data.police_station); 
-        }
-
-        this.firForm.get('policeCity')?.valueChanges.subscribe((district) => {
-          this.loadPoliceStations(district,'');
-        });
-
         if(response.data.police_range){
           this.firForm.get('policeRange')?.setValue(response.data.police_range); 
         }
@@ -1242,9 +1236,10 @@ console.log(hearingDetailsControl,"hearingDetailsControl")
         if(response.data.revenue_district){
           this.firForm.get('revenueDistrict')?.setValue(response.data.revenue_district); 
         }
-        // if(response.data.police_station){
-        //   this.firForm.get('stationName')?.setValue(response.data.police_station); 
-        // }
+        if(response.data.police_station){
+          console.log(response.data.police_station);
+          this.firForm.get('stationName')?.setValue(response.data.police_station); 
+        }
         if(response.data.officer_name){
           this.firForm.get('officerName')?.setValue(response.data.officer_name); 
         }
@@ -2204,13 +2199,17 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
     if (district) {
         this.firService.getPoliceStations(district).subscribe(
             (stations: string[]) => {
+              this.policeStations = stations.map(station =>
+                station.replace(/\s+/g, '-')); 
               if(stations){
                 this.policeStations = stations;
-                console.log(this.policeStations,'assssssssssssssssssssssssssssssssssssssssssssss')
-                console.log(station_name)
-                if(station_name){
-                  this.firForm.get('stationName')?.setValue(station_name);
+                if(station_name) {
+                  const station = this.policeStations.find(ele => ele === station_name);
+                  if (station) {
+                    this.firForm.get('stationName')?.setValue(station_name);
+                  }
                 }
+                
               }
             },
             (error) => {
@@ -2318,6 +2317,7 @@ onAccusedAgeChange(index: number): void {
 
       // Charge Sheet Details
       chargeSheetFiled: ['', Validators.required],
+      courtDistrict:['',Validators.required],
       courtDivision: ['', Validators.required],
       courtName: ['', Validators.required],
       caseNumber: ['', Validators.required],
@@ -2430,9 +2430,6 @@ onAccusedAgeChange(index: number): void {
     this.onNumberOfVictimsChange();
     this.onNumberOfAccusedChange();
     this.populateVictimsRelief([]);
-
-    console.log(this.firForm.value,"firrrrrrrrrrrrrrrrrrrrrr");
-
   }
 
   show94BAnd94C = false;
@@ -2456,7 +2453,6 @@ uploadedImageSrc: any | ArrayBuffer;
 
     this.firService.getVictimsReliefDetails(this.firId).subscribe(
       (response: any) => {
-        console.log('Victim Relief Details 1:', response.victimsReliefDetails); // Log response data
         if (response && response.victimsReliefDetails) {
           this.populateVictimsRelief(response.victimsReliefDetails);
         } else {
@@ -2478,11 +2474,9 @@ uploadedImageSrc: any | ArrayBuffer;
 
     this.firService.getVictimsReliefDetails(this.firId).subscribe(
       (response: any) => {
-        console.log('Victim Relief Details 2:', response.victimsReliefDetails);
         this.numberOfVictims = response.numberOfVictims;
         this.victimNames = response.victimNames;
           this.victimsReliefDetails = response.victimsReliefDetails;
-          console.log("Victime Data" , this.victimsReliefDetails);
           // Initialize victimsRelief array based on the number of victims
         // this.populateVictimsRelief();
       },
@@ -2605,8 +2599,6 @@ uploadedImageSrc: any | ArrayBuffer;
 
   onDesignatedCourtChange_one_fromapi() {
     const selectedValue = this.firForm.get('judgementDetails_one.designatedCourt_one')?.value;
-
-console.log(selectedValue,"selectedValue")
     this.showDuplicateSection_1 = selectedValue === 'highCourt_one' || selectedValue === 'supremeCourt'; 
   }
   onDesignatedCourtChange_one(event: Event): void {
@@ -2975,7 +2967,6 @@ console.log(selectedValue,"selectedValue")
       const additionalRelief = victimReliefDetail.additional_relief
         ? JSON.parse(victimReliefDetail.additional_relief)
         : [];
-      console.log("v details", victimReliefDetail);
    
       const reliefAmountFirstStage = (
         (parseFloat(victimReliefDetail.fir_stage_as_per_act || '0') || 0) + 
@@ -3013,7 +3004,7 @@ console.log(selectedValue,"selectedValue")
         reliefAmountThirdStage: [reliefAmountThirdStage.toFixed(2)], 
         additionalRelief: [additionalRelief]
       });
-      console.log("amount data", victimGroup);
+      
   
       victimsReliefArray.push(victimGroup);
     });
@@ -3381,7 +3372,6 @@ console.log(victimReliefDetail,"cretaieg")
   loadPoliceDivisionDetails() {
     this.firServiceAPI.getPoliceDivisionedit().subscribe(
       (data: any) => {
-        console.log(data,"policeCities")
         this.policeCities = data.district_division_name || [];
         this.policeZones = data.police_zone_name || [];
         this.policeRanges = data.police_range_name || [];
@@ -3401,8 +3391,6 @@ console.log(victimReliefDetail,"cretaieg")
           // this.police_Cities_data =data;
   
           this.policeCities = data.map((item: any) => item.district_division_name);
-  
-          console.log( data)
           this.policeZones = data.map((item: any) => item.police_zone_name);
           this.policeRanges = data.map((item: any) => item.police_range_name);
           this.revenueDistricts = data.map((item: any) => item.revenue_district_name);
@@ -4776,17 +4764,8 @@ attachment:this.attachments_2.value
   isStep1Valid(): boolean {
     const controls = [
       'policeCity',
-      'policeZone',
-      'policeRange',
-      'revenueDistrict',
-      // 'alphabetSelection',
-      // 'stationNumber',
       'stationName',
-
-
-
     ];
-
     return controls.every((controlName) => this.firForm.get(controlName)?.valid === true);
   }
 
@@ -4826,77 +4805,7 @@ attachment:this.attachments_2.value
     return Boolean(isComplainantValid && victimsValid && isDeceasedValid);
   }
 
-
-  nextStep(): void {
-    this.nextButtonClicked = true; // Indicate 'Next' button clicked
-
-    // Check if the current step is valid before moving to the next
-    if (this.step === 1 && this.isStep1Valid()) {
-      this.saveStepOneAsDraft();
-      this.updateFirStatus(1); // Update status for step 1
-      this.step++;
-    } else if (this.step === 2 && this.isStep2Valid()) {
-      this.saveStepTwoAsDraft();
-      this.updateFirStatus(2); // Update status for step 2
-      this.step++;
-    } else if (this.step === 3 && this.isStep3Valid()) {
-      this.saveStepThreeAsDraft();
-      this.updateFirStatus(3); // Update status for step 3
-      this.step++;
-    } else if (this.step === 4 && this.isStep4Valid()) {
-      this.saveStepFourAsDraft();
-      this.updateFirStatus(4); // Update status for step 4
-      this.step++;
-    } else if (this.step === 5 && this.isSubmitButtonEnabled()) {
-      this.submitStepFive(); // Final submission for Step 5
-      this.updateFirStatus(5); // Update status for step 5 on submission
-    } else {
-      // Show an error message if the required fields are not filled
-      Swal.fire('Error', 'Please fill in all required fields before proceeding.', 'error');
-    }
-
-    this.nextButtonClicked = false; // Reset the flag after navigation
-  }
-
-
-
-
-
-  // Method to update FIR status
-  updateFirStatus(status: number): void {
-    if (this.firId) {
-      this.firService.updateFirStatus(this.firId, status).subscribe(
-        (response: any) => {
-          // console.log('FIR status updated to:', status);
-        },
-        (error) => {
-          console.error('Error updating FIR status:', error);
-          Swal.fire('Error', 'Failed to update FIR status.', 'error');
-        }
-      );
-    }
-  }
-
-
-
-  navigateToStep(stepNumber: number): void {
-    this.step = stepNumber; // Update the current step
-    this.cdr.detectChanges(); // Trigger UI update
-  }
-
-
-
-  // isStep4Valid(): boolean {
-  //   const numberOfAccusedValid = !!this.firForm.get('numberOfAccused')?.valid;
-  //   const accusedsArray = this.firForm.get('accuseds') as FormArray;
-
-  //   // Check if all accused form groups are valid
-  //   const accusedsValid = accusedsArray.controls.every((accusedGroup) => !!accusedGroup.valid);
-
-  //   // Return true only if both conditions are satisfied
-  //   return numberOfAccusedValid && accusedsValid;
-  // }
-
+  
   isStep4Valid(): boolean {
     const numberOfAccusedControl = this.firForm.get('numberOfAccused');
     const accusedsArray = this.firForm.get('accuseds') as FormArray;
@@ -4948,42 +4857,6 @@ attachment:this.attachments_2.value
     return isValid;
   }
   
-
-  // isStep5Valid(): boolean {
-  //   const victimsReliefArray = this.victimsRelief as FormArray;
-
-  //   // Helper function to check validity of each control, even if disabled
-  //   const checkAllControlsValid = (group: FormGroup): boolean => {
-  //     return Object.keys(group.controls).every((controlName) => {
-  //       const control = group.get(controlName);
-  //       return control?.disabled || control?.valid; // Allow disabled fields to be considered valid
-  //     });
-  //   };
-
-  //   // Validate each FormGroup in victimsRelief array using the helper function
-  //   const victimsReliefValid = victimsReliefArray.controls.every((reliefGroup) =>
-  //     checkAllControlsValid(reliefGroup as FormGroup)
-  //   );
-
-  //   // Additional fields validation
-  //   const isTotalCompensationValid = this.firForm.get('totalCompensation')?.valid || false;
-  //   const isProceedingsFileNoValid = this.firForm.get('proceedingsFileNo')?.valid || false;
-  //   const isProceedingsDateValid = this.firForm.get('proceedingsDate')?.valid || false;
-  //   const isProceedingsFileValid = this.firForm.get('proceedingsFile')?.valid || false;
-  //   const areAttachmentsValid = this.attachmentss_1.valid;
-
-  //   // Ensure all conditions are true before enabling the button
-  //   return (
-  //     victimsReliefValid &&
-  //     isTotalCompensationValid &&
-  //     isProceedingsFileNoValid &&
-  //     isProceedingsDateValid &&
-  //     isProceedingsFileValid &&
-  //     areAttachmentsValid
-  //   );
-  // }
-
-
   isStep5Valid(): boolean {
     const mandatoryFields = ['proceedingsFileNo', 'proceedingsDate'];
   
@@ -5023,8 +4896,225 @@ attachment:this.attachments_2.value
   isSubmitButtonEnabled(): boolean {
     return this.isStep5Valid();
   }
+
+  trackStepOneChanges() {
+    const stepOneFields = ['policeCity', 'policeZone', 'policeRange', 'revenueDistrict', 'stationName', 'officerName', 'officerDesignation', 'officerPhone'];
+
+    stepOneFields.forEach(field => {
+      this.firForm.get(field)?.valueChanges.pipe(skip(1),distinctUntilChanged()).subscribe(() => {
+        this.isStepOneModified = true;
+        console.log(`Step 1 field changed: ${field}`);
+      });
+    });
+  }
+
+  trackStepTwoChanges() {
+    const stepOneFields = ['firNumber', 'firNumberSuffix', 'dateOfOccurrence', 'timeOfOccurrence', 'placeOfOccurrence', 'dateOfRegistration', 'timeOfRegistration'];
+  
+    stepOneFields.forEach(field => {
+      this.firForm.get(field)?.valueChanges.pipe(skip(1),distinctUntilChanged()).subscribe(() => {
+        this.isStepTwoModified = true;
+        console.log(`Step 2 field changed: ${field}`);
+      });
+    });
+  }
+
+
+  trackStepThreeChanges() {
+    const complainantFields = ['nameOfComplainant', 'mobileNumberOfComplainant', 'isVictimSameAsComplainant', 'numberOfVictims'];
+  
+    complainantFields.forEach(field => {
+      this.firForm.get(`complainantDetails.${field}`)?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
+        this.isStepThreeModified = true;
+        console.log(`Step 3 field changed: ${field}`);
+      });
+    });
+  
+    const otherFields = ['isDeceased', 'deceasedPersonNames'];
+    otherFields.forEach(field => {
+      this.firForm.get(field)?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
+        this.isStepThreeModified = true;
+        console.log(`Step 3 field changed: ${field}`);
+      });
+    });
+  
+    // Delay tracking changes to avoid initial triggers
+    setTimeout(() => {
+      this.firForm.get('victims')?.valueChanges.pipe(
+        skip(1), 
+        auditTime(500), // Ignores rapid consecutive changes
+        distinctUntilChanged()
+      ).subscribe(() => {
+        this.isStepThreeModified = true;
+        console.log('Victims array modified');
+      });
+    }, 500); // Wait for the form to stabilize before tracking
+  }
   
 
+trackStepFourChanges() {
+  this.firForm.get('numberOfAccused')?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
+    this.isStepFourModified = true;
+    console.log('Step 4 field changed: numberOfAccused');
+  });
+
+  this.firForm.get('accuseds')?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
+    this.isStepFourModified = true;
+    console.log('Step 4 accuseds array modified');
+  });
+}
+
+trackStepFiveChanges() {
+  const reliefFields = [
+    'reliefAmountScst',
+    'reliefAmountExGratia',
+    'reliefAmountFirstStage',
+    'reliefAmountSecondStage',
+    'totalCompensation',
+    'additionalRelief'
+  ];
+
+  reliefFields.forEach(field => {
+    this.firForm.get(field)?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
+      this.isStepFiveModified = true;
+      console.log(`Step 5 field changed: ${field}`);
+    });
+  });
+
+  // Delay tracking changes in victimsRelief array to prevent initial form load trigger
+  setTimeout(() => {
+    this.firForm.get('victimsRelief')?.valueChanges.pipe(
+      skip(1), 
+      auditTime(500), // Ignores rapid consecutive changes
+      distinctUntilChanged()
+    ).subscribe(() => {
+      this.isStepFiveModified = true;
+      console.log('VictimsRelief array modified');
+    });
+  }, 500); // Wait to prevent initialization trigger
+}
+
+
+
+  nextStep(): void {
+    this.nextButtonClicked = true; 
+    if (this.step === 1 && this.isStep1Valid()) {
+      if (this.isStepOneModified === true) { 
+        this.saveStepOneAsDraft();
+        this.updateFirStatus(1);
+        this.isStepOneModified = false;
+      }
+      this.step++;
+    } else if (this.step === 2 && this.isStep2Valid()) {
+      if (this.isStepTwoModified == true) {
+        this.saveStepTwoAsDraft();
+        this.updateFirStatus(2);
+        this.isStepTwoModified = false;
+      }
+      this.step++;
+    } else if (this.step === 3 && this.isStep3Valid()) {
+      if (this.isStepThreeModified == true) {
+      this.saveStepThreeAsDraft();
+      this.updateFirStatus(3); 
+      this.isStepThreeModified = false;
+      }
+      this.step++;
+    } else if (this.step === 4 && this.isStep4Valid()) {
+      if(this.isStepFourModified == true){
+        this.saveStepFourAsDraft();
+        this.updateFirStatus(4); 
+        this.isStepFourModified = false;
+      }
+      this.step++;
+    } else if (this.step === 5 && this.isSubmitButtonEnabled()) {
+      if(this.isStepFiveModified == true){
+      this.submitStepFive(); // Final submission for Step 5
+      this.updateFirStatus(5); // Update status for step 5 on submission
+      this.isStepFiveModified = false;
+      }
+    } else {
+      Swal.fire('Error', 'Please fill in all required fields before proceeding.', 'error');
+    }
+
+    this.nextButtonClicked = false; // Reset the flag after navigation
+  }
+
+
+
+
+
+  // Method to update FIR status
+  updateFirStatus(status: number): void {
+    if (this.firId) {
+      this.firService.updateFirStatus(this.firId, status).subscribe(
+        (response: any) => {
+          // console.log('FIR status updated to:', status);
+        },
+        (error) => {
+          console.error('Error updating FIR status:', error);
+          Swal.fire('Error', 'Failed to update FIR status.', 'error');
+        }
+      );
+    }
+  }
+
+
+
+  navigateToStep(stepNumber: number): void {
+    this.step = stepNumber; // Update the current step
+    this.cdr.detectChanges(); // Trigger UI update
+  }
+
+
+
+  // isStep4Valid(): boolean {
+  //   const numberOfAccusedValid = !!this.firForm.get('numberOfAccused')?.valid;
+  //   const accusedsArray = this.firForm.get('accuseds') as FormArray;
+
+  //   // Check if all accused form groups are valid
+  //   const accusedsValid = accusedsArray.controls.every((accusedGroup) => !!accusedGroup.valid);
+
+  //   // Return true only if both conditions are satisfied
+  //   return numberOfAccusedValid && accusedsValid;
+  // }
+
+
+  // isStep5Valid(): boolean {
+  //   const victimsReliefArray = this.victimsRelief as FormArray;
+
+  //   // Helper function to check validity of each control, even if disabled
+  //   const checkAllControlsValid = (group: FormGroup): boolean => {
+  //     return Object.keys(group.controls).every((controlName) => {
+  //       const control = group.get(controlName);
+  //       return control?.disabled || control?.valid; // Allow disabled fields to be considered valid
+  //     });
+  //   };
+
+  //   // Validate each FormGroup in victimsRelief array using the helper function
+  //   const victimsReliefValid = victimsReliefArray.controls.every((reliefGroup) =>
+  //     checkAllControlsValid(reliefGroup as FormGroup)
+  //   );
+
+  //   // Additional fields validation
+  //   const isTotalCompensationValid = this.firForm.get('totalCompensation')?.valid || false;
+  //   const isProceedingsFileNoValid = this.firForm.get('proceedingsFileNo')?.valid || false;
+  //   const isProceedingsDateValid = this.firForm.get('proceedingsDate')?.valid || false;
+  //   const isProceedingsFileValid = this.firForm.get('proceedingsFile')?.valid || false;
+  //   const areAttachmentsValid = this.attachmentss_1.valid;
+
+  //   // Ensure all conditions are true before enabling the button
+  //   return (
+  //     victimsReliefValid &&
+  //     isTotalCompensationValid &&
+  //     isProceedingsFileNoValid &&
+  //     isProceedingsDateValid &&
+  //     isProceedingsFileValid &&
+  //     areAttachmentsValid
+  //   );
+  // }
+
+
+ 
 
   previousStep() {
     if (this.step > 1) {
@@ -5126,11 +5216,9 @@ attachment:this.attachments_2.value
     
     // If no valid files remain, stop execution
     if (validFiles.length === 0) return [];
-    console.log(files,"filefile")
   
     // Upload each valid file
     const uploadPromises = validFiles.map(file => this.uploadFile(file));
-  console.log(uploadPromises,"dskjdskdjsds")
     return Promise.all(uploadPromises);
   }
 
@@ -5345,8 +5433,6 @@ resetPoliceFields() {
     this.firService.getPoliceDivision(district).subscribe(
       (data: any) => {
         // this.policeCities = [district];
-
-        console.log(data,"this.policeCities")
         this.policeZones = data.map((item: any) => item.police_zone_name);
         this.policeRanges = data.map((item: any) => item.police_range_name);
         this.revenueDistricts = data.map((item: any) => item.revenue_district_name);

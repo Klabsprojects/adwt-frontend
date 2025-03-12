@@ -49,17 +49,18 @@
         <form [formGroup]="firForm" enctype="multipart/form-data">
             <!-- Step 1: Basic Information -->
             <div *ngIf="mainStep === 1 && step === 1" class="form-step">
-                <!-- <h3 class="mb-4">Basic Information</h3> -->
-
                 <div class="location-details mb-4">
-                    <h5>Location Details</h5>
-                    <div class="row">
+                    <h3 class="pb-5">Location Details</h3>
+                    <div class="row mb-2">
                         <div class="col-md-6 col-lg-3 mb-3">
                             <label for="policeCity" class="form-label">1. Police City / District *</label>
                             <select id="policeCity" class="form-select" formControlName="policeCity" (change)="onCityChange($event)" required>
                                 <option value="" disabled>Select one</option>
                                 <option *ngFor="let city of police_Cities_data" [value]="city">{{ city }}</option>
                             </select>
+                            <small class="text-danger" *ngIf="firForm.get('policeCity')?.invalid && firForm.get('policeCity')?.touched">
+                              Please Select Police City / District.
+                            </small>
                         </div>
 
                         <div class="col-md-6 col-lg-3 mb-3">
@@ -87,38 +88,24 @@
                         </div>
 
                         <div class="col-md-6 mb-3">
-
-                              <label for="stationName" class="form-label">5. Police Station Name *</label>
-                              <select
-                                id="stationName"
-                                class="form-select"
-                                formControlName="stationName"
-                                required
-                              >
+                            <label for="stationName" class="form-label">5. Police Station Name *</label>
+                              <select id="stationName" class="form-select" formControlName="stationName" required>
                                 <option value="" disabled>Select Police Station</option>
                                 <option *ngFor="let station of policeStations" [value]="station">{{ station }}</option>
                               </select>
 
-
-
-
-                        </div>
+                              <small class="text-danger" *ngIf="firForm.get('stationName')?.invalid && firForm.get('stationName')?.touched">
+                                Please enter station name.
+                              </small>
+                          </div>
                     </div>
 
                     <div class="row">
-                      <h5>Investigating Officer Details</h5>
-                      <!-- Name of the Investigating Officer -->
+                      <h3 class="pt-5 pb-3">Investigating Officer Details</h3>
                       <div class="col-md-6 col-lg-4 mb-3">
                         <label for="officerName" class="form-label">6. Name of the Investigating Officer (IO)*</label>
-                        <input
-                          id="officerName"
-                          type="text"
-                          class="form-control"
-                          formControlName="officerName"
-                          placeholder="Enter Officer Name"
-                          (keypress)="allowOnlyLetters($event)"
-                          required
-                        />
+                        <input id="officerName" type="text" class="form-control" formControlName="officerName"
+                        placeholder="Enter Officer Name" (keypress)="allowOnlyLetters($event)" required/>
                         <small class="text-danger" *ngIf="firForm.get('officerName')?.invalid && firForm.get('officerName')?.touched">
                           Please enter a valid name.
                         </small>
@@ -142,47 +129,25 @@
 
                       <div class="col-md-6 col-lg-4 mb-3" *ngIf="showOtherDesignation">
                         <label for="officerPhone" class="form-label">7a. Designation Name</label>
-                        <input  id="otherDesignation" type="text" class="form-control" placeholder="Enter Designation Name" (input)="getDesignationName($event)" />
+                        <input  type="text" class="form-control" [value]="otherDesignation" placeholder="Enter Designation Name" (input)="getDesignationName($event)" />
                       </div>
 
 
                       <!-- Phone Number of the Investigating Officer -->
                       <div class="col-md-6 col-lg-4 mb-3">
                         <label for="officerPhone" class="form-label">8. Phone Number of the Investigating Officer *</label>
-                        <input
-                          id="officerPhone"
-                          type="text"
-                          class="form-control"
-                          formControlName="officerPhone"
-                          placeholder="Enter Phone Number"
-                          (keypress)="allowOnlyNumbers($event)"
-                          maxlength="10"
-                          required
-                        />
-                        <small
-                          class="text-danger"
-                          *ngIf="firForm.get('officerPhone')?.invalid && firForm.get('officerPhone')?.touched"
-                        >
+                        <input id="officerPhone" type="text" class="form-control" formControlName="officerPhone"
+                          placeholder="Enter Phone Number" (keypress)="allowOnlyNumbers($event)" maxlength="10"
+                          required/>
+                        <small class="text-danger"  *ngIf="firForm.get('officerPhone')?.invalid && firForm.get('officerPhone')?.touched">
                           Please enter a valid 10-digit phone number.
                         </small>
                       </div>
                     </div>
-
                 </div>
-
-
-
-
                 <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
-                <button type="button" class="btn btn-primary" (click)="nextStep()" >
-                    Next
-                </button>
-
-
-
-
-
-            </div>
+                <button type="button" class="btn btn-primary" (click)="nextStep()">Next</button>
+              </div>
 
             <div *ngIf="mainStep === 1 && step === 2" class="form-step">
                 <h3 class="mb-4">Step 2: Offence Information</h3>
@@ -308,21 +273,9 @@
                 <div class="mt-4">
                     <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
                     <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-                    <button
-                    type="button"
-                    class="btn btn-primary"
-                    (click)="nextStep()"
-                    [disabled]="!isStep2Valid()">
-                    Next
-                  </button>
-
-
-                </div>
+                    <button type="button" class="btn btn-primary" (click)="nextStep()">Next </button>
+                  </div>
             </div>
-
-
-
-
 
             <div *ngIf="mainStep === 1 && step === 3" class="form-step">
                 <h3 class="mb-4">Step 3: Victim Information</h3>
@@ -347,9 +300,6 @@
                         </div>
                     </div>
 
-
-
-
                     <div class="col-md-4 mb-3">
                         <label for="isVictimSameAsComplainant" class="form-label">17. Is the victim same as complainant? *</label>
                         <select id="isVictimSameAsComplainant" class="form-select" formControlName="isVictimSameAsComplainant" required>
@@ -366,7 +316,6 @@
                           <option *ngFor="let num of victimCountArray" [value]="num">{{ num }}</option>
                       </select>
                   </div>
-
                 </div>
 
                 <!-- Victim Details Section -->
@@ -382,8 +331,6 @@
                                     <input type="number" id="victimAge-{{i}}" class="form-control" formControlName="age" placeholder="Enter victim's age" (input)="onVictimAgeChange(i)" required />
                                   </div>
 
-                              
-
                                 <div class="col-md-4 mb-3">
                                     <label for="victimName-{{ i }}" class="form-label">20. Name of the Victim *</label>
                                     <input type="text" id="victimName-{{ i }}" class="form-control" formControlName="name" placeholder="Enter victim's name" required (input)="updateVictimNames()" (keypress)="allowOnlyLetters($event)" style="text-transform: capitalize;" />
@@ -395,12 +342,8 @@
 
                                 <div class="col-md-4 mb-3">
                                   <label for="victimGender{{ i }}" class="form-label">21. Gender of the Victim *</label>
-                                  <select
-                                    [id]="'victimGender' + i"
-                                    class="form-select"
-                                    formControlName="gender"
-                                    required
-                                    (change)="onVictimGenderChange($event, i)">
+                                  <select  [id]="'victimGender' + i" class="form-select" formControlName="gender"
+                                    required (change)="onVictimGenderChange($event, i)">
                                     <option value="" disabled>Select Gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
@@ -538,46 +481,37 @@
                                         </mat-select>
                                     </mat-form-field>
                                 </div>
-<div class="col-md-12 mb-3">
-  <label for="scstSections" class="form-label">31. Section invoked under Acts other than PoA (IPC/ POCSO/ etc.)*</label>
-  <br />
-  <!-- <mat-form-field appearance="outline" class="w-100 h-20">
-    <mat-label>Select options</mat-label>
-    <mat-select
-    formControlName="scstSections"
-    multiple
-  >
-  <mat-option *ngFor="let act of offenceActsOptions" [value]="act.offence_act_name" >
-      {{ act.offence_act_name }}
-    </mat-option>
-  </mat-select>
-  </mat-form-field> -->
-  <input type="text"  formControlName="scstSections" class="form-control" readonly />
+                              <div class="col-md-12 mb-3">
+                                <label for="scstSections" class="form-label">31. Section invoked under Acts other than PoA (IPC/ POCSO/ etc.)*</label>
+                                <br />
+                                <!-- <mat-form-field appearance="outline" class="w-100 h-20">
+                                  <mat-label>Select options</mat-label>
+                                  <mat-select
+                                  formControlName="scstSections"
+                                  multiple
+                                >
+                                <mat-option *ngFor="let act of offenceActsOptions" [value]="act.offence_act_name" >
+                                    {{ act.offence_act_name }}
+                                  </mat-option>
+                                </mat-select>
+                                </mat-form-field> -->
+                                <input type="text"  formControlName="scstSections" class="form-control" readonly />
+                              </div>
+                      <div class="col-md-12 mb-3">
+                        <label for="sectionsIPC" class="form-label">32. Section Invoked Under IPC/POCSO/etc. *</label>
+                        <input type="text" id="sectionsIPC" formControlName="sectionsIPC" class="form-control" placeholder="Enter sections, separated by commas" />
+                        <small class="form-text text-muted">Separate each section with a comma.</small>
+                      </div>
 
-</div>
-
-
-<div class="col-md-12 mb-3">
-  <label for="sectionsIPC" class="form-label">32. Section Invoked Under IPC/POCSO/etc. *</label>
-  <input type="text" id="sectionsIPC" formControlName="sectionsIPC" class="form-control" placeholder="Enter sections, separated by commas" />
-  <small class="form-text text-muted">Separate each section with a comma.</small>
-</div>
-
-
-<div style="display: none;">
-  <input type="text" formControlName="fir_stage_as_per_act" class="form-control" />
-  <input type="text" formControlName="fir_stage_ex_gratia" class="form-control" />
-  <input type="text" formControlName="chargesheet_stage_as_per_act" class="form-control" />
-  <input type="text" formControlName="chargesheet_stage_ex_gratia" class="form-control" />
-  <input type="text" formControlName="final_stage_as_per_act" class="form-control" />
-  <input type="text" formControlName="final_stage_ex_gratia" class="form-control" />
-</div>
-
-
-
-
-
-                            </div>
+                      <!-- <div style="display: none;">
+                        <input type="text" formControlName="fir_stage_as_per_act" class="form-control" />
+                        <input type="text" formControlName="fir_stage_ex_gratia" class="form-control" />
+                        <input type="text" formControlName="chargesheet_stage_as_per_act" class="form-control" />
+                        <input type="text" formControlName="chargesheet_stage_ex_gratia" class="form-control" />
+                        <input type="text" formControlName="final_stage_as_per_act" class="form-control" />
+                        <input type="text" formControlName="final_stage_ex_gratia" class="form-control" />
+                      </div> -->
+                          </div>
                         </div>
                     </div>
                 </div>
@@ -615,10 +549,6 @@
                     </button>
                 </div>
             </div>
-
-
-
-
 
             <div *ngIf="mainStep === 1 && step === 4" class="form-step">
                 <h3 class="mb-4">Step 4: Accused Information</h3>
@@ -923,7 +853,7 @@
                 <div class="mt-4">
                     <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
                     <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-                    <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid()">
+                    <button type="button" class="btn btn-primary" (click)="nextStep()">
                         Next
                     </button>
                 </div>
@@ -2350,7 +2280,7 @@
                   <button type="button" class="btn btn-secondary me-2" (click)="previousMainStep()">
                       Previous
                   </button>
-                  <button type="submit" class="btn btn-primary" (click)="submitStepSeven()" [disabled]="!isFormValid()" >
+                  <button type="submit" class="btn btn-primary" (click)="submitStepSeven()" >
                       Submit
                   </button>
               </div>

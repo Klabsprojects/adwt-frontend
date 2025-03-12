@@ -81,57 +81,44 @@
             </div>
             <div class="col-md-6 col-lg-3 mb-3">
               <label for="policeZone" class="form-label">2. Police Zone *</label>
-              <select id="policeZone" class="form-select" formControlName="policeZone" required>
+              <select id="policeZone" class="form-select" formControlName="policeZone">
                 <option value="" disabled>Select one</option>
                 <option *ngFor="let zone of policeZones" [value]="zone">{{ zone }}</option>
               </select>
             </div>
             <div class="col-md-6 col-lg-3 mb-3">
               <label for="policeRange" class="form-label">3. Police Range *</label>
-              <select id="policeRange" class="form-select" formControlName="policeRange" required>
+              <select id="policeRange" class="form-select" formControlName="policeRange">
                 <option value="" disabled>Select one</option>
                 <option *ngFor="let range of policeRanges" [value]="range">{{ range }}</option>
               </select>
             </div>
             <div class="col-md-6 col-lg-3 mb-3">
               <label for="revenueDistrict" class="form-label">4. Revenue District *</label>
-              <select id="revenueDistrict" class="form-select" formControlName="revenueDistrict" required>
+              <select id="revenueDistrict" class="form-select" formControlName="revenueDistrict">
                 <option value="" disabled>Select one</option>
                 <option *ngFor="let district of revenueDistricts" [value]="district">{{ district }}</option>
               </select>
             </div>
             <div class="col-md-6 mb-3">
               <label for="stationName" class="form-label">5. Police Station Name *</label>
-              <select id="stationName" class="form-select" formControlName="stationName" required>
+              <select id="stationName" class="form-select" formControlName="stationName">
                 <option value="" disabled>Select Police Station</option>
                 <option *ngFor="let station of policeStations" [value]="station">{{ station }}</option>
               </select>
             </div>
-            <!-- <div class="col-md-12 mb-3">
-              <label for="policeStationDetails" class="form-label small">5. Station code and</label>
-              <div class="input-group" style="max-width: 500px;">
-                <select id="alphabetSelection" class="form-select" formControlName="alphabetSelection" required style="width: 40px;">
-                  <option value="" disabled selected>Select A-Z</option>
-                  <option *ngFor="let char of alphabetList" [value]="char">{{ char }}</option>
-                </select>
-                <select id="stationNumber" class="form-select" formControlName="stationNumber" required style="width: 40px;">
-                  <option value="" disabled selected>Select One</option>
-                  <option *ngFor="let number of stationNumbers" [value]="number">{{ number }}</option>
-                </select>
-                <input type="text" id="stationName" class="form-control" formControlName="stationName" placeholder="Station Name" required style="width: 150px; text-transform: capitalize;" />
-              </div>
-              <small class="text-danger d-block mt-1">Please enter the police station details in the format "A-123-Guindy".</small>
-            </div> -->
+            
           </div>
           <div class="row">
+            <h5>Investigating Officer Details</h5>
             <div class="col-md-6 col-lg-4 mb-3">
-              <label for="officerName" class="form-label">Name of the Investigating Officer *</label>
+              <label for="officerName" class="form-label">6.Name of the Investigating Officer  (IO)*</label>
               <input id="officerName" type="text" class="form-control" formControlName="officerName" placeholder="Enter Officer Name" (keypress)="allowOnlyLetters($event)" required/>
               <small class="text-danger" *ngIf="firForm.get('officerName')?.invalid && firForm.get('officerName')?.touched">Please enter a valid name.</small>
             </div>
             <div class="col-md-6 col-lg-4 mb-3">
-              <label for="officerDesignation" class="form-label">Designation of the Investigating Officer *</label>
-              <select id="officerDesignation" class="form-select" formControlName="officerDesignation" required>
+              <label for="officerDesignation" class="form-label">7.Designation of the Investigating Officer *</label>
+              <select id="officerDesignation" class="form-select" formControlName="officerDesignation" required (change)="getDesignation($event)">
                 <option value="" disabled>Select Designation</option>
                 <option value="DSP">DSP</option>
                 <option value="ACP">ACP</option>
@@ -141,8 +128,14 @@
               </select>
               <small class="text-danger" *ngIf="firForm.get('officerDesignation')?.invalid && firForm.get('officerDesignation')?.touched">Please select a designation.</small>
             </div>
+
+            <div class="col-md-6 col-lg-4 mb-3" *ngIf="showOtherDesignation">
+              <label for="officerPhone" class="form-label">7a. Designation Name</label>
+              <input  id="otherDesignation" type="text" class="form-control" [value]="otherDesignationValue" placeholder="Enter Designation Name" (input)="getDesignationName($event)" />
+            </div>
+
             <div class="col-md-6 col-lg-4 mb-3">
-              <label for="officerPhone" class="form-label">Phone Number of the Investigating Officer *</label>
+              <label for="officerPhone" class="form-label">8. Phone Number of the Investigating Officer *</label>
               <input id="officerPhone" type="text" class="form-control" formControlName="officerPhone" placeholder="Enter Phone Number" (keypress)="allowOnlyNumbers($event)" maxlength="10" required/>
               <small class="text-danger" *ngIf="firForm.get('officerPhone')?.invalid && firForm.get('officerPhone')?.touched">Please enter a valid 10-digit phone number.</small>
             </div>
