@@ -356,7 +356,6 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     const victimsArray = firForm.get('victims') as FormArray;
     if (victimsArray && victimsArray.length > 0) {
       const firstVictim = victimsArray.at(0);
-      console.log('firstVictim.get(mobileNumber) ',firstVictim.get('mobileNumber'));
       if (isVictimSame) {
         const complainantName = firForm.get('complainantDetails.nameOfComplainant')?.value;
         const complainantMobile = firForm.get('complainantDetails.mobileNumberOfComplainant')?.value;

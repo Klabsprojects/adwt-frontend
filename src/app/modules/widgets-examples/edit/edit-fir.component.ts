@@ -660,8 +660,6 @@ loadAccusedCommunities(): void {
         this.navigateToStep(stepNumber);
       }
 
-      console.log("Navigating to step:", stepNumber);
-
     });
 
    
@@ -953,11 +951,11 @@ loadAccusedCommunities(): void {
     this.firService.getFirDetails(firId).subscribe(
       (response) => {
 
-        console.log("response",response);
+        console.log("response",response.data);
 
         this.showDuplicateSection = false;
         this.showDuplicateSection_1 = false;
-
+        this.loadPoliceStations(response.data.police_city,response.data.police_station);
         if (response.appeal_details && response.appeal_details.length > 0) {
           response.appeal_details.forEach((appealDetail:any) => {
             this.firForm.patchValue({
@@ -1236,10 +1234,9 @@ console.log(hearingDetailsControl,"hearingDetailsControl")
         if(response.data.revenue_district){
           this.firForm.get('revenueDistrict')?.setValue(response.data.revenue_district); 
         }
-        if(response.data.police_station){
-          console.log(response.data.police_station);
-          this.firForm.get('stationName')?.setValue(response.data.police_station); 
-        }
+        // if(response.data.police_station){
+        //   this.firForm.get('stationName')?.setValue(response.data.police_station); 
+        // }
         if(response.data.officer_name){
           this.firForm.get('officerName')?.setValue(response.data.officer_name); 
         }
@@ -1752,9 +1749,12 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
 
   // Save Step 1 and track officer IDs after the first save
   saveStepOneAsDraft() {
+    this.firForm.enable();
     const firData = {
       ...this.firForm.value,
     };
+
+    console.log("Submit data",firData);
 
     this.firService.handleStepOne(this.firId, firData).subscribe(
       (response: any) => { 
@@ -1773,6 +1773,9 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
         Swal.fire('Error', 'Failed to save FIR as draft for step 1.', 'error');
       }
     );
+    this.firForm.get('policeZone')?.disable();
+    this.firForm.get('policeRange')?.disable();
+    this.firForm.get('revenueDistrict')?.disable();
   }
 
   validateFirNumber(event: KeyboardEvent) {
@@ -2195,19 +2198,17 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
     return '';
   }
 
-  loadPoliceStations(district: string , station_name: string ,): void {
+  loadPoliceStations(district: string , station_name: string): void {
     if (district) {
         this.firService.getPoliceStations(district).subscribe(
             (stations: string[]) => {
-              this.policeStations = stations.map(station =>
-                station.replace(/\s+/g, '-')); 
               if(stations){
-                this.policeStations = stations;
+                this.policeStations = stations.map(station =>
+                  station.replace(/\s+/g, '-'));
+                  console.log("before station",station_name);
                 if(station_name) {
-                  const station = this.policeStations.find(ele => ele === station_name);
-                  if (station) {
-                    this.firForm.get('stationName')?.setValue(station_name);
-                  }
+                  const station = this.policeStations.find(ele => console.log(ele === station_name));
+                  this.firForm.get('stationName')?.setValue(station_name);
                 }
                 
               }
@@ -2430,6 +2431,9 @@ onAccusedAgeChange(index: number): void {
     this.onNumberOfVictimsChange();
     this.onNumberOfAccusedChange();
     this.populateVictimsRelief([]);
+    this.firForm.get('policeZone')?.disable();
+    this.firForm.get('policeRange')?.disable();
+    this.firForm.get('revenueDistrict')?.disable();
   }
 
   show94BAnd94C = false;
@@ -3957,12 +3961,16 @@ console.log(victimReliefDetail,"cretaieg")
       this.saveStepOneAsDraft();
     } else if (this.step === 2) {
       this.saveStepTwoAsDraft();
+      this.updateFirStatus(1);
     } else if (this.step === 3) {
       this.saveStepThreeAsDraft();
+      this.updateFirStatus(2);
     } else if (this.step === 4) {
       this.saveStepFourAsDraft();
+      this.updateFirStatus(3);
     } else if (this.step === 5) {
       this.saveStepFiveAsDraft();
+      this.updateFirStatus(4);
     }
   }
   getFiles(inputId: string): FileList | null {
@@ -4765,6 +4773,9 @@ attachment:this.attachments_2.value
     const controls = [
       'policeCity',
       'stationName',
+      'policeZone',
+      'policeRange',
+      'revenueDistrict'
     ];
     return controls.every((controlName) => this.firForm.get(controlName)?.valid === true);
   }
@@ -4995,10 +5006,32 @@ trackStepFiveChanges() {
 }
 
 
+validateStepOne(mode: 'next' | 'draft'): boolean {
+  const stepOneFields = ['policeCity', 'policeZone', 'policeRange', 'revenueDistrict', 'stationName', 'officerName', 'officerDesignation', 'officerPhone'];
 
+  if (mode === 'draft') {
+    return stepOneFields.some(field => {
+      const control = this.firForm.get(field);
+      return control && control.value !== null && control.value !== undefined && control.value !== '';
+    });
+  } else {
+    let isValid = true;
+    stepOneFields.forEach(field => {
+      if (this.firForm.get(field)?.invalid) {
+        this.firForm.get(field)?.markAsTouched();
+        isValid = false;
+      }
+    });
+    return isValid;
+  }
+}
   nextStep(): void {
     this.nextButtonClicked = true; 
-    if (this.step === 1 && this.isStep1Valid()) {
+    if (this.step === 1) {
+      if (!this.validateStepOne('next')) {
+            Swal.fire('Error', 'Please fill in all required fields before proceeding.', 'error');
+            return;
+          }
       if (this.isStepOneModified === true) { 
         this.saveStepOneAsDraft();
         this.updateFirStatus(1);
@@ -5413,10 +5446,22 @@ onCityChange(event: any) {
 
   if (selectedCity) {
     this.populatePoliceDivisionDetails(selectedCity);
+    this.getPoliceStation(selectedCity);
   } else {
     this.resetPoliceFields();
   }
 }
+
+// getStationName(event:any){
+//   const data = event;
+//   console.log(data);
+//   this.firForm.get('stationName')?.setValue(data);
+// }
+getStationName(value: any) {
+  console.log("Selected Station:", value);
+}
+
+
 resetPoliceFields() {
   this.firForm.patchValue({
     policeZone: '',
@@ -5427,7 +5472,57 @@ resetPoliceFields() {
   this.firForm.get('policeZone')?.enable();
   this.firForm.get('policeRange')?.enable();
   this.firForm.get('revenueDistrict')?.enable();
+  
 }
+
+// getPoliceStation(district: string): void {
+//   if (district) {
+//     this.firService.getPoliceStations(district).subscribe(
+//       (stations: string[]) => {
+//         this.policeStations = stations.map(station =>
+//           station.replace(/\s+/g, '-'));
+//           console.log("police station",this.policeStations);
+//           this.getStationName(this.policeStations.find((ele=>console.log(ele))));
+//           console.log(this.firForm.get('stationName')?.value);
+//           this.cdr.detectChanges(); 
+//       },
+//       (error) => {
+//         console.error('Error fetching police stations:', error);
+//       }
+//     );
+//   }
+// }
+
+getPoliceStation(district: string): void {
+  if (district) {
+    this.firService.getPoliceStations(district).subscribe(
+      (stations: string[]) => {
+        // Format station names
+        this.policeStations = stations.map(station => station.replace(/\s+/g, '-'));
+
+        console.log("Police Stations:", this.policeStations);
+
+        // Get the first station or a specific one
+        const firstStation = this.policeStations.length > 0 ? this.policeStations[0] : '';
+
+        // Set the value in the form
+        this.firForm.patchValue({ stationName: firstStation });
+
+        // Call getStationName with the selected value
+        this.getStationName(firstStation);
+
+        console.log("Selected Station:", this.firForm.get('stationName')?.value);
+
+        // Detect changes to update the view
+        this.cdr.detectChanges();
+      },
+      (error) => {
+        console.error('Error fetching police stations:', error);
+      }
+    );
+  }
+}
+
 
  populatePoliceDivisionDetails(district: string) {
     this.firService.getPoliceDivision(district).subscribe(
