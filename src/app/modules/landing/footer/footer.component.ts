@@ -8,12 +8,19 @@ import { Component } from '@angular/core';
 export class FooterComponent {
   currentYear: number = new Date().getFullYear();
 
+  // quickLinks = [
+  //   { name: 'Home', path: '/' },
+  //   { name: 'About Us', path: '/about' },
+  //   { name: 'Downloads', path: '/services' },
+  //   { name: 'Contact', path: '/contact' },
+  //   { name: 'Login', path: 'https://cmrf.klabsindia.com/#/login', isExternal: true }
+  // ];
   quickLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'About Us', path: '/about' },
-    { name: 'Downloads', path: '/services' },
-    { name: 'Contact', path: '/contact' },
-    { name: 'Login', path: 'https://cmrf.klabsindia.com/#/login', isExternal: true }
+    { name: 'Quick Link 1', path: '/' },
+    { name: 'Quick Link 2', path: '/' },
+    { name: 'Quick Link 3', path: '/' },
+    { name: 'Quick Link 4', path: '/' },
+    { name: 'Quick Link 5', path: '/' }
   ];
 
   contactInfo = [
