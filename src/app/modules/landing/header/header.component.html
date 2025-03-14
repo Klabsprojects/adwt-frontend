@@ -89,7 +89,8 @@
     </div>
     <div class="col-xl-4 col-lg-4 d-flex justify-content-end align-items-center px-4 desktop-only">
       <button role="button" class="btn btn-primary mobile-link" data-bs-toggle="modal"
-        data-bs-target="#exampleModal">Login</button>
+        data-bs-target="#exampleModal" *ngIf="!is_user">Login</button>
+        <button class="btn btn-primary mobile-link" *ngIf="is_user" (click)="logout()">Log out</button>
     </div>
     <div class="col-md-2 col-sm-2 col-2 mobile-only">
       <button class="menu-button" (click)="toggleMenu()">

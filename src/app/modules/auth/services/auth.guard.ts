@@ -10,7 +10,7 @@ export class AuthGuard implements CanActivate {
 
     // If user_data is missing, redirect to login
     if (!userData) {
-      this.router.navigate(['/auth/login']);
+      this.router.navigate(['/landing']);
       return false;
     }
 

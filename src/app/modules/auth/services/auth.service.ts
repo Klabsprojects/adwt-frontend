@@ -103,7 +103,7 @@ export class AuthService implements OnDestroy {
     sessionStorage.clear();
   
     // Navigate to the login page
-    this.router.navigate(['/auth/login'], { replaceUrl: true });
+    this.router.navigate(['/landing'], { replaceUrl: true });
   }
   
 
