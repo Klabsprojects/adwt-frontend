@@ -1,6 +1,6 @@
 /* Header Styles */
 .header {
-  position: fixed;
+  /* position: fixed; */
   top: 0;
   left: 0;
   width: 100%;
@@ -10,8 +10,14 @@
   padding: 1rem;
 }
 
-.mobile-only {
-  display: none;
+.mobile-only,
+.mobile-title {
+  display: none !important;
+}
+
+.web-nav {
+  background-color: #043c6c;
+  padding: 16px 10%;
 }
 
 .header-container {
@@ -61,6 +67,18 @@
   color: #333;
   margin: 0;
 }
+
+.sk {
+  font-size: 2.5rem;
+  color: #043c6c;
+}
+
+.btn {
+  background-color: #1E3A8A;
+  color: #fff !important;
+  font-weight: 600;
+}
+
 /* Enable hover dropdown */
 .nav-item:hover .dropdown-menu {
   display: block;
@@ -68,23 +86,27 @@
 
 /* Ensure proper positioning */
 .dropdown-menu {
-  margin-top: 0; /* Remove any unnecessary space */
+  margin-top: 0;
+  /* Remove any unnecessary space */
 }
 
 
 /* Navigation */
 .nav-links {
   display: flex;
-  gap: 20px;
+  gap: 4rem;
 }
 
 .nav-links a {
   text-decoration: none;
-  font-size: 1.425rem;
+  font-size: 1.325rem;
   font-weight: 500;
-  color: #374151;
+  /* color: #374151; */
+  color: #fff;
   position: relative;
   transition: color 0.2s ease-in-out;
+  font-weight: 500;
+  font-family: "ui-sans-serif", "system-ui", "sans-serif", "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
 }
 
 .nav-links a:hover,
@@ -116,13 +138,14 @@
   border: none;
   cursor: pointer;
 }
+
 /* Hide dropdown by default */
 .dropdown-menu {
   display: none;
   list-style: none;
   padding: 0;
   margin: 0;
-  background: #fff;
+  background: #043c6c;
   border: 1px solid #ddd;
   width: 130%;
 }
@@ -152,18 +175,20 @@
   .logo.small {
     height: 5.4rem;
   }
+
   .sk {
-    font-size: 1.3rem;
+    font-size: 2rem;
   }
 
   .adtw {
-    font-size: 1rem;
+    font-size: 1.5rem;
   }
 
   .gov {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
   }
-  .nav-links a{
+
+  .nav-links a {
     font-size: 1.125rem;
   }
 }
@@ -171,11 +196,18 @@
 /* Hide Desktop Menu on Mobile */
 @media (max-width: 768px) {
   .desktop-only {
-    display: none;
+    display: none !important;
   }
 
   .mobile-only {
-    display: block;
+    display: flex !important;
+    justify-content: end;
+    padding: 1rem;
+    align-items: center;
+  }
+
+  .mobile-title {
+    display: block !important;
   }
 }
 
@@ -185,7 +217,8 @@
   }
 
   .title {
-    font-size: 1rem;
+    font-size: 1.2rem;
+    line-height: 1.5;
   }
 
   .logo.large {

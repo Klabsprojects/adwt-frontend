@@ -4,14 +4,12 @@
       <!-- Logo and Description -->
       <div class="footer-section">
         <div class="footer-logo">
-          <h3>CMRF</h3>
+          <h3>ADWT</h3>
         </div>
         <p class="footer-text text-sm">
-          The Directorate of Collegiate Education was carved out of the erstwhile Directorate of Public Instruction in
-          the year 1965 with a view to administer exclusively the Collegiate Education. Tamil Nadu enjoys the privilege
-          of being one of the most developed states in the Country in the field of Higher Education. 27 Universities are
-          functioning in Tamilnadu and of these 12 Universities are getting their Block Grants from the Government of
-          Tamilnadu through the Directorate of Collegiate Education.
+          The Adi Dravidar and Tribal Welfare Department, established in 1988, is dedicated to enhancing the literacy
+          levels and socio-economic conditions of Adi Dravidar and Tribal communities. Through targeted programs, the
+          department works to uplift their standard of living.
         </p>
         <div class="footer-social">
           <a *ngFor="let social of socialLinks" [href]="social.link" class="social-link" target="_blank">
@@ -19,7 +17,7 @@
           </a>
         </div>
       </div>
-  
+
       <!-- Quick Links -->
       <div class="footer-section">
         <h4 class="footer-heading">Quick Links</h4>
@@ -32,14 +30,15 @@
           </li>
         </ul>
       </div>
-  
+
       <!-- Contact Information -->
       <div class="footer-section">
         <h4 class="footer-heading">Contact Us</h4>
-        <h4 class="footer-subheading">CMRF UNIT</h4>
+        <h4 class="footer-subheading">ADWT</h4>
         <ul class="footer-contact">
           <li *ngFor="let item of contactInfo">
-            <a *ngIf="item.link" [href]="item.link" class="contact-link text-sm" target="_blank" rel="noopener noreferrer">
+            <a *ngIf="item.link" [href]="item.link" class="contact-link text-sm" target="_blank"
+              rel="noopener noreferrer">
               <i [class]="item.icon"></i>
               <span>{{ item.info }}</span>
             </a>
@@ -55,12 +54,12 @@
 
   <!-- Bottom Bar -->
   <div class="footer-bottom">
-      <div class="footer-bottom-content text-sm">
-        <div>© {{ currentYear }} CMRF. All rights reserved.</div>
-        <div class="footer-bottom-links">
-          <a routerLink="/privacy">Privacy Policy</a>
-          <a routerLink="/terms">Terms of Use</a>
-        </div>
+    <div class="footer-bottom-content text-sm">
+      <div>© {{ currentYear }} ADWT. All rights reserved.</div>
+      <div class="footer-bottom-links">
+        <a routerLink="/privacy">Privacy Policy</a>
+        <a routerLink="/terms">Terms of Use</a>
       </div>
+    </div>
   </div>
 </footer>

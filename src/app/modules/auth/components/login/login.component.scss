@@ -133,12 +133,13 @@ button:hover {
 
 .archangel-raguel{
   transform: scale(1.2);
-  height: 58vh;
+  height: 100%;
   transition: all 1s;
+  width: 100%;
 }
 .archangel-raguel:hover{
   transform: scale(1);
-  height: 63vh;
+  // height: 63vh;
 }
 .form-box-outer{
   background-color: #fff;
@@ -188,4 +189,23 @@ a:link,a:visited{
   top: 10px;
   background: none;
   border: none6;
+}
+@media (max-width:769px){
+  .angleimage-box{
+    display: none;
+  } 
+  .login-box{
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width:426px){
+  .login-box{
+    width: 95%;
+  }
+  .login-image{
+    max-width: 70px;
+  }
+  .cm-image{
+    max-width: 80px;
+  }
 }

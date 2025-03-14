@@ -17,10 +17,10 @@ export class FooterComponent {
   ];
 
   contactInfo = [
-    { icon: 'fas fa-map-marker-alt', info: 'DIRECTORATE OF COLLEGIATE EDUCATION, Chennai, Tamil Nadu', link: 'https://maps.google.com/?q=DIRECTORATE+OF+COLLEGIATE+EDUCATION+Chennai' },
-    { icon: 'fas fa-phone', info: '044-24343106' },
-    { icon: 'fas fa-phone', info: '044-24343109' },
-    { icon: 'fas fa-envelope', info: 'cmrfdce2023@gmail.com', link: 'mailto:cmrfdce2023@gmail.com' }
+    { icon: 'fas fa-map-marker-alt', info: 'Directorate of Adi Dravidar Welfare Ezhilagam Annexure building, Cheapauk, Chennai,Tamil Nadu - 600 005.', link: 'https://maps.google.com/?q=DIRECTORATE+OF+COLLEGIATE+EDUCATION+Chennai' },
+    { icon: 'fas fa-phone', info: '044 -28589855' },
+    // { icon: 'fas fa-phone', info: '044-24343109' },
+    { icon: 'fas fa-envelope', info: 'adw.director@gmail.com', link: 'mailto:adw.director@gmail.com' }
   ];
 
   socialLinks = [
