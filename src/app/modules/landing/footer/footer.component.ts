@@ -16,11 +16,9 @@ export class FooterComponent {
   //   { name: 'Login', path: 'https://cmrf.klabsindia.com/#/login', isExternal: true }
   // ];
   quickLinks = [
-    { name: 'Quick Link 1', path: '/' },
-    { name: 'Quick Link 2', path: '/' },
-    { name: 'Quick Link 3', path: '/' },
-    { name: 'Quick Link 4', path: '/' },
-    { name: 'Quick Link 5', path: '/' }
+    { name: 'ADW Department', path: 'https://www.tnadw.in/ ' },
+    { name: 'Tribal Welfare Department', path: 'https://www.tntribalwelfare.tn.gov.in/' },
+    { name: 'National Helpline Against Atrocities', path: 'https://nhapoa.gov.in/en' },
   ];
 
   contactInfo = [

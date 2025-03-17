@@ -35,10 +35,15 @@ export class HeaderComponent implements OnInit {
     this.isMenuOpen = !this.isMenuOpen;
   }
   isDropdownOpen: boolean = false;
+  isDropdownOpenAbout: boolean = false;
 
   toggleDropdown(event: Event) {
     event.preventDefault(); // Prevent page navigation when clicking "News & Events"
     this.isDropdownOpen = !this.isDropdownOpen;
+  }
+  toggleDropdownAbout(event: Event) {
+    event.preventDefault(); // Prevent page navigation when clicking "News & Events"
+    this.isDropdownOpenAbout = !this.isDropdownOpenAbout;
   }
   closeModal() {
     const modalElement = document.getElementById('exampleModal');

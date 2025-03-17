@@ -1,5 +1,6 @@
 :host {
   width: 100%;
+
   @media (min-width: 992px) {
     .login-form {
       width: 100%;
@@ -11,6 +12,7 @@
     }
   }
 }
+
 /* Login form styling */
 .login-form {
   max-width: 400px;
@@ -25,9 +27,18 @@
 
 /* Center the image */
 .login-image {
-  max-width: 100px; /* Make the image smaller */
-  height: auto; /* Maintain aspect ratio */
-  margin: 0 auto; /* Center the image */
+  max-width: 100px;
+  /* Make the image smaller */
+  height: auto;
+  /* Maintain aspect ratio */
+  margin: 0 auto;
+  /* Center the image */
+}
+
+h1 {
+  color: #304443;
+  font-weight: 700;
+  font-size: 3rem;
 }
 
 /* Alerts */
@@ -50,7 +61,8 @@
 button {
   padding: 10px;
   font-size: 1rem;
-  background-color: #279cfd; /* Blue button */
+  background-color: #279cfd;
+  /* Blue button */
   border-radius: 5px;
   border: none;
   color: #fff;
@@ -93,31 +105,32 @@ button:hover {
 
 ///new 
 
-.header{
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.title-head{
+
+.title-head {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem;
 }
 
-.cm-image{
+.cm-image {
   max-width: 100px;
   height: auto;
 }
 
-.title{
+.title {
   text-align: center;
   margin-top: 2rem;
 }
 
-.login-box{
+.login-box {
   display: grid;
-  grid-template-columns: 4fr 6fr;
+  grid-template-columns: 1fr 1fr;
   border-radius: 35px;
   width: 70%;
   height: 63vh;
@@ -127,85 +140,101 @@ button:hover {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-.angleimage-box{
-  overflow: hidden;
+.angleimage-box {
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(173, 121, 61, 0.1019607843);
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
-.archangel-raguel{
+.archangel-raguel {
   transform: scale(1.2);
   height: 100%;
   transition: all 1s;
   width: 100%;
 }
-.archangel-raguel:hover{
+
+.archangel-raguel:hover {
   transform: scale(1);
   // height: 63vh;
 }
-.form-box-outer{
+
+.form-box-outer {
   background-color: #fff;
   justify-content: center;
   display: flex;
   flex-direction: column;
 }
-.form-box{
+
+.form-box {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2rem;
 }
-h3{
+
+h3 {
   font-size: x-large;
   color: #6b748c;
   font-weight: 600;
   text-align: center;
 }
-.form-control{
+
+.form-control {
   border-radius: 15px;
   padding: 15px 20px;
   margin-left: auto;
   margin-right: auto;
 }
 
-.form-control::placeholder{
+.form-control::placeholder {
   font-size: 1.2rem;
 }
 
-button{
+button {
   background: linear-gradient(to right, #279cfd, #1a7bc1);
   width: 160px;
   font-size: medium;
   border-radius: 11px;
 }
 
-a:link,a:visited{
+a:link,
+a:visited {
   color: #6b748c;
   text-decoration: none;
 }
 
-.input-group-text{
+.input-group-text {
   position: absolute;
   right: 10px;
   top: 10px;
   background: none;
   border: none6;
 }
-@media (max-width:769px){
-  .angleimage-box{
+
+@media (max-width:769px) {
+  .angleimage-box {
     display: none;
-  } 
-  .login-box{
-    grid-template-columns:1fr;
+  }
+
+  .login-box {
+    grid-template-columns: 1fr;
   }
 }
-@media (max-width:426px){
-  .login-box{
+
+@media (max-width:426px) {
+  .login-box {
     width: 95%;
   }
-  .login-image{
+
+  .login-image {
     max-width: 70px;
   }
-  .cm-image{
+
+  .cm-image {
     max-width: 80px;
   }
 }

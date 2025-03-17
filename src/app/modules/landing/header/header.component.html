@@ -88,9 +88,10 @@
       <h1 class="title sk">Samaththuvam Kaanbom</h1>
     </div>
     <div class="col-xl-4 col-lg-4 d-flex justify-content-end align-items-center px-4 desktop-only">
-      <button role="button" class="btn btn-primary mobile-link" data-bs-toggle="modal"
-        data-bs-target="#exampleModal" *ngIf="!is_user">Login</button>
-        <button class="btn btn-primary mobile-link" *ngIf="is_user" (click)="logout()">Log out</button>
+      <!-- <button role="button" class="btn btn-primary mobile-link loginout" data-bs-toggle="modal" data-bs-target="#exampleModal"
+        *ngIf="!is_user">Login</button>
+      <button class="btn btn-primary mobile-link loginout" *ngIf="is_user" (click)="logout()">Log out</button> -->
+      <img src="https://www.naanmudhalvan.tn.gov.in/_nuxt/img/cm.e8d4eb2.png" alt="" style="width: 7rem;">
     </div>
     <div class="col-md-2 col-sm-2 col-2 mobile-only">
       <button class="menu-button" (click)="toggleMenu()">
@@ -101,49 +102,74 @@
     <div *ngIf="isMenuOpen" class="mobile-overlay" (click)="toggleMenu()"></div>
     <div class="mobile-menu" [class.open]="isMenuOpen">
       <ng-container *ngFor="let item of menuItems">
-        <a *ngIf="item.label !== 'News & Events' && item.label !== 'Login'"
+        <a *ngIf="item.label !== 'News & Events' && item.label !== 'Login' && item.label !=='About Us'"
           [routerLink]="item.isExternal ? null : item.to" [href]="item.isExternal ? item.to : null" class="mobile-link">
           {{ item.label }}
         </a>
+        <div class="mobile-dropdown" *ngIf="item.label === 'About Us'">
+          <a href="#" class="mobile-link dropdown-toggle" (click)="toggleDropdownAbout($event)">
+            About Us
+          </a>
+          <ul class="dropdown-menu dropdown-menu-mob" [class.show]="isDropdownOpenAbout">
+            <li><a class="dropdown-item" href="#">Adidravidar & Tribal Welfare Department</a></li>
+            <li><a class="dropdown-item" href="#">Social Justice and Human Rights Wing</a></li>
+            <li><a class="dropdown-item" href="#">TN State Commission for Scheduled Castes and Scheduled Tribes</a></li>
+          </ul>
+        </div>
         <div class="mobile-dropdown" *ngIf="item.label === 'News & Events'">
           <a href="#" class="mobile-link dropdown-toggle" (click)="toggleDropdown($event)">
             News & Events
           </a>
-          <ul class="dropdown-menu" [class.show]="isDropdownOpen">
+          <ul class="dropdown-menu dropdown-menu-mob" [class.show]="isDropdownOpen">
             <li><a class="dropdown-item" href="#">Gallery</a></li>
             <li><a class="dropdown-item" href="#">Press Releases</a></li>
           </ul>
         </div>
-        <a *ngIf="item.label === 'Login'" href="#" role="button" class="mobile-link" data-bs-toggle="modal"
+        <a *ngIf="item.label === 'Login' && !is_user" href="#" role="button" class="mobile-link" data-bs-toggle="modal"
           data-bs-target="#exampleModal">
-          Login
+          Officer Login
         </a>
+        <a *ngIf="item.label === 'Login' && is_user" href="#">
+        Logut
+      </a>
       </ng-container>
     </div>
   </div>
 </section>
-<div class="row web-nav desktop-only">
+<div class="web-nav desktop-only">
   <nav class="nav-links">
     <ng-container *ngFor="let item of menuItems">
-      <a *ngIf="item.label !== 'News & Events' && item.label !== 'Login'"
-         [routerLink]="item.isExternal ? null : item.to"
-         [href]="item.isExternal ? item.to : null"
-         class="nav-link"
-         target="{{ item.isExternal ? '_blank' : '_self' }}">
+      <a *ngIf="item.label !== 'News & Events' && item.label !== 'Login' && item.label !=='About Us'"
+        [routerLink]="item.isExternal ? null : item.to" [href]="item.isExternal ? item.to : null" class="nav-link"
+        target="{{ item.isExternal ? '_blank' : '_self' }}">
         {{ item.label }}
       </a>
-  
+
+      <div class="dropdown nav-item" *ngIf="item.label === 'About Us'">
+        <a href="#" class="nav-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown">
+          About Us
+        </a>
+        <ul class="dropdown-menu dropdown-menu-about">
+          <li><a class="dropdown-item" href="#">Adidravidar & Tribal Welfare Department</a></li>
+          <li><a class="dropdown-item" href="#">Social Justice and Human Rights Wing</a></li>
+          <li><a class="dropdown-item" href="#">TN State Commission for Scheduled Castes and Scheduled Tribes</a></li>
+        </ul>
+      </div>
+
+
       <div class="dropdown nav-item" *ngIf="item.label === 'News & Events'">
-        <a href="#" class="nav-link dropdown-toggle"
-           id="newsDropdown"
-           role="button"
-           data-bs-toggle="dropdown">
+        <a href="#" class="nav-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown">
           News & Events
         </a>
         <ul class="dropdown-menu">
           <li><a class="dropdown-item" href="#">Gallery</a></li>
           <li><a class="dropdown-item" href="#">Press Releases</a></li>
         </ul>
+      </div>
+      <div *ngIf="item.label === 'Login'">
+        <button role="button" class="btn mobile-link loginout" data-bs-toggle="modal" data-bs-target="#exampleModal"
+          *ngIf="!is_user">Officer Login</button>
+        <button class="btn mobile-link loginout" *ngIf="is_user" (click)="logout()">Log out</button>
       </div>
     </ng-container>
   </nav>
