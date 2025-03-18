@@ -4,6 +4,11 @@ import { AuthGuard } from './modules/auth/services/auth.guard';
 
 export const routes: Routes = [
   {
+    path: '',
+    redirectTo: 'landing',
+    pathMatch: 'full', // Ensures the default route goes to landing
+  },
+  {
     path: 'landing',
     loadChildren: () =>
       import('./modules/landing/landing.module').then((m) => m.LandingModule),

@@ -5,7 +5,7 @@
 }
 
 .download {
-    margin-top: 9.5rem;
+    /* margin-top: 9.5rem; */
 }
 
 .header {
@@ -169,5 +169,8 @@
     .header {
         padding-left: 2.5rem;
         padding-right: 2.5rem;
+    }
+    .grid-layout{
+        grid-template-columns: repeat(1, 1fr);
     }
 }

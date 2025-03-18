@@ -8,12 +8,12 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 })
 export class HomeComponent implements OnInit {
   slides = [
-    { url: 'assets/images/slide3.png', title: '', subtitle: '' },
-    { url: 'assets/images/slide2.png', title: '', subtitle: '' },
-    { url: 'assets/images/slide1.png', title: '', subtitle: '' },
-    { url: 'assets/images/slide4.png', title: '', subtitle: '' },
-    { url: 'assets/images/slide5.png', title: '', subtitle: '' },
-    { url: 'assets/images/slide6.png', title: '', subtitle: '' }
+    { url: 'assets/images/slide1.jpg', title: '', subtitle: '' },
+    { url: 'assets/images/slide2.jpg', title: '', subtitle: '' },
+    { url: 'assets/images/slide3.jpg', title: '', subtitle: '' },
+    // { url: 'assets/images/slide4.png', title: '', subtitle: '' },
+    // { url: 'assets/images/slide5.png', title: '', subtitle: '' },
+    // { url: 'assets/images/slide6.png', title: '', subtitle: '' }
   ];
   currentSlide = 0;
 

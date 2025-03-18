@@ -4,49 +4,58 @@
       <!-- Logo and Description -->
       <div class="footer-section">
         <div class="footer-logo">
-          <h3>CMRF</h3>
+          <h3>ADWT</h3>
         </div>
         <p class="footer-text text-sm">
-          The Directorate of Collegiate Education was carved out of the erstwhile Directorate of Public Instruction in
-          the year 1965 with a view to administer exclusively the Collegiate Education. Tamil Nadu enjoys the privilege
-          of being one of the most developed states in the Country in the field of Higher Education. 27 Universities are
-          functioning in Tamilnadu and of these 12 Universities are getting their Block Grants from the Government of
-          Tamilnadu through the Directorate of Collegiate Education.
+          {{lang.lang.adwt_description}}
         </p>
-        <div class="footer-social">
+        <!-- <div class="footer-social">
           <a *ngFor="let social of socialLinks" [href]="social.link" class="social-link" target="_blank">
             <i [class]="social.icon"></i>
           </a>
-        </div>
+        </div> -->
       </div>
-  
+
       <!-- Quick Links -->
       <div class="footer-section">
-        <h4 class="footer-heading">Quick Links</h4>
+        <h4 class="footer-heading">{{lang.lang.quick_links}}</h4>
         <ul class="footer-links">
-          <li *ngFor="let link of quickLinks">
-            <a [routerLink]="link.path" class="footer-link">
+          <li>
+            <a target="_blank" href="https://www.tnadw.in/" class="footer-link">
               <span class="growbar"></span>
-              {{ link.name }}
+              {{ lang.lang.adw_department }}
+            </a>
+            <a target="_blank" href="https://www.tntribalwelfare.tn.gov.in/" class="footer-link">
+              <span class="growbar"></span>
+              {{ lang.lang.tribal_welfare_department }}
+            </a>
+            <a target="_blank" href="https://nhapoa.gov.in/en" class="footer-link">
+              <span class="growbar"></span>
+              {{ lang.lang.national_helpline }}
             </a>
           </li>
         </ul>
       </div>
-  
+
       <!-- Contact Information -->
       <div class="footer-section">
-        <h4 class="footer-heading">Contact Us</h4>
-        <h4 class="footer-subheading">CMRF UNIT</h4>
+        <h4 class="footer-heading">{{lang.lang.contact_us}}</h4>
+        <h4 class="footer-subheading">ADWT</h4>
         <ul class="footer-contact">
-          <li *ngFor="let item of contactInfo">
-            <a *ngIf="item.link" [href]="item.link" class="contact-link text-sm" target="_blank" rel="noopener noreferrer">
-              <i [class]="item.icon"></i>
-              <span>{{ item.info }}</span>
+          <li>
+            <a href="https://www.google.com/maps/place/Ezhilagam/@13.0640614,80.2803734,17z/data=!3m1!4b1!4m6!3m5!1s0x3a5268a3dcb7b6df:0xf35c2afc64c0c275!8m2!3d13.0640562!4d80.2829537!16s%2Fm%2F0nd2pls?entry=ttu&g_ep=EgoyMDI1MDMxMi4wIKXMDSoASAFQAw%3D%3D"
+              class="contact-link text-sm" target="_blank" rel="noopener noreferrer">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>{{ lang.lang.address }}</span>
             </a>
-            <div *ngIf="!item.link" class="contact-item text-sm">
-              <i [class]="item.icon"></i>
-              <span>{{ item.info }}</span>
-            </div>
+            <a class="contact-link text-sm" target="_blank" rel="noopener noreferrer">
+              <i class="fas fa-phone"></i>
+              <span>044 -28589855</span>
+            </a>
+            <a class="contact-link text-sm" target="_blank" rel="noopener noreferrer">
+              <i class="fas fa-envelope"></i>
+              <span>adw.director&#64;gmail.com</span>
+            </a>
           </li>
         </ul>
       </div>
@@ -55,12 +64,12 @@
 
   <!-- Bottom Bar -->
   <div class="footer-bottom">
-      <div class="footer-bottom-content text-sm">
-        <div>© {{ currentYear }} CMRF. All rights reserved.</div>
-        <div class="footer-bottom-links">
-          <a routerLink="/privacy">Privacy Policy</a>
-          <a routerLink="/terms">Terms of Use</a>
-        </div>
+    <div class="footer-bottom-content text-sm">
+      <div>© {{ currentYear }} ADWT. All rights reserved.</div>
+      <div class="footer-bottom-links">
+        <a routerLink="/privacy">Privacy Policy</a>
+        <a routerLink="/terms">Terms of Use</a>
       </div>
+    </div>
   </div>
 </footer>

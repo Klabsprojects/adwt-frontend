@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
-
+import { LandingService } from '../landing.service';
 @Component({
   selector: 'app-downloads',
   templateUrl: './downloads.component.html',
   styleUrls: ['./downloads.component.css']
 })
 export class DownloadsComponent {
+  constructor(public lang:LandingService){
+    
+  }
   documents = [
     {
       title: "1. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act, 1989",

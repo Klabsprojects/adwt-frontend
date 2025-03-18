@@ -1,19 +1,21 @@
 <section class="poa">
     <div class="row">
-        <div class="header">
-            <h1 class="heading">POA</h1>
-        </div>
+        <app-carousel/>
     </div>
     <div class="row">
-        <h1 style="text-align: center;margin-top: 2rem;">POA</h1>
-        <p>This Department is taking various steps to abolish Untouchability and to prevent activities against Adi
-            Dravidar and Scheduled Tribes. For this Protection of Civil Rights Act 1955 and the Scheduled Castes and
-            Scheduled Tribes (Prevention of Atrocities) Act 1989 and rules have been enacted by the Government of India
-            and implemented by the State Government effectively. Now the Scheduled Castes and Scheduled Tribes (PoA) Act
-            1989 and the Scheduled Castes and Scheduled Tribes (PoA) rules 1995 have been amended by the Government of
-            India after getting concurrence from the State Governments as Scheduled castes and Scheduled Tribes
-            (Prevention of Atrocities) (Amendments) Act 2015 and Scheduled castes and Scheduled Tribes (Prevention of
-            Atrocities) Amendment Rules 2016-2018. The above said Act and Rules have been notified in the Gazette of
-            India (Extraordinary) and came into force on 01.01.2016, 14.04.2016 and 27.06.2018 respectively.</p>
+        <div class="header">
+            <h1 class="heading">{{lang.lang.POA}}</h1>
+        </div>
+    </div>
+    <div class="row mid">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+            <img src="assets/images/slide5.jpg" alt="" class="">
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 content">
+            <h2>{{lang.lang.adwt}}</h2>
+            <ng-container *ngFor="let item of lang.lang.poa_page">
+                <p>{{item}}</p>
+            </ng-container>
+        </div>
     </div>
 </section>
