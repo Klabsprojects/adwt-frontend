@@ -200,7 +200,7 @@
 
 
                     <div class="col-md-4 mb-3">
-                      <label for="dateOfOccurrence" class="form-label">10. Date of Occurrence *</label>
+                      <label for="dateOfOccurrence" class="form-label">10.From Date of Occurrence *</label>
                       <input
                           type="date"
                           id="dateOfOccurrence"
@@ -212,7 +212,19 @@
                   </div>
 
                   <div class="col-md-4 mb-3">
-                      <label for="timeOfOccurrence" class="form-label">11. Time of Occurrence *</label>
+                    <label for="todateOfOccurrence" class="form-label">10a. To Date of Occurrence *</label>
+                    <input
+                        type="date"
+                        id="todateOfOccurrence"
+                        class="form-control"
+                        formControlName="date_of_occurrence_to"
+                        [max]="today"
+                        required
+                    />
+                </div>
+
+                  <div class="col-md-4 mb-3">
+                      <label for="timeOfOccurrence" class="form-label">11. From Time of Occurrence *</label>
                       <input
                           type="time"
                           id="timeOfOccurrence"
@@ -221,6 +233,17 @@
                           required
                       />
                   </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label for="totimeOfOccurrence" class="form-label">11a. To Time of Occurrence *</label>
+                    <input
+                        type="time"
+                        id="totimeOfOccurrence"
+                        class="form-control"
+                        formControlName="time_of_occurrence_to"
+                        required
+                    />
+                </div>
 
                   <div class="col-md-4 mb-3">
                       <label for="placeOfOccurrence" class="form-label">12. Place of Occurrence *</label>
@@ -497,20 +520,72 @@
                                 </mat-form-field> -->
                                 <input type="text"  formControlName="scstSections" class="form-control" readonly />
                               </div>
-                      <div class="col-md-12 mb-3">
-                        <label for="sectionsIPC" class="form-label">32. Section Invoked Under IPC/POCSO/etc. *</label>
-                        <input type="text" id="sectionsIPC" formControlName="sectionsIPC" class="form-control" placeholder="Enter sections, separated by commas" />
-                        <small class="form-text text-muted">Separate each section with a comma.</small>
-                      </div>
+                      <div class="col-md-12 mb-3 mt-3">
+                        <label for="sectionsIPC" class="form-label w-100">32. Section Invoked Under IPC/POCSO/etc. *
+                          <!-- <button type="button" class="btn btn-primary mt-2 float-right py-2" (click)="addField()">Add</button> -->
+                          <button type="button" class="btn btn-primary mt-2 float-right py-2" (click)="addSection(i)">Add Section</button>
 
-                      <!-- <div style="display: none;">
-                        <input type="text" formControlName="fir_stage_as_per_act" class="form-control" />
-                        <input type="text" formControlName="fir_stage_ex_gratia" class="form-control" />
-                        <input type="text" formControlName="chargesheet_stage_as_per_act" class="form-control" />
-                        <input type="text" formControlName="chargesheet_stage_ex_gratia" class="form-control" />
-                        <input type="text" formControlName="final_stage_as_per_act" class="form-control" />
-                        <input type="text" formControlName="final_stage_ex_gratia" class="form-control" />
-                      </div> -->
+                        </label>
+                        <!-- <input type="text" id="sectionsIPC" formControlName="sectionsIPC" class="form-control" placeholder="Enter sections, separated by commas" />
+                        <small class="form-text text-muted">Separate each section with a comma.</small> -->
+
+                        <!-- <div class="col-md-12 mb-3">
+                          <div *ngFor="let field of sectionFields; let i = index">
+                              <div class=" col-md-4 pl-0 float-left mr-2">
+                                <select id="sectionsDropdown" class="form-control" (change)="onSectionChange($event)">
+                                    <option selected>Select Section</option>
+                                    <option value="IPC">IPC</option>
+                                    <option value="BNS">BNS</option>
+                                    <option value="BNSS">BNSS</option>
+                                    <option value="POCSO">POCSO</option>
+                                    <option value="Child Marriage Act">Child Marriage Act</option>
+                                    <option value="Women Harassment Act">Women Harassment Act</option>
+                                    <option value="PPDL">PPDL</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                              </div>
+                              <div class="col-md-5 pl-0 float-left">
+                                <input type="text" class="form-control mb-2" placeholder="Enter section name" />
+                              </div>
+                              <div class="col-md-2 text-center float-left">
+                                <button *ngIf="i !== 0" type="button" class="btn btn-danger btn-sm" (click)="removeField(i)">Delete</button>
+                              </div>
+                            </div>
+                          </div> -->
+                          <div formArrayName="sectionDetails">
+                            <div *ngFor="let section of getSectionDetails(i).controls; let j = index" [formGroupName]="j" class="section-entry mb-3">
+                              <div class="row">
+                                <div class="col-md-4 float-left mr-2">
+                                  <!-- <label for="sectionType{{ i }}-{{ j }}" class="form-label">Section Type *</label> -->
+                                  <select id="sectionType{{ i }}-{{ j }}" class="form-control" formControlName="SectionType" required>
+                                    <option selected value="">Select</option>
+                                    <option value="IPC">IPC</option>
+                                    <option value="BNS">BNS</option>
+                                    <option value="BNSS">BNSS</option>
+                                    <option value="POCSO">POCSO</option>
+                                    <option value="Child Marriage Act">Child Marriage Act</option>
+                                    <option value="Women Harassment Act">Women Harassment Act</option>
+                                    <option value="PPDL">PPDL</option>
+                                    <option value="Others">Others</option>
+                                  </select>
+                                </div>
+                  
+                                <div class="col-md-5 float-left">
+                                  <!-- <label for="sectionName{{ i }}-{{ j }}" class="form-label">Section *</label> -->
+                                  <input type="text" id="sectionName{{ i }}-{{ j }}" class="form-control" formControlName="Section" placeholder="Enter section name" />
+                                </div>
+                  
+                                <div class="col-md-2 text-center float-left">
+                                  <button *ngIf="j !== 0" type="button" class="btn btn-danger btn-sm" (click)="removeSection(i, j)">Delete</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- Add Section Button -->
+                          
+                        
+                  
+                        </div>
                           </div>
                         </div>
                     </div>
@@ -1110,7 +1185,7 @@
                     <div class="row mb-3">
                       <!-- Case Type Selection -->
                       <div class="col-md-4 mb-3">
-                        <label for="caseType" class="form-label">66. Select Case Type *</label>
+                        <label for="caseType" class="form-label">66. Select Nature of Final Report *</label>
                         <select
                         id="caseType"
                         class="form-select"
@@ -1125,7 +1200,8 @@
                       </div>
 
                       <!-- Fields for Charge Sheet -->
-                      <div *ngIf="firForm.get('caseType')?.value === 'chargeSheet'" class="col-lg-6">
+                      <div *ngIf="firForm.get('caseType')?.value === 'chargeSheet'">
+                        <div class="col-lg-3">
                         <label for="caseNumber" class="form-label">67. Case Number Report (CNR) / Special SC Number *</label>
                         <input
                           type="text"
@@ -1135,12 +1211,23 @@
                           placeholder="Enter Case Number"
                           required
                         />
+                        </div>
+                        <div class="col-lg-3">
+                          <label for="chargesheetDate" class="form-label">67a. Date of Chargesheet</label>
+                          <input
+                            type="date"
+                            id="chargesheetDate"
+                            class="form-control"
+                            formControlName="rcsFilingDate"
+                            required
+                          />
+                        </div>
                       </div>
 
                       <!-- Fields for Referred Charge Sheet -->
                       <div *ngIf="firForm.get('caseType')?.value === 'referredChargeSheet'" class="col-md-12">
                         <div class="row">
-                          <div class="col-lg-6">
+                          <div class="col-lg-3">
                             <label for="rcsFileNumber" class="form-label">68. Referred Charge Sheet (RCS) file number</label>
                             <input
                               type="text"
@@ -1150,7 +1237,7 @@
                               required placeholder="Enter RCS File Number"
                             />
                           </div>
-                          <div class="col-lg-6">
+                          <div class="col-lg-3">
                             <label for="rcsFilingDate" class="form-label">69. Referred Charge Sheet (RCS) filing date</label>
                             <input
                               type="date"
@@ -1160,7 +1247,7 @@
                               required placeholder="Enter Case Number"
                             />
                           </div>
-                          <div class="col-lg-6">
+                          <div class="col-lg-3">
                             <label for="mfCopy" class="form-label">70. Upload MF copy</label>
                             <input
                             type="file"

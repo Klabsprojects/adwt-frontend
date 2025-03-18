@@ -161,6 +161,7 @@ i: number;
 isStepOneModified = false;
 isStepTwoModified = false; 
 isStepThreeModified = false;
+sectionFields: string[] = [''];
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -1769,7 +1770,8 @@ createVictimGroup(): FormGroup {
     nativeDistrict: [''],
     offenceCommitted: ['', Validators.required],
     scstSections: ['', Validators.required],
-    sectionsIPC: ['', Validators.required],
+    // sectionsIPC: ['', Validators.required],
+    sectionDetails: this.fb.array([this.createSection()]),
     fir_stage_as_per_act: [''],
     fir_stage_ex_gratia: [''],
     chargesheet_stage_as_per_act: [''],
@@ -1778,6 +1780,32 @@ createVictimGroup(): FormGroup {
     final_stage_ex_gratia: [''],
   });
 }
+
+createSection(): FormGroup {
+  return this.fb.group({
+    SectionType: ['', Validators.required],
+    Section: ['', Validators.required]
+  });
+}
+
+getSectionDetails(victimIndex: number): FormArray {
+  return this.victims.at(victimIndex).get('sectionDetails') as FormArray;
+}
+
+
+addSection(victimIndex: number): void {
+  const sectionDetails = this.getSectionDetails(victimIndex);
+  sectionDetails.push(this.createSection());
+}
+
+
+removeSection(victimIndex: number, sectionIndex: number): void {
+  const sectionDetails = this.getSectionDetails(victimIndex);
+  if (sectionDetails.length > 1) {
+    sectionDetails.removeAt(sectionIndex);
+  }
+}
+
 
 
 
@@ -2256,7 +2284,8 @@ console.log(isVictimSameAsComplainant,"sasa")
           nativeDistrict: victim.nativeDistrict || null,
           offenceCommitted: victim.offenceCommitted || [],
           scstSections: victim.scstSections || [],
-          sectionsIPC: victim.sectionsIPC || '',
+          // sectionsIPC: victim.sectionsIPC || '',
+          sectionDetails:victim.sectionDetails || [],
           fir_stage_as_per_act: victim.fir_stage_as_per_act || null,
           fir_stage_ex_gratia: victim.fir_stage_ex_gratia || null,
           chargesheet_stage_as_per_act: victim.chargesheet_stage_as_per_act || null,
@@ -2270,9 +2299,11 @@ console.log(isVictimSameAsComplainant,"sasa")
       isDeceased: this.firForm.get('isDeceased')?.value,
       deceasedPersonNames: this.firForm.get('deceasedPersonNames')?.value || [],
     };
-console.log(firData,"firDatafirDatafirData")
+
+    console.log("third step data",firData);
     this.firService.saveStepThreeAsDraft(firData).subscribe(
       (response: any) => {
+        console.log("After api call",response);
         this.firId = response.fir_id;
         if (this.firId) {
           sessionStorage.setItem('firId', this.firId);
@@ -4454,4 +4485,5 @@ isSubmitButtonEnabled(): boolean {
     // console.log(this.firForm.get('officerDesignation')?.value);
   }
 
+  
 }
