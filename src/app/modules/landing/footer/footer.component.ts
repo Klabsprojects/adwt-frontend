@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-
+import { LandingService } from '../landing.service';
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.css']
 })
 export class FooterComponent {
+constructor(public lang:LandingService){}
   currentYear: number = new Date().getFullYear();
 
   // quickLinks = [

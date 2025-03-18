@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
-
+import { LandingService } from '../landing.service';
 @Component({
   selector: 'app-about',
   templateUrl: './about.component.html',
   styleUrls: ['./about.component.css']
 })
 export class AboutComponent {
+  constructor(public lang:LandingService){
+    
+  }
   collegeData = [
     { id: 1, type: "Arts and Science Colleges", government: 164, aided: 139, selfFinancing: 646, total: 949 },
     { id: 2, type: "Physical Education", government: 0, aided: 3, selfFinancing: 8, total: 11 },

@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth';
+import { LandingService } from '../landing.service';
 declare var bootstrap: any; // Import Bootstrap JavaScript
 @Component({
   selector: 'app-header',
@@ -21,10 +22,30 @@ export class HeaderComponent implements OnInit {
     { to: '/auth/login', label: 'Login', isExternal: false }
   ];
   public is_user:boolean=false;
+  selLang:any="en";
+  phoneNumbers: string[] = ['+91 9876543210', '+91 0123456789'];
+  currentPhone: string = this.phoneNumbers[0];
 
-  constructor(private router: Router,private auth:AuthService) { }
+
+  constructor(private router: Router,private auth:AuthService,public lang:LandingService,private cdRef: ChangeDetectorRef) { }
   ngOnInit(): void {
+    setInterval(() => {
+      this.currentPhone = this.currentPhone === this.phoneNumbers[0] 
+        ? this.phoneNumbers[1] 
+        : this.phoneNumbers[0];
+  
+      this.cdRef.detectChanges(); // Force UI update
+    }, 1000);
     this.is_user = sessionStorage.getItem('user_data')?true:false;
+    const locLang = localStorage.getItem('adwtloclang');
+    if(locLang){
+      this.selLang = locLang;
+      this.lang.setlang(locLang);
+    }
+  }
+  changelang(lang:string){
+    this.selLang = lang;
+    this.lang.setlang(lang);
   }
 
   isActive(path: string): boolean {

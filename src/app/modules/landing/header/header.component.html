@@ -71,6 +71,22 @@
     </ng-container>
   </div>
 </header> -->
+<div class="top-header">
+  <div class="language-switcher">
+    <span *ngIf="selLang === 'tn'" (click)="changelang('en')">
+      <img src="assets/images/lang.png" alt="" width="50px"> English
+    </span>
+    <span *ngIf="selLang === 'en'" (click)="changelang('tn')">
+      <img src="assets/images/lang.png" alt="" width="50px"> தமிழ்
+    </span>
+  </div>
+
+  <div class="phone-container">
+    <img src="assets/images/phone.png" alt="" width="30px">
+    <p>{{ currentPhone }}</p>
+  </div>
+</div>
+
 <section class="header">
   <div class="row">
     <div class="col-xl-4 col-lg-4 col-md-10 col-sm-10 col-10">
@@ -78,14 +94,14 @@
         <img src="assets/images/image.png" alt="Secondary Logo" class="logo small" />
         <div class="divider"></div>
         <div class="titles">
-          <h1 class="title sk mobile-title">Samaththuvam Kaanbom</h1>
-          <h2 class="title adtw">Adi Dravidar and Tribal Welfare Department</h2>
-          <h3 class="title gov">Government of Tamil Nadu</h3>
+          <h1 class="title sk mobile-title">{{lang.lang.sk}}</h1>
+          <h2 class="title adtw">{{lang.lang.adwt}}</h2>
+          <h3 class="title gov">{{lang.lang.govt}}</h3>
         </div>
       </div>
     </div>
     <div class="col-xl-4 col-lg-4 d-flex justify-content-center align-items-center desktop-only">
-      <h1 class="title sk">Samaththuvam Kaanbom</h1>
+      <h1 class="title sk">{{lang.lang.sk}}</h1>
     </div>
     <div class="col-xl-4 col-lg-4 d-flex justify-content-end align-items-center px-4 desktop-only">
       <!-- <button role="button" class="btn btn-primary mobile-link loginout" data-bs-toggle="modal" data-bs-target="#exampleModal"
@@ -101,7 +117,7 @@
     </div>
     <div *ngIf="isMenuOpen" class="mobile-overlay" (click)="toggleMenu()"></div>
     <div class="mobile-menu" [class.open]="isMenuOpen">
-      <ng-container *ngFor="let item of menuItems">
+      <!-- <ng-container *ngFor="let item of menuItems">
         <a *ngIf="item.label !== 'News & Events' && item.label !== 'Login' && item.label !=='About Us'"
           [routerLink]="item.isExternal ? null : item.to" [href]="item.isExternal ? item.to : null" class="mobile-link">
           {{ item.label }}
@@ -130,15 +146,54 @@
           Officer Login
         </a>
         <a *ngIf="item.label === 'Login' && is_user" href="#">
-        Logut
-      </a>
+          Logut
+        </a>
+      </ng-container> -->
+      <ng-container>
+        <a routerLink="landing" class="mobile-link">
+          {{ lang.lang.home}}
+        </a>
+        <div class="dropdown nav-item">
+          <a href="#" class="mobile-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown" routerLink="about">
+            {{ lang.lang.about}}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-mob">
+            <li><a class="dropdown-item" href="#">{{lang.lang.adwt}}</a></li>
+            <li><a class="dropdown-item" href="#">{{lang.lang.sjhrw}}</a></li>
+            <li><a class="dropdown-item" href="#">{{lang.lang.tnsc}}</a></li>
+          </ul>
+        </div>
+        <a routerLink="poa" class="mobile-link">
+          {{ lang.lang.poa}}
+        </a>
+        <a routerLink="services" class="mobile-link">
+          {{ lang.lang.acts_rules}}
+        </a>
+        <div class="dropdown nav-item">
+          <a href="#" class="mobile-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown">
+            {{ lang.lang.news_events}}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-mob">
+            <li><a class="dropdown-item" href="#">{{lang.lang.gallery}}</a></li>
+            <li><a class="dropdown-item" href="#">{{lang.lang.press_releases}}</a></li>
+          </ul>
+        </div>
+        <a routerLink="helpline" class="mobile-link">
+          {{ lang.lang.poa_helpline}}
+        </a>
+        <a routerLink="faq" class="mobile-link">
+          {{ lang.lang.faq}}
+        </a>
+        <button role="button" class="btn mobile-link loginout" data-bs-toggle="modal" data-bs-target="#exampleModal"
+          *ngIf="!is_user">{{lang.lang.officers_login}}</button>
+        <button class="btn mobile-link loginout" *ngIf="is_user" (click)="logout()">{{lang.lang.logout}}</button>
       </ng-container>
     </div>
   </div>
 </section>
 <div class="web-nav desktop-only">
   <nav class="nav-links">
-    <ng-container *ngFor="let item of menuItems">
+    <!-- <ng-container *ngFor="let item of menuItems">
       <a *ngIf="item.label !== 'News & Events' && item.label !== 'Login' && item.label !=='About Us'"
         [routerLink]="item.isExternal ? null : item.to" [href]="item.isExternal ? item.to : null" class="nav-link"
         target="{{ item.isExternal ? '_blank' : '_self' }}">
@@ -171,6 +226,45 @@
           *ngIf="!is_user">Officer Login</button>
         <button class="btn mobile-link loginout" *ngIf="is_user" (click)="logout()">Log out</button>
       </div>
+    </ng-container> -->
+    <ng-container>
+      <a routerLink="landing" class="nav-link">
+        {{ lang.lang.home}}
+      </a>
+      <div class="dropdown nav-item">
+        <a href="#" class="nav-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown" routerLink="about">
+          {{ lang.lang.about}}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-about">
+          <li><a class="dropdown-item" href="#">{{lang.lang.adwt}}</a></li>
+          <li><a class="dropdown-item" href="#">{{lang.lang.sjhrw}}</a></li>
+          <li><a class="dropdown-item" href="#">{{lang.lang.tnsc}}</a></li>
+        </ul>
+      </div>
+      <a routerLink="poa" class="nav-link">
+        {{ lang.lang.poa}}
+      </a>
+      <a routerLink="services" class="nav-link">
+        {{ lang.lang.acts_rules}}
+      </a>
+      <div class="dropdown nav-item">
+        <a href="#" class="nav-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown">
+          {{ lang.lang.news_events}}
+        </a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">{{lang.lang.gallery}}</a></li>
+          <li><a class="dropdown-item" href="#">{{lang.lang.press_releases}}</a></li>
+        </ul>
+      </div>
+      <a routerLink="helpline" class="nav-link">
+        {{ lang.lang.poa_helpline}}
+      </a>
+      <a routerLink="faq" class="nav-link">
+        {{ lang.lang.faq}}
+      </a>
+      <button role="button" class="btn mobile-link loginout" data-bs-toggle="modal" data-bs-target="#exampleModal"
+        *ngIf="!is_user">{{lang.lang.officers_login}}</button>
+      <button class="btn mobile-link loginout" *ngIf="is_user" (click)="logout()">{{lang.lang.logout}}</button>
     </ng-container>
   </nav>
 </div>
