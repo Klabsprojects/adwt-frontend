@@ -833,12 +833,21 @@
 
 
                                 <!-- Antecedents of the Accused -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="antecedents{{ i }}" class="form-label">48. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *</label>
+                                 <div class="col-md-6">
+                                  <label for="antecedentsOption{{ i }}" class="form-label">48a. Antecedents *</label>
+                                  <select class="form-control" formControlName="antecedentsOption">
+                                    <option value="">Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="NA">NA</option>
+                                  </select>
+                                 </div>
+
+                                <div class="col-md-6 mb-3" *ngIf="accused.get('antecedentsOption')?.value === 'Yes'">
+                                    <label for="antecedents{{ i }}" class="form-label">48b. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *</label>
                                     <input type="text" [id]="'antecedents' + i" class="form-control" formControlName="antecedents" placeholder="Enter antecedents" required (input)="checkInput(i, 'antecedents')"/>
-                                    <small *ngIf="!isInputValid(i, 'antecedents')" class="text-danger d-block mt-1">
+                                    <!-- <small *ngIf="!isInputValid(i, 'antecedents')" class="text-danger d-block mt-1">
                                       Please type 'NA' if there are no antecedents of the accused.
-                                  </small>
+                                  </small> -->
                                 </div>
                                 <!-- <div class="col-md-6 mb-3">
                                   <label for="antecedents{{ i }}" class="form-label">
@@ -859,12 +868,20 @@
 
 
                                 <!-- L&O Issues -->
-                                <div class="col-md-6 mb-3">
-                                  <label for="landOIssues{{ i }}" class="form-label">49. L&O Issues (Pickets, Bandoust, etc) *</label>
+                                <div class="col-md-6">
+                                  <label for="loissue{{ i }}" class="form-label">49a. L & O Issues *</label>
+                                  <select class="form-control" formControlName="landOIssueOption">
+                                    <option value="">Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="NA">NA</option>
+                                  </select>
+                                 </div>
+                                <div class="col-md-6 mb-3" *ngIf="accused.get('landOIssueOption')?.value === 'Yes'">
+                                  <label for="landOIssues{{ i }}" class="form-label">49b. L&O Issues (Pickets, Bandoust, etc) *</label>
                                   <input type="text" [id]="'landOIssues' + i" class="form-control" formControlName="landOIssues" placeholder="Enter L&O issues" required (input)="checkInput(i, 'landOIssues')"/>
-                                  <small *ngIf="!isInputValid(i, 'landOIssues')" class="text-danger d-block mt-1">
+                                  <!-- <small *ngIf="!isInputValid(i, 'landOIssues')" class="text-danger d-block mt-1">
                                     Please type 'NA' if there are no L&O Issues.
-                                </small>
+                                </small> -->
                                 </div>
 
                                 <!-- Gist of the Current Case -->

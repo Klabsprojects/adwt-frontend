@@ -2158,7 +2158,9 @@ handleCaseTypeChange() {
       scstOffence: [false, Validators.required],
       scstFIRNumber: [''],
       scstFIRNumberSuffix: [''],
+      antecedentsOption:['',Validators.required],
       antecedents: ['', Validators.required],
+      landOIssueOption: ['', Validators.required],
       landOIssues: ['', Validators.required],
       gistOfCurrentCase: ['', [Validators.required, Validators.maxLength(3000)]],
       availableCastes: [[]]
