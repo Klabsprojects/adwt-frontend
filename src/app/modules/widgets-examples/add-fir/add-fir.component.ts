@@ -200,7 +200,6 @@ sectionFields: string[] = [''];
 
     // Listen for input changes and trigger UI update
     this.firForm.valueChanges.subscribe(() => {
-      //console.log('Form Updated:', this.firForm.value); // Debugging log
       this.cdr.detectChanges(); // Manually trigger UI update
     });
 
@@ -219,11 +218,6 @@ sectionFields: string[] = [''];
     this.firForm.get('caseType')?.valueChanges.subscribe(() => {
       this.handleCaseTypeChange();
     });
-    if (this.firId) {
-      //console.log(`Using existing FIR ID: ${this.firId}`);
-    } else {
-      //console.log('Creating a new FIR entry');
-    }
 
     // Listen for route changes
     this.router.events.subscribe((event: any) => {
@@ -255,7 +249,6 @@ this.loadPoliceDivision();
     const isSame = isVictimSame === 'true';
     this.onVictimSameAsComplainantChange(isSame);
     this.wasVictimSame = isSame;
-    
     this.updateAllVictims();
   });
   
@@ -264,8 +257,21 @@ this.loadPoliceDivision();
       this.updateAllVictims();
     });
   });
-  
+  this.firForm.get('antecedentsOption')?.valueChanges.subscribe(value => {
+    this.updateAntecedentsValidation(value);
+  });
   }
+
+  updateAntecedentsValidation(value: string): void {
+    const antecedentsControl = this.firForm.get('antecedents');
+    if (value === 'Yes') {
+      antecedentsControl?.setValidators([Validators.required]);
+    } else {
+      antecedentsControl?.setValidators([]);
+    }
+    antecedentsControl?.updateValueAndValidity();
+  }
+
   updateAllVictims() {
     const isVictimSame = this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.value === 'true';
     const complainantDetails = this.firForm.get('complainantDetails')?.value || {};
@@ -569,7 +575,9 @@ saveStepTwoAsDraft() {
     firNumber: this.firForm.value.firNumber,
     firNumberSuffix: this.firForm.value.firNumberSuffix,
     dateOfOccurrence: this.firForm.value.dateOfOccurrence,
+    date_of_occurrence_to: this.firForm.value.date_of_occurrence_to,
     timeOfOccurrence: this.firForm.value.timeOfOccurrence,
+    time_of_occurrence_to: this.firForm.value.time_of_occurrence_to,
     placeOfOccurrence: this.firForm.value.placeOfOccurrence,
     dateOfRegistration: this.firForm.value.dateOfRegistration,
     timeOfRegistration: this.firForm.value.timeOfRegistration,
@@ -795,7 +803,9 @@ onFileSelect_3(event: Event, controlName: string): void {
       firNumber: ['', [Validators.required, Validators.pattern(/^[1-9][0-9]*$/)]], 
       firNumberSuffix: ['', Validators.required],
       dateOfOccurrence: ['', [Validators.required, this.maxDateValidator()]],
+      date_of_occurrence_to: ['', [Validators.required, this.maxDateValidator()]],
       timeOfOccurrence: ['', Validators.required],
+      time_of_occurrence_to:['',Validators.required],
       placeOfOccurrence: ['', Validators.required],
       dateOfRegistration: ['', Validators.required],
       timeOfRegistration: ['', Validators.required],
@@ -2159,15 +2169,14 @@ handleCaseTypeChange() {
       scstFIRNumber: [''],
       scstFIRNumberSuffix: [''],
       antecedentsOption:['',Validators.required],
-      antecedents: ['', Validators.required],
+      antecedents: [''],
       landOIssueOption: ['', Validators.required],
-      landOIssues: ['', Validators.required],
+      landOIssues: [''],
       gistOfCurrentCase: ['', [Validators.required, Validators.maxLength(3000)]],
       availableCastes: [[]]
 
     });
   }
-
 
   // Handle City Change
   onCityChange(event: any) {
