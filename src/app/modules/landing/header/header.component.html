@@ -239,44 +239,48 @@
       </div>
     </ng-container> -->
     <ng-container>
-      <a routerLink="landing" class="nav-link">
-        {{ lang.lang.home}}
-      </a>
-      <div class="dropdown nav-item">
-        <a href="#" class="nav-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown"
-          routerLink="about">
-          {{ lang.lang.about}}
+      <div class="other-links">
+        <a routerLink="landing" class="nav-link">
+          {{ lang.lang.home}}
         </a>
-        <ul class="dropdown-menu dropdown-menu-about">
-          <li><a class="dropdown-item" href="#">{{lang.lang.adwt}}</a></li>
-          <li><a class="dropdown-item" href="#">{{lang.lang.sjhrw}}</a></li>
-          <li><a class="dropdown-item" href="#">{{lang.lang.tnsc}}</a></li>
-        </ul>
-      </div>
-      <a routerLink="poa" class="nav-link">
-        {{ lang.lang.poa}}
-      </a>
-      <a routerLink="services" class="nav-link">
-        {{ lang.lang.acts_rules}}
-      </a>
-      <div class="dropdown nav-item">
-        <a href="#" class="nav-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown">
-          {{ lang.lang.news_events}}
+        <div class="dropdown nav-item">
+          <a href="#" class="nav-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown"
+            routerLink="about">
+            {{ lang.lang.about}}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-about">
+            <li><a class="dropdown-item" href="#">{{lang.lang.adwt}}</a></li>
+            <li><a class="dropdown-item" href="#">{{lang.lang.sjhrw}}</a></li>
+            <li><a class="dropdown-item" href="#">{{lang.lang.tnsc}}</a></li>
+          </ul>
+        </div>
+        <a routerLink="poa" class="nav-link">
+          {{ lang.lang.poa}}
         </a>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" routerLink="gallery">{{lang.lang.gallery}}</a></li>
-          <li><a class="dropdown-item" href="#">{{lang.lang.press_releases}}</a></li>
-        </ul>
+        <a routerLink="services" class="nav-link">
+          {{ lang.lang.acts_rules}}
+        </a>
+        <div class="dropdown nav-item">
+          <a href="#" class="nav-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown">
+            {{ lang.lang.news_events}}
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" routerLink="gallery">{{lang.lang.gallery}}</a></li>
+            <li><a class="dropdown-item" href="#">{{lang.lang.press_releases}}</a></li>
+          </ul>
+        </div>
+        <a routerLink="poahelpline" class="nav-link">
+          {{ lang.lang.poa_helpline}}
+        </a>
+        <a routerLink="faq" class="nav-link">
+          {{ lang.lang.faq}}
+        </a>
       </div>
-      <a routerLink="poahelpline" class="nav-link">
-        {{ lang.lang.poa_helpline}}
-      </a>
-      <a routerLink="faq" class="nav-link">
-        {{ lang.lang.faq}}
-      </a>
-      <button role="button" class="btn mobile-link loginout" data-bs-toggle="modal" data-bs-target="#exampleModal"
+      <div>
+        <button role="button" class="btn mobile-link loginout" data-bs-toggle="modal" data-bs-target="#exampleModal"
         *ngIf="!is_user">{{lang.lang.officers_login}}</button>
       <button class="btn mobile-link loginout" *ngIf="is_user" (click)="logout()">{{lang.lang.logout}}</button>
+      </div>
     </ng-container>
   </nav>
 </div>

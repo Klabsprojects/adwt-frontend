@@ -16,7 +16,7 @@ export class LandingService {
         news_events: "News & Events",
         poa_helpline: "PoA Helpline",
         faq: "FAQ's",
-        officers_login: "Officers Login",
+        officers_login: "Officer's Login",
         adwt: "Adi Dravidar and Tribal Welfare Department",
         govt: "Government of Tamil Nadu",
         sk: "Samaththuvam Kaanbom",
