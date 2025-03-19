@@ -73,17 +73,17 @@
 
                         <div class="col-md-6 col-lg-3 mb-3">
                             <label for="policeRange" class="form-label">3. Police Range *</label>
-                            <select id="policeRange" class="form-select" formControlName="policeRange" [disabled]="firForm.get('policeRange')?.value" required>
+                            <select id="policeRange" class="form-select" formControlName="policeRange"  required>
                                 <option value="" disabled>Select one</option>
-                                <option *ngFor="let range of policeRanges" [value]="range">{{ range }}</option>
+                                <option *ngFor="let range of policeRanges[0]" [value]="range">{{ range }}</option>
                             </select>
                         </div>
 
                         <div class="col-md-6 col-lg-3 mb-3">
                             <label for="revenueDistrict" class="form-label">4. Revenue District *</label>
-                            <select id="revenueDistrict" class="form-select" formControlName="revenueDistrict" [disabled]="firForm.get('revenueDistrict')?.value" required>
+                            <select id="revenueDistrict" class="form-select" formControlName="revenueDistrict" required>
                                 <option value="" disabled>Select one</option>
-                                <option *ngFor="let district of revenueDistricts" [value]="district">{{ district }}</option>
+                                <option *ngFor="let district of revenueDistricts[0]" [value]="district">{{ district }}</option>
                             </select>
                         </div>
 
@@ -109,6 +109,33 @@
                         <small class="text-danger" *ngIf="firForm.get('officerName')?.invalid && firForm.get('officerName')?.touched">
                           Please enter a valid name.
                         </small>
+                      </div>
+
+                      <div class="col-lg-4">
+                        <label for="complaintReceived" class="form-label w-100 float-left">6a. Complaint Received</label>
+                        <div class="form-check float-left">
+                          <input  type="radio" class="radio-button" formControlName="complaintReceivedType" id="written" value="Written">
+                          <label class="form-check-label pl-2" for="written"> Written</label>
+                        </div>
+                        <div class="form-check float-left">
+                          <input  type="radio" class="radio-button" formControlName="complaintReceivedType" id="oral" value="Oral">
+                          <label class="form-check-label  pl-2" for="oral"> Oral </label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-6 col-lg-4 mb-3">
+                        <label for="complaintRegisteredBy" class="form-label">6b. Complaint Registered By</label>
+                        <select id="complaintRegisteredBy" class="form-select" formControlName="complaintRegisteredBy">
+                          <option value="" selected>Select </option>
+                          <option value="Inspector">Inspector</option>
+                          <option value="SI/ SSI">SI/ SSI</option>
+                          <option value="ORS">ORS</option>
+                        </select>
+                      </div>
+
+                      <div class="col-md-6 col-lg-4 mb-3">
+                        <label for="officerPhone" class="form-label">6c. Complaint Receiver Name</label>
+                        <input  type="text" class="form-control"  placeholder="Enter Complaint Receiver Name" formControlName="complaintReceiverName" />
                       </div>
 
                       <!-- Designation of the Investigating Officer -->
@@ -1226,7 +1253,7 @@
                           required
                         />
                         </div>
-                        <div class="col-lg-3" *ngIf="firForm.get('caseType')?.value === 'chargeSheet'">
+                        <div class="col-lg-4" *ngIf="firForm.get('caseType')?.value === 'chargeSheet'">
                           <label for="chargesheetDate" class="form-label">67b. Date of Chargesheet</label>
                           <input
                             type="date"
@@ -1241,7 +1268,7 @@
                       <!-- Fields for Referred Charge Sheet -->
                       <div *ngIf="firForm.get('caseType')?.value === 'referredChargeSheet'" class="col-md-12">
                         <div class="row">
-                          <div class="col-lg-3">
+                          <div class="col-lg-4">
                             <label for="rcsFileNumber" class="form-label">68. Referred Charge Sheet (RCS) file number</label>
                             <input
                               type="text"
@@ -1251,7 +1278,7 @@
                               required placeholder="Enter RCS File Number"
                             />
                           </div>
-                          <div class="col-lg-3">
+                          <div class="col-lg-4">
                             <label for="rcsFilingDate" class="form-label">69. Referred Charge Sheet (RCS) filing date</label>
                             <input
                               type="date"
@@ -1261,7 +1288,7 @@
                               required placeholder="Enter Case Number"
                             />
                           </div>
-                          <div class="col-lg-3">
+                          <div class="col-lg-4">
                             <label for="mfCopy" class="form-label">70. Upload MF copy</label>
                             <input
                             type="file"

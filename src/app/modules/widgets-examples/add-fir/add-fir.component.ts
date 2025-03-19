@@ -142,8 +142,8 @@ export class AddFirComponent implements OnInit, OnDestroy {
   // Dropdown options
   policeCities: string[] = [];
   policeZones: string[] = [];
-  policeRanges: string[] = [];
-  revenueDistricts: string[] = [];
+  policeRanges: any[] = [];
+  revenueDistricts: any[] = [];
   offenceOptions: any[] = [];
   offenceActsOptions: { offence_act_name: string; [key: string]: any }[] = [];
   courtDistricts: string[] = [];
@@ -793,6 +793,9 @@ onFileSelect_3(event: Event, controlName: string): void {
       //stationNumber: ['', Validators.required],
       stationName: ['', Validators.required],
       officerName: ['', [Validators.required, Validators.pattern('^[A-Za-z\\s]*$')]], // Name validation
+      complaintReceivedType:[''],
+      complaintRegisteredBy:[''],
+      complaintReceiverName:[''],
       officerDesignation: ['', Validators.required], // Dropdown selection
       officerPhone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]], // 10-digit phone validation
 
@@ -857,6 +860,7 @@ onFileSelect_3(event: Event, controlName: string): void {
       courtName: ['', Validators.required],
       caseType: ['', Validators.required], // Charge Sheet or Referred Charge Sheet
       caseNumber: [{ value: '', disabled: true }], // Dynamic field for Charge Sheet
+      chargeSheetDate:[{ value: '', disabled: true }],
       rcsFileNumber: [{ value: '', disabled: true }], // Dynamic field for RCS
       rcsFilingDate: [{ value: '', disabled: true }], // Dynamic field for RCS
       mfCopy: [{ value: '', disabled: true }], // File upload field for RCS
@@ -1899,11 +1903,13 @@ handleCaseTypeChange() {
 
   if (caseType === 'chargeSheet') {
     this.firForm.get('caseNumber')?.enable();
+    this.firForm.get('chargeSheetDate')?.enable();
     this.firForm.get('rcsFileNumber')?.disable();
     this.firForm.get('rcsFilingDate')?.disable();
     this.firForm.get('mfCopy')?.disable();
   } else if (caseType === 'referredChargeSheet') {
     this.firForm.get('caseNumber')?.disable();
+    this.firForm.get('chargeSheetDate')?.disable();
     this.firForm.get('rcsFileNumber')?.enable();
     this.firForm.get('rcsFilingDate')?.enable();
     this.firForm.get('mfCopy')?.enable();
@@ -2025,13 +2031,22 @@ handleCaseTypeChange() {
 
         console.log(data,"this.policeCities")
         this.policeZones = data.map((item: any) => item.police_zone_name);
-        this.policeRanges = data.map((item: any) => item.police_range_name);
-        this.revenueDistricts = data.map((item: any) => item.revenue_district_name);
-      
-        const policeZoneValue = this.policeZones.length > 0 ? this.policeZones[0] : '';
-        const policeRangeValue = this.policeRanges.length > 0 ? this.policeRanges[0] : '';
-        const revenueDistrictValue = this.revenueDistricts.length > 0 ? this.revenueDistricts[0] : '';
+        // this.policeRanges = data.map((item: any) => item.police_range_name);
+        // this.revenueDistricts = data.map((item: any) => item.revenue_district_name);
+        this.policeRanges = data.map((item: any) => {
+          return item.police_range_name ? item.police_range_name.split(',') : [];
+        });
+        this.revenueDistricts = data.map((item: any) => {
+          return item.revenue_district_name ? item.revenue_district_name.split(',') : [];
+        });
 
+        const policeZoneValue = this.policeZones.length > 0 ? this.policeZones[0] : '';
+        // const policeRangeValue = this.policeRanges.length > 0 ? this.policeRanges[0] : '';
+        // const revenueDistrictValue = this.revenueDistricts.length > 0 ? this.revenueDistricts[0] : '';
+
+        const policeRangeValue = this.policeRanges.length > 0 && this.policeRanges[0].length > 0 ? this.policeRanges[0][0] : '';
+        const revenueDistrictValue = this.revenueDistricts.length > 0 && this.revenueDistricts[0].length > 0 ? this.revenueDistricts[0][0] : '';
+          
         this.firForm.patchValue({
           policeZone: policeZoneValue,
           policeRange: policeRangeValue,
@@ -2039,8 +2054,8 @@ handleCaseTypeChange() {
         });
 
         if (policeZoneValue) this.firForm.get('policeZone')?.disable();
-        if (policeRangeValue) this.firForm.get('policeRange')?.disable();
-        if (revenueDistrictValue) this.firForm.get('revenueDistrict')?.disable();
+        // if (policeRangeValue) this.firForm.get('policeRange')?.disable();
+        // if (revenueDistrictValue) this.firForm.get('revenueDistrict')?.disable();
       },
       (error: any) => {
         Swal.fire('Error', 'Failed to load division details.', 'error');
@@ -2181,11 +2196,24 @@ handleCaseTypeChange() {
   // Handle City Change
   onCityChange(event: any) {
     const selectedCity = event.target.value;
-  
+    console.log(selectedCity);
+    if(selectedCity == "Chennai City"){
+      this.firForm.get('policeRange')?.enable();
+    }
+    else{
+      this.firForm.get('policeRange')?.disable();
+    }
     if (selectedCity) {
       this.loadPoliceDivisionDetails(selectedCity);
     } else {
       this.resetPoliceFields();
+    }
+    const citiesThatEnableRevenueDistrict = ["Chennai City", "Avadi City", "Tambaram City"];
+  
+    if (citiesThatEnableRevenueDistrict.includes(selectedCity)) {
+      this.firForm.get('revenueDistrict')?.enable();
+    } else {
+      this.firForm.get('revenueDistrict')?.disable();
     }
   }
   resetPoliceFields() {
@@ -2684,6 +2712,9 @@ saveAsDraft_6(isSubmit: boolean = false): void {
       caseNumber: this.firForm.get('caseType')?.value === 'chargeSheet'
         ? this.firForm.get('caseNumber')?.value || ''
         : null,
+      chargeSheetDate: this.firForm.get('caseType')?.value === 'chargeSheet'
+        ? this.firForm.get('chargeSheetDate')?.value || null
+        : null,
       rcsFileNumber: this.firForm.get('caseType')?.value === 'referredChargeSheet'
         ? this.firForm.get('rcsFileNumber')?.value || ''
         : null,
@@ -3094,6 +3125,7 @@ async saveAsDraft_7(isSubmit: boolean = false)  {
 courtName: this.firForm.get('Court_name1')?.value,
 courtDistrict: this.firForm.get('courtDistrict')?.value,
 trialCaseNumber: this.firForm.get('caseNumber')?.value,
+chargeSheetDate: this.firForm.get('chargeSheetDate')?.value,
 publicProsecutor: this.firForm.get('publicProsecutor')?.value,
 prosecutorPhone: this.firForm.get('prosecutorPhone')?.value,
 firstHearingDate: this.firForm.get('firstHearingDate')?.value,
@@ -3664,6 +3696,7 @@ isStep6Valid(): boolean {
     // Validate fields specific to `chargeSheet`
     controls = [
       'caseNumber',
+      'chargeSheetDate',
       'chargeSheetFiled',
       'courtDistrict',
       'courtName',
