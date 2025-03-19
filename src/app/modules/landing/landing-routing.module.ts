@@ -6,7 +6,9 @@ import { AboutComponent } from './about/about.component';
 import { DownloadsComponent } from './downloads/downloads.component';
 import { ContactComponent } from './contact/contact.component';
 import { POAComponent } from './poa/poa.component';
-
+import { PoaHelplineComponent } from './poa-helpline/poa-helpline.component';
+import { GalleryComponent } from './gallery/gallery.component';
+import { FaqComponent } from './faq/faq.component';
 const routes: Routes = [
   {
     path: '',
@@ -17,6 +19,10 @@ const routes: Routes = [
       { path: 'services', component: DownloadsComponent },
       { path: 'contact', component: ContactComponent },
       { path: 'poa',component:POAComponent},
+      { path: 'poahelpline',component:PoaHelplineComponent},
+      { path: 'gallery',component:GalleryComponent},
+      { path: 'faq',component:FaqComponent},
+      
       { path: '**', redirectTo: '', pathMatch: 'full' }, // Redirect unknown paths to Home
     ],
   },

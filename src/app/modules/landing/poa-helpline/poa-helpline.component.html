@@ -1,0 +1,67 @@
+<div>
+    <div class="header">
+        <h1 class="heading">{{lang.lang.poa_helpline_heading}}</h1>
+        <p class="subheading">{{lang.lang.poa_helpline_subheading}}</p>
+    </div>
+</div>
+<div class="container py-5">
+    <!-- Call Centre Information -->
+    <div class="card shadow-sm p-4 border-0">
+      <div class="card-body">
+        <h4 class="fw-bold"><i class="bi bi-telephone-inbound text-primary"></i>{{lang.lang.poa_help.call_centre.title}}</h4>
+        <!-- <p>
+          NHAPOA provides a <strong>24/7 call center</strong> and grievance redressal system for victims of atrocities 
+          under the SC/ST (Prevention of Atrocities) Act.
+        </p> -->
+        <p>
+          {{lang.lang.poa_help.call_centre.description}}
+        </p>
+      </div>
+    </div>
+  
+    <!-- Grievance Registration Methods -->
+    <div class="row mt-4">
+      <!-- Portal -->
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-3">
+          <div class="card-body text-center">
+            <i class="bi bi-globe text-success display-4"></i>
+            <h5 class="fw-bold mt-3">{{lang.lang.poa_help.grievance_methods.portal.title}}</h5>
+            <p>
+              {{lang.lang.poa_help.grievance_methods.portal.description}}
+              <a href="https://nhapoa.gov.in/en" target="_blank" class="text-primary fw-bold">{{lang.lang.poa_help.grievance_methods.portal.link_text}}</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Call Centre -->
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-3">
+          <div class="card-body text-center">
+            <i class="bi bi-telephone text-danger display-4"></i>
+            <h5 class="fw-bold mt-3">{{lang.lang.poa_help.grievance_methods.call_centre.title}}</h5>
+            <p>
+              {{lang.lang.poa_help.grievance_methods.call_centre.description}}
+              <span class="fw-bold text-dark">{{ currentPhone }}</span>.
+            </p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Email -->
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-3">
+          <div class="card-body text-center">
+            <i class="bi bi-envelope text-warning display-4"></i>
+            <h5 class="fw-bold mt-3">{{lang.lang.poa_help.grievance_methods.email.title}}</h5>
+            <p>
+              {{lang.lang.poa_help.grievance_methods.email.description}}
+              <a href="mailto:helpdesk-ncrb@nic.in" class="text-dark fw-bold">helpdesk-ncrb&#64;nic.in</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

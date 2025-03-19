@@ -11,11 +11,11 @@
 }
 .top-header {
   background-color: #043c6c;
-  padding: 10px 10%;
+  padding: 3px 10%;
   display: flex;
   align-items: center;
   justify-content: end;
-  gap: 1rem;
+  gap: 4rem;
   color: #fff;
   font-size: 1rem;
   font-weight: 500;
@@ -34,12 +34,19 @@
   color: #ffdd57;
 }
 
+.language-switcher{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
 .phone-container {
   display: flex;
   align-items: center;
   gap: 10px;
   font-size: 1.1rem;
   font-weight: bold;
+  width: 150px;
 }
 .phone-container p{
 margin: 0;
@@ -104,13 +111,15 @@ margin: 0;
 .title {
   /* font-size: 1.8rem; */
   font-weight: bold;
-  color: #333;
+  /* color: #333; */
+  color: darkblue;
   margin: 0;
 }
 
 .sk {
   font-size: 2.5rem;
-  color: #043c6c;
+  /* color: #043c6c; */
+  color: #d10000;
 }
 
 .btn {
@@ -230,6 +239,45 @@ margin: 0;
 .dropdown-item:hover{
   background-color: #1E3A8A;
   color: gold;
+}
+.modal-body{
+  padding: 0;
+}
+.btn-close{
+  position: absolute;
+  top: 15px;
+  right: 20px;
+}
+
+.lang{
+  display: none;
+}
+.langlabel{
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  background-color: #6799cd;
+  padding: 15px 28px;
+  border-radius: 1000px;
+  cursor: pointer;
+  font-size: 1rem !important;
+  font-weight: 500;
+}
+.toggle{
+  display: inline-block;
+  height: 25px;
+  width: 25px;
+  background-color: #fff;
+  border: none;
+  border-radius: 50%;
+  position: absolute;
+  left: 3px;
+  transition: all 0.3s;
+}
+.lang:checked + .langlabel .toggle{
+  transform: translateX(25px);
 }
 
 

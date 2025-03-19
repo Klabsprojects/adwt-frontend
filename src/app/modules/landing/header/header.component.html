@@ -73,12 +73,22 @@
 </header> -->
 <div class="top-header">
   <div class="language-switcher">
-    <span *ngIf="selLang === 'tn'" (click)="changelang('en')">
-      <img src="assets/images/lang.png" alt="" width="50px"> English
+    <span style="font-weight: 800;color: gold;font-size: 1.3rem;">த</span>
+    <span>
+      <!-- <img src="assets/images/lang.png" alt="" width="50px"> -->
+      <input type="checkbox" name="" id="lang" class="lang" [(ngModel)]="languagechecked" (change)="changelang()">
+      <label for="lang" class="langlabel">
+        <span class="toggle"></span>
+        <!-- <span>{{language}}</span> -->
+      </label>
     </span>
-    <span *ngIf="selLang === 'en'" (click)="changelang('tn')">
-      <img src="assets/images/lang.png" alt="" width="50px"> தமிழ்
+    <span style="font-weight: 800;color: gold;font-size: 1.3rem;">E</span>
+    <!-- <span *ngIf="selLang === 'tn'" (click)="changelang()">
+      <img src="assets/images/lang.png" alt="" width="50px"> <button class="btn loginout">English</button>
     </span>
+    <span *ngIf="selLang === 'en'" (click)="changelang()">
+      <img src="assets/images/lang.png" alt="" width="50px"><button class="btn loginout">தமிழ்</button>
+    </span> -->
   </div>
 
   <div class="phone-container">
@@ -154,7 +164,8 @@
           {{ lang.lang.home}}
         </a>
         <div class="dropdown nav-item">
-          <a href="#" class="mobile-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown" routerLink="about">
+          <a href="#" class="mobile-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown"
+            routerLink="about">
             {{ lang.lang.about}}
           </a>
           <ul class="dropdown-menu dropdown-menu-mob">
@@ -174,11 +185,11 @@
             {{ lang.lang.news_events}}
           </a>
           <ul class="dropdown-menu dropdown-menu-mob">
-            <li><a class="dropdown-item" href="#">{{lang.lang.gallery}}</a></li>
+            <li><a class="dropdown-item" routerLink="gallery">{{lang.lang.gallery}}</a></li>
             <li><a class="dropdown-item" href="#">{{lang.lang.press_releases}}</a></li>
           </ul>
         </div>
-        <a routerLink="helpline" class="mobile-link">
+        <a routerLink="poahelpline" class="mobile-link">
           {{ lang.lang.poa_helpline}}
         </a>
         <a routerLink="faq" class="mobile-link">
@@ -232,7 +243,8 @@
         {{ lang.lang.home}}
       </a>
       <div class="dropdown nav-item">
-        <a href="#" class="nav-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown" routerLink="about">
+        <a href="#" class="nav-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown"
+          routerLink="about">
           {{ lang.lang.about}}
         </a>
         <ul class="dropdown-menu dropdown-menu-about">
@@ -252,11 +264,11 @@
           {{ lang.lang.news_events}}
         </a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#">{{lang.lang.gallery}}</a></li>
+          <li><a class="dropdown-item" routerLink="gallery">{{lang.lang.gallery}}</a></li>
           <li><a class="dropdown-item" href="#">{{lang.lang.press_releases}}</a></li>
         </ul>
       </div>
-      <a routerLink="helpline" class="nav-link">
+      <a routerLink="poahelpline" class="nav-link">
         {{ lang.lang.poa_helpline}}
       </a>
       <a routerLink="faq" class="nav-link">
@@ -269,7 +281,7 @@
   </nav>
 </div>
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <!-- <div class="modal-header">
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

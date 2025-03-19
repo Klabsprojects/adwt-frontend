@@ -10,7 +10,8 @@ declare var bootstrap: any; // Import Bootstrap JavaScript
 })
 export class HeaderComponent implements OnInit {
   isMenuOpen = false;
-
+  languagechecked = false;
+  language:string=""
   menuItems = [
     { to: 'landing', label: 'Home', isExternal: false },
     { to: 'about', label: 'About Us', isExternal: false },
@@ -23,7 +24,7 @@ export class HeaderComponent implements OnInit {
   ];
   public is_user:boolean=false;
   selLang:any="en";
-  phoneNumbers: string[] = ['+91 9876543210', '+91 0123456789'];
+  phoneNumbers: string[] = ['1800 202 1989', '1800 202 14566'];
   currentPhone: string = this.phoneNumbers[0];
 
 
@@ -38,12 +39,16 @@ export class HeaderComponent implements OnInit {
     }, 1000);
     this.is_user = sessionStorage.getItem('user_data')?true:false;
     const locLang = localStorage.getItem('adwtloclang');
+    this.languagechecked = locLang === 'en' ? true : false;
+    this.language = locLang === 'en' ? 'E' : 'த';
     if(locLang){
       this.selLang = locLang;
       this.lang.setlang(locLang);
     }
   }
-  changelang(lang:string){
+  changelang(){
+    this.language = this.languagechecked ? 'E' : 'த';
+    var lang = this.languagechecked ? 'en' : 'tn';
     this.selLang = lang;
     this.lang.setlang(lang);
   }

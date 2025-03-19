@@ -12,6 +12,10 @@ import { FooterComponent } from './footer/footer.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AuthModule } from '../auth/auth.module';
 import { CarouselComponent } from './carousel/carousel.component';
+import { PoaHelplineComponent } from './poa-helpline/poa-helpline.component';
+import { GalleryComponent } from './gallery/gallery.component';
+import { FaqComponent } from './faq/faq.component';
+import { FormsModule } from '@angular/forms';
 @NgModule({
   declarations: [
     CarouselComponent,
@@ -21,9 +25,12 @@ import { CarouselComponent } from './carousel/carousel.component';
     DownloadsComponent,
     ContactComponent,
     POAComponent,
+    PoaHelplineComponent,
+    GalleryComponent,
+    FaqComponent,
     HeaderComponent,
     FooterComponent,
   ],
-  imports: [CommonModule, LandingRoutingModule,NgbModule,AuthModule],
+  imports: [CommonModule, LandingRoutingModule,NgbModule,AuthModule,FormsModule],
 })
 export class LandingModule {}
