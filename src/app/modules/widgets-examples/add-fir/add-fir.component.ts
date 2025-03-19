@@ -90,7 +90,8 @@ export class AddFirComponent implements OnInit, OnDestroy {
   accusedCommunitiesOptions: string[] = []; // Stores all accused community options
   natureOfOffenceOptions: string[] = [];
   scstSectionsOptions: string[] = [];
-
+  showSubCaste = true;
+  showSubCasteText = false;
   showDuplicateSection = false; // To show/hide the duplicate form section
   showLegalOpinionObtained_one = false;
   showFiledBy_one = false;
@@ -357,7 +358,7 @@ loadAccusedCommunities(): void {
   this.firService.getAllAccusedCommunities().subscribe(
     (communities: string[]) => {
       this.accusedCommunitiesOptions = communities; 
-      
+      this.accusedCommunitiesOptions.push('General','Others');
       
       // Populate accused community options
     },
@@ -384,7 +385,15 @@ onInputChangeee(index: number, event: Event) {
 
 onAccusedCommunityChange(event: any, index: number): void {
   const selectedCommunity = event;
-
+  console.log(selectedCommunity);
+  if(selectedCommunity == "General" || selectedCommunity == "Others"){
+    this.showSubCaste = false;
+    this.showSubCasteText = true;
+  }
+  else{
+    this.showSubCaste = true;
+    this.showSubCasteText = false;
+  }
   if (selectedCommunity) {
     this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
       (castes: string[]) => {

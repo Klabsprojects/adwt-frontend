@@ -756,7 +756,7 @@
                                       {{ caste }}
                                     </option>
                                   </select> -->
-                                  <ng-select  
+                                  <ng-select  *ngIf="showSubCaste"
                                     [id]="'accusedCaste' + i"
                                     class="form-select"
                                     [items]="accuseds.at(i).get('availableCastes')?.value"
@@ -768,6 +768,9 @@
                                     [placeholder]="accuseds.at(i).get('caste')?.value ? '' : 'Select Caste'"
                                     required>
                                   </ng-select>
+
+                                  <input *ngIf="showSubCasteText" type="text" [id]="'accusedCaste' + i" class="form-control" formControlName="caste"  />
+
                                 </div>
 
 
@@ -970,7 +973,7 @@
                     <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
                     <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
                     <button type="button" class="btn btn-primary" (click)="nextStep()">
-                        Next
+                        Submit
                     </button>
                 </div>
             </div>
