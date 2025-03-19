@@ -79,7 +79,7 @@
 
 </form> -->
 <div class="container">
-  <div class="header">
+  <!-- <div class="header">
     <div class="title-head">
       <img src="./assets/images/image.png" alt="Login Image" class="login-image">
       <h2>Adi Dravidar and Tribal Welfare Department <br>
@@ -88,19 +88,17 @@
     </div>
     <img src="./assets/images/cm.png" alt="CM Image" class="cm-image">
   </div>
-  <h2 class="title">Prevention of Atrocities (PoA) Portal</h2>
+  <h2 class="title">Prevention of Atrocities (PoA) Portal</h2> -->
   <div class="login-box">
     <div class="angleimage-box">
       <img src="./assets/images/image.png" alt="" class="login-image">
       <div class="d-flex justify-content-center align-items-center" style="flex-direction: column;">
-        <h1>Login</h1>
-        <h1>To</h1>
-        <h1>ADWT</h1>
+        <h1>{{lang.lang.adwt}}</h1>
       </div>
       <!-- <img src="./assets/images/angelofjustice.jpg" alt="archangel raguel" class="archangel-raguel"> -->
     </div>
     <div class="form-box-outer">
-      <h3>Login Page</h3>
+      <h3>Officers Login</h3>
       <form action="" class="form-box" *ngIf="loginForm" [formGroup]="loginForm" novalidate="novalidate"
         id="kt_login_signin_form" (ngSubmit)="submit()">
         <div style="width: 75%;margin-left: auto;margin-right: auto;">

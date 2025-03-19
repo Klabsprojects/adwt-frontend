@@ -4,7 +4,7 @@ import { Subscription, Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
-
+import { LandingService } from 'src/app/modules/landing/landing.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -26,7 +26,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    public lang : LandingService
   ) {
     this.isLoading$ = this.authService.isLoading$;
     if (this.authService.currentUserValue) {

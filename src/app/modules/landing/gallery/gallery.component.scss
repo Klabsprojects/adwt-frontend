@@ -1,0 +1,37 @@
+.layout-container{
+    width: min(1000px,100%);
+    margin: 0 auto;
+    columns: 3 300px;
+    column-gap: 1em;
+}
+img{
+    display: block;
+    margin-bottom: 1em;
+    width: 100%;
+}
+.header {
+    position: relative;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    background: linear-gradient(to right, #2563EB, #1E3A8A);
+    color: #FFFFFF;
+    overflow: hidden;
+}
+
+.heading {
+    font-size: 3rem;
+    /* Equivalent to text-4xl */
+    font-weight: bold;
+    /* Equivalent to font-bold */
+    margin-bottom: 1.5rem;
+    /* Equivalent to mb-6 */
+    text-align: center;
+    color: #FFFFFF;
+}
+
+.subheading {
+    font-size: 1.25rem;
+    color: #DBEAFE;
+    line-height: 1.625;
+    text-align: center;
+}

@@ -1,0 +1,43 @@
+.container {
+    max-width: 800px;
+  }
+  
+  .card {
+    border-radius: 12px;
+    transition: transform 0.3s ease-in-out;
+  
+    &:hover {
+      transform: translateY(-5px);
+    }
+  }
+  
+  i {
+    font-size: 3rem;
+  }
+  .header {
+    position: relative;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    background: linear-gradient(to right, #2563EB, #1E3A8A);
+    color: #FFFFFF;
+    overflow: hidden;
+}
+
+.heading {
+    font-size: 3rem;
+    /* Equivalent to text-4xl */
+    font-weight: bold;
+    /* Equivalent to font-bold */
+    margin-bottom: 1.5rem;
+    /* Equivalent to mb-6 */
+    text-align: center;
+    color: #FFFFFF;
+}
+
+.subheading {
+    font-size: 1.25rem;
+    color: #DBEAFE;
+    line-height: 1.625;
+    text-align: center;
+}
+  

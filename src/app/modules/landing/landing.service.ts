@@ -16,7 +16,7 @@ export class LandingService {
         news_events: "News & Events",
         poa_helpline: "PoA Helpline",
         faq: "FAQ's",
-        officers_login: "Officers Login",
+        officers_login: "Officer's Login",
         adwt: "Adi Dravidar and Tribal Welfare Department",
         govt: "Government of Tamil Nadu",
         sk: "Samaththuvam Kaanbom",
@@ -41,6 +41,30 @@ export class LandingService {
             "Now, the Scheduled Castes and Scheduled Tribes (PoA) Act 1989 and the Scheduled Castes and Scheduled Tribes (PoA) rules 1995 have been amended by the Government of India after getting concurrence from the State Governments as the Scheduled Castes and Scheduled Tribes (Prevention of Atrocities) (Amendments) Act 2015 and Scheduled Castes and Scheduled Tribes (Prevention of Atrocities) Amendment Rules 2016-2018.",
             "The above said Act and Rules have been notified in the Gazette of India (Extraordinary) and came into force on 01.01.2016, 14.04.2016, and 27.06.2018 respectively."
           ],
+        // poa helpline
+        poa_helpline_heading: "National Helpline Against Atrocities (NHAPOA)",
+        poa_helpline_subheading: "An initiative by the Government of India under the Ministry of Social Justice and Empowerment.",
+        poa_help: {
+          "call_centre": {
+            "title": "Call Centre",
+            "description": "NHAPOA provides a 24/7 call center and grievance redressal system for victims of atrocities under the SC/ST (Prevention of Atrocities) Act."
+          },
+          "grievance_methods": {
+            "portal": {
+              "title": "Portal",
+              "description": "Register a grievance online at",
+              "link_text": "NHAPOA Portal",
+            },
+            "call_centre": {
+              "title": "Call Centre",
+              "description": "Call the Toll-Free Helpline:",
+            },
+            "email": {
+              "title": "E-mail",
+              "description": "Send your grievance to",
+            }
+          }
+        },
         //about
         mission: "Established in 1988, is dedicated to enhancing the literacy levels and socio-economic conditions of Adi Dravidar and Tribal communities.",
         about_us: [
@@ -57,7 +81,12 @@ export class LandingService {
         ],
         //services
         "govt_act_rules": "Government Act & Rules",
-        "service_description": "Everything you need to know about our platform, all in one place."
+        "service_description": "Everything you need to know about our platform, all in one place.",
+        // faq
+        faq_land: {
+            "title": "Frequently Asked Questions (FAQ)",
+            "description": "Find answers to common queries about our helpline services."
+          }
     };
 
     tamil = {
@@ -93,6 +122,30 @@ export class LandingService {
             "இப்போது, 1989 ஆம் ஆண்டு நிர்ணயிக்கப்பட்ட சாதிகள் மற்றும் பழங்குடியினருக்கான (PoA) சட்டம் மற்றும் 1995 ஆம் ஆண்டு (PoA) விதிகள் மாநில அரசுகளின் ஒப்புதலின்பிறகு, 2015 ஆம் ஆண்டு திருத்தச் சட்டம் மற்றும் 2016-2018 திருத்த விதிகளாக மாற்றப்பட்டுள்ளன.",
             "மேலே குறிப்பிடப்பட்ட சட்டம் மற்றும் விதிகள் இந்தியாவின் அரசிதழில் (விசேஷ வெளியீடு) அறிவிக்கப்பட்டு, முறையே 01.01.2016, 14.04.2016, மற்றும் 27.06.2018 அன்று அமலுக்கு வந்துள்ளன."
           ],
+        //poa helpline
+        poa_helpline_heading: "அதிர்ச்சிகரமான குற்றங்களுக்கு எதிரான தேசிய உதவி மையம் (NHAPOA)",
+        poa_helpline_subheading: "இந்திய அரசின் சமூக நீதி மற்றும் அதிகாரமளிப்பு அமைச்சகத்தின் கீழ் தொடங்கப்பட்ட முயற்சி.",
+        poa_help: {
+          "call_centre": {
+            "title": "கால்சென்டர்",
+            "description": "NHAPOA 24/7 கால்சென்டர் மற்றும் SC/ST (அதிர்ச்சிகரமான குற்றங்களை தடுக்கும்) சட்டத்தின் கீழ் பாதிக்கப்பட்டவர்களுக்கான புகார் தீர்வு அமைப்பை வழங்குகிறது."
+          },
+          "grievance_methods": {
+            "portal": {
+              "title": "தளவாய்ப்பு",
+              "description": "ஆன்லைனில் புகார் பதிவு செய்ய",
+              "link_text": "NHAPOA தளம்",
+            },
+            "call_centre": {
+              "title": "கால்சென்டர்",
+              "description": "டோல்-ஃப்ரீ உதவி எண்ணை அழைக்கவும்:",
+            },
+            "email": {
+              "title": "மின்னஞ்சல்",
+              "description": "உங்கள் புகாரை அனுப்பவும்",
+            }
+          }
+        },
         //about
         mission: "1988ஆம் ஆண்டில் நிறுவப்பட்டு, ஆதி திராவிடர் மற்றும் பழங்குடியினர் சமூகங்களின் கல்வியறிவு மட்டமும் சமூக-பொருளாதார நிலையும் மேம்பட உழைக்கிறது.",
         about_us: [
@@ -109,10 +162,13 @@ export class LandingService {
         ],
         //services
         "govt_act_rules": "அரசு சட்டங்கள் & விதிகள்",
-        "service_description": "எங்கள் தளத்தைக் குறித்த அனைத்து தகவல்களும் ஒரே இடத்தில் கிடைக்கும்."
+        "service_description": "எங்கள் தளத்தைக் குறித்த அனைத்து தகவல்களும் ஒரே இடத்தில் கிடைக்கும்.",
+        // faq
+        faq_land: {
+            "title": "அடிக்கடி கேட்கப்படும் கேள்விகள் (FAQ)",
+            "description": "எங்கள் உதவி மைய சேவைகளை பற்றிய பொதுவான கேள்விகளுக்கு பதில்களை கண்டுபிடிக்கவும்."
+          }
     };
-
-
 
     lang = this.en;
     constructor() {

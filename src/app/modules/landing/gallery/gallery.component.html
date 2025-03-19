@@ -1,0 +1,8 @@
+<div class="header mb-5">
+    <h1 class="heading">{{lang.lang.gallery}}</h1>
+</div>
+<div class="layout-container mb-5">
+    <ng-container *ngFor="let item of gallery">
+        <img [src]="item" alt="" width="300px">
+    </ng-container>
+</div>

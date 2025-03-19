@@ -12,7 +12,9 @@
     }
   }
 }
-
+.container{
+  padding: 0;
+}
 /* Login form styling */
 .login-form {
   max-width: 400px;
@@ -39,6 +41,8 @@ h1 {
   color: #304443;
   font-weight: 700;
   font-size: 3rem;
+  text-align: center;
+  line-height: 1.2;
 }
 
 /* Alerts */
@@ -131,9 +135,9 @@ button:hover {
 .login-box {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border-radius: 35px;
-  width: 70%;
-  height: 63vh;
+  // border-radius: 35px;
+  // width: 70%;
+  // height: 63vh;
   margin-left: auto;
   margin-right: auto;
   overflow: hidden;
@@ -166,6 +170,7 @@ button:hover {
   justify-content: center;
   display: flex;
   flex-direction: column;
+  padding: 7rem 0;
 }
 
 .form-box {
