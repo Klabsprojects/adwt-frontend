@@ -44,7 +44,7 @@ export class ReliefListComponent implements OnInit {
     this.isLoading = true;
     this.reliefService.getFIRReliefList().subscribe(
       (data) => {
-        this.firList = (data || []).filter((fir) => [5, 6, 7, 11, 12,13].includes(fir.status)); // Filter data
+        this.firList = (data || []).filter((fir) => [4 ,5, 6, 7, 11, 12,13].includes(fir.status)); // Filter data
         this.updatePagination();
         this.isLoading = false;
         this.cdr.detectChanges(); // Ensure the UI is updated immediately
@@ -141,7 +141,8 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
     1: 'Pending | FIR Stage | Step 1 Completed',
     2: 'Pending | FIR Stage | Step 2 Completed',
     3: 'Pending | FIR Stage | Step 3 Completed',
-    4: 'Pending | FIR Stage | Step 4 Completed',
+    // 4: 'Pending | FIR Stage | Step 4 Completed',
+    4: 'FIR Stage pending',
     5: 'FIR Stage pending',
     6: 'Chargesheet Stage pending',
     7: 'Trial Stage pending',

@@ -135,7 +135,7 @@
                 </span>
               </span>
               <span *ngSwitchCase="'actions'">
-                  <button
+                  <button *ngIf="fir.status > 4"
                   class="btn btn-primary btn-sm"
                   (click)="navigateToRelief(fir.fir_id)"
                 >
