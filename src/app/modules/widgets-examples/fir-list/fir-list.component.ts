@@ -96,7 +96,7 @@ export class FirListComponent implements OnInit {
   reliefAmountFirstStage: string = ''; // Default: ₹20,000
   additionalRelief: string = ''; // Default: Text
 
-  totalCompensation = 0; // Default: ₹100,000
+  totalCompensation: string = ''; // Default: ₹100,000
   proceedingsFileNo: string = ''; // Default: Proceedings file number
   proceedingsDate: string = ''; // Default: YYYY-MM-DD
   proceedingsFile: string = ''; // Default: Text
@@ -336,6 +336,7 @@ export class FirListComponent implements OnInit {
 
   steps = ['Location Details', 'Offence Information', 'Victim Information', 'Accused Info', 'MRF Info','ChargeSheet Stage','Trail Stage'];
   currentStep = 0;
+  step :any;
   searchText: string = '';
   firList: any[] = [];
   page: number = 1;
@@ -350,7 +351,7 @@ export class FirListComponent implements OnInit {
   selectedDistrict: string = '';
   selectedNatureOfOffence: string = '';
   selectedStatusOfCase: string = '';
-  selectedStatusOfRelief: string = '';
+  selectedStatusOfRelief: any;
  @ViewChild('firDetailsModal') firDetailsModal!: TemplateRef<any>;
 
   // Filter options
@@ -426,13 +427,12 @@ export class FirListComponent implements OnInit {
 
   displayedColumns: { label: string; field: string; sortable: boolean; visible: boolean }[] = [
     { label: 'Sl.No', field: 'sl_no', sortable: false, visible: true },
-    { label: 'FIR No.', field: 'fir_number', sortable: true, visible: true },
-    { label: 'FIR ID.', field: 'fir_id', sortable: true, visible: true },
+    { label: 'FIR No.', field: 'fir_id', sortable: true, visible: true },
     { label: 'Police City', field: 'police_city', sortable: true, visible: true },
     { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
     { label: 'Created By', field: 'created_by', sortable: true, visible: true },
     { label: 'Created At', field: 'created_at', sortable: true, visible: true },
-    { label: 'Data Entry Status', field: 'status', sortable: false, visible: true },
+    { label: 'Status', field: 'status', sortable: false, visible: true },
     { label: 'Actions', field: 'actions', sortable: false, visible: true },
   ];
 
@@ -477,7 +477,7 @@ export class FirListComponent implements OnInit {
   // funtions
   fetchFirDetails(firId:any): void {
 
-    this.totalCompensation = 0;
+
     console.log(firId)
     this.firService.getFirView(firId).subscribe(
       (data) => {
@@ -488,17 +488,10 @@ export class FirListComponent implements OnInit {
         } else {
           console.log(data.queryResults);
           this.victimsdata =data.queryResults1;
-
-          if(data && data.queryResults && data.queryResults.length > 0){
-            data.queryResults.map((victim : any) => {
-              this.totalCompensation = ((this.totalCompensation) + (victim.relief_amount_first_stage || 0));
-          })
-          }
-
           this.victimsdata = this.victimsdata.map((victim) => ({
             ...victim, // Keep all existing properties
-            scst_sections: victim.scst_sections ? victim.scst_sections : victim.scst_sections ,
-            offence_committed: victim.offence_committed ? victim.offence_committed : victim.offence_committed
+            scst_sections: victim.scst_sections ? this.formatedata(victim.scst_sections) : victim.scst_sections ,
+            offence_committed: victim.offence_committed ? this.formatedata(victim.offence_committed) : victim.offence_committed
           }));
           this.accusedsdata =data.queryResults2;
           this.reliefsdata =data.queryResults3;
@@ -644,7 +637,7 @@ console.log( data.queryResults[0],"vire ")
           // this.reliefAmountExGratia=data.queryResults3[0].relief_amount_exgratia;
           // this.reliefAmountFirstStage=data.queryResults3[0].relief_amount_first_stage;
           // this.additionalRelief=data.queryResults[0].additional_relief;
-          // this.totalCompensation=data.queryResults[0].total_amount_third_stage;
+          this.totalCompensation=data.queryResults[0].total_amount_third_stage;
           this.proceedingsFileNo=data.queryResults[0].proceedings_file_no;
           this.proceedingsDate= data.queryResults[0].proceedings_date ? this.convertToNormalDate(data.queryResults[0].proceedings_date) : data.queryResults[0].proceedings_date;
           //need to check
@@ -838,28 +831,33 @@ console.log(this.firList,"loadfirst")
     this.filteredFirList();
   }
 
+  // Filtered FIR list based on search and filter criteria
   filteredFirList() {
-    const searchLower = this.searchText.trim().toLowerCase();
-  
+    const searchLower = this.searchText.toLowerCase();
+
+    // console.log(this.selectedDistrict,'this.selectedDistrict')
+    // console.log(this.selectedNatureOfOffence,'this.selectedNatureOfOffence')
+    // console.log(this.selectedStatusOfCase,'this.selectedStatusOfCase')
+    // console.log(this.selectedStatusOfRelief,'this.selectedStatusOfRelief')
+
     return this.firList.filter((fir) => {
+      // Apply search filter
       const matchesSearch =
-      (fir.fir_id?.toString().toLowerCase() || '').includes(searchLower) ||
-      (fir.fir_number?.toString().toLowerCase() || '').includes(searchLower) ||
-      (fir.police_city || '').toLowerCase().includes(searchLower) ||
-      (fir.police_station || '').toLowerCase().includes(searchLower);
-  
+        fir.fir_id.toString().includes(searchLower) ||
+        (fir.police_city || '').toLowerCase().includes(searchLower) ||
+        (fir.police_station || '').toLowerCase().includes(searchLower);
+
+      // Apply dropdown filters
       const matchesDistrict = this.selectedDistrict ? fir.police_city === this.selectedDistrict : true;
-      const matchesNatureOfOffence = this.selectedNatureOfOffence ? fir.nature_of_offence === this.selectedNatureOfOffence : true;
+      const matchesNatureOfOffence = this.selectedNatureOfOffence? fir.nature_of_offence === this.selectedNatureOfOffence: true;
       const matchesStatusOfCase = this.selectedStatusOfCase ? fir.relief_status == this.selectedStatusOfCase : true;
       // const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status == this.selectedStatusOfRelief : true;
-      const selectedStatus = Number(this.selectedStatusOfRelief);
-const matchesStatusOfRelief =
-  this.selectedStatusOfRelief !== null && this.selectedStatusOfRelief !== undefined
-    ? selectedStatus === 0
-      ? fir.status >= 0 && fir.status <= 5 // If selectedStatus is 0, match FIR status 0 to 5
-      : fir.status === selectedStatus // Otherwise, match exact value
-    : true; // If no filter is selected, return all results
+      const matchesStatusOfRelief = this.selectedStatusOfRelief
+      ? (this.selectedStatusOfRelief == 0 ? fir.status >= 0 && fir.status <= 5 : fir.status == this.selectedStatusOfRelief)
+      : true;
 
+      console.log(matchesStatusOfRelief);
+    
       return (
         matchesSearch &&
         matchesDistrict &&
@@ -869,7 +867,6 @@ const matchesStatusOfRelief =
       );
     });
   }
-  
 
   clearfilter(){
     this.selectedDistrict = '';
@@ -878,6 +875,8 @@ const matchesStatusOfRelief =
     this.selectedStatusOfRelief = '';
     this.applyFilters();
   }
+
+
 
   // Sorting logic
   sortTable(field: string) {
@@ -913,10 +912,6 @@ const matchesStatusOfRelief =
       2: 'Pending | FIR Stage | Step 2 Completed',
       3: 'Pending | FIR Stage | Step 3 Completed',
       4: 'Completed | FIR Stage',
-      // 1: 'FIR Draft',
-      // 2: 'FIR Draft',
-      // 3: 'FIR Draft',
-      // 4: 'FIR Draft',
       5: 'Completed | FIR Stage',
       6: 'Charge Sheet Completed',
       7: 'Trial Stage Completed',
@@ -936,10 +931,6 @@ getStatusBadgeClass(status: number): string {
     2: 'badge bg-warning text-dark',
     3: 'badge bg-warning text-dark',
     4: 'badge bg-success text-white',
-    // 1: 'badge bg-info text-white',
-    // 2: 'badge bg-info text-white',
-    // 3: 'badge bg-info text-white',
-    // 4: 'badge bg-info text-white',
     5: 'badge bg-success text-white',
     6: 'badge bg-success text-white',
     7: 'badge bg-success text-white',
