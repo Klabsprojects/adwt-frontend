@@ -3562,11 +3562,12 @@ console.log(victimReliefDetail,"cretaieg")
         );
     
   }
-
+  police_Cities_data:any
    loadPoliceDivision() {
       this.policeDivisionService.getAllPoliceDivisions().subscribe(
         (data: any) => {
           // this.police_Cities_data =data;
+          this.police_Cities_data = data.map((item: any) => item.district_division_name);
   
           this.policeCities = data.map((item: any) => item.district_division_name);
           this.policeZones = data.map((item: any) => item.police_zone_name);
