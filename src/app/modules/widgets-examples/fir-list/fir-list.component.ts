@@ -435,12 +435,12 @@ export class FirListComponent implements OnInit {
 
   displayedColumns: { label: string; field: string; sortable: boolean; visible: boolean }[] = [
     { label: 'Sl.No', field: 'sl_no', sortable: false, visible: true },
-    { label: 'FIR No.', field: 'fir_id', sortable: true, visible: true },
+    { label: 'FIR No.', field: 'fir_number', sortable: true, visible: true },
     { label: 'Police City', field: 'police_city', sortable: true, visible: true },
     { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
     { label: 'Created By', field: 'created_by', sortable: true, visible: true },
     { label: 'Created At', field: 'created_at', sortable: true, visible: true },
-    { label: 'Status', field: 'status', sortable: false, visible: true },
+    { label: 'Data Entry Status', field: 'status', sortable: false, visible: true },
     { label: 'Actions', field: 'actions', sortable: false, visible: true },
   ];
 
