@@ -217,7 +217,7 @@ sectionFields: string[] = [''];
     // this.loadVictimsDetails();
 
     this.firForm.get('caseType')?.valueChanges.subscribe(() => {
-      this.handleCaseTypeChange();
+       this.handleCaseTypeChange();
     });
 
     // Listen for route changes
@@ -458,7 +458,7 @@ updateValidationForCaseType() {
     this.firForm.get('proceedingsDate_1')?.setValidators([Validators.required]);
     this.firForm.get('uploadProceedings_1')?.setValidators([Validators.required]);
     this.firForm.get('attachments_1')?.setValidators([Validators.required]);
-
+    this.firForm.get('chargeSheetDate')?.setValidators([Validators.required]);
     // Disable RCS specific fields if it's a chargeSheet
     this.firForm.get('rcsFileNumber')?.clearValidators();
     this.firForm.get('rcsFilingDate')?.clearValidators();
@@ -469,7 +469,7 @@ updateValidationForCaseType() {
     this.firForm.get('proceedingsDate_1')?.clearValidators();
     this.firForm.get('uploadProceedings_1')?.clearValidators();
     this.firForm.get('attachments_1')?.clearValidators();
-
+    this.firForm.get('chargeSheetDate')?.clearValidators();
     // Add required validators for RCS fields
     this.firForm.get('rcsFileNumber')?.setValidators([Validators.required]);
     this.firForm.get('rcsFilingDate')?.setValidators([Validators.required]);
@@ -483,6 +483,7 @@ updateValidationForCaseType() {
   this.firForm.get('attachments_1')?.updateValueAndValidity();
   this.firForm.get('rcsFileNumber')?.updateValueAndValidity();
   this.firForm.get('rcsFilingDate')?.updateValueAndValidity();
+  this.firForm.get('chargeSheetDate')?.updateValueAndValidity();
   this.firForm.get('mfCopy')?.updateValueAndValidity();
 }
 
@@ -3134,7 +3135,6 @@ async saveAsDraft_7(isSubmit: boolean = false)  {
 courtName: this.firForm.get('Court_name1')?.value,
 courtDistrict: this.firForm.get('courtDistrict')?.value,
 trialCaseNumber: this.firForm.get('caseNumber')?.value,
-chargeSheetDate: this.firForm.get('chargeSheetDate')?.value,
 publicProsecutor: this.firForm.get('publicProsecutor')?.value,
 prosecutorPhone: this.firForm.get('prosecutorPhone')?.value,
 firstHearingDate: this.firForm.get('firstHearingDate')?.value,
