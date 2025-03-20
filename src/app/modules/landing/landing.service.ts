@@ -47,21 +47,23 @@ export class LandingService {
         poa_help: {
           "call_centre": {
             "title": "Call Centre",
-            "description": "NHAPOA provides a 24/7 call center and grievance redressal system for victims of atrocities under the SC/ST (Prevention of Atrocities) Act."
+            "description": "The National Helpline Against Atrocities (NHAPOA) is an initiative by the Government of India under the Ministry of Social Justice and Empowerment for providing 24/7 call center and a grievance redressal system for the victims of atrocities under the SC/ST (Prevention of Atrocities) Act."
           },
           "grievance_methods": {
             "portal": {
               "title": "Portal",
-              "description": "Register a grievance online at",
+              "description": `A grievance can be registered through the website "https://nhapoa.gov.in/en" and entering the required details. This can be done by the victim, an informer, or an NGO. Once submitted, the complaint will be reviewed, and appropriate actions will be taken to ensure justice and resolution.`,
               "link_text": "NHAPOA Portal",
             },
             "call_centre": {
               "title": "Call Centre",
-              "description": "Call the Toll-Free Helpline:",
+              "description": `A grievance can be registered by calling the Toll Free Helpline number 18002021989/ 14566.  The call centre representative will obtain the details and register a grievance on the platform. The call can be made by a victim, an informer, or an NGO. The complaint will be reviewed, and appropriate actions will be taken.`,
             },
             "email": {
               "title": "E-mail",
-              "description": "Send your grievance to",
+              "description": `A grievance can be registered by sending a clear description of the issue, along with the contact details and any supporting documents to the email ‘helpdesk-ncrb@nic.in’.
+This SOP is for the call centre representatives on setting up the call centre helpdesk and guidelines on handling calls. 
+`,
             }
           }
         },
