@@ -324,6 +324,24 @@
                   [value]="officerName"
                 />
               </div>
+ 
+              
+              <div class="col-lg-4">
+                <label for="complaintReceived" class="form-label w-100 float-left">6a. Complaint Received</label>
+                  <input  type="text" class="form-control" readonly [value]="complaintReceivedType" name="complaintReceivedType" id="complaintReceived">
+                
+              </div>
+
+              <div class="col-md-6 col-lg-4 mb-3">
+                <label for="complaintRegisteredBy" class="form-label">6b. Complaint Registered By</label>
+                  <input id="complaintRegisteredBy" type="text" readonly class="form-control" [value]="complaintRegisteredBy" name="complaintRegisteredBy" />
+              </div>
+
+              <div class="col-md-6 col-lg-4 mb-3">
+                <label for="officerPhone" class="form-label">6c. Complaint Receiver Name</label>
+                <input  type="text" class="form-control" readonly [value]="complaintReceiverName" name="complaintReceiverName" />
+              </div>
+
               <div class="col-md-6 col-lg-4 mb-3">
                 <label for="officerDesignation" class="form-label">7. Designation of the Investigating Officer</label>
                 <input
@@ -336,6 +354,12 @@
                   [value]="officerDesignation"
                 />
               </div>
+
+              <div class="col-md-6 col-lg-4 mb-3" *ngIf="showOtherDesignation">
+                <label for="officerPhone" class="form-label">7a. Designation Name</label>
+                <input  id="otherDesignation" type="text" class="form-control" [value]="otherDesignationValue" readonly />
+              </div>
+
               <div class="col-md-6 col-lg-4 mb-3">
                 <label for="officerPhone" class="form-label">8. Phone Number of the Investigating Officer</label>
                 <input
@@ -364,7 +388,7 @@
             <h5>Step 2: Offence Information</h5>
             <div class="row mb-3">
               <!-- FIR Number -->
-              <div class="col-md-6 mb-3">
+              <div class="col-md-4 mb-3">
                 <label for="firNumber" class="form-label">9. FIR Number</label>
                 <input
                   readonly
@@ -378,8 +402,8 @@
               </div>
 
               <!-- Date of Occurrence -->
-              <div class="col-md-6 mb-3">
-                <label for="dateOfOccurrence" class="form-label">10. Date of Occurrence</label>
+              <div class="col-md-4 mb-3">
+                <label for="dateOfOccurrence" class="form-label">10.From Date of Occurrence</label>
                 <input
                   readonly
                   type="text"
@@ -391,9 +415,21 @@
                 />
               </div>
 
+              <div class="col-md-4 mb-3">
+                <label for="todateOfOccurrence" class="form-label">10a. To Date of Occurrence *</label>
+                <input
+                    type="text"
+                    id="todateOfOccurrence"
+                    class="form-control"
+                    name="date_of_occurrence_to"
+                    [value]="date_of_occurrence_to"
+                    readonly
+                />
+            </div>
+
               <!-- Time of Occurrence -->
-              <div class="col-md-6 mb-3">
-                <label for="timeOfOccurrence" class="form-label">11. Time of Occurrence</label>
+              <div class="col-md-4 mb-3">
+                <label for="timeOfOccurrence" class="form-label">11.From Time of Occurrence</label>
                 <input
                   readonly
                   type="text"
@@ -405,8 +441,21 @@
                 />
               </div>
 
+              <div class="col-md-4 mb-3">
+                <label for="totimeOfOccurrence" class="form-label">11a. To Time of Occurrence *</label>
+                <input
+                    type="text"
+                    id="totimeOfOccurrence"
+                    class="form-control"
+                    name="time_of_occurrence_to"
+                    [value]="time_of_occurrence_to"
+                    readonly
+                />
+            </div>
+
+
               <!-- Place of Occurrence -->
-              <div class="col-md-6 mb-3">
+              <div class="col-md-4 mb-3">
                 <label for="placeOfOccurrence" class="form-label">12. Place of Occurrence</label>
                 <input
                   readonly
@@ -420,7 +469,7 @@
               </div>
 
               <!-- Date of Case Registration -->
-              <div class="col-md-6 mb-3">
+              <div class="col-md-4 mb-3">
                 <label for="dateOfRegistration" class="form-label">13. Date of Case Registration</label>
                 <input
                   readonly
@@ -434,7 +483,7 @@
               </div>
 
               <!-- Time of Case Registration -->
-              <div class="col-md-6 mb-3">
+              <div class="col-md-4 mb-3">
                 <label for="timeOfRegistration" class="form-label">14. Time of Case Registration</label>
                 <input
                   readonly
@@ -690,13 +739,25 @@
 
                 <div class="col-md-6 mb-3">
                   <label for="sectionsIPC{{ i }}" class="form-label">32. Section Invoked Under IPC/POCSO/etc. *</label>
-                  <textarea
+                  <!-- <textarea
                     readonly
                     name="sectionsIPC{{ i }}"
                     id="sectionsIPC{{ i }}"
                     class="form-control"
                     placeholder="Enter Sections, separated by commas"
-                  >{{ victim.sectionsIPC }}</textarea>
+                  >{{ victim.sectionsIPC }}</textarea> -->
+                  <div *ngFor="let section of sectionsIPC; let i = index">
+                    <div class="form-group col-md-6" style="float: left; margin-right:10px;">
+                      <label>Section Type</label>
+                      <input type="text" class="form-control" [value]="section.SectionType" readonly />
+                    </div>
+                    <div class="form-group col-md-5" style="float: left;">
+                      <label>Section</label>
+                      <input type="text" class="form-control" [value]="section.Section" readonly />
+                    </div>
+                  </div>
+                  
+                  
                 </div>
 
               </div>

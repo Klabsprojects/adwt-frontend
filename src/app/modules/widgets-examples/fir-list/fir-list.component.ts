@@ -26,12 +26,19 @@ export class FirListComponent implements OnInit {
   stationName: string = '';
 
   officerName: string = '';
+  complaintReceivedType:string='';
+  complaintRegisteredBy:string='';
+  complaintReceiverName:string='';
   officerDesignation: string = '';
+  showOtherDesignation = false;
+  otherDesignationValue:string='';
   officerPhone: string = '';
 
   firNumber: string = '';
   dateOfOccurrence: string = '';
+  date_of_occurrence_to:string='';
   timeOfOccurrence: string = '';
+  time_of_occurrence_to:string='';
   placeOfOccurrence: string = '';
   dateOfRegistration: string = '';
   timeOfRegistration: string = '';
@@ -59,7 +66,7 @@ export class FirListComponent implements OnInit {
   nativeDistrict: string = '';
   victimOffence: string = '';
   invokedAct: string = '';
-  sectionsIPC: string = '';
+  sectionsIPC: any = [];
 
 
   isDeceased: string = '';
@@ -558,12 +565,26 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
           this.stationName = data.queryResults[0].police_station;
 
           this.officerName = data.queryResults[0].officer_name;
+          this.complaintReceivedType = data.queryResults[0].complaintReceivedType;
+          this.complaintRegisteredBy = data.queryResults[0].complaintRegisteredBy;
+          this.complaintReceiverName = data.queryResults[0].complaintReceiverName;
           this.officerDesignation=data.queryResults[0].officer_designation;
+          if (this.officerDesignation.startsWith("Others")) {
+            const parts = this.officerDesignation.split(" - ");
+            this.showOtherDesignation = true;
+            this.officerDesignation = parts[0];
+            this.otherDesignationValue = parts[1] || ''; 
+          }
+          else{
+            this.showOtherDesignation = false;
+          }
           this.officerPhone=data.queryResults[0].officer_phone;
 
           this.firNumber=data.queryResults[0].fir_number+'/'+data.queryResults[0].fir_number_suffix;
           this.dateOfOccurrence= data.queryResults[0].date_of_occurrence ? this.convertToNormalDate(data.queryResults[0].date_of_occurrence) : data.queryResults[0].date_of_occurrence;
+          this.date_of_occurrence_to= data.queryResults[0].date_of_occurrence_to ? this.convertToNormalDate(data.queryResults[0].date_of_occurrence_to) : data.queryResults[0].date_of_occurrence_to;
           this.timeOfOccurrence=data.queryResults[0].time_of_occurrence;
+          this.time_of_occurrence_to=data.queryResults[0].time_of_occurrence_to;
           this.placeOfOccurrence=data.queryResults[0].place_of_occurrence;
           this.dateOfRegistration= data.queryResults[0].date_of_registration ? this.convertToNormalDate(data.queryResults[0].date_of_registration) : data.queryResults[0].date_of_registration;
           this.timeOfRegistration=data.queryResults[0].time_of_registration;
@@ -599,8 +620,14 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
           // this.victimOffence=data.queryResults1[0].offence_committed;
           // this.invokedAct=data.queryResults1[0].scst_sections;
           // this.sectionsIPC=data.queryResults1[0].sectionsIPC;
-
-
+          // this.sectionsIPC = data.queryResults1[0].sectionsIPC_JSON;
+          try {
+            this.sectionsIPC = JSON.parse(data.queryResults1[0].sectionsIPC_JSON);
+          } catch (error) {
+            console.error("Error parsing sectionsIPC_JSON:", error);
+          }
+          console.log("section",data.queryResults1[0].sectionsIPC_JSON);
+          
           this.isDeceased=data.queryResults[0].is_deceased;
           this.deceasedPersonNames= data.queryResults[0].deceased_person_names ? this.formatedata(data.queryResults[0].deceased_person_names) : data.queryResults[0].deceased_person_names;
 
@@ -856,7 +883,7 @@ console.log(this.firList,"loadfirst")
       ? (this.selectedStatusOfRelief == 0 ? fir.status >= 0 && fir.status <= 5 : fir.status == this.selectedStatusOfRelief)
       : true;
 
-      console.log(matchesStatusOfRelief);
+    
     
       return (
         matchesSearch &&
@@ -1056,14 +1083,44 @@ getStatusBadgeClass(status: number): string {
     return `${day}-${month}-${year}`; // Format as DD-MMM-YYYY
   }
 
-  formatedata(value : any){
-    if(value == '[]'){
-      return ''
+  // formatedata(value : any){
+  //   if(value == '[]'){
+  //     return ''
+  //   }
+    
+  //   var data2 = JSON.parse(value)
+  //   var data3 = data2.join(',')
+  //   return data3;
+  // }
+
+  formatedata(value: any) {
+    // Check if value is an empty array represented as a string or falsy
+    if (value === '[]' || !value) {
+      return '';
     }
-    var data2 = JSON.parse(value)
-    var data3 = data2.join(',')
-    return data3;
+  
+    let data2;
+    
+    // Try parsing the JSON value safely
+    try {
+      data2 = JSON.parse(value);
+    } catch (error) {
+      console.error('Invalid JSON format:', error);
+      return '';
+    }
+  
+    // Check if the parsed data is actually an array
+    if (Array.isArray(data2)) {
+      return data2.join(',');
+    } else if (typeof data2 === 'object') {
+      // If it's an object, join its values
+      return Object.values(data2).join(',');
+    } else {
+      // For any other type (string, number), convert to string and return
+      return String(data2);
+    }
   }
+  
 
   GotoRelief(){
     this.router.navigate(['/widgets-examples/relief-list'], {
