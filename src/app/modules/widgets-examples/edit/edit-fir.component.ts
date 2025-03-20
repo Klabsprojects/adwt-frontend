@@ -1680,7 +1680,6 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
 
 
             const accusedGroup = this.createAccusedGroup();
-
             
             // console.log('accusedGroupaccusedGroup:', accusedGroup);
 
@@ -1714,8 +1713,6 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
 
             
             accusedFormArray.push(accusedGroup);
-
-
             console.log(accusedFormArray,"accusedFormArrayaccusedFormArrayaccusedFormArray")
           });
         }
@@ -3397,6 +3394,7 @@ console.log(victimReliefDetail,"cretaieg")
     const startYear = 1900;
 
     for (let year = currentYear; year >= startYear; year--) {
+      console.log("year-year", typeof year);
       this.yearOptions.push(year); // Populate yearOptions array with years
     }
   }
@@ -3481,6 +3479,7 @@ console.log(victimReliefDetail,"cretaieg")
       if (selectedCommunity) {
         this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
           (castes: string[]) => {
+            this.scstSectionsOptions = castes;
             const accusedGroup = this.accuseds.at(index) as FormGroup;
             accusedGroup.patchValue({ caste: '' }); // Reset caste selection
             accusedGroup.get('availableCastes')?.setValue(castes);
@@ -5101,8 +5100,7 @@ attachment:this.attachments_2.value
   }
 
   trackStepTwoChanges() {
-    const stepOneFields = ['firNumber', 'firNumberSuffix', 'dateOfOccurrence', 'timeOfOccurrence', 'placeOfOccurrence', 'dateOfRegistration', 'timeOfRegistration'];
-  
+    const stepOneFields = ['firNumber', 'firNumberSuffix', 'dateOfOccurrence', 'timeOfOccurrence', 'placeOfOccurrence', 'dateOfRegistration', 'timeOfRegistration','todateOfOccurrence','totimeOfOccurrence'];
     stepOneFields.forEach(field => {
       this.firForm.get(field)?.valueChanges.pipe(skip(1),distinctUntilChanged()).subscribe(() => {
         this.isStepTwoModified = true;

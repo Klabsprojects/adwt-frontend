@@ -595,7 +595,7 @@
                 <ng-select  *ngIf="showSubCaste"
                   [id]="'accusedCaste' + i"
                   class="form-select"
-                  [items]="accuseds.at(i).get('availableCastes')?.value"
+                  [items]="scstSectionsOptions"
                   bindLabel="caste"
                   bindValue="caste"
                   formControlName="caste"
