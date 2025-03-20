@@ -1007,9 +1007,20 @@
                   </div>
 
                   <!-- Antecedents of the Accused -->
+                  <div class="col-md-6">
+                    <label for="antecedentsOption{{ i }}" class="form-label">48a. Antecedents *</label>
+                    <input
+                    readonly
+                    type="text"
+                    name="antecedentsOption{{ i }}"
+                    id="antecedentsOption{{ i }}"
+                    class="form-control"
+                    [value]="accused.antecedentsOption"
+                  />
+                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="antecedents{{i}}" class="form-label">
-                      48. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *
+                      48b. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *
                     </label>
                     <input
                       readonly
@@ -1023,9 +1034,20 @@
                   </div>
 
                   <!-- L&O Issues -->
+                  <div class="col-md-6">
+                    <label for="loissue{{ i }}" class="form-label">49a. L & O Issues *</label>
+                    <input
+                      readonly
+                      type="text"
+                      name="loissue{{ i }}"
+                      id="loissue{{ i }}"
+                      class="form-control"
+                      [value]="accused.landOIssueOption"
+                    />
+                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="landOIssues{{i}}" class="form-label">
-                      49. L&O Issues (Pickets, Bandoust, etc.) *
+                      49b. L&O Issues (Pickets, Bandoust, etc.) *
                     </label>
                     <input
                       readonly
@@ -1342,7 +1364,7 @@
   <div class="row mb-3">
     <!-- Case Type -->
     <div class="col-md-4">
-      <label for="caseType" class="form-label">66. Select Case Type</label>
+      <label for="caseType" class="form-label">66.Nature of Final Report</label>
       <input
         readonly
         type="text"
@@ -1355,7 +1377,7 @@
     </div>
     <!-- Case Number -->
     <div class="col-md-6">
-      <label for="caseNumber" class="form-label">67. Case Number Report (CNR) / Special SC Number</label>
+      <label for="caseNumber" class="form-label">67a. Case Number Report (CNR) / Special SC Number</label>
       <input
         readonly
         type="text"
@@ -1366,6 +1388,18 @@
         placeholder="Enter Case Number"
       />
     </div>
+
+    <div class="col-md-6">
+      <label for="chargeSheetDate" class="form-label">67b. Date of Chargesheet</label>
+      <input
+        type="text"
+        id="chargeSheetDate"
+        class="form-control"
+        name="chargeSheetDate"
+        [value]="chargeSheetDate"
+      />
+    </div> 
+
     <!-- RCS File Number -->
     <div class="col-md-6">
       <label for="rcsFileNumber" class="form-label">68. RCS File Number</label>
