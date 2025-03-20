@@ -114,6 +114,7 @@ export class FirListComponent implements OnInit {
   courtName: string = ''; // Default: Court Range
   caseType: string = ''; // Default: Case Type
   caseNumber: string = ''; // Default: Case Number Report
+  chargeSheetDate:string='';
   rcsFileNumber: string = ''; // Default: RCS File Number
   rcsFilingDate: string = ''; // Default: YYYY-MM-DD
   mfCopy: string = ''; // Default: Upload MF Copy
@@ -691,6 +692,10 @@ console.log( data.queryResults[0],"vire ")
           this.courtName=data.queryResults[0].court_name;
           this.caseType=data.queryResults[0].case_type;
           this.caseNumber=data.queryResults[0].case_number;
+          this.chargeSheetDate=data.queryResults[0].chargesheetDate;
+          console.log(data.queryResults[0].chargeSheetDate);
+          // this.chargeSheetDate= data.queryResults[0].chargeSheetDate ? this.convertToNormalDate(data.queryResults[0].chargeSheetDate) : data.queryResults[0].chargeSheetDate;
+
           this.rcsFileNumber=data.queryResults[0].rcs_file_number;
           this.rcsFilingDate=data.queryResults[0].rcs_filing_date;
           this.mfCopy=data.queryResults[0].mf_copy_path;
