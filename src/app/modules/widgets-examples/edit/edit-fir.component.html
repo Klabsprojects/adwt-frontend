@@ -90,14 +90,14 @@
               <label for="policeRange" class="form-label">3. Police Range *</label>
               <select id="policeRange" class="form-select" formControlName="policeRange">
                 <option value="" disabled>Select one</option>
-                <option *ngFor="let range of policeRanges" [value]="range">{{ range }}</option>
+                <option *ngFor="let range of policeRanges[0]" [value]="range">{{ range }}</option>
               </select>
             </div>
             <div class="col-md-6 col-lg-3 mb-3">
               <label for="revenueDistrict" class="form-label">4. Revenue District *</label>
               <select id="revenueDistrict" class="form-select" formControlName="revenueDistrict">
                 <option value="" disabled>Select one</option>
-                <option *ngFor="let district of revenueDistricts" [value]="district">{{ district }}</option>
+                <option *ngFor="let district of revenueDistricts[0]" [value]="district">{{ district }}</option>
               </select>
             </div>
             <div class="col-md-6 mb-3">
@@ -112,10 +112,47 @@
           </div>
           <div class="row">
             <h5>Investigating Officer Details</h5>
-            <div class="col-md-6 col-lg-4 mb-3">
+            <!-- <div class="col-md-6 col-lg-4 mb-3">
               <label for="officerName" class="form-label">6.Name of the Investigating Officer  (IO)*</label>
               <input id="officerName" type="text" class="form-control" formControlName="officerName" placeholder="Enter Officer Name" (keypress)="allowOnlyLetters($event)" required/>
               <small class="text-danger" *ngIf="firForm.get('officerName')?.invalid && firForm.get('officerName')?.touched">Please enter a valid name.</small>
+            </div> -->
+            <div class="col-md-6 col-lg-4 mb-3">
+              <label for="officerName" class="form-label">6. Name of the Investigating Officer (IO)*</label>
+              <input id="officerName" type="text" class="form-control" formControlName="officerName"
+              placeholder="Enter Officer Name" (keypress)="allowOnlyLetters($event)" required/>
+              <small class="text-danger" *ngIf="firForm.get('officerName')?.invalid && firForm.get('officerName')?.touched">
+                Please enter a valid name.
+              </small>
+            </div>
+
+            <div class="col-lg-4">
+              <label for="complaintReceived" class="form-label w-100 float-left">6a. Complaint Received</label>
+              <div class="d-flex align-items-center justify-content-start">
+                <div class="form-check float-left">
+                  <input  type="radio" class="radio-button" formControlName="complaintReceivedType" id="written" value="Written">
+                  <label class="form-check-label pl-2" for="written"> Written</label>
+                </div>
+                <div class="form-check float-left">
+                  <input  type="radio" class="radio-button" formControlName="complaintReceivedType" id="oral" value="Oral">
+                  <label class="form-check-label  pl-2" for="oral"> Oral </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-3">
+              <label for="complaintRegisteredBy" class="form-label">6b. Complaint Registered By</label>
+              <select id="complaintRegisteredBy" class="form-select" formControlName="complaintRegisteredBy">
+                <option value="" selected>Select </option>
+                <option value="Inspector">Inspector</option>
+                <option value="SI/ SSI">SI/ SSI</option>
+                <option value="ORS">ORS</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-3">
+              <label for="officerPhone" class="form-label">6c. Complaint Receiver Name</label>
+              <input  type="text" class="form-control"  placeholder="Enter Complaint Receiver Name" formControlName="complaintReceiverName" />
             </div>
             <div class="col-md-6 col-lg-4 mb-3">
               <label for="officerDesignation" class="form-label">7.Designation of the Investigating Officer *</label>
@@ -184,13 +221,34 @@
             </div>
           </div>
           <div class="col-md-4 mb-3">
-            <label for="dateOfOccurrence" class="form-label">10. Date of Occurrence *</label>
+            <label for="dateOfOccurrence" class="form-label">10. From Date of Occurrence *</label>
             <input type="date" id="dateOfOccurrence" class="form-control" formControlName="dateOfOccurrence" [max]="today" required />
           </div>
           <div class="col-md-4 mb-3">
-            <label for="timeOfOccurrence" class="form-label">11. Time of Occurrence *</label>
+            <label for="todateOfOccurrence" class="form-label">10a. To Date of Occurrence *</label>
+            <input
+                type="date"
+                id="todateOfOccurrence"
+                class="form-control"
+                formControlName="date_of_occurrence_to"
+                [max]="today"
+                required
+            />
+        </div>
+          <div class="col-md-4 mb-3">
+            <label for="timeOfOccurrence" class="form-label">11. From Time of Occurrence *</label>
             <input type="time" id="timeOfOccurrence" class="form-control" formControlName="timeOfOccurrence" required />
           </div>
+          <div class="col-md-4 mb-3">
+            <label for="totimeOfOccurrence" class="form-label">11a. To Time of Occurrence *</label>
+            <input
+                type="time"
+                id="totimeOfOccurrence"
+                class="form-control"
+                formControlName="time_of_occurrence_to"
+                required
+            />
+        </div>
           <div class="col-md-4 mb-3">
             <label for="placeOfOccurrence" class="form-label">12. Place of Occurrence *</label>
             <input type="text" id="placeOfOccurrence" class="form-control" formControlName="placeOfOccurrence" placeholder="Place of Occurrence" style="text-transform: capitalize;" required pattern="^[A-Za-z\s]*$" (keypress)="allowOnlyLetters($event)" />
@@ -372,9 +430,40 @@
 
                 </div>
                 <div class="col-md-12 mb-3">
-                  <label class="form-label">32. Section Invoked Under IPC/POCSO/etc. *</label>
+                  <label for="sectionsIPC" class="form-label w-100">32. Section Invoked Under IPC/POCSO/etc. *
+                    <button type="button" class="btn btn-primary mt-2 float-right py-2" (click)="addSection(i)" style="float: right!important;">Add Section</button>
+
+                  </label>
+                  <div formArrayName="sectionDetails">
+                    <div *ngFor="let section of getSectionDetails(i).controls; let j = index" [formGroupName]="j" class="section-entry mb-3">
+                      <div class="row">
+                        <div class="col-md-4 float-left mr-2">
+                          <select id="sectionType{{ i }}-{{ j }}" class="form-control" formControlName="SectionType" required>
+                            <option selected value="">Select</option>
+                            <option value="IPC">IPC</option>
+                            <option value="BNS">BNS</option>
+                            <option value="BNSS">BNSS</option>
+                            <option value="POCSO">POCSO</option>
+                            <option value="Child Marriage Act">Child Marriage Act</option>
+                            <option value="Women Harassment Act">Women Harassment Act</option>
+                            <option value="PPDL">PPDL</option>
+                            <option value="Others">Others</option>
+                          </select>
+                        </div>
+          
+                        <div class="col-md-5 float-left">
+                          <input type="text" id="sectionName{{ i }}-{{ j }}" class="form-control" formControlName="Section" placeholder="Enter section name" />
+                        </div>
+          
+                        <div class="col-md-2 text-center float-left">
+                          <button *ngIf="j !== 0" type="button" class="btn btn-danger btn-sm" (click)="removeSection(i, j)">Delete</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <label class="form-label">32. Section Invoked Under IPC/POCSO/etc. *</label>
                   <input type="text" formControlName="sectionsIPC" class="form-control" placeholder="Enter sections, separated by commas" />
-                  <small class="form-text text-muted">Separate each section with a comma.</small>
+                  <small class="form-text text-muted">Separate each section with a comma.</small> -->
                 </div>
               </div>
             </div>
@@ -449,13 +538,26 @@
                 </div>
                 <div class="col-md-4 mb-3">
                   <label for="accusedCommunity{{ i }}" class="form-label">41. Community of the Accused *</label>
-                  <select [id]="'accusedCommunity' + i" class="form-select" (change)="onAccusedCommunityChange($event, i)" formControlName="community" required>
+                  <!-- <select [id]="'accusedCommunity' + i" class="form-select" (change)="onAccusedCommunityChange($event, i)" formControlName="community" required>
                     <option value="" disabled>Select Community</option>
                     <option value="DNC">DNC</option>
                     <option value="BC">BC</option>
                     <option value="BCM">BCM</option>
                     <option value="MBC">MBC</option>
-                  </select>
+                  </select> -->
+                  <ng-select  
+                    [id]="'accusedCommunity' + i"
+                    class="form-select"
+                    [items]="accusedCommunitiesOptions"
+                    bindLabel="community"
+                    bindValue="community"
+                    formControlName="community"
+                    [searchable]="true"
+                    [clearable]="false"
+                    [placeholder]="accused.get('community')?.value ? '' : 'Select Community'"
+                    (change)="onAccusedCommunityChange($event, i)"
+                    required>
+                  </ng-select>
                   <!-- <ng-select  
                   [id]="'accusedCommunity' + i"
                   class="form-select"
@@ -472,13 +574,12 @@
                 </div>
                 <div class="col-md-4 mb-3">
                   <label for="accusedCaste{{ i }}" class="form-label">42. Caste of the Accused *</label>
-                  <select [id]="'accusedCaste' + i" class="form-select" formControlName="caste" required>
+                  <!-- <select [id]="'accusedCaste' + i" class="form-select" formControlName="caste" required>
                     <option value="" disabled>Select Caste</option>
-                    <!-- <option *ngFor="let caste of scstSectionsOptions" [value]="caste">{{ caste }}</option> -->
                     <option *ngFor="let caste of accuseds.at(i).get('availableCastes')?.value" [value]="caste">
                       {{ caste }}
                     </option>
-                  </select>
+                  </select> -->
                   <!-- <ng-select  
                   [id]="'accusedCaste' + i"
                   class="form-select"
@@ -491,6 +592,20 @@
                   [placeholder]="accuseds.at(i).get('caste')?.value ? '' : 'Select Caste'"
                   required>
                 </ng-select> -->
+                <ng-select  *ngIf="showSubCaste"
+                  [id]="'accusedCaste' + i"
+                  class="form-select"
+                  [items]="accuseds.at(i).get('availableCastes')?.value"
+                  bindLabel="caste"
+                  bindValue="caste"
+                  formControlName="caste"
+                  [searchable]="true"
+                  [clearable]="false"
+                  [placeholder]="accuseds.at(i).get('caste')?.value ? '' : 'Select Caste'"
+                  required>
+                </ng-select>
+
+                <input *ngIf="showSubCasteText" type="text" [id]="'accusedCaste' + i" class="form-control" formControlName="caste"  />
                 </div>
                 <div class="col-md-4 mb-3">
                   <label for="accusedGuardian{{ i }}" class="form-label">43. Name of Accused person’s Father/ Mother/ Spouse/ guardian *</label>
@@ -542,13 +657,38 @@
                   </div>
                   <small *ngIf="!isFirValid('scstFIRNumber' + i, 'scstFIRNumberSuffix' + i)" class="text-danger d-block mt-1">Please follow the format "12/2024".</small>
                 </div>
-                <div class="col-md-6 mb-3">
+                <!-- <div class="col-md-6 mb-3">
                   <label for="antecedents{{ i }}" class="form-label">48. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *</label>
                   <input type="text" [id]="'antecedents' + i" class="form-control" formControlName="antecedents" placeholder="Enter antecedents" required />
+                </div> -->
+                <div class="col-md-6">
+                  <label for="antecedentsOption{{ i }}" class="form-label">48a. Antecedents *</label>
+                  <select class="form-control" formControlName="antecedentsOption">
+                    <option value="">Select</option>
+                    <option value="Yes">Yes</option>
+                    <option value="NA">NA</option>
+                  </select>
+                 </div>
+
+                <div class="col-md-6 mb-3" *ngIf="accused.get('antecedentsOption')?.value === 'Yes'">
+                    <label for="antecedents{{ i }}" class="form-label">48b. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *</label>
+                    <input type="text" [id]="'antecedents' + i" class="form-control" formControlName="antecedents" placeholder="Enter antecedents"  (input)="checkInput(i, 'antecedents')"/>
                 </div>
-                <div class="col-md-6 mb-3">
+                <!-- <div class="col-md-6 mb-3">
                   <label for="landOIssues{{ i }}" class="form-label">49. L&O Issues (Pickets, Bandoust, etc) *</label>
                   <input type="text" [id]="'landOIssues' + i" class="form-control" formControlName="landOIssues" placeholder="Enter L&O issues" required />
+                </div> -->
+                <div class="col-md-6">
+                  <label for="loissue{{ i }}" class="form-label">49a. L & O Issues *</label>
+                  <select class="form-control" formControlName="landOIssueOption">
+                    <option value="">Select</option>
+                    <option value="Yes">Yes</option>
+                    <option value="NA">NA</option>
+                  </select>
+                 </div>
+                <div class="col-md-6 mb-3" *ngIf="accused.get('landOIssueOption')?.value === 'Yes'">
+                  <label for="landOIssues{{ i }}" class="form-label">49b. L&O Issues (Pickets, Bandoust, etc) *</label>
+                  <input type="text" [id]="'landOIssues' + i" class="form-control" formControlName="landOIssues" placeholder="Enter L&O issues" (input)="checkInput(i, 'landOIssues')"/>
                 </div>
                 <div class="col-md-12 mb-3">
                   <label for="gistOfCurrentCase{{ i }}" class="form-label">50. Gist of the Current Case *</label>
@@ -587,7 +727,7 @@
           <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
           <!-- <button type="button" class="btn btn-primary" (click)="saveStepFourAsDraft()" [disabled]="!isStepValid()">Next</button> -->
-          <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid()">Next</button>
+          <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid()">Submit</button>
         </div>
       </div>
       <div *ngIf="mainStep === 1 && step === 5" class="form-step">
@@ -857,17 +997,37 @@
             </div>
             <div class="row mb-3">
               <div class="col-md-4 mb-3">
-                <label for="caseType" class="form-label">66. Select Case Type *</label>
+                <label for="caseType" class="form-label">66. Select Nature of Final Report *</label>
                 <select id="caseType" class="form-select" formControlName="caseType" required>
                   <option value="" disabled>Select Case Type</option>
                   <option value="chargeSheet">Charge Sheet</option>
                   <option value="referredChargeSheet">Referred Charge Sheet (RCS)</option>
                 </select>
               </div>
-              <div *ngIf="firForm.get('caseType')?.value === 'chargeSheet'" class="col-lg-6">
+              <!-- <div *ngIf="firForm.get('caseType')?.value === 'chargeSheet'" class="col-lg-6">
                 <label for="caseNumber" class="form-label">67. Case Number Report (CNR) / Special SC Number *</label>
                 <input type="text" id="caseNumber" class="form-control" formControlName="caseNumber" placeholder="Enter Case Number" required/>
-              </div>
+              </div> -->
+              <div class="col-lg-6" *ngIf="firForm.get('caseType')?.value === 'chargeSheet'">
+                <label for="caseNumber" class="form-label">67a. Case Number Report (CNR) / Special SC Number *</label>
+                <input
+                  type="text"
+                  id="caseNumber"
+                  class="form-control"
+                  formControlName="caseNumber"
+                  placeholder="Enter Case Number"
+                  required
+                />
+                </div>
+                <div class="col-lg-4" *ngIf="firForm.get('caseType')?.value === 'chargeSheet'">
+                  <label for="chargeSheetDate" class="form-label">67b. Date of Chargesheet</label>
+                  <input
+                    type="date"
+                    id="chargeSheetDate"
+                    class="form-control"
+                    formControlName="chargeSheetDate"
+                  />
+                </div>
               <div *ngIf="firForm.get('caseType')?.value === 'referredChargeSheet'" class="col-md-12">
                 <div class="row">
                   <div class="col-lg-6">
