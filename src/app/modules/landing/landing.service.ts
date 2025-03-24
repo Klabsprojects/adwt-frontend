@@ -33,6 +33,9 @@ export class LandingService {
         national_helpline: "National Helpline Against Atrocities",
         contact_us: "Contact Us",
         address: "Directorate of Adi Dravidar Welfare, Ezhilagam Annexure building, Chepauk, Chennai, Tamil Nadu - 600 005.",
+        tribal_research_centres: "Tribal Research Centres",
+        tahdco: "TAHDCO",
+        csje: "Centre for Social Justice and Equity (CSJE)",
         //poa
         POA: "Prevention of Atrocities",
         poa_page: [
@@ -116,6 +119,9 @@ This SOP is for the call centre representatives on setting up the call centre he
         national_helpline: "தீவிரமான குற்றங்களுக்கு எதிரான தேசிய உதவி எண்",
         contact_us: "எங்களை தொடர்புகொள்ள",
         address: "ஆதி திராவிடர் நலத்துறை இயக்குநரகம், எழிலகம் அனெக்சர் கட்டிடம், சேப்பாக்கம், சென்னை, தமிழ்நாடு - 600 005.",
+        tribal_research_centres: "பழங்குடி ஆய்வு மையங்கள்",
+        tahdco: "TAHDCO",
+        csje: "சமூக நீதியும் சமத்துவமும் மையம் (CSJE)",
         //poa
         POA: "அதிர்ச்சிகரமான குற்றங்களை தடுப்பது",
         poa_page: [

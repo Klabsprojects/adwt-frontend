@@ -20,8 +20,10 @@ constructor(public lang:LandingService){}
     { name: 'ADW Department', path: 'https://www.tnadw.in/ ' },
     { name: 'Tribal Welfare Department', path: 'https://www.tntribalwelfare.tn.gov.in/' },
     { name: 'National Helpline Against Atrocities', path: 'https://nhapoa.gov.in/en' },
+    { name: 'Tribal Research Centres', path: 'https://tntrc.org.in/ ' },
+    { name: 'TAHDCO', path: 'https://tahdco.com/' },
+    { name: 'CSJE', path: 'https://csje.mssw.in/' },
   ];
-
   contactInfo = [
     { icon: 'fas fa-map-marker-alt', info: 'Directorate of Adi Dravidar Welfare Ezhilagam Annexure building, Cheapauk, Chennai,Tamil Nadu - 600 005.', link: 'https://maps.google.com/?q=DIRECTORATE+OF+COLLEGIATE+EDUCATION+Chennai' },
     { icon: 'fas fa-phone', info: '044 -28589855' },
