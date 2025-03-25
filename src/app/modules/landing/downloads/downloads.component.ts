@@ -57,6 +57,13 @@ export class DownloadsComponent {
 
       fileType: "PDF",
       downloadUrl: "assets/pdf/7. Model Contingency Plan Tamil Nadu, 2017.pdf"
+    },
+    {
+      title: "8. G.O. for enhancement of relief given to SC ST victims of Atrocities 2022",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/8. G.O. for enhancement of relief given to SC ST victims of Atrocities 2022.pdf"
     }
   ];
   downloadPdf(pdfPath: string) {
