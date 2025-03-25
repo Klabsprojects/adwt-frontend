@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.prod';
 @Injectable({
@@ -14,7 +14,7 @@ export class FirListTestService {
   // Fetch FIR list from the backend
   getFirList(): Observable<any[]> {
     console.log("Requesting FIR list from backend (FirListTestService)");
-    return this.http.get<any[]>(`${this.baseUrl}/list`);
+    return this.http.get<any[]>(`${this.baseUrl}/list`+'/chumma');
   }
 
 
@@ -38,4 +38,28 @@ export class FirListTestService {
   getReportdata(): Observable<any> {
     return this.http.get(`${environment.apiUrl}/additionalreport/getadditionalreportdetails`);
   }
+
+
+  getPaginatedFirList(page: number, pageSize: number , filters: any = {}) {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString());
+      
+      // Add all filters to params
+      Object.keys(filters).forEach(key => {
+        params = params.set(key, filters[key]);
+      });
+        // Add other filters as needed
+    
+    return this.http.get<any>(`${this.baseUrl}/list_paginated`, { params });
+  }
+
+
+  getPoliceRanges() {
+  return this.http.get<any>(`${this.baseUrl}/getPoliceRanges`);
+  }
+
+  getRevenue_district() {
+    return this.http.get<any>(`${this.baseUrl}/getRevenue_district`);
+    }
 }

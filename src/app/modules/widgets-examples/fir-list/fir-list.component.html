@@ -38,24 +38,51 @@
 
   <div class="card-body pt-0">
     <!-- Filters -->
+
     <div class="d-flex gap-3 mb-3">
       <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
-        <option value="" selected disabled>Police City</option>
+        <option value="" selected hidden disabled>Police City</option>
         <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
       </select>
 
-      <!-- <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
-        <option value="" selected disabled>Select One</option>
-        <option *ngFor="let nature of naturesOfOffence" [value]="nature">{{ nature }}</option>
+      <select class="form-select" [(ngModel)]="selectedPoliceZone" (change)="applyFilters()">
+        <option value="" selected hidden disabled>Police Zone</option>
+        <option *ngFor="let item of policeZones" [value]="item">{{ item }}</option>
       </select>
 
-      <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
-        <option value="" selected disabled>Select One</option>
-        <option *ngFor="let status of statusesOfCase" [value]="status">{{ status }}</option>
-      </select> -->
+
+      <select class="form-select" [(ngModel)]="selectedPoliceRange" (change)="applyFilters()">
+        <option value="" selected hidden disabled>Police Range</option>
+        <option *ngFor="let item of policeRanges" [value]="item.police_range">{{ item.police_range }}</option>
+      </select>
+
+      <select class="form-select" [(ngModel)]="selectedRevenue_district" (change)="applyFilters()">
+        <option value="" selected hidden disabled>Revenue District</option>
+        <option *ngFor="let item of revenueDistricts" [value]="item.revenue_district">{{ item.revenue_district }}</option>
+      </select>
+
+      <select class="form-select" [(ngModel)]="selectedComplaintReceivedType" (change)="applyFilters()">
+        <option value="" selected hidden disabled>Complaint Received Type</option>
+        <option value="written" >written</option>
+        <option value="oral" >oral</option>
+      </select>
+
+      <!-- <input type="date" [(ngModel)]="startDate" (change)="applyFilters()" class="form-control" placeholder="Start Date">
+      <input type="date" [(ngModel)]="endDate" (change)="applyFilters()" class="form-control" placeholder="End Date"> -->
+
+      <div class="tooltip-container">
+        <input type="date" [(ngModel)]="startDate" (change)="applyFilters()" class="form-control" placeholder="Start Date">
+        <span class="tooltip-text">Date of Registration From Date</span>
+      </div>
+      
+      <div class="tooltip-container">
+        <input type="date" [(ngModel)]="endDate" (change)="applyFilters()" class="form-control" placeholder="End Date">
+        <span class="tooltip-text">Date of Registration To Date</span>
+      </div>
+     
 
       <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
-        <option value="" selected disabled>Status</option>
+        <option value="" selected hidden disabled>Status</option>
         <option *ngFor="let reliefStatus of statusesOfRelief" [value]="reliefStatus.value">
           {{ reliefStatus.label }}
         </option>
@@ -88,11 +115,23 @@
         <tr *ngFor="let fir of paginatedFirList(); let i = index">
           <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
             <ng-container [ngSwitch]="column.field">
-              <span *ngSwitchCase="'sl_no'">{{ (page - 1) * itemsPerPage + i + 1 }}</span>
+              <span *ngSwitchCase="'sl_no'">{{ fir.row_num }}</span>
               <span *ngSwitchCase="'fir_number'">{{ fir.fir_number }}</span>
               <span *ngSwitchCase="'fir_id'">{{ fir.fir_id }}</span>
               <span *ngSwitchCase="'police_city'">{{ fir.police_city }}</span>
+              <span *ngSwitchCase="'police_zone'">{{ fir.police_zone }}</span>
+              <span *ngSwitchCase="'police_range'">{{ fir.police_range }}</span>
+              <span *ngSwitchCase="'revenue_district'">{{ fir.revenue_district }}</span>
               <span *ngSwitchCase="'police_station'">{{ fir.police_station }}</span>
+
+              <span *ngSwitchCase="'officer_name'">{{ fir.officer_name }}</span>
+              <span *ngSwitchCase="'complaintReceivedType'">{{ fir.complaintReceivedType }}</span>
+              <span *ngSwitchCase="'complaintRegisteredBy'">{{ fir.complaintRegisteredBy }}</span>
+              <span *ngSwitchCase="'complaintReceiverName'">{{ fir.complaintReceiverName }}</span>
+              <span *ngSwitchCase="'officer_designation'">{{ fir.officer_designation }}</span>
+              <span *ngSwitchCase="'place_of_occurrence'">{{ fir.place_of_occurrence }}</span>
+              <span *ngSwitchCase="'date_of_registration'">{{ fir.date_of_registration }}</span>
+
               <span *ngSwitchCase="'created_by'">{{ fir.created_by || 'Super User' }}</span>
               <span *ngSwitchCase="'created_at'">{{ fir.created_at | date: 'dd-MM-yyyy' }}</span>
               <span *ngSwitchCase="'status'">
@@ -134,24 +173,7 @@
     </table>
 
 
-    <!-- Pagination Controls -->
-    <!-- <nav *ngIf="filteredFirList().length > itemsPerPage" class="d-flex justify-content-end mt-3">
-      <ul class="pagination">
-        <li class="page-item" [class.disabled]="page === 1">
-          <button class="page-link" (click)="previousPage()">Previous</button>
-        </li>
-        <li class="page-item" *ngFor="let pageNum of totalPagesArray()">
-          <button class="page-link" (click)="goToPage(pageNum)" [class.active]="page === pageNum">
-            {{ pageNum }}
-          </button>
-        </li>
-        <li class="page-item" [class.disabled]="!hasNextPage()">
-          <button class="page-link" (click)="nextPage()">Next</button>
-        </li>
-      </ul>
-    </nav> -->
-
-    <ul class="pagination">
+    <!-- <ul class="pagination">
       <li class="page-item" [class.disabled]="page === 1">
         <button class="page-link" (click)="previousPage()">Previous</button>
       </li>
@@ -169,6 +191,39 @@
       <li class="page-item" [class.disabled]="!hasNextPage()">
         <button class="page-link" (click)="nextPage()">Next</button>
       </li>
+    </ul> -->
+
+    <ul class="pagination">
+
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="goToFirstPage()">Start</button>
+      </li>
+
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="previousPage()">Previous</button>
+      </li>
+      
+      <li class="page-item" *ngFor="let pageNum of totalPagesArray()">
+        <button
+          class="page-link"
+          (click)="goToPage(pageNum)"
+          [class.active]="currentPage === pageNum"
+        >
+          {{ pageNum }}
+        </button>
+      </li>
+    
+      <li class="page-item" [class.disabled]="!hasNextPage()">
+        <button class="page-link" (click)="nextPage()">Next</button>
+      </li>
+
+      <li class="page-item" [class.disabled]="!hasNextPage()">
+        <button class="page-link" (click)="goToLastPage()">End</button>
+      </li>
+      
+      <span class="ms-3 mt-2">
+        Page {{ currentPage }} of {{ totalPages }} ({{ totalRecords }} records)
+      </span>
     </ul>
 
   </div>
@@ -3093,3 +3148,32 @@
 
 
 
+<style>
+  
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 6px 8px;
+  border-radius: 5px;
+  position: absolute;
+  top: -35px; /* Position above the input */
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+</style>
