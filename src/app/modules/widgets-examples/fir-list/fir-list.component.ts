@@ -8,6 +8,7 @@ import { Router , ActivatedRoute } from '@angular/router';
 import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
+import { PoliceDivisionService } from 'src/app/services/police-division.service';
 @Component({
   selector: 'app-fir-list',
   templateUrl: './fir-list.component.html',
@@ -359,50 +360,65 @@ export class FirListComponent implements OnInit {
   selectedDistrict: string = '';
   selectedNatureOfOffence: string = '';
   selectedStatusOfCase: string = '';
-  selectedStatusOfRelief: any;
+  selectedStatusOfRelief: string = '';
+  selectedPoliceZone: string = '';
+  selectedPoliceRange: string = '';
+  selectedRevenue_district: string = '';
+  selectedComplaintReceivedType: string = '';
+  startDate: string = '';
+  endDate: string = '';
+
+
+
+
  @ViewChild('firDetailsModal') firDetailsModal!: TemplateRef<any>;
 
   // Filter options
-  districts: string[] = [
-    'Ariyalur',
-    'Chengalpattu',
-    'Chennai',
-    'Coimbatore',
-    'Cuddalore',
-    'Dharmapuri',
-    'Dindigul',
-    'Erode',
-    'Kallakurichi',
-    'Kanchipuram',
-    'Kanniyakumari',
-    'Karur',
-    'Krishnagiri',
-    'Madurai',
-    'Mayiladuthurai',
-    'Nagapattinam',
-    'Namakkal',
-    'Nilgiris',
-    'Perambalur',
-    'Pudukkottai',
-    'Ramanathapuram',
-    'Ranipet',
-    'Salem',
-    'Sivagangai',
-    'Tenkasi',
-    'Thanjavur',
-    'Theni',
-    'Thoothukudi (Tuticorin)',
-    'Tiruchirappalli (Trichy)',
-    'Tirunelveli',
-    'Tirupathur',
-    'Tiruppur',
-    'Tiruvallur',
-    'Tiruvannamalai',
-    'Tiruvarur',
-    'Vellore',
-    'Viluppuram',
-    'Virudhunagar'
-  ];
+  // districts: string[] = [
+  //   'Ariyalur',
+  //   'Chengalpattu',
+  //   'Chennai',
+  //   'Coimbatore',
+  //   'Cuddalore',
+  //   'Dharmapuri',
+  //   'Dindigul',
+  //   'Erode',
+  //   'Kallakurichi',
+  //   'Kanchipuram',
+  //   'Kanniyakumari',
+  //   'Karur',
+  //   'Krishnagiri',
+  //   'Madurai',
+  //   'Mayiladuthurai',
+  //   'Nagapattinam',
+  //   'Namakkal',
+  //   'Nilgiris',
+  //   'Perambalur',
+  //   'Pudukkottai',
+  //   'Ramanathapuram',
+  //   'Ranipet',
+  //   'Salem',
+  //   'Sivagangai',
+  //   'Tenkasi',
+  //   'Thanjavur',
+  //   'Theni',
+  //   'Thoothukudi (Tuticorin)',
+  //   'Tiruchirappalli (Trichy)',
+  //   'Tirunelveli',
+  //   'Tirupathur',
+  //   'Tiruppur',
+  //   'Tiruvallur',
+  //   'Tiruvannamalai',
+  //   'Tiruvarur',
+  //   'Vellore',
+  //   'Viluppuram',
+  //   'Virudhunagar'
+  // ];
+
+  districts : any;
+  policeZones : any;
+  policeRanges : any;
+  revenueDistricts : any;
 
   naturesOfOffence: string[] = [
     'Theft',
@@ -437,6 +453,18 @@ export class FirListComponent implements OnInit {
     { label: 'Sl.No', field: 'sl_no', sortable: false, visible: true },
     { label: 'FIR No.', field: 'fir_number', sortable: true, visible: true },
     { label: 'Police City', field: 'police_city', sortable: true, visible: true },
+    { label: 'Police Zone', field: 'police_zone', sortable: true, visible: true },
+    { label: 'Police Range', field: 'police_range', sortable: true, visible: true },
+    { label: 'Revenue District', field: 'revenue_district', sortable: true, visible: true },
+    
+    { label: 'Officer Name', field: 'officer_name', sortable: true, visible: false },
+    { label: 'Complaint Received Type', field: 'complaintReceivedType', sortable: true, visible: false },
+    { label: 'Complaint Registered By', field: 'complaintRegisteredBy', sortable: true, visible: false },
+    { label: 'Complaint Receiver Name', field: 'complaintReceiverName', sortable: true, visible: false },
+    { label: 'Officer Designation', field: 'officer_designation', sortable: true, visible: false },
+    { label: 'Place of Occurrence', field: 'place_of_occurrence', sortable: true, visible: false },
+    { label: 'Date of Registration', field: 'date_of_registration', sortable: true, visible: false },
+
     { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
     { label: 'Created By', field: 'created_by', sortable: true, visible: true },
     { label: 'Created At', field: 'created_at', sortable: true, visible: true },
@@ -451,17 +479,30 @@ export class FirListComponent implements OnInit {
   currentSortField: string = '';
   isAscending: boolean = true;
   RecivedFirData : any;
+
+
+  pageSizeOptions: number[] = [5, 10, 20, 50]; // Available page size options
+  pageSize: number = 10; // Default records per page
+  totalRecords: number = 0; // Total number of records
+  currentPage: number = 1; // Current page
+  totalPages: number = 0;
+
+
   constructor(
     private firService: FirListTestService,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private route: ActivatedRoute,
     private modalService: NgbModal,
+    private policeDivisionService :PoliceDivisionService
   ) {}
 
   ngOnInit(): void {
-    this.loadFirList();
+    this.loadFirList(1, this.pageSize);
     this.updateSelectedColumns();
+    this.loadPoliceDivision();
+    this.loadPoliceRanges();
+    this.loadRevenue_district();
 
     setTimeout(() => {
       this.route.queryParams.subscribe(params => {
@@ -837,74 +878,294 @@ console.log( data.queryResults[0],"vire ")
 
 
   // Load FIR list from the backend
-  loadFirList() {
-    this.isLoading = true;
-    this.firService.getFirList().subscribe(
-      (data: any[]) => {
-        this.firList = data;
+//   loadFirList() {
+//     this.isLoading = true;
+//     this.firService.getFirList().subscribe(
+//       (data: any[]) => {
+//         this.firList = data;
 
-console.log(this.firList,"loadfirst")
+// console.log(this.firList,"loadfirst")
 
-        this.filteredList = [...this.firList];
-        this.isLoading = false;
-        this.cdr.detectChanges();
+//         this.filteredList = [...this.firList];
+//         this.isLoading = false;
+//         this.cdr.detectChanges();
+//       },
+//       (error) => {
+//         this.isLoading = false;
+//         Swal.fire('Error', 'Failed to load FIR data', 'error');
+//       }
+//     );
+//   }
+
+
+
+// loadFirList(page: number = 1) {
+//   this.isLoading = true;
+//   this.currentPage = page;
+  
+//   this.firService.getPaginatedFirList(page, this.pageSize,'','').subscribe(
+//     (response: any) => {
+//       this.firList = response.data;
+//       this.totalRecords = response.total;
+//       this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
+//       this.filteredList = [...this.firList];
+//       this.isLoading = false;
+//       this.cdr.detectChanges();
+//     },
+//     (error : any) => {
+//       this.isLoading = false;
+//       Swal.fire('Error', 'Failed to load FIR data', 'error');
+//     }
+//   );
+// }
+
+
+loadFirList(page: number = 1, pageSize: number = this.pageSize) {
+  this.isLoading = true;
+  this.currentPage = page;
+  this.pageSize = pageSize;
+  
+  this.firService.getPaginatedFirList(page, pageSize, this.getFilterParams()).subscribe(
+    (response: any) => {
+      this.firList = response.data;
+      this.totalRecords = response.total;
+      this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
+      this.filteredList = [...this.firList];
+      // this.policeRanges = response.data.map((item: any) => item.police_range);
+      // this.policeRanges = [...new Set(this.policeRanges)];
+      // this.revenueDistricts = response.data.map((item: any) => item.revenue_district_name);
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    },
+    (error) => {
+      this.isLoading = false;
+      Swal.fire('Error', 'Failed to load FIR data', 'error');
+    }
+  );
+}
+
+loadPoliceRanges(){
+  this.firService.getPoliceRanges().subscribe(
+    (response: any) => {
+      this.policeRanges = response;
+    },
+    (error : any) => {
+      console.error('Error', 'Failed to load FIR data', 'error',error);
+    }
+  );
+}
+
+
+loadRevenue_district(){
+  this.firService.getRevenue_district().subscribe(
+    (response: any) => {
+      this.revenueDistricts = response;
+    },
+    (error : any) => {
+      console.error('Error', 'Failed to load FIR data', 'error',error);
+    }
+  );
+}
+
+
+loadPoliceDivision() {
+    this.policeDivisionService.getAllPoliceDivisions().subscribe(
+      (data: any) => {
+
+        this.districts = data.map((item: any) => item.district_division_name);
+        this.policeZones = data.map((item: any) => item.police_zone_name);
+        this.policeZones = [...new Set(this.policeZones)];
       },
-      (error) => {
-        this.isLoading = false;
-        Swal.fire('Error', 'Failed to load FIR data', 'error');
+      (error: any) => {
+        console.error(error)
       }
     );
   }
 
+
+// Change page size
+changePageSize(newSize: number) {
+  this.pageSize = newSize;
+  this.loadFirList(1, newSize); // Reset to first page with new size
+}
+
+// Navigation methods
+goToFirstPage() {
+  if (this.currentPage !== 1) {
+    this.loadFirList(1);
+  }
+}
+
+goToLastPage() {
+  if (this.currentPage !== this.totalPages) {
+    this.loadFirList(this.totalPages);
+  }
+}
+
+previousPage() {
+  if (this.currentPage > 1) {
+    this.loadFirList(this.currentPage - 1);
+  }
+}
+
+nextPage() {
+  if (this.currentPage < this.totalPages) {
+    this.loadFirList(this.currentPage + 1);
+  }
+}
+
+goToPage(pageNum: number) {
+  if (pageNum >= 1 && pageNum <= this.totalPages) {
+    this.loadFirList(pageNum);
+  }
+}
+
+// Generate visible page numbers for pagination (with ellipsis for many pages)
+getVisiblePageNumbers(): (number | string)[] {
+  const visiblePages: (number | string)[] = [];
+  const totalPages = this.totalPages;
+  
+  if (totalPages <= 10) {
+    // If we have 10 or fewer pages, show all of them
+    for (let i = 1; i <= totalPages; i++) {
+      visiblePages.push(i);
+    }
+  } else {
+    // Always show first page
+    visiblePages.push(1);
+    
+    // Calculate range of pages to show around current page
+    let startPage = Math.max(2, this.currentPage - 2);
+    let endPage = Math.min(this.totalPages - 1, this.currentPage + 2);
+    
+    // Add ellipsis if needed before the range
+    if (startPage > 2) {
+      visiblePages.push('...');
+    }
+    
+    // Add the range of pages
+    for (let i = startPage; i <= endPage; i++) {
+      visiblePages.push(i);
+    }
+    
+    // Add ellipsis if needed after the range
+    if (endPage < this.totalPages - 1) {
+      visiblePages.push('...');
+    }
+    
+    // Always show last page
+    visiblePages.push(this.totalPages);
+  }
+  
+  return visiblePages;
+}
+
+
+getFilterParams() {
+  const params: any = {};
+  
+  if (this.searchText) {
+    params.search = this.searchText;
+  }
+  
+  if (this.selectedDistrict) {
+    params.district = this.selectedDistrict;
+  }
+
+  if (this.selectedPoliceZone) {
+    params.police_zone = this.selectedPoliceZone;
+  }
+
+  if (this.selectedPoliceRange) {
+    params.police_range = this.selectedPoliceRange;
+  }
+
+  if (this.selectedRevenue_district) {
+    params.revenue_district = this.selectedRevenue_district;
+  }
+
+  if (this.selectedComplaintReceivedType) {
+    params.complaintReceivedType = this.selectedComplaintReceivedType;
+  }
+
+  if (this.startDate) {
+    params.start_date = this.startDate;
+  }
+
+  if (this.endDate) {
+    params.end_date = this.endDate;
+  }
+  
+  if (this.selectedStatusOfRelief) {
+    params.status = this.selectedStatusOfRelief;
+  }
+  
+  // Add other filters as needed
+  
+  return params;
+}
+
   // Apply filters to the FIR list
+  // applyFilters() {
+  //   this.page = 1; // Reset to the first page
+  //   this.cdr.detectChanges();
+  //   this.filteredFirList();
+  // }
+
   applyFilters() {
-    this.page = 1; // Reset to the first page
-    this.cdr.detectChanges();
-    this.filteredFirList();
+    this.loadFirList(1);
   }
 
   // Filtered FIR list based on search and filter criteria
   filteredFirList() {
-    const searchLower = this.searchText.toLowerCase();
+    // const searchLower = this.searchText.toLowerCase();
 
-    // console.log(this.selectedDistrict,'this.selectedDistrict')
-    // console.log(this.selectedNatureOfOffence,'this.selectedNatureOfOffence')
-    // console.log(this.selectedStatusOfCase,'this.selectedStatusOfCase')
-    // console.log(this.selectedStatusOfRelief,'this.selectedStatusOfRelief')
+    // // console.log(this.selectedDistrict,'this.selectedDistrict')
+    // // console.log(this.selectedNatureOfOffence,'this.selectedNatureOfOffence')
+    // // console.log(this.selectedStatusOfCase,'this.selectedStatusOfCase')
+    // // console.log(this.selectedStatusOfRelief,'this.selectedStatusOfRelief')
 
-    return this.firList.filter((fir) => {
-      // Apply search filter
-      const matchesSearch =
-        fir.fir_id.toString().includes(searchLower) ||
-        (fir.police_city || '').toLowerCase().includes(searchLower) ||
-        (fir.police_station || '').toLowerCase().includes(searchLower);
+    // return this.firList.filter((fir) => {
+    //   // Apply search filter
+    //   const matchesSearch =
+    //     fir.fir_id.toString().includes(searchLower) ||
+    //     (fir.police_city || '').toLowerCase().includes(searchLower) ||
+    //     (fir.police_station || '').toLowerCase().includes(searchLower);
 
-      // Apply dropdown filters
-      const matchesDistrict = this.selectedDistrict ? fir.police_city === this.selectedDistrict : true;
-      const matchesNatureOfOffence = this.selectedNatureOfOffence? fir.nature_of_offence === this.selectedNatureOfOffence: true;
-      const matchesStatusOfCase = this.selectedStatusOfCase ? fir.relief_status == this.selectedStatusOfCase : true;
-      // const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status == this.selectedStatusOfRelief : true;
-      const matchesStatusOfRelief = this.selectedStatusOfRelief
-      ? (this.selectedStatusOfRelief == 0 ? fir.status >= 0 && fir.status <= 5 : fir.status == this.selectedStatusOfRelief)
-      : true;
+    //   // Apply dropdown filters
+    //   const matchesDistrict = this.selectedDistrict ? fir.police_city === this.selectedDistrict : true;
+    //   const matchesNatureOfOffence = this.selectedNatureOfOffence? fir.nature_of_offence === this.selectedNatureOfOffence: true;
+    //   const matchesStatusOfCase = this.selectedStatusOfCase ? fir.relief_status == this.selectedStatusOfCase : true;
+    //   // const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status == this.selectedStatusOfRelief : true;
+    //   const matchesStatusOfRelief = this.selectedStatusOfRelief
+    //   ? (this.selectedStatusOfRelief == 0 ? fir.status >= 0 && fir.status <= 5 : fir.status == this.selectedStatusOfRelief)
+    //   : true;
 
     
     
-      return (
-        matchesSearch &&
-        matchesDistrict &&
-        matchesNatureOfOffence &&
-        matchesStatusOfCase &&
-        matchesStatusOfRelief
-      );
-    });
+    //   return (
+    //     matchesSearch &&
+    //     matchesDistrict &&
+    //     matchesNatureOfOffence &&
+    //     matchesStatusOfCase &&
+    //     matchesStatusOfRelief
+    //   );
+    // });
+    return this.firList;
   }
 
   clearfilter(){
+    this.searchText = '';
     this.selectedDistrict = '';
+    this.selectedPoliceZone = '';
+    this.selectedPoliceRange = '';
+    this.selectedRevenue_district = '';
+    this.selectedComplaintReceivedType = '';
     this.selectedNatureOfOffence = '';
     this.selectedStatusOfCase = '';
     this.selectedStatusOfRelief = '';
+    this.startDate = '';
+    this.endDate = '';
     this.applyFilters();
   }
 
@@ -992,20 +1253,26 @@ getStatusBadgeClass(status: number): string {
   //     .map((_, i) => i + 1);
   // }
 
-  nextPage() {
-    if (this.hasNextPage()) this.page++;
-  }
+  // nextPage() {
+  //   if (this.hasNextPage()) this.page++;
+  // }
 
-  previousPage() {
-    if (this.page > 1) this.page--;
-  }
 
-  goToPage(pageNum: number) {
-    this.page = pageNum;
-  }
+  // previousPage() {
+  //   if (this.page > 1) this.page--;
+  // }
 
-  hasNextPage(): boolean {
-    return this.page * this.itemsPerPage < this.filteredFirList().length;
+  // goToPage(pageNum: number) {
+  //   this.page = pageNum;
+  // }
+
+
+  // hasNextPage(): boolean {
+  //   return this.page * this.itemsPerPage < this.filteredFirList().length;
+  // }
+
+  hasNextPage() {
+    return this.currentPage < this.totalPages;
   }
 
   // Delete FIR
@@ -1051,21 +1318,47 @@ getStatusBadgeClass(status: number): string {
     this.router.navigate(['/widgets-examples/altered-case'], { queryParams: { fir_id: firId } });
   }
 
+  // totalPagesArray(): number[] {
+  //   const totalPages = Math.ceil(this.filteredFirList().length / this.itemsPerPage);
+  //   const pageNumbers = [];
+  
+  //   // Define how many pages to show before and after the current page
+  //   const delta = 2; // Number of pages to show before and after the current page
+  
+  //   // Calculate start and end page numbers
+  //   let startPage = Math.max(1, this.page - delta);
+  //   let endPage = Math.min(this.totalPages, this.page + delta);
+  
+  //   // Adjust start and end if there are not enough pages before or after
+  //   if (this.page <= delta) {
+  //     endPage = Math.min(this.totalPages, startPage + delta * 2);
+  //   } else if (this.page + delta >= this.totalPages) {
+  //     startPage = Math.max(1, endPage - delta * 2);
+  //   }
+  
+  //   for (let i = startPage; i <= endPage; i++) {
+  //     pageNumbers.push(i);
+  //   }
+  
+  //   return pageNumbers;
+  // }
+
   totalPagesArray(): number[] {
-    const totalPages = Math.ceil(this.filteredFirList().length / this.itemsPerPage);
-    const pageNumbers = [];
+    // Use total pages from server-side pagination
+    const totalPages = this.totalPages;
+    const pageNumbers: number[] = [];
   
     // Define how many pages to show before and after the current page
     const delta = 2; // Number of pages to show before and after the current page
   
     // Calculate start and end page numbers
-    let startPage = Math.max(1, this.page - delta);
-    let endPage = Math.min(totalPages, this.page + delta);
+    let startPage = Math.max(1, this.currentPage - delta);
+    let endPage = Math.min(totalPages, this.currentPage + delta);
   
     // Adjust start and end if there are not enough pages before or after
-    if (this.page <= delta) {
+    if (this.currentPage <= delta) {
       endPage = Math.min(totalPages, startPage + delta * 2);
-    } else if (this.page + delta >= totalPages) {
+    } else if (this.currentPage + delta >= totalPages) {
       startPage = Math.max(1, endPage - delta * 2);
     }
   
@@ -1075,6 +1368,10 @@ getStatusBadgeClass(status: number): string {
   
     return pageNumbers;
   }
+
+  // totalPagesArray() {
+  //   return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  // }
 
 
   convertToNormalDate(isoDate: string): string {
