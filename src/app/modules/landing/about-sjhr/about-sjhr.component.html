@@ -1,0 +1,40 @@
+<section class="about">
+    <div class="row">
+        <div class="header">
+            <h1 class="heading">{{lang.lang.sjhr_title}}</h1>
+            <p class="subheading">{{lang.lang.sjhr_description}}</p>
+        </div>
+    </div>
+    <div class="row mid">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+            <img src="assets/images/slide4.jpg" alt="" class="">
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 content">
+            <h2>{{lang.lang.sjhr_title}}</h2>
+            <ng-container *ngFor="let item of lang.lang.sjhr_content">
+                <p>{{item}}</p>
+            </ng-container>
+        </div>
+    </div>
+    <div class="row bottom">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 px-4">
+            <h2>{{lang.lang.sjhr_structure.sjhr_title}}</h2>
+            <div class="block-box">
+                <!-- <p class="b-des">During the Vice Chancellor's Conference held on 30.08.2022, the Hon'ble Chief Minister
+                    of Tamilnadu
+                    made the following announcement:-</p> -->
+                <p class="b-block">{{lang.lang.sjhr_structure.sjhr_state_level}}</p>
+            </div>
+            <p>{{lang.lang.sjhr_structure.sjhr_hq}}</p>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 px-4">
+            <img src="assets/images/sjhr.png" alt="" class="d-block w-100" style="border-radius: 15px;">
+        </div>
+    </div>
+    <div class="row bottom">
+        <h2 style="text-align: center;">{{lang.lang.sjhr_administrative_setup}}</h2>
+        <div class="col-xl-12 col-lg-12 col-md-12 d-flex justify-content-center align-items-center" style="margin-top: 2rem !important;">
+            <img src="assets/images/SJHR-screen.png" alt="" class="d-block w-50" style="border-radius: 11px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+        </div>
+    </div>
+</section>

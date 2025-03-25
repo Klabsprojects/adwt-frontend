@@ -84,6 +84,23 @@ This SOP is for the call centre representatives on setting up the call centre he
             "The Tribal Research Centre, established in 1983-84 in the Nilgiris, studies the culture, traditions, and languages of Tamil Nadu’s 37 tribal communities and preserves tribal heritage.",
             "The Centre for Social Justice and Equity, in collaboration with the Madras School of Social Work, conducts research, offers courses, and organizes seminars on social justice issues."
         ],
+        // about-sjhr
+        "sjhr_title": "Social Justice & Human Rights",
+        "sjhr_description": "Social Justice is the tool to Sustainable development, the State of Tamil Nadu is the precursor in India to form an egalitarian society and strengthening the social fabric encompassing all for communal harmony.",
+        "sjhr_content": [
+          "The crimes against the Scheduled Castes and the Scheduled Tribes continued despite the constitutional provisions and legal safeguards. Protection of Civil Rights Act, 1955, was the first post-independent legislation enacted for the purpose of protecting the Civil Rights of the Scheduled Castes and Scheduled Tribes.",
+          "The community has been a victim of persistent injustice throughout centuries and has been looked down upon as a downtrodden community. The Scheduled Castes and Scheduled Tribes (Prevention of Atrocities) Act, 1989, is also known as the POA, SC/ST Act, the Prevention of Atrocities Act, or the Atrocities Act of 1989.",
+          "The Act being notified on March 31, 1995, was enacted on September 9, 1989. It is one of the legislations enacted to safeguard the rights of the Scheduled Castes and Scheduled Tribes community in India.",
+          "In 1970, the Government of India, Ministry of Law and Social Welfare, brought notice to the State Government to eradicate all forms of violence and atrocities against members of Scheduled Caste and Scheduled Tribe by the dominant communities in rural areas.",
+          "The State Government of Tamil Nadu formed the Social Justice and Human Rights unit as a Mobile Police Squad in certain districts for prevention of violence and atrocities against members of SC/ST. This was established via G.O. Ms. No. 34, Home Department dated 05.01.1972.",
+          "The Mobile Police Squad (PCR Unit) in certain districts was tasked with preventing caste fragilities in society along with enforcing and periodically monitoring the Prevention of Civil Rights Act, 1955, in the State. The unit’s scope was expanded further with the enactment of the Prevention of Atrocities Act, 1989, and its Rules of 1995."
+        ],
+        "sjhr_structure": {
+          "sjhr_title": "Structure and Organogram of SJHR",
+          "sjhr_state_level": "The Social Justice and Human Rights unit, headed by the Additional Director General of Police, was created in 1972 in Tamil Nadu to prevent physical violence and atrocities against Scheduled Castes and Scheduled Tribes.",
+          "sjhr_hq": "At the state level (Headquarters - Chennai), the Additional Director General of Police, Assistant Inspector General of Police, and the Social Justice and Human Rights division monitor the strict enforcement of the SC/ST (Prevention of Atrocities) Act, 1989, with support from a research unit comprising one Sociologist and one Economist."
+        },
+        "sjhr_administrative_setup":"ADMINISTRATIVE SET-UP OF SJ&HR",
         //services
         "govt_act_rules": "Government Act & Rules",
         "service_description": "Everything you need to know about our platform, all in one place.",
@@ -168,6 +185,23 @@ This SOP is for the call centre representatives on setting up the call centre he
             "1983-84 இல் நீலகிரியில் நிறுவப்பட்ட பழங்குடியினர் ஆராய்ச்சி மையம், தமிழகத்தின் 37 பழங்குடியினர் சமூகங்களின் கலாச்சாரம், பாரம்பரியம், மொழிகளை ஆய்வு செய்து, பழங்குடியினர் மரபுகளை பாதுகாக்கிறது.",
             "சமூக நீதி மற்றும் சமத்துவ மையம், மெட்ராஸ் சமூக பணியியல் பள்ளியுடன் இணைந்து, ஆராய்ச்சி செய்கிறது, படிப்புகள் வழங்குகிறது, மற்றும் சமூக நீதி தொடர்பான கருத்தரங்குகளை நடத்துகிறது."
         ],
+        //about-sjhr
+        "sjhr_title": "சமூக நீதி & மனித உரிமைகள்",
+        "sjhr_description": "சமூக நீதி என்பது நிலைத்த தரமான வளர்ச்சிக்கான கருவியாகும். இந்தியாவில் சமத்துவமான சமுதாயத்தை உருவாக்குவதில் முன்னோடியான மாநிலமாக தமிழ்நாடு சமூக உறவுகளை பலப்படுத்தி, ஒற்றுமையை ஊக்குவிக்கிறது.",
+        "sjhr_content": [
+          "அரசியல் மற்றும் சட்ட பாதுகாப்புகள் இருந்தபோதிலும், நிர்ணயிக்கப்பட்ட சாதி மற்றும் பழங்குடியினருக்கு எதிரான குற்றங்கள் தொடர்ந்தன. 1955 ஆம் ஆண்டு குடிமக்கள் உரிமை பாதுகாப்பு சட்டம், இந்தியாவின் சுதந்திரத்திற்குப் பிறகு, நிர்ணயிக்கப்பட்ட சாதி மற்றும் பழங்குடியினரின் குடிமக்கள் உரிமைகளைப் பாதுகாக்க உருவாக்கப்பட்ட முதல் சட்டமாகும்.",
+          "இந்த சமூகமானது பல நூற்றாண்டுகளாக நிலைத்திருக்கும் அநீதிக்குள் இருந்து பாதிக்கப்பட்டுள்ளது மற்றும் கீழ்த்தர சமூகமாக கருதப்பட்டது. 1989 ஆம் ஆண்டு நிர்ணயிக்கப்பட்ட சாதிகள் மற்றும் பழங்குடியினருக்கான (பாதுகாப்பு) சட்டம், POA, SC/ST சட்டம், அல்லது 1989 ஆம் ஆண்டு அதிர்ச்சிகரமான குற்றங்களைத் தடுக்கும் சட்டம் என்று அழைக்கப்படுகிறது.",
+          "இந்தச் சட்டம் 1989 செப்டம்பர் 9 அன்று இயற்றப்பட்டு, 1995 மார்ச் 31 அன்று அறிவிக்கப்பட்டது. இது நிர்ணயிக்கப்பட்ட சாதி மற்றும் பழங்குடியினரின் உரிமைகளை பாதுகாக்க உருவாக்கப்பட்ட சட்டங்களில் ஒன்றாகும்.",
+          "1970 ஆம் ஆண்டு, இந்திய அரசின் சட்டம் மற்றும் சமூக நல அமைச்சகம் மாநில அரசுக்கு அறிவிப்பு அனுப்பியது, கிராமப்புறங்களில் நிர்ணயிக்கப்பட்ட சாதி மற்றும் பழங்குடியினருக்கு எதிரான அனைத்து விதமான வன்முறைகள் மற்றும் அதிர்ச்சிகரமான குற்றங்களை ஒழிக்க தேவையான நடவடிக்கைகளை எடுக்குமாறு.",
+          "தமிழ்நாடு அரசு, சமூக நீதி மற்றும் மனித உரிமைகள் பிரிவை சில மாவட்டங்களில் அலைந்து திரியும் போலீஸ் படையாக அமைத்தது, எஸ்.சி/எஸ்.டி உறுப்பினர்களுக்கு எதிரான வன்முறை மற்றும் அதிர்ச்சிகரமான குற்றங்களைத் தடுக்கும் நோக்கில். இது G.O. Ms. No. 34, உள்துறை துறை, 05.01.1972 அன்று வெளியிடப்பட்டது.",
+          "போலீஸ் (PCR Unit) சில மாவட்டங்களில் சமூகத்தில் சாதி தொடர்பான பிரச்சினைகளை தடுக்கும் பணியை மேற்கொண்டு, 1955 ஆம் ஆண்டு குடிமக்கள் உரிமை பாதுகாப்பு சட்டத்தின் அமலாக்கத்தையும் கண்காணிக்கவும் செயல்பட்டது. 1989 ஆம் ஆண்டு அதிர்ச்சிகரமான குற்றங்களைத் தடுக்கும் சட்டம் மற்றும் 1995 விதிகளின் மூலம் இப்பிரிவின் செயல்பாடு மேலும் விரிவுபடுத்தப்பட்டது."
+        ],
+        "sjhr_structure": {
+          "sjhr_title": "SJHR இன் அமைப்பு மற்றும் பணிப்பிரிவுகள்",
+          "sjhr_state_level": "சமூக நீதி மற்றும் மனித உரிமைகள் பிரிவு, கூடுதல் டைரக்டர் ஜெனரல் ஆப் போலீஸ் தலைமையில் 1972 ஆம் ஆண்டு தமிழ்நாட்டில் உருவாக்கப்பட்டது. இது நிர்ணயிக்கப்பட்ட சாதி மற்றும் பழங்குடியினருக்கு எதிரான வன்முறைகள் மற்றும் குற்றங்களைத் தடுக்க செயல்படுகிறது.",
+          "sjhr_hq": "மாநில மட்டத்தில் (தலைமைச்செயலகம் - சென்னை), கூடுதல் டைரக்டர் ஜெனரல் ஆப் போலீஸ், உதவி ஆய்வாளர் மற்றும் சமூக நீதி மற்றும் மனித உரிமைகள் பிரிவு, SC/ST (அதிர்ச்சிகரமான குற்றங்களைத் தடுக்கும்) சட்டம், 1989 இன் அமலாக்கத்தைக் கண்காணிக்கின்றனர், மேலும் ஒரு சமூகவியல் மற்றும் பொருளாதார நிபுணர்களைக் கொண்ட ஆராய்ச்சி பிரிவின் ஆதரவைப் பெறுகின்றனர்."
+        },
+        "sjhr_administrative_setup":"SJ&HR இன் நிர்வாக அமைப்பு",
         //services
         "govt_act_rules": "அரசு சட்டங்கள் & விதிகள்",
         "service_description": "எங்கள் தளத்தைக் குறித்த அனைத்து தகவல்களும் ஒரே இடத்தில் கிடைக்கும்.",

@@ -16,12 +16,14 @@ import { PoaHelplineComponent } from './poa-helpline/poa-helpline.component';
 import { GalleryComponent } from './gallery/gallery.component';
 import { FaqComponent } from './faq/faq.component';
 import { FormsModule } from '@angular/forms';
+import { AboutSjhrComponent } from './about-sjhr/about-sjhr.component';
 @NgModule({
   declarations: [
     CarouselComponent,
     LandingComponent,
     HomeComponent,
     AboutComponent,
+    AboutSjhrComponent,
     DownloadsComponent,
     ContactComponent,
     POAComponent,

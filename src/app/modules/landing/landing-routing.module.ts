@@ -9,6 +9,7 @@ import { POAComponent } from './poa/poa.component';
 import { PoaHelplineComponent } from './poa-helpline/poa-helpline.component';
 import { GalleryComponent } from './gallery/gallery.component';
 import { FaqComponent } from './faq/faq.component';
+import { AboutSjhrComponent } from './about-sjhr/about-sjhr.component';
 const routes: Routes = [
   {
     path: '',
@@ -16,6 +17,7 @@ const routes: Routes = [
     children: [
       { path: '', component: HomeComponent }, // Default Home Page
       { path: 'about', component: AboutComponent },
+      { path: 'about-sjhr',component:AboutSjhrComponent},
       { path: 'services', component: DownloadsComponent },
       { path: 'contact', component: ContactComponent },
       { path: 'poa',component:POAComponent},
