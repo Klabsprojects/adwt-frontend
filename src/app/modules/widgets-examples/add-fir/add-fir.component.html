@@ -526,7 +526,7 @@
                                         <mat-label>Select options</mat-label>
                                         <mat-select formControlName="offenceCommitted" multiple (selectionChange)="onOffenceCommittedChange($event, i)">
                                             <mat-option *ngFor="let option of offenceOptions" [value]="option.offence_name">
-                                                {{ option.offence_name }}
+                                                {{ option.offence_name }} - {{option.offence_act_name}}
                                             </mat-option>
                                         </mat-select>
                                     </mat-form-field>

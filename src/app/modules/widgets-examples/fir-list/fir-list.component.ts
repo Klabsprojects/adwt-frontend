@@ -367,6 +367,7 @@ export class FirListComponent implements OnInit {
   selectedComplaintReceivedType: string = '';
   startDate: string = '';
   endDate: string = '';
+  selectedUIPT: string = '';
 
 
 
@@ -456,6 +457,7 @@ export class FirListComponent implements OnInit {
     { label: 'Police Zone', field: 'police_zone', sortable: true, visible: true },
     { label: 'Police Range', field: 'police_range', sortable: true, visible: true },
     { label: 'Revenue District', field: 'revenue_district', sortable: true, visible: true },
+    { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
     
     { label: 'Officer Name', field: 'officer_name', sortable: true, visible: false },
     { label: 'Complaint Received Type', field: 'complaintReceivedType', sortable: true, visible: false },
@@ -464,11 +466,18 @@ export class FirListComponent implements OnInit {
     { label: 'Officer Designation', field: 'officer_designation', sortable: true, visible: false },
     { label: 'Place of Occurrence', field: 'place_of_occurrence', sortable: true, visible: false },
     { label: 'Date of Registration', field: 'date_of_registration', sortable: true, visible: false },
+    { label: 'Time of Registration', field: 'time_of_registration', sortable: true, visible: false },
 
-    { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
+    { label: 'Date of Occurrence', field: 'date_of_occurrence', sortable: true, visible: false },
+    { label: 'Time of Occurrence', field: 'time_of_occurrence', sortable: true, visible: false },
+    { label: 'Date of Occurrence To', field: 'date_of_occurrence_to', sortable: true, visible: false },
+    { label: 'Time of Occurrence To', field: 'time_of_occurrence_to', sortable: true, visible: false },
+    { label: 'Name of Nomplainant', field: 'name_of_complainant', sortable: true, visible: false },
+
     { label: 'Created By', field: 'created_by', sortable: true, visible: true },
     { label: 'Created At', field: 'created_at', sortable: true, visible: true },
     { label: 'Data Entry Status', field: 'status', sortable: false, visible: true },
+    { label: 'Case Status', field: 'Case_Status', sortable: false, visible: false },
     { label: 'Actions', field: 'actions', sortable: false, visible: true },
   ];
 
@@ -1095,6 +1104,11 @@ getFilterParams() {
   if (this.endDate) {
     params.end_date = this.endDate;
   }
+
+  if (this.selectedUIPT) {
+    params.UIPT = this.selectedUIPT;
+  }
+  
   
   if (this.selectedStatusOfRelief) {
     params.status = this.selectedStatusOfRelief;
@@ -1166,6 +1180,7 @@ getFilterParams() {
     this.selectedStatusOfRelief = '';
     this.startDate = '';
     this.endDate = '';
+    this.selectedUIPT = '';
     this.applyFilters();
   }
 
@@ -1210,6 +1225,23 @@ getFilterParams() {
       7: 'Trial Stage Completed',
       8: 'This Case is Altered Case',
       9: 'Mistake Of Fact',
+    } as { [key: number]: string };
+
+    return statusTextMap[status] || 'Unknown';
+  }
+
+  getStatusTextUIPT(status: number): string {
+    const statusTextMap = {
+      0: 'UI',
+      1: 'UI',
+      2: 'UI',
+      3: 'UI',
+      4: 'UI',
+      5: 'UI',
+      6: 'PT',
+      7: 'PT',
+      8: 'PT',
+      9: 'PT',
     } as { [key: number]: string };
 
     return statusTextMap[status] || 'Unknown';
