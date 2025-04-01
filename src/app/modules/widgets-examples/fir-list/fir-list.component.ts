@@ -361,6 +361,7 @@ export class FirListComponent implements OnInit {
   selectedNatureOfOffence: string = '';
   selectedStatusOfCase: string = '';
   selectedStatusOfRelief: string = '';
+  selectedOffenceGroup: string = '';
   selectedPoliceZone: string = '';
   selectedPoliceRange: string = '';
   selectedRevenue_district: string = '';
@@ -444,6 +445,22 @@ export class FirListComponent implements OnInit {
     'Terrorism'
   ];
 
+  offenceGroupsList : string[] = [
+    "Non GCR",
+    "Murder",
+    "Rape",
+    "POCSO",
+    "Other POCSO",
+    "Gang Rape",
+    "Rape by Cheating",
+    "Arson",
+    "Death",
+    "GCR",
+    "Attempt Murder",
+    "Rape POCSO"
+  ];
+  
+
   statusesOfCase: string[] = ['Just Starting', 'Pending', 'Completed'];
   // statusesOfRelief: string[] = ['FIR Stage', 'ChargeSheet Stage', 'Trial Stage'];
   statusesOfRelief: any[] = [{value : 0 , label : 'FIR Stage'}, {value : 6 , label :'ChargeSheet Stage'} , {value : 7 , label : 'Trial Stage'}];
@@ -458,7 +475,8 @@ export class FirListComponent implements OnInit {
     { label: 'Police Range', field: 'police_range', sortable: true, visible: true },
     { label: 'Revenue District', field: 'revenue_district', sortable: true, visible: true },
     { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
-    
+
+    { label: 'Offence', field: 'Offence_group', sortable: true, visible: false },
     { label: 'Officer Name', field: 'officer_name', sortable: true, visible: false },
     { label: 'Complaint Received Type', field: 'complaintReceivedType', sortable: true, visible: false },
     { label: 'Complaint Registered By', field: 'complaintRegisteredBy', sortable: true, visible: false },
@@ -1109,9 +1127,12 @@ getFilterParams() {
     params.UIPT = this.selectedUIPT;
   }
   
-  
   if (this.selectedStatusOfRelief) {
     params.status = this.selectedStatusOfRelief;
+  }
+
+  if (this.selectedOffenceGroup) {
+    params.Offence_group = this.selectedOffenceGroup;
   }
   
   // Add other filters as needed
@@ -1178,6 +1199,7 @@ getFilterParams() {
     this.selectedNatureOfOffence = '';
     this.selectedStatusOfCase = '';
     this.selectedStatusOfRelief = '';
+    this.selectedOffenceGroup = '';
     this.startDate = '';
     this.endDate = '';
     this.selectedUIPT = '';

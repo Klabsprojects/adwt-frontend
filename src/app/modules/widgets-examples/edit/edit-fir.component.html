@@ -414,7 +414,9 @@
                   <mat-form-field appearance="outline" class="w-100">
                     <mat-label>Select options</mat-label>
                     <mat-select formControlName="offenceCommitted" multiple (selectionChange)="onOffenceCommittedChange($event, i)">
-                      <mat-option *ngFor="let option of offenceOptions" [value]="option">{{ option }}</mat-option>
+                      <mat-option *ngFor="let option of offenceOptions" [value]="option.offence_name">
+                        {{option.offence_act_name}} - {{ option.offence_name }}
+                      </mat-option>
                     </mat-select>
                   </mat-form-field>
                 </div>
@@ -1399,6 +1401,26 @@ maxlength="10"
                           <option value="" disabled selected>Select Nature of Judgement</option>
                           <option value="Convicted">Accused person(s) has been Convicted</option>
                           <option value="Acquitted">Accused person(s) have been Acquitted</option>
+                          <option value="Charge_Abated">Charge Abated</option>
+                          <option value="Quashed">Quashed</option>
+                        </select>
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label">Conviction Type</label>
+                        <select
+                          class="form-select"
+                          formControlName="Conviction_Type"
+                        >
+                          <option value="" selected disabled>Select Conviction Type</option>
+                          <option value="Life Sentence">Life Sentence</option>
+                          <option value="Below 5 years imprisonment">Below 5 years imprisonment</option>
+                          <option value="Others">Others</option>
+                          <option value="Below 1 year imprisonment">Below 1 year imprisonment</option>
+                          <option value="Above 20 Years imprisonment">Above 20 Years imprisonment</option>
+                          <option value="Double Life Sentence">Double Life Sentence</option>
+                          <option value="Above 10 Years imprisonment">Above 10 Years imprisonment</option>
+                          <option value="Above 5 Years imprisonment">Above 5 Years imprisonment</option>
                         </select>
                       </div>
 
@@ -1674,6 +1696,26 @@ maxlength="10"
                                   <option value="" disabled>Select Nature of Judgement</option>
                                   <option value="Convicted_one">Accused person(s) has been Convicted</option>
                                   <option value="Acquitted_one">Accused person(s) have been Acquitted</option>
+                                  <option value="Charge_Abated_one">Charge Abated</option>
+                                  <option value="Quashed_one">Quashed</option>
+                                </select>
+                              </div>
+
+                              <div class="col-md-6">
+                                <label class="form-label">Conviction Type</label>
+                                <select
+                                  class="form-select"
+                                  formControlName="Conviction_Type_one"
+                                >
+                                  <option value="" selected disabled>Select Conviction Type</option>
+                                  <option value="Life Sentence">Life Sentence</option>
+                                  <option value="Below 5 years imprisonment">Below 5 years imprisonment</option>
+                                  <option value="Others">Others</option>
+                                  <option value="Below 1 year imprisonment">Below 1 year imprisonment</option>
+                                  <option value="Above 20 Years imprisonment">Above 20 Years imprisonment</option>
+                                  <option value="Double Life Sentence">Double Life Sentence</option>
+                                  <option value="Above 10 Years imprisonment">Above 10 Years imprisonment</option>
+                                  <option value="Above 5 Years imprisonment">Above 5 Years imprisonment</option>
                                 </select>
                               </div>
 
@@ -1932,6 +1974,26 @@ maxlength="10"
                                   <option value="" disabled>Select Nature of Judgement</option>
                                   <option value="Convicted_two">Accused person(s) has been Convicted</option>
                                   <option value="Acquitted_two">Accused person(s) have been Acquitted</option>
+                                  <option value="Charge_Abated_two">Charge Abated</option>
+                                  <option value="Quashed_two">Quashed</option>
+                                </select>
+                              </div>
+
+                              <div class="col-md-6">
+                                <label class="form-label">Conviction Type</label>
+                                <select
+                                  class="form-select"
+                                  formControlName="Conviction_Type_two"
+                                >
+                                  <option value="" selected disabled>Select Conviction Type</option>
+                                  <option value="Life Sentence">Life Sentence</option>
+                                  <option value="Below 5 years imprisonment">Below 5 years imprisonment</option>
+                                  <option value="Others">Others</option>
+                                  <option value="Below 1 year imprisonment">Below 1 year imprisonment</option>
+                                  <option value="Above 20 Years imprisonment">Above 20 Years imprisonment</option>
+                                  <option value="Double Life Sentence">Double Life Sentence</option>
+                                  <option value="Above 10 Years imprisonment">Above 10 Years imprisonment</option>
+                                  <option value="Above 5 Years imprisonment">Above 5 Years imprisonment</option>
                                 </select>
                               </div>
 

@@ -36,7 +36,7 @@
 
   </div>
 
-  <div class="card-body pt-0">
+  <div style="min-height: 500px;" class="card-body pt-0">
     <!-- Filters -->
 
     <div class="d-flex gap-3 mb-3">
@@ -61,14 +61,18 @@
         <option *ngFor="let item of revenueDistricts" [value]="item.revenue_district">{{ item.revenue_district }}</option>
       </select>
 
-      <select class="form-select" [(ngModel)]="selectedComplaintReceivedType" (change)="applyFilters()">
+      <!-- <select class="form-select" [(ngModel)]="selectedComplaintReceivedType" (change)="applyFilters()">
         <option value="" selected hidden disabled>Complaint Received Type</option>
         <option value="written" >written</option>
         <option value="oral" >oral</option>
-      </select>
+      </select> -->
 
-      <!-- <input type="date" [(ngModel)]="startDate" (change)="applyFilters()" class="form-control" placeholder="Start Date">
-      <input type="date" [(ngModel)]="endDate" (change)="applyFilters()" class="form-control" placeholder="End Date"> -->
+      <select class="form-select" [(ngModel)]="selectedOffenceGroup" (change)="applyFilters()">
+        <option value="" selected hidden disabled>Offence</option>
+        <option *ngFor="let item of offenceGroupsList" [value]="item">
+          {{ item }}
+        </option>
+      </select>
 
       <div class="tooltip-container">
         <input type="date" [(ngModel)]="startDate" (change)="applyFilters()" class="form-control" placeholder="Start Date">
@@ -103,7 +107,7 @@
 
     <!-- Updated Table -->
 
-    <div style="width: 100%; overflow-y: auto; overflow-x: auto;">
+    <div style="width: 100%; overflow-y: auto; overflow-x: auto; min-height: 500px;">
 
     <table *ngIf="filteredFirList().length > 0" class="table table-striped table-bordered table-hover">
       <thead>
@@ -132,6 +136,7 @@
               <span *ngSwitchCase="'revenue_district'">{{ fir.revenue_district }}</span>
               <span *ngSwitchCase="'police_station'">{{ fir.police_station }}</span>
 
+              <span *ngSwitchCase="'Offence_group'">{{ fir.Offence_group }}</span>
               <span *ngSwitchCase="'officer_name'">{{ fir.officer_name }}</span>
               <span *ngSwitchCase="'complaintReceivedType'">{{ fir.complaintReceivedType }}</span>
               <span *ngSwitchCase="'complaintRegisteredBy'">{{ fir.complaintRegisteredBy }}</span>

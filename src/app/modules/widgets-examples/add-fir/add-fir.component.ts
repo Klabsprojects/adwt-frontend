@@ -893,6 +893,7 @@ onFileSelect_3(event: Event, controlName: string): void {
 
       judgementDetails: this.fb.group({
         judgementNature: ['', Validators.required],
+        Conviction_Type : [''],
         uploadJudgement: [''],
         legalOpinionObtained: [''],
         caseFitForAppeal: [''],
@@ -924,6 +925,7 @@ onFileSelect_3(event: Event, controlName: string): void {
       judgementAwarded_one: ['', Validators.required],
       judgementDetails_one: this.fb.group({
       judgementNature_one: ['', Validators.required],
+      Conviction_Type_one : [''],
       uploadJudgement_one: [''],
       legalOpinionObtained_one: [''],
       caseFitForAppeal_one: [''],
@@ -938,6 +940,7 @@ onFileSelect_3(event: Event, controlName: string): void {
     judgementAwarded_two: ['', Validators.required],
     judgementDetails_two: this.fb.group({
       judgementNature_two: [''],
+      Conviction_Type_two : [''],
       uploadJudgement_two: [''],
       legalOpinionObtained_two: [''],
       caseFitForAppeal_two: [''],
@@ -3098,6 +3101,7 @@ async saveAsDraft_7(isSubmit: boolean = false)  {
         firstHearingDate: this.firForm.get('firstHearingDate')?.value,
         judgementAwarded: this.firForm.get('judgementAwarded')?.value,
         judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
+        Conviction_Type: this.firForm.get('judgementDetails.Conviction_Type')?.value,
         uploadJudgement: uploadJudgementPath
     };
 
@@ -3146,6 +3150,7 @@ judgementAwarded1:this.firForm.get('judgementAwarded1')?.value,
 
 judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
 uploadJudgement: this.firForm.get('judgementDetails.uploadJudgement')?.value,
+Conviction_Type: this.firForm.get('judgementDetails.Conviction_Type')?.value,
     },
 
 
@@ -3161,6 +3166,7 @@ uploadJudgement: this.firForm.get('judgementDetails.uploadJudgement')?.value,
  
       judgementNature: this.firForm.get('judgementDetails_one.judgementNature_one')?.value,
       uploadJudgement: this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value,
+      Conviction_Type: this.firForm.get('judgementDetails_one.Conviction_Type_one')?.value,
   },
   trialDetails_two: {
     courtName: this.firForm.get('Court_name1')?.value,
@@ -3175,6 +3181,7 @@ uploadJudgement: this.firForm.get('judgementDetails.uploadJudgement')?.value,
 
     judgementNature: this.firForm.get('judgementDetails_two.judgementNature_two')?.value,
     uploadJudgement: this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value,
+    Conviction_Type: this.firForm.get('judgementDetails_two.Conviction_Type_two')?.value,
 },
 
     

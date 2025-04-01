@@ -979,6 +979,7 @@ loadAccusedCommunities(): void {
             this.firForm.patchValue({
               judgementDetails: {
                 judgementNature: appealDetail.judgementNature || '',
+                // Conviction_Type: response.data5.Conviction_Type || '',
           legalOpinionObtained: appealDetail.legal_opinion_obtained || '',
           filedBy:appealDetail.filed_by || '',
           designatedCourt:appealDetail.designated_court || '',
@@ -1014,6 +1015,7 @@ console.log(response.casedetail_one,"casedetail_onee")
             firstHearingDate_one: item.second_hearing_date ? formatDate(item.second_hearing_date, 'yyyy-MM-dd', 'en') : '',
             judgementAwarded_one: item.judgement_awarded || '',
             judgementNature_one:item.judgementNature || '',
+            Conviction_Type_one:item.Conviction_Type || '',
           });
 
           
@@ -1027,8 +1029,7 @@ console.log(response.casedetail_one,"casedetail_onee")
                         this.firForm.patchValue({
                           judgementDetails_one: {
                 judgementNature_one: appealDetail.judgementNature || '',
-     
-
+                Conviction_Type_one:appealDetail.Conviction_Type || '',
                 legalOpinionObtained_one: appealDetail.legal_opinion_obtained || '',
                 caseFitForAppeal_one:appealDetail.case_fit_for_appeal || '',
                 filedBy_one: appealDetail.filed_by || '',
@@ -1114,7 +1115,28 @@ console.log(response.casedetail_one,"casedetail_onee")
         });
       }
       
+      // if (this.firForm && response.data5 && response.data5.length > 0) {
+      //   console.log("ConvictionType from API:", response.data5[0].Conviction_Type);
+      //   console.log("Form Control before setting:", this.firForm.get('Conviction_Type')?.value);
+      //   const convictionType = response.data5[0].Conviction_Type || ''; 
+      //   this.firForm.get('Conviction_Type')?.setValue(convictionType);
+      //   console.log("Form Control after setting:", this.firForm.get('Conviction_Type')?.value);
+      // }
+
+      if (this.firForm && response.data5 && response.data5.length > 0) {
+        console.log("ConvictionType from API:", response.data5[0].Conviction_Type);
       
+        const convictionType = response.data5[0].Conviction_Type || '';
+      
+        // Check if the form group exists before setting the value
+        if (this.firForm.get('judgementDetails.Conviction_Type')) {
+          this.firForm.get('judgementDetails.Conviction_Type')?.setValue(convictionType);
+          console.log("Form Control after setting:", this.firForm.get('judgementDetails.Conviction_Type')?.value);
+        } else {
+          console.error("Conviction_Type is missing inside judgementDetails!");
+        }
+      }
+
 
         if (response.data5 && response.data5.length > 0) {
 
@@ -1132,6 +1154,7 @@ console.log(response.casedetail_one,"casedetail_onee")
                 prosecutorPhone: item.prosecutor_phone || '',
                 firstHearingDate: item.first_hearing_date ? formatDate(item.first_hearing_date, 'yyyy-MM-dd', 'en') : '',
                 judgementAwarded: item.judgement_awarded || '',
+                // Conviction_Type: (item.Conviction_Type || '').trim(),
                 CaseHandledBy:item.CaseHandledBy || '',
                 judgementAwarded1:item.judgementAwarded1 ||'',
                 judgementAwarded2:item.judgementAwarded2 ||'',
@@ -1592,10 +1615,10 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
             let offence_committed_data: any[] = [];
             let scst_sections_data: any[] = [];
 
-            if (victim.offence_committed) {
+            if (victim.offence_committed && this.isValidJSON(victim.offence_committed)) {
               offence_committed_data = JSON.parse(victim.offence_committed);
             }
-            if (victim.scst_sections) {
+            if (victim.scst_sections && this.isValidJSON(victim.scst_sections)) {
               scst_sections_data = JSON.parse(victim.scst_sections);
             }
         
@@ -2437,6 +2460,7 @@ onAccusedAgeChange(index: number): void {
 
       judgementDetails: this.fb.group({
         judgementNature: ['', Validators.required],
+        Conviction_Type : [''],
         uploadJudgement: [''],
         legalOpinionObtained: [''],
         caseFitForAppeal: [''],
@@ -2468,6 +2492,7 @@ onAccusedAgeChange(index: number): void {
      judgementAwarded_one: ['', Validators.required],
       judgementDetails_one: this.fb.group({
         judgementNature_one: ['', Validators.required],
+        Conviction_Type_one : [''],
         uploadJudgement_one: [''],
         legalOpinionObtained_one: [''],
         caseFitForAppeal_one: [''],
@@ -2482,6 +2507,7 @@ onAccusedAgeChange(index: number): void {
       judgementAwarded_two: ['', Validators.required],
       judgementDetails_two: this.fb.group({
         judgementNature_two: [''],
+        Conviction_Type_two : [''],
         uploadJudgement_two: [''],
         legalOpinionObtained_two: [''],
         caseFitForAppeal_two: [''],
@@ -3403,7 +3429,8 @@ console.log(victimReliefDetail,"cretaieg")
   loadOptions() {
     this.firService.getOffences().subscribe(
       (offences: any) => {
-        this.offenceOptions = offences.map((offence: any) => offence.offence_name);
+        // this.offenceOptions = offences.map((offence: any) => offence.offence_name);
+        this.offenceOptions = offences;
         this.offenceOptionData = offences.map((offence: any) => offence);
       },
       (error: any) => {
@@ -3804,7 +3831,7 @@ console.log(victimReliefDetail,"cretaieg")
         control.markAsTouched(); // Mark field as touched to trigger validation
   
         if (!control.valid) {
-          console.log(`Invalid Field: ${controlName}`, control.errors); // Log errors for invalid fields
+          // console.log(`Invalid Field: ${controlName}`, control.errors); // Log errors for invalid fields
           allValid = false;
         }
       } else {
@@ -4517,6 +4544,7 @@ console.log(formFields,"formFieldsformFields")
       
           judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
           uploadJudgement: this.firForm.get('judgementDetails.uploadJudgement')?.value,
+          Conviction_Type: this.firForm.get('judgementDetails.Conviction_Type')?.value,
       },
       // judgementAwarded_one
       trialDetails_one: {
@@ -4531,6 +4559,7 @@ console.log(formFields,"formFieldsformFields")
    
         judgementNature: this.firForm.get('judgementDetails_one.judgementNature_one')?.value,
         uploadJudgement: this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value,
+        Conviction_Type: this.firForm.get('judgementDetails_one.Conviction_Type_one')?.value,
     },
     trialDetails_two: {
       courtName: this.firForm.get('Court_name1')?.value,
@@ -4545,6 +4574,7 @@ console.log(formFields,"formFieldsformFields")
  
       judgementNature: this.firForm.get('judgementDetails_two.judgementNature_two')?.value,
       uploadJudgement: this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value,
+      Conviction_Type: this.firForm.get('judgementDetails_two.Conviction_Type_two')?.value,
   },
       compensationDetails: {
           totalCompensation: this.firForm.get('totalCompensation')?.value,
@@ -5014,12 +5044,12 @@ attachment:this.attachments_2.value
       accusedsArray.controls.forEach((accusedControl, index) => {
         const accusedGroup = accusedControl as FormGroup; // Explicitly cast to FormGroup
         if (!accusedGroup.valid) {
-          console.log(`Invalid Field in accuseds[${index}]:`, accusedGroup.errors);
+          // console.log(`Invalid Field in accuseds[${index}]:`, accusedGroup.errors);
           
           Object.keys(accusedGroup.controls).forEach((field) => {
             const fieldControl = accusedGroup.get(field);
             if (fieldControl && !fieldControl.valid) {
-              console.log(`Invalid accuseds[${index}].${field}:`, fieldControl.errors);
+              // console.log(`Invalid accuseds[${index}].${field}:`, fieldControl.errors);
             }
           });
   
@@ -5770,4 +5800,12 @@ getPoliceStation(district: string): void {
   } 
   
   
+   isValidJSON(str : any) {
+    try {
+      JSON.parse(str);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }
