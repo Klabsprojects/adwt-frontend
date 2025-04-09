@@ -27,7 +27,7 @@ export class VmcComponent implements OnInit {
     level_of_member: '',
     designation: '',
     other_designation: '',
-    meetingDate: '',
+    appointment_date: '',
     validityEndDate: '',
     status: '1',
     district: '',
@@ -40,6 +40,7 @@ export class VmcComponent implements OnInit {
   searchText: string = '';
   page: number = 1;
   currentUser: any = {};
+  Parsed_UserInfo : any;
 
   // Dropdown enable/disable states
   isDistrictDisabled: boolean = false;
@@ -51,12 +52,14 @@ export class VmcComponent implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {
+    const UserInfo : any = sessionStorage.getItem('user_data');
+    this.Parsed_UserInfo = JSON.parse(UserInfo)
     // Reload members when navigating back to this component
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.loadMembers();
-      });
+    // this.router.events
+    //   .pipe(filter((event) => event instanceof NavigationEnd))
+    //   .subscribe(() => {
+    //     this.loadMembers();
+    //   });
   }
 
   ngOnInit(): void {
@@ -64,6 +67,7 @@ export class VmcComponent implements OnInit {
     this.loadMembers();
     this.resetForm();
     this.loadDistricts();
+ 
   }
 
   // Load logged-in user from session
@@ -78,6 +82,23 @@ export class VmcComponent implements OnInit {
 
   // Load all members
   loadMembers() {
+    if(this.Parsed_UserInfo.role == '4'){
+      this.vmcService.getDistrictLevelMember(this.Parsed_UserInfo.district).subscribe(
+        (results: any[]) => {
+          this.members = results;
+          this.filteredMembers = this.members;
+          this.cdr.detectChanges();
+        },
+        () => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load members. Please try again later.',
+            confirmButtonColor: '#d33',
+          });
+        }
+      );
+    } else {
     this.vmcService.getAllMembers().subscribe(
       (results: any[]) => {
         this.members = results;
@@ -94,6 +115,7 @@ export class VmcComponent implements OnInit {
       }
     );
   }
+  }
 
   // Filter members based on search text
   filterMembers() {
@@ -104,10 +126,17 @@ export class VmcComponent implements OnInit {
     );
   }
 
+  formatDate(dateString: string): string {
+    return dateString ? dateString.split("T")[0] : ''; // Extract only YYYY-MM-DD
+  }
+
   // Open Add/Edit Modal
   openModal(member?: any): void {
     if (member) {
       this.member = { ...member }; // Pre-fill form for editing
+      setTimeout(() => {
+        this.member.subdivision = member.subdivision;
+      }, 3000);
       this.editIndex = this.members.findIndex((m) => m.id === member.id);
       this.onLevelChange(this.member.level_of_member); // Set dropdown states based on level
     } else {
@@ -117,6 +146,13 @@ export class VmcComponent implements OnInit {
   }
 
   onLevelChange(level: string): void {
+
+    if(this.Parsed_UserInfo.role == '4'){
+      console.log(this.districts)
+      console.log(this.Parsed_UserInfo.district)
+      this.member.district = this.Parsed_UserInfo.district;
+    }
+
     // Update dropdown states based on the selected level
     this.isDistrictDisabled = level === 'State Level';
     this.isSubdivisionDisabled = level !== 'Subdivision';
@@ -154,10 +190,10 @@ export class VmcComponent implements OnInit {
 
   onSubmit(myForm: NgForm) {
     if (myForm.valid) {
-      const formattedMeetingDate = this.formatDateForBackend(this.member.meetingDate);
+      const formattedappointment_date = this.formatDateForBackend(this.member.appointment_date);
       const formattedValidityDate = this.formatDateForBackend(this.member.validityEndDate);
 
-      if (!formattedMeetingDate || !formattedValidityDate) {
+      if (!formattedappointment_date) {
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -177,7 +213,7 @@ export class VmcComponent implements OnInit {
         return;
       }
 
-      this.member.meeting_date = formattedMeetingDate;
+      this.member.meeting_date = formattedappointment_date;
       this.member.validity_end_date = formattedValidityDate;
 
       if (this.editIndex !== null) {
@@ -238,10 +274,10 @@ export class VmcComponent implements OnInit {
       return;
     }
 
-    const formattedMeetingDate = this.formatDateForBackend(this.member.meetingDate);
+    const formattedappointment_date = this.formatDateForBackend(this.member.appointment_date);
     const formattedValidityDate = this.formatDateForBackend(this.member.validityEndDate);
 
-    this.member.meeting_date = formattedMeetingDate;
+    this.member.meeting_date = formattedappointment_date;
     this.member.validity_end_date = formattedValidityDate;
 
     this.vmcService.updateMember(this.member.vmc_id, this.member).subscribe(
@@ -265,9 +301,20 @@ export class VmcComponent implements OnInit {
 
 
 
-
+  logDistrictChange(event: any) {
+    console.log("District changed to:", event);
+  }
 
   loadDistricts() {
+    if(this.Parsed_UserInfo.role == '4'){
+      this.districts.push({ district: this.Parsed_UserInfo.district });
+      // this.member.district = this.Parsed_UserInfo.district;
+      // setTimeout(() => {
+      //   this.member.district = this.Parsed_UserInfo.district;
+      //   console.log("After Timeout:", this.member.district);
+      // });
+      console.log(this.districts,this.Parsed_UserInfo.district,this.member.district)
+    } else {
     this.vmcService.getAllDistricts().subscribe(
       (results: any[]) => {
         this.districts = results;
@@ -280,6 +327,7 @@ export class VmcComponent implements OnInit {
         });
       }
     );
+  }
   }
 
   onDistrictChange(event: Event): void {
@@ -350,7 +398,7 @@ export class VmcComponent implements OnInit {
 
 // Toggle member status
 toggleStatus(member: any): void {
-  const newStatus = member.status === '1' ? '0' : '1';
+  const newStatus = member.status == '1' ? '0' : '1';
   this.vmcService.toggleMemberStatus(member.id, newStatus).subscribe(
     () => {
       this.showSuccessAlert(
@@ -367,6 +415,7 @@ toggleStatus(member: any): void {
       });
     }
   );
+
 }
 
 
@@ -397,7 +446,7 @@ toggleStatus(member: any): void {
       name: '',
       designation: '',
       other_designation: '',
-      meetingDate: '',
+      appointment_date: '',
       validityEndDate: '',
       level_of_member: '',
       status: '1',

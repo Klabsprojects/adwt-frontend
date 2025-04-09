@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.prod';
 @Injectable({
@@ -16,6 +16,12 @@ export class Vmcservice {
     return this.http.get(this.baseUrl);
   }
 
+  getDistrictLevelMember(district : any): Observable<any> {
+    const params = new HttpParams()
+    .set('district', district)
+    return this.http.get(`${this.baseUrl}/getDistrictLevelMember`, { params });
+  }
+
   addMember(memberData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}`, memberData);
   }
@@ -30,8 +36,8 @@ export class Vmcservice {
 
 
 
-  toggleMemberStatus(memberId: string, status: string): Observable<any> {
-    return this.http.patch(`${this.baseUrl}/${memberId}/toggle-status`, { status });
+  toggleMemberStatus(memberId: any, status: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${memberId}/status`, { status });
   }
 
 

@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { VmcMeetingService } from 'src/app/services/vmc-meeting.service';
+import { environment } from 'src/environments/environment.prod';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -18,7 +19,7 @@ export class VmcmeetingComponent implements OnInit {
     return meetingKeys[index] || '';
   }
   
-  districts: string[] = [];
+  districts: any;
   subdivisionsMap: { [key: string]: string[] } = {};
   filteredAttendees: any[] = [];
   formState: { [key: string]: any } = {};
@@ -33,12 +34,27 @@ export class VmcmeetingComponent implements OnInit {
   meeting_Quarter : any = [];
   exisiting_record = false;
   location_based_vmc_member_detail :any;
-
+  today: string = new Date().toISOString().split('T')[0];
+  view = 'LIST';
+  filteredMeeting: any[] = [];
+  MeetingList: any[] = [];
+  searchText: string = '';
+  page: number = 1;
+  Parsed_UserInfo : any;
+  existingFilePath: string | null;
+  file_access = environment.file_access;
+  showFileInput: boolean = true;
+  RemoveFormUpload : any;
+  public isDialogVisible: boolean = false;
+  selectedFile: File | null = null;
 
   constructor(
     private vmcMeeting: VmcMeetingService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    const UserInfo : any = sessionStorage.getItem('user_data');
+    this.Parsed_UserInfo = JSON.parse(UserInfo)
+  }
 
   ngOnInit(): void {
     this.initializeFiscalYears();
@@ -48,18 +64,103 @@ export class VmcmeetingComponent implements OnInit {
     );
     this.selectedMeeting = this.selectedCommittee?.meetings[0];
   
-    this.vmcMeeting.getDistricts().subscribe((data) => {
-      this.districts = Object.keys(data);
-      this.subdivisionsMap = data;
-      this.cdr.detectChanges();
-    });
-  
+    
+    if(this.Parsed_UserInfo.role == '4'){
+
+      this.committees = [
+        { name: 'DLVMC', meetings: ['Jan-Mar', 'Apr-Jun', 'Jul-Sep', 'Oct-Dec'] },
+        { name: 'SDLVMC', meetings: ['Jan-Mar', 'Apr-Jun', 'Jul-Sep', 'Oct-Dec'] },
+      ];
+      this.selectedCommittee = this.committees[0];
+
+      this.vmcMeeting.getDistricts().subscribe((data) => {
+        this.subdivisionsMap = data;
+        this.cdr.detectChanges();
+      });
+      // this.vmcMeeting.getUserBasedDistrict(this.Parsed_UserInfo.id).subscribe((data) => {
+        this.districts = [this.Parsed_UserInfo.district];
+        this.cdr.detectChanges();
+      // });
+
+    } else {
+      this.committees = [
+        { name: 'DLVMC', meetings: ['Jan-Mar', 'Apr-Jun', 'Jul-Sep', 'Oct-Dec'] },
+        { name: 'SDLVMC', meetings: ['Jan-Mar', 'Apr-Jun', 'Jul-Sep', 'Oct-Dec'] },
+        { name: 'SLVMC', meetings: ['1st Meeting', '2nd Meeting'] },
+      ];
+      this.selectedCommittee = this.committees[0];
+
+      this.vmcMeeting.getDistricts().subscribe((data) => {
+        this.districts = Object.keys(data);
+        this.subdivisionsMap = data;
+        this.cdr.detectChanges();
+      });
+    }
+
+
+    this.loadMeeting();
     this.initializeFormState(this.selectedMeeting);
   
-    // Merge hardcoded colors into the formState
+    // Select the committee based on the quarter
+    const currentMonth = new Date().getMonth() + 1; // Get current month (1-12)
+
+    const quarterMap: { [key: number]: string } = {
+      1: 'Jan-Mar', 2: 'Jan-Mar', 3: 'Jan-Mar',
+      4: 'Apr-Jun', 5: 'Apr-Jun', 6: 'Apr-Jun',
+      7: 'Jul-Sep', 8: 'Jul-Sep', 9: 'Jul-Sep',
+      10: 'Oct-Dec', 11: 'Oct-Dec', 12: 'Oct-Dec'
+    };
+    this.selectMeeting(quarterMap[currentMonth]);
 
   }
   
+    loadMeeting() {
+
+      if(this.Parsed_UserInfo.role == '4'){
+        this.vmcMeeting.getDistrictLevelMeeting(this.Parsed_UserInfo.district).subscribe(
+          (results: any) => {
+            this.MeetingList = results.Data;
+            this.filteredMeeting = this.MeetingList;
+            console.log(this.filteredMeeting)
+            this.cdr.detectChanges();
+          },
+          () => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to load members. Please try again later.',
+              confirmButtonColor: '#d33',
+            });
+          }
+        );
+      } else {
+        this.vmcMeeting.getAllMeeting().subscribe(
+          (results: any) => {
+            this.MeetingList = results.Data;
+            this.filteredMeeting = this.MeetingList;
+            console.log(this.filteredMeeting)
+            this.cdr.detectChanges();
+          },
+          () => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to load members. Please try again later.',
+              confirmButtonColor: '#d33',
+            });
+          }
+        );
+      }
+    }
+  
+    // Filter members based on search text
+    filterMembers() {
+      this.filteredMeeting = this.MeetingList.filter((meeting) =>
+        (meeting.name ? meeting.name.toLowerCase() : '').includes(
+          this.searchText.toLowerCase()
+        )
+      );
+    }
 
   // initializeFiscalYears(): void {
   //   const currentYear = new Date().getFullYear();
@@ -93,12 +194,18 @@ export class VmcmeetingComponent implements OnInit {
 
   selectCommittee(committee: any): void {
 
+    this.filteredAttendees = [];
+    this.cdr.detectChanges();
+    console.log(this.filteredAttendees,'filteredAttendeesfilteredAttendeesfilteredAttendeesfilteredAttendees')
     this.selectedCommittee = committee;
     this.selectedMeeting = committee.meetings[0];
     this.initializeFormState(this.selectedMeeting);
-    this.fetchAttendees();
-    if(committee == 'SLVMC'){
+    // this.fetchAttendees();
+    if(committee.name == 'SLVMC'){
       this.getAttendeesByDistrictbysk();
+    }
+    if(committee.name == 'SDLVMC'){
+      this.onDistrictChange()
     }
   }
 
@@ -136,9 +243,13 @@ export class VmcmeetingComponent implements OnInit {
       this.formState[meeting].uploadedFile = null;
     }
 
+    this.formState[this.selectedMeeting].selectedDistrict = this.Parsed_UserInfo.district
+    if(this.selectedCommittee.name == 'DLVMC' && this.formState[this.selectedMeeting].selectedDistrict){
+      this.getAttendeesByDistrictbysk();
+    }
     this.exisiting_record = false;
     this.filteredAttendees = [];
-    this.filteredAttendees = this.location_based_vmc_member_detail;
+    // this.filteredAttendees = this.location_based_vmc_member_detail;
     this.cdr.detectChanges();
   }
 
@@ -173,10 +284,12 @@ export class VmcmeetingComponent implements OnInit {
     this.formState[currentmeeting].meetingDetails.meetingTime = this.filteredAttendees[0].meeting_time ? this.filteredAttendees[0].meeting_time : null;
     this.formState[currentmeeting].uploadedFile = null;
   }
+  this.cdr.detectChanges();
 
 }
 
   onDistrictChange(): void {
+    this.filteredAttendees = [];
     const state = this.formState[this.selectedMeeting];
     this.selectedDistrict = this.formState[this.selectedMeeting].selectedDistrict
     
@@ -192,14 +305,17 @@ export class VmcmeetingComponent implements OnInit {
   
     console.log('Selected District:', state.selectedDistrict);
     this.selectedDistrict = state.selectedDistrict;
-    this.fetchAttendees(); // Fetch attendees based on updated district or subdivision
-    this.getAttendeesByDistrictbysk();
+    this.cdr.detectChanges();
+    // this.fetchAttendees(); 
+    if (this.selectedCommittee.name === 'DLVMC') {
+      this.getAttendeesByDistrictbysk();
+    }
   }
 
   getAttendeesByDistrictbysk(){
     let uiobject = {
       committee : this.selectedCommittee.name,
-      district : this.selectedDistrict,
+      district : this.formState[this.selectedMeeting].selectedDistrict,
       subdivision : this.selectedSubdivision
     }
     this.vmcMeeting.getAttendeesByDistrictbysk(uiobject).subscribe(
@@ -208,6 +324,7 @@ export class VmcmeetingComponent implements OnInit {
           this.filteredAttendees = [];
           this.location_based_vmc_member_detail = data.Data;
           this.filteredAttendees = data.Data;
+          this.cdr.detectChanges();
         },
         (error) => {
           console.error('Error fetching attendees:', error);
@@ -267,12 +384,12 @@ export class VmcmeetingComponent implements OnInit {
           this.formState[meetingKey] = {};
         }
   
-        this.formState[meetingKey].color = isCompleted ? 'green' : 'red';
+        // this.formState[meetingKey].color = isCompleted ? 'green' : 'red';
       } else {
         if (!this.formState[meetingKey]) {
           this.formState[meetingKey] = {};
         }
-        this.formState[meetingKey].color = 'red'; // Default to red if no data
+        // this.formState[meetingKey].color = 'red'; // Default to red if no data
       }
     });
   
@@ -282,14 +399,17 @@ export class VmcmeetingComponent implements OnInit {
   
 
   selectedSudivision(){
+  this.filteredAttendees = [];
   this.selectedSubdivision = this.formState[this.selectedMeeting].meetingDetails.subdivision;
   this.selectedSubdivisionList = this.formState[this.selectedMeeting].subdivisions;
+  this.getAttendeesByDistrictbysk();
   }
   
   
   
   selectMeeting(meeting: string): void {
     this.selectedMeeting = meeting;
+    console.log(meeting,'committee.................................................')
     console.log(meeting)
 
     var exisingmeetingdata : any;
@@ -307,11 +427,11 @@ export class VmcmeetingComponent implements OnInit {
       exisingmeetingdata = this.meeting_Quarter["2nd Meeting"]
     }
     
-    if(exisingmeetingdata && exisingmeetingdata.length > 0){
-      this.appendformstate(exisingmeetingdata, meeting);
-    } else {
+    // if(exisingmeetingdata && exisingmeetingdata.length > 0){
+    //   this.appendformstate(exisingmeetingdata, meeting);
+    // } else {
       this.initializeFormState(meeting);
-    }
+    // }
   }
   
 
@@ -324,9 +444,9 @@ export class VmcmeetingComponent implements OnInit {
     }
   }
 
-  submitForm(): void {
+  async submitForm(): Promise<void> {
     const state = this.formState[this.selectedMeeting];
-    const { selectedDistrict, meetingDetails, uploadedFile } = state;
+    const { selectedDistrict, meetingDetails } = state;
 
     if (!selectedDistrict && this.selectedCommittee.name !== 'SLVMC') {
       Swal.fire('Error', 'Please select a district.', 'error');
@@ -336,7 +456,7 @@ export class VmcmeetingComponent implements OnInit {
       Swal.fire('Error', 'Please fill out all required fields.', 'error');
       return;
     }
-    if (!uploadedFile) {
+    if (!this.selectedFile) {
       Swal.fire('Error', 'Please upload the minutes.', 'error');
       return;
     }
@@ -346,6 +466,12 @@ export class VmcmeetingComponent implements OnInit {
       attended: attendee.attended || false,
     }));
 
+    let minutesUpload_Path: string | undefined;
+      if (this.selectedFile) {
+        const paths = await this.uploadMultipleFiles([this.selectedFile]);
+        minutesUpload_Path = paths[0];
+      }
+
     const meetingData = {
       committee: this.selectedCommittee.name,
       meeting: this.selectedMeeting,
@@ -354,7 +480,8 @@ export class VmcmeetingComponent implements OnInit {
       meetingDate: meetingDetails.meetingDate,
       meetingTime: meetingDetails.meetingTime,
       attendees: attendees,
-      uploadedFile: uploadedFile,
+      Year: this.selectedYear,
+      uploaded_minutes : minutesUpload_Path || this.existingFilePath || null,
     };
 
     console.log(meetingData,'meetingData')
@@ -362,13 +489,25 @@ export class VmcmeetingComponent implements OnInit {
     this.vmcMeeting.submitMeeting(meetingData).subscribe(
       (response: any) => {
         console.log('Form submission successful:', response);
+
+        if (response.message === 'Meeting already exists!') {
+          // Show warning popup if meeting already exists
+          Swal.fire({
+            icon: 'warning',
+            title: 'Meeting Already Exists',
+            text: `A meeting for ${this.selectedMeeting} has already been submitted for this year.`,
+            confirmButtonColor: '#d33',
+          });
+        } else {
+
         Swal.fire({
           icon: 'success',
           title: 'Success',
           text: `Form for ${this.selectedMeeting} submitted successfully.`,
           confirmButtonColor: '#3085d6',
         });
-        this.resetForm()
+        this.Back();
+      }
       },
       (error: any) => {
         console.error('Form submission failed:', error);
@@ -389,6 +528,109 @@ export class VmcmeetingComponent implements OnInit {
       fileInput.value = '';
     }
     this.ngOnInit();
+    this.cdr.detectChanges();
   }
+
+  Add(){
+    this.view = 'ADD';
+  }
+
+
+  Back(){
+    this.view = 'LIST';
+    this.resetForm();
+  }
+
+  async uploadMultipleFiles(files: File | File[]): Promise<string[]> {
+    // If no file is provided, return an empty array
+    if (!files) return [];
+  
+    // Ensure files is always an array
+    const fileArray = Array.isArray(files) ? files : [files];
+  
+    // Filter out any invalid file values (optional, to prevent processing invalid data)
+    const validFiles = fileArray.filter(file => file instanceof File);
+    
+    // If no valid files remain, stop execution
+    if (validFiles.length === 0) return [];
+  
+    // Upload each valid file
+    const uploadPromises = validFiles.map(file => this.uploadFile(file));
+  
+    return Promise.all(uploadPromises);
+  }
+
+  uploadFile(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        reject('No file provided');
+        return;
+      }
+
+      if (!(file instanceof File)) {
+        reject('Invalid file. Please upload a valid file.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      this.vmcMeeting.uploadFile(formData).subscribe({
+        next: (response : any) => resolve(response.filePath),
+        error: (error : any) => reject(error)
+      });
+    });
+  }
+
+  getFileName(): string {
+    return this.existingFilePath ? this.existingFilePath.split('/').pop() || '' : '';
+  }
+
+  viewFile(): void {
+    if (this.existingFilePath) {
+      window.open(this.file_access+this.existingFilePath, '_blank');
+    }
+  }
+
+  clearFile(): void {
+    this.existingFilePath = null;
+    this.showFileInput = true;
+    const fileInput = document.getElementById('minutesUpload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';  // Correct way to reset a file input
+    } 
+    if(this.selectedFile){
+      this.selectedFile = null;
+    }
+  }
+
+  openDialog(form:any): void {
+    // this.dialogMessage = 'This is a dialog message!';
+    this.RemoveFormUpload = form;
+    this.isDialogVisible = true;
+  }
+
+  closeDialog(): void {
+    this.isDialogVisible = false;
+  }
+
+  confirmClear(result: any) {
+    if (this.RemoveFormUpload == '1') {
+      this.clearFile();
+    }
+    this.closeDialog();
+  }
+
+  uploadMinutes(event: any): void {
+    const file = event.target.files[0];  
+
+    if (file && file.type === 'application/pdf' && file.size <= 5 * 1024 * 1024) {
+      this.selectedFile = file;
+      console.log('File selected:', file.name,this.selectedFile,);
+    } else {
+      Swal.fire('Error', 'Please upload a valid PDF file under 5MB.', 'error');
+    }
+  }
+
 
 }

@@ -6,6 +6,7 @@ import { UserService } from 'src/app/services/user.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { filter } from 'rxjs/operators';
+import { VmcMeetingService } from 'src/app/services/vmc-meeting.service';
 
 @Component({
   selector: 'app-user-listing',
@@ -44,22 +45,25 @@ export class UserListingComponent implements OnInit {
     'For DSPs of the SJ&HR Wing', 'For DADTWOs of the ADW&TW Dept., in each district'
   ];
 
-  districts = [
-    'Ariyalur', 'Chengalpattu', 'Chennai', 'Coimbatore', 'Cuddalore', 'Dharmapuri',
-    'Dindigul', 'Erode', 'Kallakurichi', 'Kancheepuram', 'Karur', 'Krishnagiri',
-    'Madurai', 'Nagapattinam', 'Kanyakumari', 'Namakkal', 'Perambalur', 'Pudukkottai',
-    'Ramanathapuram', 'Ranipet', 'Salem', 'Sivaganga', 'Tenkasi', 'Thanjavur',
-    'Theni', 'Thoothukudi', 'Tiruchirappalli', 'Tirunelveli', 'Tirupattur',
-    'Tiruppur', 'Tiruvallur', 'Tiruvannamalai', 'Tiruvarur', 'Vellore', 'Viluppuram',
-    'Virudhunagar', 'Chennai City', 'Avadi City', 'Tambaram City', 'Salem City',
-    'Coimbatore City', 'Tiruppur City', 'Trichy City', 'Madurai City', 'Tirunelveli City'
-  ];
+  // districts = [
+  //   'Ariyalur', 'Chengalpattu', 'Chennai', 'Coimbatore', 'Cuddalore', 'Dharmapuri',
+  //   'Dindigul', 'Erode', 'Kallakurichi', 'Kancheepuram', 'Karur', 'Krishnagiri',
+  //   'Madurai', 'Nagapattinam', 'Kanyakumari', 'Namakkal', 'Perambalur', 'Pudukkottai',
+  //   'Ramanathapuram', 'Ranipet', 'Salem', 'Sivaganga', 'Tenkasi', 'Thanjavur',
+  //   'Theni', 'Thoothukudi', 'Tiruchirappalli', 'Tirunelveli', 'Tirupattur',
+  //   'Tiruppur', 'Tiruvallur', 'Tiruvannamalai', 'Tiruvarur', 'Vellore', 'Viluppuram',
+  //   'Virudhunagar', 'Chennai City', 'Avadi City', 'Tambaram City', 'Salem City',
+  //   'Coimbatore City', 'Tiruppur City', 'Trichy City', 'Madurai City', 'Tirunelveli City'
+  // ];
+
+  districts : any;
 
   constructor(
     private modalService: NgbModal,
     private userService: UserService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private vmcMeeting: VmcMeetingService,
   ) {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd && event.urlAfterRedirects.includes('/apps/users'))
@@ -83,6 +87,10 @@ export class UserListingComponent implements OnInit {
 
     this.loadUsers();
     this.loadRoles();
+    this.vmcMeeting.getDistricts().subscribe((data : any) => {
+      this.districts = Object.keys(data);
+      console.log(this.districts)
+    });
   }
 
   loadUserFromSession() {
