@@ -48,6 +48,27 @@ export class VmcmeetingComponent implements OnInit {
   public isDialogVisible: boolean = false;
   selectedFile: File | null = null;
 
+  filter_District = '';
+  filter_meeting_type = '';
+  filter_meeting_quarter = '';
+  filter_year = '';
+
+  year = ['2025','2024','2023','2022','2021','2020']
+  meeting_quater_list = ['Jan-Mar', 'Apr-Jun', 'Jul-Sep', 'Oct-Dec'];
+  meeting_type_list = ['DLVMC','SDLVMC']
+  
+  Edit_committee = '';
+  Edit_meeting = '';
+  Edit_district = '';
+  Edit_subdivision = '';
+  Edit_meetingDate = '';
+  Edit_meetingTime = '';
+  Edit_attendees: any
+  Edit_Year = ''
+  Edit_Sub_divisions : any;
+  update_Meeting_Id = '';
+  TotalMember = '';
+
   constructor(
     private vmcMeeting: VmcMeetingService,
     private cdr: ChangeDetectorRef
@@ -114,66 +135,141 @@ export class VmcmeetingComponent implements OnInit {
 
   }
   
+    // loadMeeting() {
+
+    //   if(this.Parsed_UserInfo.role == '4'){
+    //     this.vmcMeeting.getDistrictLevelMeeting(this.Parsed_UserInfo.district).subscribe(
+    //       (results: any) => {
+    //         this.MeetingList = results.Data;
+    //         this.filteredMeeting = this.MeetingList;
+    //         console.log(this.filteredMeeting)
+    //         this.cdr.detectChanges();
+    //       },
+    //       () => {
+    //         Swal.fire({
+    //           icon: 'error',
+    //           title: 'Error',
+    //           text: 'Failed to load members. Please try again later.',
+    //           confirmButtonColor: '#d33',
+    //         });
+    //       }
+    //     );
+    //   } else {
+    //     this.vmcMeeting.getAllMeeting().subscribe(
+    //       (results: any) => {
+    //         this.MeetingList = results.Data;
+    //         this.filteredMeeting = this.MeetingList;
+    //         console.log(this.filteredMeeting)
+    //         this.cdr.detectChanges();
+    //       },
+    //       () => {
+    //         Swal.fire({
+    //           icon: 'error',
+    //           title: 'Error',
+    //           text: 'Failed to load members. Please try again later.',
+    //           confirmButtonColor: '#d33',
+    //         });
+    //       }
+    //     );
+    //   }
+    // }
+
+
     loadMeeting() {
 
-      if(this.Parsed_UserInfo.role == '4'){
-        this.vmcMeeting.getDistrictLevelMeeting(this.Parsed_UserInfo.district).subscribe(
-          (results: any) => {
-            this.MeetingList = results.Data;
-            this.filteredMeeting = this.MeetingList;
-            console.log(this.filteredMeeting)
-            this.cdr.detectChanges();
-          },
-          () => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Failed to load members. Please try again later.',
-              confirmButtonColor: '#d33',
-            });
-          }
-        );
-      } else {
-        this.vmcMeeting.getAllMeeting().subscribe(
-          (results: any) => {
-            this.MeetingList = results.Data;
-            this.filteredMeeting = this.MeetingList;
-            console.log(this.filteredMeeting)
-            this.cdr.detectChanges();
-          },
-          () => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Failed to load members. Please try again later.',
-              confirmButtonColor: '#d33',
-            });
-          }
-        );
-      }
+      this.vmcMeeting.GetVmcMeetings(this.getFilterParams()).subscribe(
+        (results: any) => {
+          this.MeetingList = results.data;
+          this.TotalMember = results.total_members;
+          this.filteredMeeting = this.MeetingList;
+          console.log(this.filteredMeeting)
+          this.cdr.detectChanges();
+        },
+        () => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load members. Please try again later.',
+            confirmButtonColor: '#d33',
+          });
+        }
+      );
     }
   
     // Filter members based on search text
-    filterMembers() {
-      this.filteredMeeting = this.MeetingList.filter((meeting) =>
-        (meeting.name ? meeting.name.toLowerCase() : '').includes(
-          this.searchText.toLowerCase()
-        )
-      );
+    // filterMeeting() {
+    //   this.filteredMeeting = this.MeetingList.filter((meeting) =>
+    //     (meeting.name ? meeting.name.toLowerCase() : '').includes(
+    //       this.searchText.toLowerCase()
+    //     )
+    //   );
+    // }
+
+    filterMeeting() {
+      const lowerSearch = this.searchText.toLowerCase();
+    
+      this.filteredMeeting = this.MeetingList.filter((meeting) => {
+        const type = meeting.meeting_type?.toLowerCase() || '';
+        const quarter = meeting.meeting_quarter?.toLowerCase() || '';
+        const date = meeting.meeting_date ? new Date(meeting.meeting_date).toLocaleDateString('en-GB') : ''; // Format: dd/MM/yyyy
+        const district = meeting.district?.toLowerCase() || '';
+        const subdivision = meeting.subdivision?.toLowerCase() || '';
+    
+        return (
+          type.includes(lowerSearch) ||
+          quarter.includes(lowerSearch) ||
+          date.includes(lowerSearch) ||
+          district.includes(lowerSearch) ||
+          subdivision.includes(lowerSearch)
+        );
+      });
     }
 
-  // initializeFiscalYears(): void {
-  //   const currentYear = new Date().getFullYear();
-  //   const endYear = currentYear + 5; // Extend to show up to 5 years in the future
-  //   console.log('Initializing fiscal years:');
+    meeting_Quarter_Change(){
+      if(this.filter_meeting_type == 'SLVMC'){
+        this.meeting_quater_list = ['1st Meeting', '2nd Meeting'];
+      } else {
+        this.meeting_quater_list = ['Jan-Mar', 'Apr-Jun', 'Jul-Sep', 'Oct-Dec'];
+      }
+    }
 
-  //   for (let year = currentYear; year <= endYear; year++) {
-  //     const fiscalYear = `${year}-${year + 1}`; // Format "YYYY-YYYY"
-  //     this.availableYears.push(fiscalYear);
-  //   }
+    getFilterParams() {
+      const params: any = {};
+      
+      if(this.filter_year){
+        params.year = this.filter_year;
+      }
+      
+      if (this.filter_District) {
+        params.district = this.filter_District;
+      }
 
-  //   console.log('Available fiscal years:', this.availableYears);
-  // }
+      if(this.Parsed_UserInfo.role == '4'){
+        params.district = this.Parsed_UserInfo.district
+        this.filter_District = this.Parsed_UserInfo.district
+      } 
+
+      if (this.filter_meeting_type) {
+        params.meeting_type = this.filter_meeting_type;
+      }
+
+      if (this.filter_meeting_quarter) {
+        params.meeting_quarter = this.filter_meeting_quarter;
+      }
+
+
+        
+      return params;
+    }
+
+    clearfilter(){
+      this.searchText = '';
+      this.filter_District = '';
+      this.filter_meeting_type = '';
+      this.filter_meeting_quarter = '';
+      this.filter_year = '';
+      this.loadMeeting();
+    }
 
   initializeFiscalYears(): void {
     const currentYear = new Date().getFullYear();
@@ -632,5 +728,169 @@ export class VmcmeetingComponent implements OnInit {
     }
   }
 
+  EditgetAttendeesByDistrictbysk(){
+    let uiobject = {
+      committee : this.Edit_committee,
+      district : this.Edit_district,
+      subdivision : this.Edit_subdivision
+    }
+    this.vmcMeeting.getAttendeesByDistrictbysk(uiobject).subscribe(
+        (data) => {
+          console.log('Fetched meeting data:', data); // Debug fetched data
+          this.filteredAttendees = [];
+          this.location_based_vmc_member_detail = data.Data;
+          this.filteredAttendees = data.Data;
+          this.cdr.detectChanges();
+        },
+        (error) => {
+          console.error('Error fetching attendees:', error);
+          Swal.fire('Error', 'Failed to fetch meeting data.', 'error');
+        }
+      );
+  }
 
+  onCommitteeChange(event : any){
+    this.filteredAttendees = [];  
+    if (this.Edit_committee === 'SDLVMC') {
+      this.Edit_Sub_divisions = this.subdivisionsMap[this.Edit_district] || [];
+      this.Edit_subdivision = ''; 
+    }
+  
+    this.cdr.detectChanges();
+    if(this.Edit_committee !== 'SDLVMC'){
+      this.EditgetAttendeesByDistrictbysk();
+    }
+  }
+
+  onEditDistrictChange(): void {
+
+    this.filteredAttendees = [];  
+    if (this.Edit_committee === 'SDLVMC') {
+      this.Edit_Sub_divisions = this.subdivisionsMap[this.Edit_district] || [];
+      this.Edit_subdivision = ''; 
+    }
+  
+    this.cdr.detectChanges();
+    if (this.Edit_committee === 'DLVMC') {
+      this.EditgetAttendeesByDistrictbysk();
+    }
+  }
+
+  EditselectedSudivision(){
+    this.filteredAttendees = [];
+    this.EditgetAttendeesByDistrictbysk();
+    }
+
+
+    Edit(meetinng : any, view : any){
+      console.log(meetinng)
+      this.view = view;
+      this.update_Meeting_Id = meetinng.id;
+      this.Edit_committee = meetinng.meeting_type;
+      this.Edit_meeting = meetinng.meeting_quarter;
+      this.Edit_district = meetinng.district;
+      this.Edit_subdivision = meetinng.subdivision;
+      this.Edit_meetingDate = meetinng.meeting_date;
+      this.Edit_meetingTime = meetinng.meeting_time;
+      this.Edit_Year = meetinng.year;
+      if(meetinng.uploaded_minutes){
+        this.existingFilePath = meetinng.uploaded_minutes;
+        this.showFileInput = false;
+      }
+
+      this.vmcMeeting.GetMeetingAttendiesById(meetinng.id).subscribe(
+        (data) => {
+          console.log('Fetched meeting data:', data); // Debug fetched data
+          this.filteredAttendees = [];
+          this.location_based_vmc_member_detail = data.Data;
+          this.filteredAttendees = data.Data;
+          if( !this.filteredAttendees || this.filteredAttendees.length == 0){
+            this.EditgetAttendeesByDistrictbysk();
+          }
+          this.cdr.detectChanges();
+        },
+        (error) => {
+          console.error('Error fetching attendees:', error);
+          Swal.fire('Error', 'Failed to fetch meeting data.', 'error');
+        }
+      );
+    }
+    
+    async submitEditForm(){
+  
+      if (!this.Edit_district && this.Edit_committee !== 'SLVMC') {
+        Swal.fire('Error', 'Please select a district.', 'error');
+        return;
+      }
+      if (!this.Edit_meetingDate || !this.Edit_meetingTime) {
+        Swal.fire('Error', 'Please fill out all required fields.', 'error');
+        return;
+      }
+      if (!this.selectedFile && !this.existingFilePath) {
+        Swal.fire('Error', 'Please upload the minutes.', 'error');
+        return;
+      }
+
+      if(this.Edit_committee !== 'SDLVMC'){
+        this.Edit_subdivision = '';
+      }
+      if(this.Edit_committee == 'SLVMC'){
+        this.Edit_district = '';
+      }
+  
+      const attendees = this.filteredAttendees.map((attendee) => ({
+        id: attendee.id,
+        attended: attendee.attended || false,
+      }));
+  
+      let minutesUpload_Path: string | undefined;
+        if (this.selectedFile) {
+          const paths = await this.uploadMultipleFiles([this.selectedFile]);
+          minutesUpload_Path = paths[0];
+        }
+
+      const meetingData = {
+        meetingId : this.update_Meeting_Id,
+        committee: this.Edit_committee,
+        meeting: this.Edit_meeting,
+        district: this.Edit_district,
+        subdivision: this.Edit_subdivision || '',
+        meetingDate: this.Edit_meetingDate,
+        meetingTime: this.Edit_meetingTime,
+        attendees: attendees,
+        Year: this.selectedYear,
+        uploaded_minutes : minutesUpload_Path || this.existingFilePath || null,
+      };
+  
+      console.log(meetingData,'meetingData')
+  
+      this.vmcMeeting.updateMeeting(meetingData).subscribe(
+        (response: any) => {
+          console.log('Form submission successful:', response);
+  
+          if (response.message === 'Meeting already exists!') {
+            // Show warning popup if meeting already exists
+            Swal.fire({
+              icon: 'warning',
+              title: 'Meeting Already Exists',
+              text: `A meeting for ${this.Edit_meeting} has already been submitted for this year.`,
+              confirmButtonColor: '#d33',
+            });
+          } else {
+  
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: `Form for ${this.Edit_meeting} Updated successfully.`,
+            confirmButtonColor: '#3085d6',
+          });
+          this.Back();
+        }
+        },
+        (error: any) => {
+          console.error('Form submission failed:', error);
+          Swal.fire('Error', 'Failed to submit the form.', 'error');
+        }
+      );
+    }
 }

@@ -2,9 +2,9 @@
   <div class="card-header border-0 pt-6">
     <div class="card-title">
       <div class="d-flex align-items-center position-relative my-1">
-        <!-- <i class="fas fa-search fs-3 position-absolute ms-5"></i>
+        <i class="fas fa-search fs-3 position-absolute ms-5"></i>
         <input type="text" [(ngModel)]="searchText" class="form-control form-control-solid w-250px ps-12"
-          placeholder="Search Member Name" (input)="filterMembers()" /> -->
+          placeholder="Search " (input)="filterMeeting()" />
       </div>
     </div>
     <div class="card-toolbar">
@@ -12,6 +12,34 @@
         <i class="fas fa-plus-circle"></i> Add Meeting
       </button>
     </div>
+  </div>
+
+  <div style="margin: 0 10px;" class="d-flex gap-3 mb-3">
+    
+    <select class="form-select" [(ngModel)]="filter_year" (change)="loadMeeting()">
+      <option value="" selected hidden disabled>Year</option>
+      <option *ngFor="let item of year" [value]="item">{{ item }}</option>
+    </select>
+
+     <select class="form-select" [(ngModel)]="filter_meeting_type" (change)="loadMeeting();meeting_Quarter_Change()">
+      <option value="" selected hidden disabled>Meeting Type</option>
+      <option *ngFor="let item of meeting_type_list" [value]="item">{{ item }}</option>
+      <option *ngIf="Parsed_UserInfo.role != 4" value="SLVMC">SLVMC</option>
+    </select>
+
+    <select class="form-select" [(ngModel)]="filter_meeting_quarter" (change)="loadMeeting()">
+      <option value="" selected hidden disabled>Meeting Quarter </option>
+      <option *ngFor="let item of meeting_quater_list" [value]="item">{{ item }}</option>
+    </select>
+
+    <select *ngIf="Parsed_UserInfo.role != 4" class="form-select" [(ngModel)]="filter_District" (change)="loadMeeting()">
+      <option value="" selected hidden disabled>District</option>
+      <option *ngFor="let item of districts" [value]="item">{{ item }}</option>
+    </select>
+
+
+    <button style="width: 40% !important;" (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
+    <button *ngIf="filter_District != ''" style="width: 40% !important;" class="btn btn-success btn-sm">Total Member {{TotalMember}}</button>
   </div>
 
   <div class="card-body pt-0">
@@ -24,6 +52,9 @@
           <th>Meeting Date</th>
           <th>District</th>
           <th>Sub Division</th>
+          <th *ngIf="filter_District == ''" >Total Member</th>
+          <th>present</th>
+          <th>Actions</th>
          
         </tr>
       </thead>
@@ -38,26 +69,20 @@
           <td>{{ meeting.meeting_date | date: 'dd/MM/yyyy' ||  'N/A' }}</td>
           <td>{{ meeting.district || 'N/A' }}</td>
           <td>{{ meeting.subdivision || 'N/A' }}</td>
-          <!-- <td>
-            <span class="badge" [ngClass]="member.status == '1' ? 'badge-success' : 'badge-danger'">
-              {{ member.status == '1' ? 'Active' : 'Inactive' }}
-            </span>
-          </td> -->
-          <!-- <td>
+          <td *ngIf="filter_District == ''" >{{ meeting.total_member || 'N/A' }}</td>
+          <td>{{ meeting.present || 'N/A' }}</td>
+
+          <td>
             <div ngbDropdown class="d-inline-block">
               <button ngbDropdownToggle class="btn btn-sm btn-circle btn-icon btn-bg-light btn-active-color-primary">
                 <i class="bi bi-three-dots-vertical fs-3"></i>
               </button>
               <div ngbDropdownMenu>
-                <button ngbDropdownItem (click)="openModal(member)">Edit</button>
-                <button ngbDropdownItem (click)="deleteMember(member.vmc_id)">Delete</button>
-
-                <button ngbDropdownItem (click)="toggleStatus(member)">
-                  {{ member.status == '1' ? 'Set Inactive' : 'Set Active' }}
-                </button>
+                <button ngbDropdownItem (click)="Edit(meeting,'Edit')">Edit</button>
+                <button ngbDropdownItem (click)="Edit(meeting,'View')">View</button>
               </div>
             </div>
-          </td> -->
+          </td>
         </tr>
 
       </tbody>
@@ -213,7 +238,7 @@
       <td>{{ attendee.name }}</td>
       <td>{{ attendee.designation }}</td>
       <!-- <td>{{ attendee.meeting_date | date: 'dd-MM-yyyy' }}</td> -->
-      <td *ngIf="!exisiting_record">
+      <td>
         <select
           class="form-select"
           [(ngModel)]="attendee.attended"
@@ -224,31 +249,9 @@
           <option [value]="false">Absent</option>
         </select>
       </td>
-      <td *ngIf="exisiting_record">
-        {{ attendee.Attendance ? 'Present' : 'Absent' }}
-      </td>
-      <!-- <td>
-        {{ attendee.meeting_status }}
-      </td> -->
     </tr>
   </tbody>
 </table>
-
-
-
-      <!-- File Upload -->
-      <!-- <div *ngIf="!exisiting_record" class="row g-3 mt-4">
-        <div class="col-md-6">
-          <label for="minutesUpload" class="form-label">Upload the Minutes</label><span style="color: red;font-size: 9px;margin-left: 10px;" >(Only PDF file less than 5 MB will be allowed)</span>
-          <input
-            type="file"
-            id="minutesUpload"
-            class="form-control"
-            (change)="onFileChange($event)"
-            accept="application/pdf"
-          />
-        </div>
-      </div> -->
 
       <div class="col-md-4 mb-3">                
         <div *ngIf="existingFilePath && !showFileInput">
@@ -280,10 +283,276 @@
 
 
       <!-- Submit Button -->
-      <div *ngIf="!exisiting_record" class="row mt-4">
+      <div class="row mt-4">
         <div class="col-md-12 text-right">
           <button class="btn btn-primary btn-lg" (click)="Back()">Back</button>
           <button style="margin-left: 10px;" class="btn btn-primary btn-lg" (click)="submitForm()">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="view == 'Edit' || view == 'View'" class="card">
+  <div class="card-header border-0 pt-6 bg-primary text-white">
+    <h3 class="card-title text-white">Meeting Details</h3>
+  </div>
+
+  <div class="card-body">
+    <!-- Tabs for Committees -->
+
+    <div class="mb-4">
+      <label for="year" class="form-label">Select Year:</label><span class="required"></span>
+      <select
+        id="year"
+        class="form-select"
+        [(ngModel)]="Edit_Year"
+      >
+        <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
+      </select>
+    </div>
+
+    <div class="form-check form-check-inline">
+      <input 
+        class="form-check-input" 
+        type="radio" 
+        name="inlineRadioOptions" 
+        id="inlineRadio1" 
+        value="DLVMC"
+        [(ngModel)]="Edit_committee"
+        (change)="onCommitteeChange($event)">
+      <label class="form-check-label" for="inlineRadio1">DLVMC</label>
+    </div>
+    
+    <div class="form-check form-check-inline">
+      <input 
+        class="form-check-input" 
+        type="radio" 
+        name="inlineRadioOptions" 
+        id="inlineRadio2" 
+        value="SDLVMC"
+        [(ngModel)]="Edit_committee"
+        (change)="onCommitteeChange($event)">
+      <label class="form-check-label" for="inlineRadio2">SDLVMC</label>
+    </div>
+    
+    <div *ngIf="Parsed_UserInfo.role != '4'" class="form-check form-check-inline">
+      <input 
+        class="form-check-input" 
+        type="radio" 
+        name="inlineRadioOptions" 
+        id="inlineRadio3" 
+        value="SLVMC"
+        [(ngModel)]="Edit_committee"
+        (change)="onCommitteeChange($event)">
+      <label class="form-check-label" for="inlineRadio3">SLVMC</label>
+    </div>
+    
+
+    <div class="row g-3 mb-3 mt-3"> 
+      <!-- Show District only for DLVMC and SLVMC -->
+      <div *ngIf="Edit_committee !== 'SLVMC'" class="col-md-6">
+        
+        <select
+          id="district"
+          class="form-select"
+          [(ngModel)]="Edit_district"
+          (change)="onEditDistrictChange()"
+        >
+          <option value="" disabled>Select District</option>
+          <option *ngFor="let district of districts" [value]="district">
+            {{ district }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Show Subdivision only for SDLVMC -->
+      <div *ngIf="Edit_committee === 'SDLVMC'" class="col-md-6">
+       
+        <select
+          id="subdivision"
+          class="form-select"
+          [(ngModel)]="Edit_subdivision"
+          (change)="EditselectedSudivision()"
+        >
+          <option value="" disabled>Select Subdivision</option>
+          <option *ngFor="let subdivision of Edit_Sub_divisions" [value]="subdivision">
+            {{ subdivision }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Meeting Tabs -->
+
+    <div *ngIf="Edit_committee != 'SLVMC'" class="form-check form-check-inline">
+      <input 
+        class="form-check-input" 
+        type="radio" 
+        name="inlineRadioOptions2" 
+        id="inlineRadio4" 
+        value="Jan-Mar"
+        [(ngModel)]="Edit_meeting">
+      <label class="form-check-label" for="inlineRadio4">Jan-Mar</label>
+    </div>
+    
+    <div *ngIf="Edit_committee != 'SLVMC'" class="form-check form-check-inline">
+      <input 
+        class="form-check-input" 
+        type="radio" 
+        name="inlineRadioOptions2" 
+        id="inlineRadio5" 
+        value="Apr-Jun"
+        [(ngModel)]="Edit_meeting">
+      <label class="form-check-label" for="inlineRadio5">Apr-Jun</label>
+    </div>
+    
+    <div *ngIf="Edit_committee != 'SLVMC'" class="form-check form-check-inline">
+      <input 
+        class="form-check-input" 
+        type="radio" 
+        name="inlineRadioOptions2" 
+        id="inlineRadio6" 
+        value="Jul-Sep"
+        [(ngModel)]="Edit_meeting">
+      <label class="form-check-label" for="inlineRadio6">Jul-Sep</label>
+    </div>
+
+    <div *ngIf="Edit_committee != 'SLVMC'" class="form-check form-check-inline">
+      <input 
+        class="form-check-input" 
+        type="radio" 
+        name="inlineRadioOptions2" 
+        id="inlineRadio7" 
+        value="Oct-Dec"
+        [(ngModel)]="Edit_meeting">
+      <label class="form-check-label" for="inlineRadio7">Oct-Dec</label>
+    </div>
+
+    <div *ngIf="Edit_committee == 'SLVMC'" class="form-check form-check-inline">
+      <input 
+        class="form-check-input" 
+        type="radio" 
+        name="inlineRadioOptions2" 
+        id="inlineRadio8" 
+        value="1st Meeting"
+        [(ngModel)]="Edit_meeting">
+      <label class="form-check-label" for="inlineRadio8">1st Meeting</label>
+    </div>
+
+    <div *ngIf="Edit_committee == 'SLVMC'" class="form-check form-check-inline">
+      <input 
+        class="form-check-input" 
+        type="radio" 
+        name="inlineRadioOptions2" 
+        id="inlineRadio9" 
+        value="2nd Meeting"
+        [(ngModel)]="Edit_meeting">
+      <label class="form-check-label" for="inlineRadio9">2nd Meeting</label>
+    </div>
+  
+
+    <!-- Form Content -->
+    <div>
+      <div class="section-title mt-4 mb-3">{{ Edit_meeting }} Form</div>
+
+      <!-- Conditional District and Subdivision Inputs -->
+    
+
+      <!-- Meeting Details: Date and Time -->
+      <div class="row g-3 mt-4">
+        <div class="col-md-6">
+          <label for="meetingDate" class="form-label">Date of Meeting</label><span class="required"></span>
+          <input
+            type="date"
+            id="meetingDate"
+            [max]="today"
+            class="form-control"
+            [(ngModel)]="Edit_meetingDate"
+            required
+          />
+        </div>
+        <div class="col-md-6">
+          <label for="meetingTime" class="form-label">Time of Meeting</label><span class="required"></span>
+          <input
+            type="time"
+            id="meetingTime"
+            class="form-control"
+            [(ngModel)]="Edit_meetingTime"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Member Table -->
+      <div class="section-title mt-4 mb-3">Attendee Details</div>
+    <table class="table table-striped table-bordered">
+  <thead class="table-light">
+    <tr>
+      <th>Salutation</th>
+      <th>Attendee Type</th>
+      <th>Name</th>
+      <th>Designation</th>
+      <th>Attendance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let attendee of filteredAttendees; let i = index" [style.backgroundColor]="attendee.color">
+      <td>{{ attendee.salutation }}</td>
+      <td>{{ attendee.member_type }}</td>
+      <td>{{ attendee.name }}</td>
+      <td>{{ attendee.designation }}</td>
+      <td>
+        <select
+          class="form-select"
+          [(ngModel)]="attendee.attended"
+          [name]="'attended_' + i"
+        >
+          <option value="" disabled>Select one option</option>
+          <option [value]="true">Present</option>
+          <option [value]="false">Absent</option>
+        </select>
+      </td>
+
+    </tr>
+  </tbody>
+</table>
+
+
+      <div style="width: fit-content;" class="mb-3">                
+        <div *ngIf="existingFilePath && !showFileInput">
+         <div class="mb-3">
+           <div style="padding: 7px;" class="card">
+             <div style="padding: 7px;" class="card-body d-flex justify-content-between align-items-center">
+               <span class="text-truncate me-2">{{ getFileName() }}</span>
+               <div>
+                 <button type="button" class="btn btn-primary btn-sm me-2" (click)="viewFile()">
+                   View
+                 </button>
+                 <button *ngIf="view == 'Edit'" type="button" class="btn btn-danger btn-sm" (click)="openDialog('1')">
+                   <i class="fas fa-times"></i>
+                 </button>
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+       <label *ngIf="showFileInput" for="minutesUpload" class="form-label">Upload the Minutes</label><span *ngIf="showFileInput" style="color: red;font-size: 9px;margin-left: 10px;" >(Only PDF file less than 5 MB will be allowed)</span>
+           <input *ngIf="showFileInput"
+             type="file" 
+             class="form-control" 
+             id="minutesUpload"
+             (change)="uploadMinutes($event)" 
+             accept="application/pdf"
+           />
+       </div> 
+
+
+      <!-- Submit Button -->
+      <div class="row mt-4">
+        <div class="col-md-12 text-right">
+          <button class="btn btn-primary btn-lg" (click)="Back()">Back</button>
+          <button *ngIf="view == 'Edit'" style="margin-left: 10px;" class="btn btn-primary btn-lg" (click)="submitEditForm()">Submit</button>
         </div>
       </div>
     </div>

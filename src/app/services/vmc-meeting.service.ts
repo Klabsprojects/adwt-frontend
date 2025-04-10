@@ -73,10 +73,21 @@ export class VmcMeetingService {
     return this.http.post(`${this.baseUrl}/submit-meeting`, meetingData);
   }
 
+  updateMeeting(meetingData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/updateMeeting`, meetingData);
+  }
+
 
   getAttendeesByDistrictbysk(Data: any): Observable<any> {
     let body = Data;
     return this.http.post(`${this.baseUrl}/getAttendeesByDistrictbysk`, body);
+  }
+
+  GetMeetingAttendiesById(meetingId: any): Observable<any> {
+    const params = new HttpParams()
+    .set('id', meetingId)
+ 
+    return this.http.get(`${this.baseUrl}/GetMeetingAttendiesById`, { params });
   }
 
 
@@ -84,10 +95,18 @@ export class VmcMeetingService {
     return this.http.get(`${this.baseUrl}/getAllMeeting`);
   }
   
-  getDistrictLevelMeeting(district : any): Observable<any> {
-    const params = new HttpParams()
-    .set('district', district)
-    return this.http.get(`${this.baseUrl}/getDistrictLevelMeeting`, { params });
+  // getDistrictLevelMeeting(district : any): Observable<any> {
+  //   const params = new HttpParams()
+  //   .set('district', district)
+  //   return this.http.get(`${this.baseUrl}/getDistrictLevelMeeting`, { params });
+  // }
+
+  GetVmcMeetings( filters: any = {}): Observable<any> {
+    let params = new HttpParams()
+    Object.keys(filters).forEach(key => {
+      params = params.set(key, filters[key]);
+    });
+    return this.http.get(`${this.baseUrl}/GetVmcMeetings`, { params });
   }
 
   uploadFile(formData: any): Observable<any> {
