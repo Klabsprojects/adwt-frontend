@@ -145,6 +145,8 @@
 
 .bamini {
   font-family: "Bamini-16";
+  font-size: 4rem !important;
+  font-weight: 500;
 }
 .teko{
   font-family: "Teko";

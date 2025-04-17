@@ -122,7 +122,7 @@ This SOP is for the call centre representatives on setting up the call centre he
         officers_login: "அதிகாரிகள் உள்நுழைவு",
         adwt: "ஆதி திராவிடர் மற்றும் பழங்குடியினர் நலத்துறை",
         govt: "தமிழ்நாடு அரசு",
-        sk: "சமத்துவம் காண்போம்",
+        sk: "rkj;Jtk; fhz;Nghk;",
         sjhrw: "சமூக நீதி மற்றும் மனித உரிமை பிரிவு",
         tnsc: "தமிழ்நாடு மாநில ஒதுக்கப்பட்ட இன மற்றும் பழங்குடியினர் ஆணையம்",
         gallery: "கேலரி",
