@@ -389,6 +389,9 @@
 
 /* Hide Desktop Menu on Mobile */
 @media (max-width: 768px) {
+  .title{
+    line-height: 1;
+  }
   .desktop-only {
     display: none !important;
   }
@@ -431,7 +434,7 @@
 
   .title {
     font-size: 1.2rem;
-    line-height: 1.5;
+    /* line-height: 1.5; */
   }
 
   .logo.large {
@@ -448,6 +451,9 @@
 
   .header {
     padding: 15px 5px;
+  }
+  .bamini{
+    font-size: 3rem !important;
   }
 }
 
