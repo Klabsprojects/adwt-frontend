@@ -17,33 +17,31 @@
 </div>
 
 <section class="header">
-  <div class="row">
-    <div class="col-xl-4 col-lg-4 col-md-10 col-sm-10 col-10">
-      <div class="logo-section">
-        <img src="assets/images/image.png" alt="Secondary Logo" class="logo small" />
-        <div class="divider"></div>
-        <div class="titles">
-          <h1 class="title sk mobile-title" [ngClass]="{'bamini':selLang=='tn'}">{{lang.lang.sk}}</h1>
-          <span class="mob-tiru">
-            <h3>பிறப்பொக்கும் எல்லா உயிர்க்கும் சிறப்பொவ்வா</h3>
-            <h3>செய்தொழில் வேற்றுமை யான். (972)</h3>
-          </span>
-          <h2 class="title adtw">{{lang.lang.adwt}}</h2>
-          <h3 class="title gov">{{lang.lang.govt}}</h3>
-        </div>
+    <div class="logo-section">
+      <img src="assets/images/image.png" alt="Secondary Logo" class="logo small" />
+      <div class="divider"></div>
+      <div class="titles">
+        <h1 class="title sk mobile-title" [ngClass]="{'bamini':selLang=='tn'}">{{lang.lang.sk}}</h1>
+        <span class="mob-tiru">
+          <h3>பிறப்பொக்கும் எல்லா உயிர்க்கும் சிறப்பொவ்வா</h3>
+          <h3>செய்தொழில் வேற்றுமை யான். (972)</h3>
+        </span>
+        <h2 class="title adtw">{{lang.lang.adwt}}</h2>
+        <h3 class="title gov">{{lang.lang.govt}}</h3>
       </div>
     </div>
-    <div class="col-xl-4 col-lg-4 d-flex justify-content-center align-items-center desktop-only" style="flex-direction: column;gap: 1rem;">
+    <div class="d-flex justify-content-center align-items-center desktop-only"
+      style="flex-direction: column;gap: 1rem;">
       <h1 class="title sk" [ngClass]="{'bamini':selLang=='tn'}">{{lang.lang.sk}}</h1>
       <span>
-        <h3>பிறப்பொக்கும் எல்லா உயிர்க்கும் சிறப்பொவ்வா</h3>
-        <h3>செய்தொழில் வேற்றுமை யான். (972)</h3>
+        <h3 class="web-tiru">பிறப்பொக்கும் எல்லா உயிர்க்கும் சிறப்பொவ்வா</h3>
+        <h3 class="web-tiru">செய்தொழில் வேற்றுமை யான். (972)</h3>
       </span>
     </div>
-    <div class="col-xl-4 col-lg-4 d-flex justify-content-end align-items-center px-4 desktop-only">
+    <div class="d-flex justify-content-end align-items-center px-4 desktop-only">
       <img src="https://www.naanmudhalvan.tn.gov.in/_nuxt/img/cm.e8d4eb2.png" alt="" style="width: 7rem;">
     </div>
-    <div class="col-md-2 col-sm-2 col-2 mobile-only">
+    <div class="mobile-only">
       <button class="menu-button" (click)="toggleMenu()">
         <span *ngIf="!isMenuOpen">&#9776;</span>
         <span *ngIf="isMenuOpen">&#10005;</span>
@@ -92,7 +90,6 @@
         <button class="btn mobile-link loginout" *ngIf="is_user" (click)="logout()">{{lang.lang.logout}}</button>
       </ng-container>
     </div>
-  </div>
 </section>
 <div class="web-nav desktop-only">
   <nav class="nav-links">
@@ -136,8 +133,8 @@
       </div>
       <div>
         <button role="button" class="btn mobile-link loginout" data-bs-toggle="modal" data-bs-target="#exampleModal"
-        *ngIf="!is_user">{{lang.lang.officers_login}}</button>
-      <button class="btn mobile-link loginout" *ngIf="is_user" (click)="logout()">{{lang.lang.logout}}</button>
+          *ngIf="!is_user">{{lang.lang.officers_login}}</button>
+        <button class="btn mobile-link loginout" *ngIf="is_user" (click)="logout()">{{lang.lang.logout}}</button>
       </div>
     </ng-container>
   </nav>

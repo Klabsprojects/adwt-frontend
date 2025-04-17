@@ -14,7 +14,7 @@
 //     transition: opacity 0.3s ease-in-out, background-color 0.3s ease-in-out;
 //     margin-bottom: 3rem;
 //   }
-  
+
 //   .carousel-indicators .active {
 //     opacity: 1; /* Fully visible when active */
 //     width: 15px;
@@ -23,13 +23,13 @@
 //   .carousel-item {
 //     position: relative;
 //   }
-  
+
 //   .carousel-item img {
 //     width: 100%;
 //     height: auto; /* Keeps the aspect ratio */
 //     object-fit: cover; /* Ensures the image covers the container */
 //   }
-  
+
 //   .overlay {
 //     position: absolute;
 //     width: 100%;
@@ -39,3 +39,13 @@
 //     top: 0;
 //     left: 0;
 //   }
+
+img {
+    aspect-ratio: 16/9;
+    height: 60dvh;
+}
+@media(max-width:769px){
+    img{
+        height: 50%;
+    }
+}
