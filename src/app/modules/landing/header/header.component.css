@@ -139,13 +139,15 @@
   font-size: 2.5rem;
   /* color: #043c6c; */
   color: #d10000;
-  font-family: "Teko";
   text-align: center;
   line-height: 1.1;
 }
 
 .bamini {
-  font-family: 'Bamini-16' !important;
+  font-family: "Bamini-16";
+}
+.teko{
+  font-family: "Teko";
 }
 
 .btn {
