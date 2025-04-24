@@ -13,7 +13,12 @@ export class MeetingFilterComponent implements OnInit {
   subdivs:any[]=[];
   selectedDistrict:string='';
   selectedSubDivision:string='';
+  role:string=''
   ngOnInit(): void {
+    const JsonData = sessionStorage.getItem('user_data');
+    const userData = JsonData ? JSON.parse(JsonData) : {};
+    this.selectedDistrict = userData.access_type==='District'? userData.district:'';
+    this.role = userData.access_type==='District'? 'District':'';
     this.ds.userGetMethod('vmcmeeting/districts').subscribe((res:any)=>{
       this.distandsubdivs = res;
       this.districts = Object.keys(res);
@@ -29,7 +34,9 @@ export class MeetingFilterComponent implements OnInit {
       this.selectedDistrict = '';
       this.subdivs = [];
     }
-    this.getFilterDatas();
+    if(this.role !== 'District'){
+      this.getFilterDatas();
+    }
   }
   selectSubdiv(event:any){
     if(event.target.value){
@@ -38,7 +45,9 @@ export class MeetingFilterComponent implements OnInit {
     else{
       this.selectedSubDivision = '';
     }
-    this.getFilterDatas();
+    if(this.role !== 'District'){
+      this.getFilterDatas();
+    }
   }
 
   getFilterDatas(){
@@ -87,7 +96,9 @@ export class MeetingFilterComponent implements OnInit {
     this.selectedDistrict = '';
     this.selectedSubDivision = '';
     this.subdivs=[];
-    this.getFilterDatas();
+    if(this.role !== 'District'){
+      this.getFilterDatas();
+    }
     this.cdr.detectChanges()
   }
 

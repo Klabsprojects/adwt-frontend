@@ -401,10 +401,17 @@ frameborder="0" allowFullScreen="true"></iframe> -->
 			(click)="switchDashboard('meeting')">
 			Meeting Dashboard
 		</button>
+		<button type="button" class="btn btn-outline-primary" [class.active]="currentDashboard === 'relief'"
+			(click)="switchDashboard('relief')">
+			Relief Dashboard
+		</button>
 	</div>
 
 	<div [ngSwitch]="currentDashboard" class="card shadow-sm p-4">
 		<app-case-dashbaord *ngSwitchCase="'case'"></app-case-dashbaord>
 		<app-home-meeting-dashboard *ngSwitchCase="'meeting'"></app-home-meeting-dashboard>
+		<iframe title="attrocities" width="1200" height="800"
+			src="https://app.powerbi.com/view?r=eyJrIjoiYzdhNzVmZmEtNTlmZi00MDExLTkxMjMtY2EyN2M2MmViODE2IiwidCI6ImI1OTZjYmNlLTBmNDktNDcyZi1iODgyLTAwZjFiZjNhMjI2MSJ9"
+			frameborder="0" allowFullScreen="true" *ngSwitchCase="'relief'"></iframe>
 	</div>
 </div>

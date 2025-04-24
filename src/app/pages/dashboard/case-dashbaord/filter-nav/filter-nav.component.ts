@@ -30,9 +30,16 @@ export class FilterNavComponent implements OnInit {
   };
   constructor(private dashboardService: DashboardService, private hcs:homeCaseService,private cds:commondashboardSerivce) { }
   ngOnInit(): void {
-    this.callAllfunction({});
+    const JsonData = sessionStorage.getItem('user_data');
+    const userData = JsonData ? JSON.parse(JsonData) : {};
+    const body = userData.access_type==='District'? {district:userData.district}:{};
+    this.callAllfunction(body);
     this.hcs.distrct$.subscribe((res:any)=>{
-      this.callAllfunction({district:res});
+      if(res){
+        if(Object.keys(body).length === 0){
+          this.callAllfunction({district:res});
+        }
+      }
     })
   }
   callAllfunction(body:any){

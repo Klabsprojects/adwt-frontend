@@ -119,7 +119,8 @@ export class LoginComponent implements OnInit, OnDestroy {
             // Redirect based on role
             if (userRole === '4') {
               //console.log('Redirecting to Dadtwo dashboard');
-              this.router.navigate(['/dadtwo-dashboard']);
+              // this.router.navigate(['/dadtwo-dashboard']);
+              this.router.navigate(['/dashboard']); 
               this.loginSuccess.emit();
               // this.router.navigate(['/dashboard']);
             } else {
