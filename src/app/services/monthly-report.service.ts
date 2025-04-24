@@ -23,6 +23,32 @@ export class MonthlyReportService {
     return this.http.get(`${this.baseUrl}/get-monthly-report-details`);
   }
 
+  GetDistrictWisePendingUI(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/GetDistrictWisePendingUI`);
+  }
+
+  GetReasonWisePendingUI(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/GetReasonWisePendingUI`);
+  }
+
+  GetCommunity_Certificate_Report(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/GetCommunity_Certificate_Report`);
+  }
+
+  GetDistrictWisePendingPT(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/GetDistrictWisePendingPT`);
+  }
+
+  GetConvictionTypeRepot(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/GetConvictionTypeRepot`);
+  }
+
+  MonnthlyUpdate(fir_id: any, Reason : any): Observable<any[]> {
+    const allDataUrl = `${this.baseUrl}/MonnthlyUpdate`;
+    const body = {Reason : Reason, fir_id : fir_id}
+    return this.http.put<any[]>(allDataUrl, body); // 👈 Empty body, headers in 3rd param
+  }
+
   // Update status and reason for current month to given fir report details
   updateMonthlyReportDetail(data: any): Observable<any> {
     return this.http.put(`${this.baseUrl}/update-monthly-report-details`, data);
