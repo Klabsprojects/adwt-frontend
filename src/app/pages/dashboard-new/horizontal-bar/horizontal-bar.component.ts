@@ -1,4 +1,4 @@
-import { Component, ViewChild, AfterViewInit } from "@angular/core";
+import { Component, ViewChild,Input, SimpleChanges, OnChanges, Output, EventEmitter } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { NgApexchartsModule } from "ng-apexcharts";
 import {
@@ -10,7 +10,6 @@ import {
   ApexPlotOptions,
   ApexStroke
 } from "ng-apexcharts";
-import { NgZone } from '@angular/core';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -28,30 +27,37 @@ export type ChartOptions = {
   templateUrl: './horizontal-bar.component.html',
   styleUrl: './horizontal-bar.component.scss'
 })
-export class HorizontalBarComponent implements AfterViewInit {
+export class HorizontalBarComponent implements OnChanges {
   @ViewChild("chart", { static: false }) chart!: ChartComponent;
+  @Input() values: number[] = [];
+  @Output() zoneClicked = new EventEmitter<string>();
 
+  ngOnChanges(changes: SimpleChanges) {
+    console.log("hello")
+    if (changes['values']) {
+      this.createBar(this.values);
+    }
+  }
   public chartOptions: ChartOptions;
-
-  constructor() {
+  createBar(values: any) {
     this.chartOptions = {
       series: [
         {
-          name: "2024",
-          data: [142, 109, 86, 84]
-        },
-        {
-          name: "2023",
-          data: [14, 9, 10, 5]
-        },
-        {
-          name: "2022",
-          data: [0, 1, 4, 0]
+          name: "",
+          data: values
         }
       ],
       chart: {
         type: "bar",
-        height: 430
+        height: 200,
+        events: {
+          dataPointSelection: (event, chartContext, config) => {
+            const index = config.dataPointIndex;
+            const zones = ['South Zone', 'Central Zone', 'North Zone', 'West Zone'];
+            const selectedZone = zones[index];
+            this.zoneClicked.emit(selectedZone); // 🚀 Emit zone
+          }
+        }
       },
       plotOptions: {
         bar: {
@@ -75,13 +81,11 @@ export class HorizontalBarComponent implements AfterViewInit {
         colors: ["#fff"]
       },
       xaxis: {
-        categories: ['West Zone', 'North Zone', 'Central Zone', 'South Zone']
+        categories: ['South Zone', 'Central Zone', 'North Zone', 'West Zone']
       }
     };
   }
-
-  ngAfterViewInit() {
-    // You can now interact with the chart component
-    console.log(this.chart);
+  clear(){
+    this.zoneClicked.emit('');
   }
 }

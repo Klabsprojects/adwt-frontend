@@ -1,0 +1,44 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 3rem;
+    height: 300px;
+    overflow: scroll;
+}
+
+.responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+
+    th,
+    td {
+        border: 1px solid #ccc;
+        padding: 8px 12px;
+    }
+
+    thead {
+        color: #fff;
+    }
+
+    th {
+        white-space: nowrap;
+    }
+}
+
+/* helper class */
+.red{
+    background-color:#d64550;
+}
+.green{
+    background-color: #2E928C;
+}
+.blue{
+    background-color: #186cbd;
+}
+

@@ -7,8 +7,6 @@ import { NgCircleProgressModule } from 'ng-circle-progress';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { FormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
-
-
 @NgModule({
   declarations: [],
   imports: [

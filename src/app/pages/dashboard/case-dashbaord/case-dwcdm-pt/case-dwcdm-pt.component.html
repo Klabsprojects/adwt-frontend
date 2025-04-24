@@ -1,0 +1,34 @@
+<div class="card-header">
+    <h5 class="card-title" style="font-size: 18px;font-weight: 500;">District-Wise Case Pendency Map
+        PT</h5>
+</div>
+<div class="card-body">
+    <div class="legend">
+        <div class="legenditem">
+            <span class="dot" style="background-color: #808080;"></span> No Cases
+        </div>
+        <div class="legenditem">
+            <span class="dot" style="background-color: lightgreen;"></span> 0 - 30
+        </div>
+        <div class="legenditem">
+            <span class="dot" style="background-color: green;"></span> 31 - 60
+        </div>
+        <div class="legenditem">
+            <span class="dot" style="background-color: yellow;"></span> 61 - 90
+        </div>
+        <div class="legenditem">
+            <span class="dot" style="background-color: red;"></span> More than 90
+        </div>
+    </div>
+    <div class="svg-container mt-5">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1591.1 1975.3">
+            <ng-container *ngFor="let district of districtData">
+                <path class="st0" [attr.id]="district.id" [attr.d]="getPath(district.id)"
+                    [attr.fill]="getDistrictColor(district.data.count)"
+                    matTooltip="{{ district.name }} - Count: {{ district.data.count }}"
+                    matTooltipPosition="above" (click)="onDistrictClick(district)"
+                    (mouseover)="onHover(district)" (mouseout)="onHoverOut()"></path>
+            </ng-container>
+        </svg>
+    </div>
+</div>

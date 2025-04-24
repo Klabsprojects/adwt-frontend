@@ -1,9 +1,18 @@
 <!-- <section class="pgs">
         <app-table/>
 </section> -->
-<section class="zone">
-        <app-horizontal-bar/>
+<!-- <section class="zone">
 </section>
 <section class="reason">
-        <app-piechart/>
-</section>
+</section> -->
+<div class="grid mt-3">
+        <div class="card">
+                <app-horizontal-bar [values]="values" (zoneClicked)="onZoneClicked($event)"/>
+        </div>
+        <div class="card d-flex align-items-center justify-content-center">
+                <app-table [zonewise]="years" [zone]="zone" (yearEmit)="yearHandle($event)"/>
+        </div>
+        <div class="card">
+                <app-piechart />
+        </div>
+</div>

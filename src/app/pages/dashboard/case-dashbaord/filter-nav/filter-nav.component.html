@@ -1,0 +1,74 @@
+<section class="filter-nav">
+    <div class="title-box">
+        <h3>Atrocity Case Dashboard</h3>
+    </div>
+    <div class="filters">
+        <div class="filter">
+            <p>Status Of Case</p>
+            <select class="filter-select" [(ngModel)]="selectedFilters.status" (change)="applyFilters()">
+                <option value="" disabled selected>Status of the Case</option>
+                <option *ngFor="let option of filterOptions.status" [value]="option.key">
+                    {{ option.value }}
+                </option>
+            </select>
+        </div>
+        <div class="filter">
+            <p>Disctrict</p>
+            <select class="filter-select" [(ngModel)]="selectedFilters.district" (change)="applyFilters()">
+                <option value="" disabled selected>Districts</option>
+                <option *ngFor="let option of filterOptions.district" [value]="option">
+                    {{ option }}
+                </option>
+            </select>
+        </div>
+        <div class="filter">
+            <p>Community</p>
+            <select name="" id="">
+                <option value="All">All</option>
+            </select>
+        </div>
+        <div class="filter">
+            <p>Caste</p>
+            <select class="filter-select" [(ngModel)]="selectedFilters.caste" (change)="applyFilters()">
+                <option value="" disabled selected>Caste</option>
+                <option *ngFor="let option of filterOptions.caste" [value]="option">
+                    {{ option }}
+                </option>
+            </select>
+        </div>
+        <div class="filter">
+            <p>Zone</p>
+            <select name="" id="">
+                <option value="All">All</option>
+            </select>
+        </div>
+        <div class="filter">
+            <p>Date Category</p>
+            <select name="" id="">
+                <option value="All">All</option>
+            </select>
+        </div>
+        <div class="filter">
+            <p>Nature of Offence</p>
+            <select name="" id="">
+                <option value="All">All</option>
+            </select>
+        </div>
+        <div class="filter">
+            <p>Court</p>
+            <select name="" id="">
+                <option value="All">All</option>
+            </select>
+        </div>
+        <div class="filter">
+            <p>Date</p>
+            <div>
+                <input type="date" class="filter-input" [(ngModel)]="selectedFilters.fromDate" placeholder="From Date" />
+                <input type="date" class="filter-input" [(ngModel)]="selectedFilters.toDate" placeholder="To Date" />
+            </div>
+        </div>
+        <div class="filter img-container">
+            <img src="assets/images/filter.png" alt="filter" width="40px">
+        </div>
+    </div>
+</section>

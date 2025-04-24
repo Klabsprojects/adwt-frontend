@@ -1,0 +1,38 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.section-cards{
+    margin-top: 1rem;
+}
+.card-grid{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    column-gap: 1rem;
+    row-gap: 1rem;
+}
+.cards{
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+.box{
+    flex: 1;
+    color: #fff;
+    padding: 1rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.3rem;
+}
+
+/* helper class */
+.red{
+    background-color:#d64550;
+}
+.blue{
+    background-color:#48327a;
+}

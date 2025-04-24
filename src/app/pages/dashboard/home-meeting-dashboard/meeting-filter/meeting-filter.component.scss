@@ -1,0 +1,38 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.filter{
+    padding: 1.5rem;
+    background-color: #186cbd;
+}
+ul{
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    align-items: center;
+}
+
+.filters{
+    gap: 1rem;
+}
+
+.filters div{
+    flex: 1;
+}
+
+select{
+    width: 100%;
+    padding: 0.3rem;
+    border-radius: 0.3rem;
+}
+
+h1, p{
+    color: #fff;
+    font-weight: 600;
+}
+
+img{
+    cursor: pointer;
+}

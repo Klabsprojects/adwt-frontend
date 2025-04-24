@@ -1,11 +1,29 @@
 import { Component, AfterViewInit, ViewChild, ElementRef,ChangeDetectorRef, EventEmitter, OnInit, Output  } from '@angular/core';
 import * as L from 'leaflet';
-import { Chart,ChartOptions, ChartData, ChartType } from 'chart.js/auto';
+import { Chart, ChartData, ChartType } from 'chart.js/auto';
 import { Color } from '@swimlane/ngx-charts';
 import { ScaleType } from '@swimlane/ngx-charts';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { DashboardService } from '../../services/dashboard.service';
+import { commondashboardSerivce } from './case-dashboard.service';
+import {
+  ApexAxisChartSeries,
+  ApexChart,
+  ChartComponent,
+  ApexDataLabels,
+  ApexXAxis,
+  ApexPlotOptions
+} from "ng-apexcharts";
+import { min } from 'moment';
+
+export type ChartOptions = {
+  series: ApexAxisChartSeries;
+  chart: ApexChart;
+  dataLabels: ApexDataLabels;
+  plotOptions: ApexPlotOptions;
+  xaxis: ApexXAxis;
+};
 
 interface LineChartData {
   labels: string[];
@@ -116,6 +134,7 @@ export class DashboardComponent implements AfterViewInit  {
   chartInstance1: any;
   barChart: Chart | null = null;
   barChart13: Chart | null = null;
+  barChart14:Chart | null = null;
   chartInstance2: Chart | null = null;
 
   caseCounts1 = {
@@ -123,14 +142,16 @@ export class DashboardComponent implements AfterViewInit  {
     chargesheet: 0,
     trial: 0
   };
-
-
-
   caseCounts2 = {
     death: 0,
     rape: 0,
     others: 0
   };
+  status_of_case = {
+    gcr:1,
+    non_gcr:1
+  }
+
 
   ptBar: number[] = [];
   uiBar: number[] = [];
@@ -141,7 +162,7 @@ export class DashboardComponent implements AfterViewInit  {
   lineChart77: LineChartData = { labels: [], datasets: [] };
 
 
-  constructor(private dashboardService: DashboardService,private cdRef: ChangeDetectorRef) {}
+  constructor(private dashboardService: DashboardService,private cdRef: ChangeDetectorRef, private cds:commondashboardSerivce) {}
 
 
 
@@ -159,15 +180,14 @@ export class DashboardComponent implements AfterViewInit  {
     this.chartInstance = new Chart("pieChart1", {
       type: 'pie',
       data: {
-        labels: ['FIR', 'Chargesheet', 'Trial'],
+        labels: ['',''],
         datasets: [{
           data: [
-            Number(this.caseCounts1.fir),
-            Number(this.caseCounts1.chargesheet),
-            Number(this.caseCounts1.trial)
+            Number(this.status_of_case.gcr),
+            Number(this.status_of_case.non_gcr)
           ],
-          backgroundColor: ['#e12a2a', '#3e42ea', '#e3a01c'],
-          hoverBackgroundColor: ['#e12a2a', '#3e42ea', '#e3a01c'],
+          backgroundColor: ['#e12a2a', '#3e42ea'],
+          hoverBackgroundColor: ['#e12a2a', '#3e42ea'],
           borderWidth: 1
         }]
       },
@@ -300,7 +320,6 @@ export class DashboardComponent implements AfterViewInit  {
 
   createBarChart(): void {
     const ptBar = this.ptBar;
-
     if (this.barChart) {
       this.barChart.destroy();
     }
@@ -341,7 +360,8 @@ export class DashboardComponent implements AfterViewInit  {
                 const value = dataset.data[dataIndex];
                 const label = this.barChart!.data.labels?.[dataIndex];
                 if (label && value !== undefined) {
-                  const text = `${label}: ${value}`;
+                  // const text = `${label}: ${value}`;
+                  const text = `${value}`;
                   const x = bar.x;
                   const y = bar.y - -2;
                   ctx.fillStyle = '#000000';
@@ -399,7 +419,65 @@ export class DashboardComponent implements AfterViewInit  {
                 const value = dataset.data[dataIndex];
                 const label = this.barChart13!.data.labels?.[dataIndex];
                 if (label && value !== undefined) {
-                  const text = `${label}: ${value}`;
+                  // const text = `${label}: ${value}`;
+                  const text = `${value}`;
+                  const x = bar.x;
+                  const y = bar.y - -2;
+                  ctx.fillStyle = '#000000';
+                  ctx.fillText(text, x, y);
+                }
+              });
+            });
+          },
+        },
+      },
+    });
+  }
+  createBarChart2(): void {
+    const uiBar = this.Annualcases.cases;
+
+    if (this.barChart14) {
+      this.barChart14.destroy();
+    }
+
+    this.barChart14 = new Chart('barChart14', {
+      type: 'bar',
+      data: {
+        labels: this.Annualcases.year,
+        datasets: [
+          {
+            label: 'UI (Under Investigation)',
+            data: uiBar,
+            backgroundColor: '#414ce7',
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        interaction: {
+          mode: 'none' as any,
+          intersect: false,
+        },
+        animation: {
+          onComplete: () => {
+            const ctx = this.barChart14!.ctx;
+            ctx.font = 'bold 13px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+
+            this.barChart14!.data.datasets.forEach((dataset, datasetIndex) => {
+              const meta = this.barChart14!.getDatasetMeta(datasetIndex);
+              meta.data.forEach((bar, dataIndex) => {
+                const value = dataset.data[dataIndex];
+                const label = this.barChart14!.data.labels?.[dataIndex];
+                if (label && value !== undefined) {
+                  // const text = `${label}: ${value}`;
+                  const text = `${value}`;
                   const x = bar.x;
                   const y = bar.y - -2;
                   ctx.fillStyle = '#000000';
@@ -504,14 +582,14 @@ export class DashboardComponent implements AfterViewInit  {
       this.map1 = data.map1;
       this.map2 = data.map2;
 
-      this.createPieChart();
+      // this.createPieChart();
       this.createPieChart1();
 
 
       this.createBarChart();
       this.createBarChart1();
 
-       this.renderLineChart();
+      //  this.renderLineChart();
 
        this.updateDistrictCounts();
        this.updateDistrictCounts1();
@@ -519,6 +597,8 @@ export class DashboardComponent implements AfterViewInit  {
 
       this.cdRef.detectChanges();
     });
+    this.getStatusOfCase({});
+    this.getAnnualOverView({});
 
     // this.dashboardService.getCasesByYearRange().subscribe(data => {
       // this.cases = data.cases;
@@ -769,9 +849,11 @@ export class DashboardComponent implements AfterViewInit  {
 
 
   colorRanges = [
-    { min: 0, max: 5, color: '#28a745' },
-    { min: 5, max: 10, color: '#ffdd55' },
-    { min: 10, max: Infinity, color: '#dc3545' },
+    { min: 0, max: 1, color: '#808080'},
+    { min: 1, max: 30, color: '#90EE90'},
+    { min: 31, max: 60, color: '#28a745' },
+    { min: 61, max: 90, color: '#ffdd55' },
+    { min: 90, max: Infinity, color: '#dc3545' },
   ];
 
   getDistrictColor(count: number): string {
@@ -886,6 +968,9 @@ export class DashboardComponent implements AfterViewInit  {
   }
   onDistrictClick(district: any): void {
     console.log('Clicked district:', district);
+    this.getStatusOfCase({district:district.name});
+    this.getAnnualOverView({district:district.name});
+    this.cds.selectDistrict(district.name);
   }
 
 
@@ -898,5 +983,33 @@ export class DashboardComponent implements AfterViewInit  {
   }
   onDistrictClick1(district: any): void {
     console.log('Clicked district:', district);
+    this.getStatusOfCase({district:district.name});
+    this.getAnnualOverView({district:district.name});
+    this.cds.selectDistrict(district.name);
+  }
+
+  getStatusOfCase(body:any){
+    this.dashboardService.userPostMethod('GetNatureOfOffenceChartValue',body).subscribe((res:any)=>{
+      const data = {gcr:res.data[0].gcr,non_gcr:res.data[0].non_gcr};
+      this.status_of_case = data;
+      this.createPieChart();
+    })
+  }
+  public Annualcases:any;
+  getAnnualOverView(body:any){
+    this.dashboardService.userPostMethod('GetAnnualOverViewRegisterdCases',body).subscribe((res:any)=>{
+      this.Annualcases = {
+        year: res.data.map((item:any) => item.year),
+        cases: res.data.map((item:any) => item.total_cases)
+      };
+      this.createBarChart2();
+    })
+  }
+
+  // new dashboard switch code
+  currentDashboard: 'case' | 'meeting' = 'case';
+
+  switchDashboard(dashboard: 'case' | 'meeting') {
+    this.currentDashboard = dashboard;
   }
 }

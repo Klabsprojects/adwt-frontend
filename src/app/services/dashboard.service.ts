@@ -35,6 +35,13 @@ export class DashboardService {
 
   constructor(private http: HttpClient) {}
 
+  userPostMethod(url:string,body:any): Observable<any>{
+    return this.http.post(`${this.backendUrl}${url}`, body);
+  }
+  userGetMethod(url:string):Observable<any>{
+    return this.http.get(`${this.backendUrl}${url}`);
+  }
+
   applyFilters(filters: any): Observable<any> {
     return this.http.post(`${this.backendUrl}/apply-filters`, filters);
   }

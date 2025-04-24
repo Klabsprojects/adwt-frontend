@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-table',
@@ -8,6 +8,15 @@ import { CommonModule } from '@angular/common';
   styleUrl: './table.component.scss'
 })
 export class TableComponent {
+  @Input() zonewise:any[]=[];
+  @Input() zone:any;
+  @Output() yearEmit = new EventEmitter<any>();
+  // public zonewise = [
+  //   { year: 2021, cz: 120, wz: 95, nz: 110, sz: 130 },
+  //   { year: 2022, cz: 140, wz: 105, nz: 115, sz: 125 },
+  //   { year: 2023, cz: 135, wz: 98, nz: 120, sz: 140 },
+  //   { year: 2024, cz: 150, wz: 110, nz: 130, sz: 145 },
+  // ];
   public tabletop = [
     {year:'2023',UIB:'734',report:'2,068',charge:'1,706',refer:'514',UIE:'582'},
     {year:'2024 (up to September)',UIB:'582',report:'1,464',charge:'1,200',refer:'382',UIE:'464'},
@@ -30,4 +39,7 @@ export class TableComponent {
     "TCC": "539", 
     "PFC": "389"
   }  
+  emitYear(year:any){
+    this.yearEmit.emit(year);
+  }
 }
