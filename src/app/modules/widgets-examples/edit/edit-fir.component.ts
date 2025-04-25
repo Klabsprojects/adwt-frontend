@@ -895,7 +895,18 @@ loadAccusedCommunities(): void {
   
   // Calls firService to update victim details based on selected offences
   onOffenceCommittedChange(event: any, index: number): void {
-    const selectedOffences = event.value; // Get selected values from the 30th field
+    // const selectedOffences = event.value; // Get selected values from the 30th field
+
+    let selectedOffences: string[] = [];
+
+    // If the items are objects, extract the offence_name
+    if (Array.isArray(event) && event.length && typeof event[0] === 'object') {
+      selectedOffences = event.map((item: any) => item.offence_name);
+    } else {
+      // If already strings, use as is
+      selectedOffences = event;
+    }
+
     const getId = this.offenceOptionData
     .filter(option => selectedOffences.includes(option.offence_name))
     .map(option => option.id);
@@ -1303,6 +1314,7 @@ console.log(hearingDetailsControl,"hearingDetailsControl")
         }
 
         // step 2
+        this.firForm.get('is_case_altered')?.setValue('No');
         if(response.data.fir_number){
           this.firForm.get('firNumber')?.setValue(response.data.fir_number); 
         }
@@ -1329,10 +1341,19 @@ console.log(hearingDetailsControl,"hearingDetailsControl")
           this.firForm.get('placeOfOccurrence')?.setValue(response.data.place_of_occurrence); 
         }
         if(response.data.date_of_registration){
-          const dateObj1 = new Date(response.data.date_of_occurrence);
+          const dateObj1 = new Date(response.data.date_of_registration);
           const formattedDate1 = dateObj1.toISOString().split('T')[0];
           this.firForm.get('dateOfRegistration')?.setValue(formattedDate1); 
         }
+        if(response.data.is_case_altered){
+          this.firForm.get('is_case_altered')?.setValue(response.data.is_case_altered); 
+        }
+        if(response.data.altered_date){
+          const dateObj1 = new Date(response.data.altered_date);
+          const formattedDate1 = dateObj1.toISOString().split('T')[0];
+          this.firForm.get('altered_date')?.setValue(formattedDate1); 
+        }
+        
         if(response.data.time_of_registration){
           this.firForm.get('timeOfRegistration')?.setValue(response.data.time_of_registration); 
         }
@@ -1902,6 +1923,8 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
       timeOfOccurrence: this.firForm.value.timeOfOccurrence,
       placeOfOccurrence: this.firForm.value.placeOfOccurrence,
       dateOfRegistration: this.firForm.value.dateOfRegistration,
+      is_case_altered: this.firForm.value.is_case_altered,
+      altered_date: this.firForm.value.altered_date,
       timeOfRegistration: this.firForm.value.timeOfRegistration,
       date_of_occurrence_to: this.firForm.value.date_of_occurrence_to,
       time_of_occurrence_to: this.firForm.value.time_of_occurrence_to,
@@ -2397,6 +2420,8 @@ onAccusedAgeChange(index: number): void {
       proceedingsDate_1: ['', Validators.required],
       placeOfOccurrence: ['', Validators.required],
       dateOfRegistration: ['', Validators.required],
+      is_case_altered: [''],
+      altered_date: [''],
       timeOfRegistration: ['', Validators.required],
       // natureOfOffence: [[], Validators.required],
       sectionsIPC: ['trerterterterter'],
@@ -3593,7 +3618,10 @@ console.log(victimReliefDetail,"cretaieg")
       this.policeDivisionService.getAllPoliceDivisions().subscribe(
         (data: any) => {
           // this.police_Cities_data =data;
-          this.police_Cities_data = data.map((item: any) => item.district_division_name);
+          // this.police_Cities_data = data.map((item: any) => item.district_division_name);
+          this.police_Cities_data = Array.from(
+            new Set(data.map((item: any) => item.district_division_name as string))
+          ).sort((a: any, b: any) => a.localeCompare(b));
   
           this.policeCities = data.map((item: any) => item.district_division_name);
           this.policeZones = data.map((item: any) => item.police_zone_name);
@@ -5130,7 +5158,7 @@ attachment:this.attachments_2.value
   }
 
   trackStepTwoChanges() {
-    const stepOneFields = ['firNumber', 'firNumberSuffix', 'dateOfOccurrence', 'timeOfOccurrence', 'placeOfOccurrence', 'dateOfRegistration', 'timeOfRegistration','todateOfOccurrence','totimeOfOccurrence'];
+    const stepOneFields = ['firNumber', 'firNumberSuffix', 'dateOfOccurrence', 'timeOfOccurrence', 'placeOfOccurrence', 'dateOfRegistration', 'timeOfRegistration','todateOfOccurrence','totimeOfOccurrence','altered_date','is_case_altered'];
     stepOneFields.forEach(field => {
       this.firForm.get(field)?.valueChanges.pipe(skip(1),distinctUntilChanged()).subscribe(() => {
         this.isStepTwoModified = true;
@@ -5808,4 +5836,17 @@ getPoliceStation(district: string): void {
       return false;
     }
   }
+
+  isActExcluded(act: string): boolean {
+    const excluded = [
+      '100 percent incapacitation',
+      'Disability: Incapacitation greater than 50',
+      'Disability: Incapacitation less than 50',
+      'Rape',
+      'Gang Rape',
+      'Murder'
+    ];
+    return excluded.includes(act);
+  }
+
 }

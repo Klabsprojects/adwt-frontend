@@ -502,7 +502,16 @@ loadAllOffenceReliefDetails(): void {
 
 // Calls firService to update victim details based on selected offences
 onOffenceCommittedChange(event: any, index: number): void {
-  const selectedOffences = event.value; // Get selected values from the 30th field
+  // const selectedOffences = event.value; // Get selected values from the 30th field
+  let selectedOffences: string[] = [];
+
+  // If the items are objects, extract the offence_name
+  if (Array.isArray(event) && event.length && typeof event[0] === 'object') {
+    selectedOffences = event.map((item: any) => item.offence_name);
+  } else {
+    // If already strings, use as is
+    selectedOffences = event;
+  }
   console.log(this.victimsRelief);
   // const getId = selectedOffences.map((ele:any)=>ele.id);
   const getId = this.offenceOptions
@@ -590,6 +599,8 @@ saveStepTwoAsDraft() {
     time_of_occurrence_to: this.firForm.value.time_of_occurrence_to,
     placeOfOccurrence: this.firForm.value.placeOfOccurrence,
     dateOfRegistration: this.firForm.value.dateOfRegistration,
+    is_case_altered: this.firForm.value.is_case_altered,
+    altered_date: this.firForm.value.altered_date,
     timeOfRegistration: this.firForm.value.timeOfRegistration,
 
   };
@@ -821,6 +832,8 @@ onFileSelect_3(event: Event, controlName: string): void {
       time_of_occurrence_to:['',Validators.required],
       placeOfOccurrence: ['', Validators.required],
       dateOfRegistration: ['', Validators.required],
+      is_case_altered: [''],
+      altered_date: [''],
       timeOfRegistration: ['', Validators.required],
 
 
@@ -973,8 +986,10 @@ onFileSelect_3(event: Event, controlName: string): void {
       attachments: this.fb.array([this.createAttachmentGroup()]),
     },
     { validators: this.dateTimeValidator() }
+
   );
 
+  this.firForm.get('is_case_altered')?.setValue('No');
 
 
 
@@ -2083,7 +2098,10 @@ handleCaseTypeChange() {
       (data: any) => {
         // this.police_Cities_data =data;
 
-        this.police_Cities_data = data.map((item: any) => item.district_division_name);
+        // this.police_Cities_data = data.map((item: any) => item.district_division_name);
+        this.police_Cities_data = Array.from(
+          new Set(data.map((item: any) => item.district_division_name as string))
+        ).sort((a: any, b: any) => a.localeCompare(b));
 
         console.log( data)
         this.policeZones = data.map((item: any) => item.police_zone_name);
@@ -3843,7 +3861,7 @@ validateStepTwo(mode: 'next' | 'draft'): boolean {
 }
 
 trackStepTwoChanges() {
-  const stepOneFields = ['firNumber', 'firNumberSuffix', 'dateOfOccurrence', 'timeOfOccurrence', 'placeOfOccurrence', 'dateOfRegistration', 'timeOfRegistration'];
+  const stepOneFields = ['firNumber', 'firNumberSuffix', 'dateOfOccurrence', 'timeOfOccurrence', 'placeOfOccurrence', 'dateOfRegistration', 'timeOfRegistration','is_case_altered','altered_date'];
 
   stepOneFields.forEach(field => {
     this.firForm.get(field)?.valueChanges.subscribe(() => {
@@ -4545,5 +4563,16 @@ isSubmitButtonEnabled(): boolean {
     // console.log(this.firForm.get('officerDesignation')?.value);
   }
 
-  
+  isActExcluded(act: string): boolean {
+    const excluded = [
+      '100 percent incapacitation',
+      'Disability: Incapacitation greater than 50',
+      'Disability: Incapacitation less than 50',
+      'Rape',
+      'Gang Rape',
+      'Murder'
+    ];
+    return excluded.includes(act);
+  }
 }
+  

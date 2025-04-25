@@ -549,7 +549,7 @@ exportToExcel1(): void {
     fill: {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: '173687' } // This is the hex color without the #
+      fgColor: { argb: '1F497D' } // This is the hex color without the #
     },
     font: {
       color: { argb: 'FFFFFF' },
@@ -680,7 +680,7 @@ exportToExcel2(): void {
     fill: {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: '173687' } // This is the hex color without the #
+      fgColor: { argb: '1F497D' } // This is the hex color without the #
     },
     font: {
       color: { argb: 'FFFFFF' },
@@ -810,7 +810,7 @@ exportToExcel3(): void {
     fill: {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: '173687' } // This is the hex color without the #
+      fgColor: { argb: '1F497D' } // This is the hex color without the #
     },
     font: {
       color: { argb: 'FFFFFF' },
@@ -970,7 +970,7 @@ exportToExcel4(): void {
   ];
 
   // Styling Constants
-  const headerBlue = '173687'; // The blue color from your image without #
+  const headerBlue = '1F497D'; // The blue color from your image without #
 
   // Style headers
   const headerRow = worksheet.getRow(1);
@@ -1128,7 +1128,7 @@ exportToExcel5(): void {
   ];
 
   // Styling Constants
-  const headerBlue = '173687'; // The blue color from your image without #
+  const headerBlue = '1F497D'; // The blue color from your image without #
 
   // Style headers
   const headerRow = worksheet.getRow(1);
