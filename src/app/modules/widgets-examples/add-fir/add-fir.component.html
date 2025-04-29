@@ -287,8 +287,16 @@
                       />
                   </div>
 
+                  <div class="col-md-6 col-lg-4 mb-3">
+                    <label for="is_case_altered" class="form-label">13. Is Case altered?</label>
+                    <select id="is_case_altered" class="form-select" formControlName="is_case_altered">
+                      <option value="No" selected>No</option>
+                      <option value="Yes">Yes</option>
+                    </select>
+                  </div>
+
                   <div class="col-md-4 mb-3">
-                      <label for="dateOfRegistration" class="form-label">13. Date of Case Registration *</label>
+                      <label for="dateOfRegistration" class="form-label">13a. Date of Case Registration *</label>
                       <input
                           type="date"
                           id="dateOfRegistration"
@@ -301,6 +309,18 @@
                           Date of Case Registration cannot be earlier than the Date of Occurrence.
                       </div>
                   </div>
+
+                  <div *ngIf="firForm.get('is_case_altered')?.value === 'Yes'" class="col-md-4 mb-3">
+                    <label for="altered_date" class="form-label">13b. Date of Case Alteration *</label>
+                    <input
+                        type="date"
+                        id="altered_date"
+                        class="form-control"
+                        formControlName="altered_date"
+                        [max]="today"
+                        required
+                    />
+                </div>
 
                   <div class="col-md-4 mb-3">
                       <label for="timeOfRegistration" class="form-label">14. Time of Case Registration *</label>
@@ -414,7 +434,7 @@
 
 
                                 <div class="col-md-4 mb-3">
-                                    <label for="victimMobile{{ i }}" class="form-label">22. Mobile Number of the Victim</label>
+                                    <label for="victimMobile{{ i }}" class="form-label">22. Mobile Number of the Victim *</label>
                                     <input type="text" [id]="'victimMobile' + i" class="form-control" formControlName="mobileNumber" placeholder="Enter Mobile Number" maxlength="10" (keypress)="allowOnlyNumbers($event)" />
                                     <div *ngIf="isVictimMobileInvalid(i)" class="text-danger mt-1">
                                         Please enter a valid 10-digit mobile number.
@@ -428,7 +448,7 @@
                                 </div>
 
                                 <div class="col-md-4 mb-3">
-                                    <label for="victimPincode{{ i }}" class="form-label">24. Pincode</label>
+                                    <label for="victimPincode{{ i }}" class="form-label">24. Pincode *</label>
                                     <input type="text" [id]="'victimPincode' + i" class="form-control" formControlName="victimPincode" placeholder="Enter Pincode" maxlength="6" (keypress)="allowOnlyNumbers($event)" />
                                     <div *ngIf="isVictimPincodeInvalid(i)" class="text-danger mt-1">
                                         Please enter a valid 6-digit pincode.
@@ -520,17 +540,53 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-6 mb-3">
+                                <!-- <div class="col-md-6 mb-3">
                                     <label class="form-label">30. Nature of offence committed against the victim *</label>
                                     <mat-form-field appearance="outline" class="w-100">
                                         <mat-label>Select options</mat-label>
                                         <mat-select formControlName="offenceCommitted" multiple (selectionChange)="onOffenceCommittedChange($event, i)">
                                             <mat-option *ngFor="let option of offenceOptions" [value]="option.offence_name">
-                                              {{option.offence_act_name}} - {{ option.offence_name }}
+                                              {{option.offence_act_name}} 
+                                              <span *ngIf="option.offence_act_name != '100 percent incapacitation' && option.offence_act_name != 'Disability: Incapacitation greater than 50' && option.offence_act_name != 'Disability: Incapacitation less than 50' && option.offence_act_name != 'Rape'  && option.offence_act_name != 'Gang Rape'  && option.offence_act_name != 'Murder'">- {{ option.offence_name }}</span>
                                             </mat-option>
                                         </mat-select>
                                     </mat-form-field>
+                                </div> -->
+
+                                <div class="col-md-12 mb-3">
+                                  <label class="form-label">30. Sections of the SC/ST POA Act Invoked for the Offence *</label>
+                                  <ng-select
+                                  class="form-select"
+                                  [items]="offenceOptions"
+                                  bindLabel="offence_name"
+                                  bindValue="offence_name"
+                                  [multiple]="true"
+                                  formControlName="offenceCommitted"
+                                  [searchable]="true"
+                                  [clearable]="false"
+                                  [placeholder]="victims.at(i).get('offenceCommitted')?.value?.length ? '' : 'Select offences'"
+                                  (change)="onOffenceCommittedChange($event, i)"
+                                  [id]="'victimOffence' + i"
+                                  required>
+
+                                  <!-- Custom selected label -->
+                                  <ng-template ng-label-tmp let-item="item">
+                                    <span>{{ item.offence_act_name }}</span>
+                                    <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
+                                  </ng-template>
+
+                                  <!-- Custom dropdown option -->
+                                  <ng-template ng-option-tmp let-item="item">
+                                    {{ item.offence_act_name }}
+                                    <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
+                                  </ng-template>
+                                </ng-select>
                                 </div>
+
+                                 
+
+                             
+
                               <div class="col-md-12 mb-3">
                                 <label for="scstSections" class="form-label">31. Section invoked under Acts other than PoA (IPC/ POCSO/ etc.)*</label>
                                 <br />
@@ -904,7 +960,7 @@
                                   </select>
                                  </div>
                                 <div class="col-md-6 mb-3" *ngIf="accused.get('landOIssueOption')?.value === 'Yes'">
-                                  <label for="landOIssues{{ i }}" class="form-label">49b. L&O Issues (Pickets, Bandoust, etc) *</label>
+                                  <label for="landOIssues{{ i }}" class="form-label">49b. L&O Issues (Pickets, Bandobust, etc) *</label>
                                   <input type="text" [id]="'landOIssues' + i" class="form-control" formControlName="landOIssues" placeholder="Enter L&O issues" (input)="checkInput(i, 'landOIssues')"/>
                                   <!-- <small *ngIf="!isInputValid(i, 'landOIssues')" class="text-danger d-block mt-1">
                                     Please type 'NA' if there are no L&O Issues.

@@ -188,3 +188,22 @@
   margin-top: 4px;
   margin-right: 6px;
 }
+
+.mat-select-search-container {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: white;
+  padding: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Make the search form field more compact */
+.mat-select-search-container .mat-form-field-wrapper {
+  padding-bottom: 0;
+}
+
+.mat-select-search-container .mat-form-field-infix {
+  padding: 0.5em 0;
+}
+
