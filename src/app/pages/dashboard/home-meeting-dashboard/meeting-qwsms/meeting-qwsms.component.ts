@@ -1,6 +1,7 @@
-import { Component, ViewChild, OnInit, ChangeDetectorRef } from "@angular/core";
+import { Component, ViewChild, OnInit, ChangeDetectorRef,OnDestroy } from "@angular/core";
 import { ApexAxisChartSeries, ApexChart, ChartComponent, ApexDataLabels, ApexPlotOptions, ApexResponsive, ApexXAxis, ApexLegend, ApexFill } from "ng-apexcharts";
 import { homeMeetingService } from "../home-meeting.service";
+import { Subscription } from "rxjs";
 export type ChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
@@ -18,27 +19,30 @@ export type ChartOptions = {
   templateUrl: './meeting-qwsms.component.html',
   styleUrl: './meeting-qwsms.component.scss'
 })
-export class MeetingQwsmsComponent implements OnInit {
+export class MeetingQwsmsComponent implements OnInit,OnDestroy {
+  private subscription =  new Subscription();
   @ViewChild("chart") chart: ChartComponent;
   public chartOptions: ChartOptions;
   ngOnInit(): void {
-    this.hms.qwsms$.subscribe((res: any) => {
-      if (res) {
-        const categories = Object.keys(res); // ["Q1", "Q2", "Q3", "Q4"]
-        const completed = categories.map(q => res[q].completed);
-        const pending = categories.map(q => res[q].pending);
-
-        this.chartOptions.series = [
-          { name: 'Completed', data: completed },
-          { name: 'Pending', data: pending }
-        ];
-
-        this.chartOptions.xaxis = {
-          categories
-        };
-      }
-      this.cdr.detectChanges();
-    })
+    this.subscription.add(
+      this.hms.qwsms$.subscribe((res: any) => {
+        if (res) {
+          const categories = Object.keys(res); // ["Q1", "Q2", "Q3", "Q4"]
+          const completed = categories.map(q => res[q].completed);
+          const pending = categories.map(q => res[q].pending);
+  
+          this.chartOptions.series = [
+            { name: 'Completed', data: completed },
+            { name: 'Pending', data: pending }
+          ];
+  
+          this.chartOptions.xaxis = {
+            categories
+          };
+        }
+        this.cdr.detectChanges();
+      })
+    )
   }
 
   constructor(private hms: homeMeetingService, private cdr: ChangeDetectorRef) {
@@ -117,5 +121,8 @@ export class MeetingQwsmsComponent implements OnInit {
       }
     };
 
+  }
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }

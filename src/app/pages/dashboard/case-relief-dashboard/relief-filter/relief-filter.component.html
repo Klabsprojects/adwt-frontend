@@ -13,7 +13,7 @@
         </div>
         <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4">
             <p>District</p>
-            <select name="" id="" [(ngModel)]="selectedDistrict" (change)="get_other_details()">
+            <select name="" id="" [(ngModel)]="selectedDistrict" (change)="get_other_details()" [disabled]="isDistrictDisabled">
                 <option value="" selected>Select</option>
                 <option [value]="district.district_name" *ngFor="let district of districts">{{district.district_name}}</option>
             </select>

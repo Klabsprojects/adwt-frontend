@@ -21,8 +21,13 @@ export class ReliefFilterComponent implements OnInit {
   selectedNatureOfOffence: string = '';
   selectedReliefStatus: string = '';
 
+  isDistrictDisabled:boolean=false;
+  private userData:any;
+
   constructor(private ds: DashboardService, private crs: caseReliefService) { }
   ngOnInit() {
+    const JsonData = sessionStorage.getItem('user_data');
+    this.userData = JsonData ? JSON.parse(JsonData) : {};
     this.callAllFunction({});
   }
 
@@ -73,10 +78,12 @@ export class ReliefFilterComponent implements OnInit {
     })
   }
   get_caste() {
-    this.ds.userGetMethod(`fir/castes-by-community?community=${this.selectedCommunity}`).subscribe((res: any) => {
-      this.castes = res;
-      this.get_other_details();
-    })
+    if(this.selectedCommunity){
+      this.ds.userGetMethod(`fir/castes-by-community?community=${this.selectedCommunity}`).subscribe((res: any) => {
+        this.castes = res;
+      })
+    }
+    this.get_other_details();
   }
   get_offence_nature() {
     this.ds.userGetMethod('GetOffence').subscribe((res: any) => {
@@ -92,6 +99,11 @@ export class ReliefFilterComponent implements OnInit {
 
 
   get_other_details() {
+    if(this.userData.access_type==="District"){
+      this.filterJson.district = this.userData.district;
+      this.selectedDistrict = this.userData.district;
+      this.isDistrictDisabled = true;
+    }
     this.crs.setFilterJson(this.filterJson);
   }
 }

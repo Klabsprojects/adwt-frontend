@@ -117,8 +117,8 @@ export class ReliefGivenComponent implements OnInit, OnDestroy {
         const patta = res.map(item => item.Patta_Given);
         const scholarship = res.map(item => item.Education_Given);
 
-        // Set chart height dynamically
-        const dynamicHeight = districts.length * 25;
+        // ✅ Use minimum height to avoid collapse
+        const dynamicHeight = Math.max(districts.length * 25, 150);
 
         this.chartOptions = {
           ...this.chartOptions,

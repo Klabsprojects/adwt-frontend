@@ -117,7 +117,8 @@ export class ReliefPendingComponent implements OnInit, OnDestroy {
         const patta = res.map(item => item.Patta_Pending);
         const scholarship = res.map(item => item.Education_Pending);
 
-        const dynamicHeight = districts.length * 25;
+        // Set dynamic height with minimum threshold
+        const dynamicHeight = Math.max(districts.length * 25, 150);
 
         this.chartOptions = {
           ...this.chartOptions,
