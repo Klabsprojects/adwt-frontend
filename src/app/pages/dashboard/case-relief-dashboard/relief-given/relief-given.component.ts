@@ -1,6 +1,12 @@
-import { Component, OnInit, ViewChild, OnDestroy, ChangeDetectorRef } from "@angular/core";
-import { caseReliefService } from "../cas-relief.service";
-import { Subscription } from "rxjs"
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+  ChangeDetectorRef
+} from '@angular/core';
+import { caseReliefService } from '../cas-relief.service';
+import { Subscription } from 'rxjs';
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -14,7 +20,7 @@ import {
   ApexTooltip,
   ApexFill,
   ApexLegend
-} from "ng-apexcharts";
+} from 'ng-apexcharts';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -36,19 +42,18 @@ export type ChartOptions = {
   styleUrls: ['./relief-given.component.scss']
 })
 export class ReliefGivenComponent implements OnInit, OnDestroy {
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
-  }
   private subscription: Subscription = new Subscription();
-
-  @ViewChild("chart") chart: ChartComponent;
+  @ViewChild('chart') chart: ChartComponent;
   public chartOptions: ChartOptions;
 
-  constructor(private csr: caseReliefService, private cdr: ChangeDetectorRef) {
+  constructor(
+    private csr: caseReliefService,
+    private cdr: ChangeDetectorRef
+  ) {
     this.chartOptions = {
-      series: [], // Placeholder
+      series: [],
       chart: {
-        type: "bar",
+        type: 'bar',
         height: 350,
         stacked: true
       },
@@ -62,16 +67,19 @@ export class ReliefGivenComponent implements OnInit, OnDestroy {
       },
       stroke: {
         width: 1,
-        colors: ["#fff"]
+        colors: ['#fff']
       },
       title: {
-        text: "Job, Pension, Patta,Scholorship Given"
+        text: 'Job, Pension, Patta, Scholarship Given'
       },
       xaxis: {
-        categories: [], // Placeholder
+        categories: [],
         labels: {
+          style: {
+            fontSize: '10px'
+          },
           formatter: function (val) {
-            return val + "";
+            return val + '';
           }
         }
       },
@@ -83,7 +91,7 @@ export class ReliefGivenComponent implements OnInit, OnDestroy {
       tooltip: {
         y: {
           formatter: function (val) {
-            return val + "";
+            return val + '';
           }
         }
       },
@@ -91,8 +99,8 @@ export class ReliefGivenComponent implements OnInit, OnDestroy {
         opacity: 1
       },
       legend: {
-        position: "top",
-        horizontalAlign: "left",
+        position: 'top',
+        horizontalAlign: 'left',
         offsetX: 40
       }
     };
@@ -102,30 +110,40 @@ export class ReliefGivenComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.csr.given$.subscribe((res: any[]) => {
         if (!res) return;
-  
+
         const districts = res.map(item => item.revenue_district);
         const job = res.map(item => item.job_Given);
         const pension = res.map(item => item.Pension_Given);
         const patta = res.map(item => item.Patta_Given);
         const scholarship = res.map(item => item.Education_Given);
-  
+
+        // Set chart height dynamically
+        const dynamicHeight = districts.length * 25;
+
         this.chartOptions = {
           ...this.chartOptions,
+          chart: {
+            ...this.chartOptions.chart,
+            height: dynamicHeight
+          },
           series: [
-            { name: "Job Given", data: job },
-            { name: "Pension Given", data: pension },
-            { name: "Patta Given", data: patta },
-            { name: "Scholarship Given", data: scholarship }
+            { name: 'Job Given', data: job },
+            { name: 'Pension Given', data: pension },
+            { name: 'Patta Given', data: patta },
+            { name: 'Scholarship Given', data: scholarship }
           ],
           xaxis: {
             ...this.chartOptions.xaxis,
             categories: districts
           }
         };
-  
-        this.cdr.detectChanges(); // Necessary if using OnPush
+
+        this.cdr.detectChanges();
       })
     );
   }
-  
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 }
