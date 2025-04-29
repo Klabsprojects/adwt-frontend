@@ -586,8 +586,8 @@ export class DashboardComponent implements AfterViewInit  {
       this.createPieChart1();
 
 
-      this.createBarChart();
-      this.createBarChart1();
+      // this.createBarChart();
+      // this.createBarChart1();
 
       //  this.renderLineChart();
 
@@ -597,8 +597,8 @@ export class DashboardComponent implements AfterViewInit  {
 
       this.cdRef.detectChanges();
     });
-    this.getStatusOfCase({});
-    this.getAnnualOverView({});
+    // this.getStatusOfCase({});
+    // this.getAnnualOverView({});
 
     // this.dashboardService.getCasesByYearRange().subscribe(data => {
       // this.cases = data.cases;
@@ -1007,7 +1007,7 @@ export class DashboardComponent implements AfterViewInit  {
   }
 
   // new dashboard switch code
-  currentDashboard: 'case' | 'meeting' | 'relief' = 'case';
+  currentDashboard: 'case' | 'meeting' | 'relief' = 'relief';
 
   switchDashboard(dashboard: 'case' | 'meeting' | 'relief') {
     this.currentDashboard = dashboard;

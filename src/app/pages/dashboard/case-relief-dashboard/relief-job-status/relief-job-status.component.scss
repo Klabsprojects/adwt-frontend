@@ -1,0 +1,57 @@
+.donut{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 1.5rem;
+}
+.pie-div,h2{
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+h2{
+    color: #00008B;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.pie-div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.Legends{
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: sans-serif;
+
+}
+.num-case{
+    background-color: orangered;
+    color: #fff;
+    padding: 5px;
+}
+.pie{
+    width: 50%;
+}
+
+.red{
+    display: inline-block;
+    padding: 0.6rem;
+    background-color: #d64550;
+    border-radius: 50%;
+    border: none;
+    margin-right: 0.2rem;
+}
+.blue{
+    display: inline-block;
+    padding: 0.6rem;
+    background-color: #48327a;
+    border-radius: 50%;
+    border: none;
+    margin-right: 0.2rem;
+}

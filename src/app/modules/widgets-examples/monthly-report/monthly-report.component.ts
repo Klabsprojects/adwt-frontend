@@ -597,13 +597,13 @@ exportToExcel1(): void {
     ]);
 
     // Center align all data cells
-    row.eachCell((cell) => {
+    row.eachCell((cell:any) => {
       cell.alignment = { horizontal: 'center', vertical: 'middle' };
     });
   });
 
   // Generate Excel file
-  workbook.xlsx.writeBuffer().then((buffer) => {
+  workbook.xlsx.writeBuffer().then((buffer:any) => {
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     FileSaver.saveAs(blob, 'District_Wise_Pending_UI.xlsx');
   });
@@ -728,13 +728,13 @@ exportToExcel2(): void {
     ]);
 
     // Center align all data cells
-    row.eachCell((cell) => {
+    row.eachCell((cell:any) => {
       cell.alignment = { horizontal: 'center', vertical: 'middle' };
     });
   });
 
   // Generate Excel file
-  workbook.xlsx.writeBuffer().then((buffer) => {
+  workbook.xlsx.writeBuffer().then((buffer:any) => {
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     FileSaver.saveAs(blob, 'Reason_Wise_Pending_UI.xlsx');
   });
@@ -858,13 +858,13 @@ exportToExcel3(): void {
     ]);
 
     // Center align all data cells
-    row.eachCell((cell) => {
+    row.eachCell((cell:any) => {
       cell.alignment = { horizontal: 'center', vertical: 'middle' };
     });
   });
 
   // Generate Excel file
-  workbook.xlsx.writeBuffer().then((buffer) => {
+  workbook.xlsx.writeBuffer().then((buffer:any) => {
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     FileSaver.saveAs(blob, 'Community_Certificate.xlsx');
   });
@@ -976,7 +976,7 @@ exportToExcel4(): void {
   const headerRow = worksheet.getRow(1);
   headerRow.height = 25; // Increase header height for better appearance
   
-  headerRow.eachCell((cell, colNumber) => {
+  headerRow.eachCell((cell:any, colNumber:any) => {
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
@@ -1001,11 +1001,11 @@ exportToExcel4(): void {
   });
 
   // Style data rows
-  worksheet.eachRow((row, rowNumber) => {
+  worksheet.eachRow((row:any, rowNumber:any) => {
     if (rowNumber > 1) { // Skip header row
       row.height = 22; // Consistent row height
       
-      row.eachCell((cell) => {
+      row.eachCell((cell:any) => {
         cell.alignment = {
           vertical: 'middle',
           horizontal: 'center'
@@ -1020,7 +1020,7 @@ exportToExcel4(): void {
       
       // Add zebra striping for better readability (optional)
       if (rowNumber % 2 === 0) {
-        row.eachCell((cell) => {
+        row.eachCell((cell:any) => {
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -1032,7 +1032,7 @@ exportToExcel4(): void {
   });
 
   // Generate Excel file
-  workbook.xlsx.writeBuffer().then((buffer) => {
+  workbook.xlsx.writeBuffer().then((buffer:any) => {
     const blob = new Blob([buffer], { 
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
     });
@@ -1134,7 +1134,7 @@ exportToExcel5(): void {
   const headerRow = worksheet.getRow(1);
   headerRow.height = 25; // Increase header height for better appearance
   
-  headerRow.eachCell((cell, colNumber) => {
+  headerRow.eachCell((cell:any, colNumber:any) => {
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
@@ -1159,11 +1159,11 @@ exportToExcel5(): void {
   });
 
   // Style data rows
-  worksheet.eachRow((row, rowNumber) => {
+  worksheet.eachRow((row:any, rowNumber:any) => {
     if (rowNumber > 1) { // Skip header row
       row.height = 22; // Consistent row height
       
-      row.eachCell((cell) => {
+      row.eachCell((cell:any) => {
         cell.alignment = {
           vertical: 'middle',
           horizontal: 'center'
@@ -1178,7 +1178,7 @@ exportToExcel5(): void {
       
       // Add zebra striping for better readability (optional)
       if (rowNumber % 2 === 0) {
-        row.eachCell((cell) => {
+        row.eachCell((cell:any) => {
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -1191,7 +1191,7 @@ exportToExcel5(): void {
 
   // Generate Excel file
   const file_name = 'Conviction_for_the_Year_'+this.currentYear+'.xlsx'
-  workbook.xlsx.writeBuffer().then((buffer) => {
+  workbook.xlsx.writeBuffer().then((buffer:any) => {
     const blob = new Blob([buffer], { 
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
     });

@@ -1,0 +1,40 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: #fff;
+    font-weight: 600;
+}
+.cards{
+    margin-top: 1rem;
+}
+
+.card-box{
+    display: flex;
+    justify-content: center;
+    gap: 0.2rem;
+    padding: 0.2rem;
+}
+.case{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+.filter{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+.case,.filter{
+    flex: 1;
+    padding: 1rem;
+}
+
+.red{
+    background-color:#d64550;
+}
+.blue{
+    background-color:#48327a;
+}

@@ -1,0 +1,25 @@
+<div class="table-container">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>FIR NO</th>
+          <th>District</th>
+          <th>Relief Stage</th>
+          <th>Pending Days</th>
+          <th>Priority</th>
+          <th>Next Action Due</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of tableData; let i = index" [ngClass]="i % 2 === 0 ? 'row-white' : 'row-gray'">
+          <td>{{ item.fir_id}}</td>
+          <td>{{ item.District }}</td>
+          <td>{{ item.Relief_Stage }}</td>
+          <td>{{ item.Pending_Days }}</td>
+          <td>{{ item.Priority }}</td>
+          <td>{{ item.Next_Action_Due }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

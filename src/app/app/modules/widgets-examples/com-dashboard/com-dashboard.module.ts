@@ -31,6 +31,17 @@ import { CaseAnnualComponent } from 'src/app/pages/dashboard/case-dashbaord/case
 import { CaseHorizontalBarComponent } from 'src/app/pages/dashboard/case-dashbaord/case-horizontal-bar/case-horizontal-bar.component';
 import { CasePiechartComponent } from 'src/app/pages/dashboard/case-dashbaord/case-piechart/case-piechart.component';
 import { CaseTableComponent } from 'src/app/pages/dashboard/case-dashbaord/case-table/case-table.component';
+import { CaseReliefDashboardComponent } from 'src/app/pages/dashboard/case-relief-dashboard/case-relief-dashboard.component';
+import { ReliefFilterComponent } from 'src/app/pages/dashboard/case-relief-dashboard/relief-filter/relief-filter.component';
+import { ReliefCardsComponent } from 'src/app/pages/dashboard/case-relief-dashboard/relief-cards/relief-cards.component';
+import { ReliefEducationStatusComponent } from 'src/app/pages/dashboard/case-relief-dashboard/relief-education-status/relief-education-status.component';
+import { ReliefGivenComponent } from 'src/app/pages/dashboard/case-relief-dashboard/relief-given/relief-given.component';
+import { ReliefJobStatusComponent } from 'src/app/pages/dashboard/case-relief-dashboard/relief-job-status/relief-job-status.component';
+import { ReliefPattaStatusComponent } from 'src/app/pages/dashboard/case-relief-dashboard/relief-patta-status/relief-patta-status.component';
+import { ReliefPendingComponent } from 'src/app/pages/dashboard/case-relief-dashboard/relief-pending/relief-pending.component';
+import { ReliefPensionStatusComponent } from 'src/app/pages/dashboard/case-relief-dashboard/relief-pension-status/relief-pension-status.component';
+import { ReliefReliefStatusComponent } from 'src/app/pages/dashboard/case-relief-dashboard/relief-relief-status/relief-relief-status.component';
+import { ReliefTableComponent } from 'src/app/pages/dashboard/case-relief-dashboard/relief-table/relief-table.component';
 import { BaseChartDirective } from 'ng2-charts';
 @NgModule({
   declarations: [
@@ -56,6 +67,17 @@ import { BaseChartDirective } from 'ng2-charts';
     CaseHorizontalBarComponent,
     CasePiechartComponent,
     CaseTableComponent,
+    CaseReliefDashboardComponent,
+    ReliefFilterComponent,
+    ReliefCardsComponent,
+    ReliefEducationStatusComponent,
+    ReliefGivenComponent,
+    ReliefJobStatusComponent,
+    ReliefPattaStatusComponent,
+    ReliefPendingComponent,
+    ReliefPensionStatusComponent,
+    ReliefReliefStatusComponent,
+    ReliefTableComponent
   ],
   imports: [
     NgxChartsModule,

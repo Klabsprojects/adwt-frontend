@@ -1,0 +1,38 @@
+*{
+    margin: 0;
+    border: 0;
+    box-sizing: border-box;
+    font-size: 0.7rem;
+}
+.table-container {
+    overflow-x: auto;
+    width: 100%;
+    height: 200px;
+  }
+  
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+  }
+  
+  .custom-table th {
+    background-color: royalblue;
+    color: white;
+    padding: 5px;
+    text-align: left;
+  }
+  
+  .custom-table td {
+    padding: 5px;
+    border: 1px solid #ddd;
+  }
+  
+  .row-white {
+    background-color: white;
+  }
+  
+  .row-gray {
+    background-color: #f2f2f2;
+  }
+  
