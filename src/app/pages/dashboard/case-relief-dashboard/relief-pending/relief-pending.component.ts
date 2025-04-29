@@ -98,52 +98,33 @@ export class ReliefPendingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    let disctrics: any = [];
-    let job: any = [];
-    let pension: any = [];
-    let patta: any = [];
-    let scholorship: any = [];
     this.subscription.add(
-      this.csr.pending$.subscribe((res: any) => {
-        if (res) {
-          disctrics = [];
-          job = [];
-          pension = [];
-          patta = [];
-          scholorship = [];
-          for (let i = 0; i < res.length; i++) {
-            disctrics.push(res[i].revenue_district);
-            job.push(res[i].Job_Pending);
-            pension.push(res[i].Pension_Pending);
-            patta.push(res[i].Patta_Pending);
-            scholorship.push(res[i].Education_Pending);
+      this.csr.pending$.subscribe((res: any[]) => {
+        if (!res) return;
+  
+        const districts = res.map(item => item.revenue_district);
+        const job = res.map(item => item.Job_Pending);
+        const pension = res.map(item => item.Pension_Pending);
+        const patta = res.map(item => item.Patta_Pending);
+        const scholarship = res.map(item => item.Education_Pending);
+  
+        this.chartOptions = {
+          ...this.chartOptions,
+          series: [
+            { name: "Job Pending", data: job },
+            { name: "Pension Pending", data: pension },
+            { name: "Patta Pending", data: patta },
+            { name: "Scholarship Pending", data: scholarship }
+          ],
+          xaxis: {
+            ...this.chartOptions.xaxis,
+            categories: districts
           }
-          console.log("disctrics",disctrics);
-          // Load dynamic data
-          this.chartOptions.series = [
-            {
-              name: "Job Pending",
-              data: job
-            },
-            {
-              name: "Pension Pending",
-              data: pension
-            },
-            {
-              name: "Patta Pending",
-              data: patta
-            },
-            {
-              name: "Scholorship Pending",
-              data: scholorship
-            }
-          ];
-
-          this.chartOptions.xaxis.categories = disctrics;
-        }
+        };
+  
+        // Trigger change detection if needed
         this.cdr.detectChanges();
       })
-    )
-
+    );
   }
 }

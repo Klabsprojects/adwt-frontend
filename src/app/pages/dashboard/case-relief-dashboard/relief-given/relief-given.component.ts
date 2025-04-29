@@ -99,45 +99,33 @@ export class ReliefGivenComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    let disctrics: any = [];
-    let job: any = [];
-    let pension: any = [];
-    let patta: any = [];
-    let scholorship: any = [];
     this.subscription.add(
-      this.csr.given$.subscribe((res: any) => {
-        if (res) {
-          for (let i = 0; i < res.length; i++) {
-            disctrics.push(res[i].revenue_district);
-            job.push(res[i].job_Given);
-            pension.push(res[i].Pension_Given);
-            patta.push(res[i].Patta_Given);
-            scholorship.push(res[i].Education_Given);
+      this.csr.given$.subscribe((res: any[]) => {
+        if (!res) return;
+  
+        const districts = res.map(item => item.revenue_district);
+        const job = res.map(item => item.job_Given);
+        const pension = res.map(item => item.Pension_Given);
+        const patta = res.map(item => item.Patta_Given);
+        const scholarship = res.map(item => item.Education_Given);
+  
+        this.chartOptions = {
+          ...this.chartOptions,
+          series: [
+            { name: "Job Given", data: job },
+            { name: "Pension Given", data: pension },
+            { name: "Patta Given", data: patta },
+            { name: "Scholarship Given", data: scholarship }
+          ],
+          xaxis: {
+            ...this.chartOptions.xaxis,
+            categories: districts
           }
-          // Load dynamic data
-          this.chartOptions.series = [
-            {
-              name: "Job Given",
-              data: job
-            },
-            {
-              name: "Pension Given",
-              data: pension
-            },
-            {
-              name: "Patta Given",
-              data: patta
-            },
-            {
-              name: "Scholorship Given",
-              data: scholorship
-            }
-          ];
-
-          this.chartOptions.xaxis.categories = disctrics;
-          this.cdr.detectChanges();
-        }
+        };
+  
+        this.cdr.detectChanges(); // Necessary if using OnPush
       })
-    )
+    );
   }
+  
 }
