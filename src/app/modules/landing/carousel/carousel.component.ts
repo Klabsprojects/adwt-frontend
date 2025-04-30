@@ -7,6 +7,7 @@ import { Component } from '@angular/core';
 })
 export class CarouselComponent {
   slides = [
+    { url: 'assets/images/adwt9.jpg', title: '', subtitle: '' },
     { url: 'assets/images/adwt8.jpg', title: '', subtitle: '' },
     { url: 'assets/images/adwt7.jpg', title: '', subtitle: '' },
     { url: 'assets/images/adwt6.jpg', title: '', subtitle: '' },
