@@ -1,12 +1,13 @@
-import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit,ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { homeCaseService } from '../home-case.service';
-
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-case-dwcdm-ui',
   templateUrl: './case-dwcdm-ui.component.html',
   styleUrl: './case-dwcdm-ui.component.scss'
 })
-export class CaseDwcdmUiComponent {
+export class CaseDwcdmUiComponent implements OnInit,OnDestroy {
+  private subscription = new Subscription();
   selectedDistrict: string | null = null;
   map:string[];
   districtData = [
@@ -98,13 +99,18 @@ export class CaseDwcdmUiComponent {
   ];
 
   constructor(private hcs:homeCaseService,private cdr:ChangeDetectorRef){}
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
   ngOnInit(): void {
-    this.hcs.dwcdmui$.subscribe((res:any)=>{
-      if(res){
-        this.updateCount(res);
-      }
-      this.cdr.detectChanges();
-    })
+    this.subscription.add(
+      this.hcs.dwcdmui$.subscribe((res:any)=>{
+        if(res){
+          this.updateCount(res);
+        }
+        this.cdr.detectChanges();
+      })
+    )
   }
 
   getDistrictColor(count: number): string {
@@ -125,8 +131,8 @@ export class CaseDwcdmUiComponent {
   }
   updateCount(data: any) {
     this.districtData.forEach(district => {
-      const districtCount = data.find((d: any) => d.district_name === district.name);
-      district.data.count = districtCount ? districtCount.count : 0;
+      const districtCount = data.find((d: any) => d.district === district.name);
+      district.data.count = districtCount ? districtCount.UI_Count : 0;
     });
   }
 }

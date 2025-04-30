@@ -1,23 +1,36 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { homeCaseService } from '../home-case.service';
 import { Chart} from 'chart.js/auto';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-pt-case',
   templateUrl: './pt-case.component.html',
   styleUrl: './pt-case.component.scss'
 })
-export class PtCaseComponent implements OnInit {
+export class PtCaseComponent implements OnInit, OnDestroy {
+  private subscription = new Subscription();
   constructor(private hcs:homeCaseService, private cdr:ChangeDetectorRef){}
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
   barChart1: Chart | null = null;
   ptBar: number[] = [];
   ngOnInit(): void {
-    this.hcs.ptbar$.subscribe((res:any)=>{
-      if(res){
-        this.ptBar = res;
-        this.createbarChart1();
-      }
-      this.cdr.detectChanges();
-    })
+    this.subscription.add(
+      this.hcs.ptbar$.subscribe((res: any) => {
+        if (res) {
+          this.ptBar = [
+            Number(res.pt_less_than_1_year),
+            Number(res.pt_1_to_5_years),
+            Number(res.pt_6_to_10_years),
+            Number(res.pt_11_to_20_years),
+            Number(res.pt_greater_than_20_years),
+          ];
+          this.createbarChart1();
+        }
+        this.cdr.detectChanges();
+      })
+    )
   }
   createbarChart1(): void {
     const ptBar = this.ptBar;

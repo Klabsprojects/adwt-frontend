@@ -1,20 +1,35 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef,OnDestroy } from '@angular/core';
 import { homeCaseService } from '../home-case.service';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-cards',
   templateUrl: './cards.component.html',
   styleUrls: ['./cards.component.css']
 })
-export class CardsComponent implements OnInit {
-  cardsData:any={};
+export class CardsComponent implements OnInit,OnDestroy {
+  staticCardsData:any={};
+  dynamicCardsData:any={};
+  private subscription = new Subscription(); 
   constructor(private hsc:homeCaseService, private cdr:ChangeDetectorRef){}
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
   ngOnInit(): void {
-    this.hsc.cardsdata$.subscribe((res:any)=>{
-      if(res){
-        console.log("cards",res);
-        this.cardsData = res;
+    this.subscription.add(
+      this.hsc.staticCardsdata$.subscribe((res:any)=>{
+        if(res){
+          this.staticCardsData = res;
+        }
         this.cdr.detectChanges();
-      }
-    })
+      })
+    )
+    this.subscription.add(
+      this.hsc.dynamicCardsData$.subscribe((res:any)=>{
+        if(res){
+          this.dynamicCardsData = res;
+        }
+        this.cdr.detectChanges();
+      })
+    )
   }
 }

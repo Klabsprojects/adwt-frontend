@@ -549,64 +549,64 @@ export class DashboardComponent implements AfterViewInit  {
 
   ngOnInit(): void {
 
-    this.dashboardService.getFilterOptions().subscribe(data => {
-      this.filterOptions.status = this.filterOptions.status;
-      this.filterOptions.gender = this.filterOptions.gender;
-      this.filterOptions.district = data.district || [];
-      this.filterOptions.caste = data.caste || [];
-      this.filterOptions.subcaste = data.subcaste || [];
-      // this.filterOptions.nature = data.nature || [];
-    });
+    // this.dashboardService.getFilterOptions().subscribe(data => {
+    //   this.filterOptions.status = this.filterOptions.status;
+    //   this.filterOptions.gender = this.filterOptions.gender;
+    //   this.filterOptions.district = data.district || [];
+    //   this.filterOptions.caste = data.caste || [];
+    //   this.filterOptions.subcaste = data.subcaste || [];
+    //   this.filterOptions.nature = data.nature || [];
+    // });
 
 
-    this.dashboardService.getDashboardCountData().subscribe(data => {
+    // this.dashboardService.getDashboardCountData().subscribe(data => {
 
-      console.log(data);
+    //   console.log(data);
 
-      this.totalCases = data.totalCases;
-      this.minorCases = data.minorCases;
-      this.pendingTrials = data.pendingTrials;
-      this.acquitted = data.acquittedCases;
-      this.convicted = data.convictedCases;
+    //   this.totalCases = data.totalCases;
+    //   this.minorCases = data.minorCases;
+    //   this.pendingTrials = data.pendingTrials;
+    //   this.acquitted = data.acquittedCases;
+    //   this.convicted = data.convictedCases;
 
-      this.cases = data.cases;
-      this.uicases = data.uicases;
-      this.caseCounts1 = data.piechart1cases;
-      this.caseCounts2 = data.piechart2cases;
+    //   this.cases = data.cases;
+    //   this.uicases = data.uicases;
+    //   this.caseCounts1 = data.piechart1cases;
+    //   this.caseCounts2 = data.piechart2cases;
 
-      this.uiBar = data.uiBar;
-      this.ptBar = data.ptBar;
+    //   this.uiBar = data.uiBar;
+    //   this.ptBar = data.ptBar;
 
-      this.lineChart77 = data.linechartcases;
+    //   this.lineChart77 = data.linechartcases;
 
-      this.map1 = data.map1;
-      this.map2 = data.map2;
+    //   this.map1 = data.map1;
+    //   this.map2 = data.map2;
 
-      // this.createPieChart();
-      this.createPieChart1();
-
-
-      // this.createBarChart();
-      // this.createBarChart1();
-
-      //  this.renderLineChart();
-
-       this.updateDistrictCounts();
-       this.updateDistrictCounts1();
+    //   this.createPieChart();
+    //   this.createPieChart1();
 
 
-      this.cdRef.detectChanges();
-    });
+    //   this.createBarChart();
+    //   this.createBarChart1();
+
+    //    this.renderLineChart();
+
+    //    this.updateDistrictCounts();
+    //    this.updateDistrictCounts1();
+
+
+    //   this.cdRef.detectChanges();
+    // });
     // this.getStatusOfCase({});
     // this.getAnnualOverView({});
 
     // this.dashboardService.getCasesByYearRange().subscribe(data => {
-      // this.cases = data.cases;
+    //   this.cases = data.cases;
     //   this.cdRef.detectChanges();
     // });
 
     // this.dashboardService.getCasesByMonthRange().subscribe(data => {
-      // this.uicases = data.uicases;
+    //   this.uicases = data.uicases;
     //   this.cdRef.detectChanges();
     // });
 
@@ -1007,7 +1007,7 @@ export class DashboardComponent implements AfterViewInit  {
   }
 
   // new dashboard switch code
-  currentDashboard: 'case' | 'meeting' | 'relief' = 'relief';
+  currentDashboard: 'case' | 'meeting' | 'relief' = 'case';
 
   switchDashboard(dashboard: 'case' | 'meeting' | 'relief') {
     this.currentDashboard = dashboard;

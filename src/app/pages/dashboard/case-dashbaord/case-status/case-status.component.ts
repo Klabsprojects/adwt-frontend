@@ -1,12 +1,14 @@
-import { Component, ElementRef, ViewChild, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, ChangeDetectorRef,OnDestroy } from '@angular/core';
 import { Chart, ChartData, ChartType } from 'chart.js/auto';
 import { homeCaseService } from '../home-case.service';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-case-status',
   templateUrl: './case-status.component.html',
   styleUrl: './case-status.component.scss'
 })
-export class CaseStatusComponent implements OnInit {
+export class CaseStatusComponent implements OnInit,OnDestroy {
+  private subscription = new Subscription();
   @ViewChild('pieChartstatus') pieChartstatus!: ElementRef;
   chartInstance: any;
   status_of_case = {
@@ -14,15 +16,20 @@ export class CaseStatusComponent implements OnInit {
     non_gcr:1
   }
   constructor(private hcs:homeCaseService,private cdr:ChangeDetectorRef){}
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
   ngOnInit(): void {
     this.createPieChart();
-    this.hcs.status$.subscribe((res:any)=>{
-      if(res){
-        this.status_of_case = res;
-        this.createPieChart();
-      }
-      this.cdr.detectChanges();
-    })
+    this.subscription.add(
+      this.hcs.status$.subscribe((res:any)=>{
+        if(res){
+          this.status_of_case = res;
+          this.createPieChart();
+        }
+        this.cdr.detectChanges();
+      })
+    )
   }
 
   createPieChart(): void {

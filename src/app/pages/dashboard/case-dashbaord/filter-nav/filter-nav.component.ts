@@ -1,13 +1,39 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,OnDestroy } from '@angular/core';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { homeCaseService } from '../home-case.service';
 import { commondashboardSerivce } from '../../case-dashboard.service';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-filter-nav',
   templateUrl: './filter-nav.component.html',
   styleUrls: ['./filter-nav.component.css']
 })
-export class FilterNavComponent implements OnInit {
+export class FilterNavComponent implements OnInit, OnDestroy {
+  private subscription = new Subscription();
+  status: any[]=[
+    { key: 'UI', value: 'UI Stage' },
+    { key: 'PT', value: 'PT Stage' },
+  ]
+  districts:any=[];
+  communities:any[]=[];
+  castes:any[]=[];
+  zones:any[]=[];
+  offences:any[]=[];
+  policeCities:any[]=[];
+  fromdate:any;
+  todate:any;
+  private userData:any;
+
+  selectedStatus:string='';
+  selectedDistricts:string='';
+  selectedCommunity:string='';
+  selectedCaste:string='';
+  selectedZone:string='';
+  selectedOffence:string='';
+  selectedPoliceCity:string=''
+  selectedFromDate:any="";
+  selectedToDate:any="";
+
   filterOptions: any = {
     status: [
       { key: 'UI', value: 'UI Stage' },
@@ -29,118 +55,82 @@ export class FilterNavComponent implements OnInit {
     toDate: ''
   };
   constructor(private dashboardService: DashboardService, private hcs:homeCaseService,private cds:commondashboardSerivce) { }
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
   ngOnInit(): void {
     const JsonData = sessionStorage.getItem('user_data');
+    this.userData = JsonData ? JSON.parse(JsonData) : {};
     const userData = JsonData ? JSON.parse(JsonData) : {};
     const body = userData.access_type==='District'? {district:userData.district}:{};
-    this.callAllfunction(body);
-    this.hcs.distrct$.subscribe((res:any)=>{
-      if(res){
-        if(Object.keys(body).length === 0){
-          this.callAllfunction({district:res});
+    this.callAllfunction();
+    this.subscription.add(
+      this.hcs.distrct$.subscribe((res:any)=>{
+        if(res){
+          if(Object.keys(body).length === 0){
+            this.selectedDistricts = res;
+            this.callAllfunction();
+          }
         }
-      }
-    })
+      })
+    )
   }
-  callAllfunction(body:any){
+  get filterJson(){
+    return {
+      "district": this.selectedDistricts,
+      "community":this.selectedCommunity,
+      "caste":this.selectedCaste,
+      "police_city":this.selectedPoliceCity,
+      "Status_Of_Case":this.selectedStatus,
+      "police_zone": this.selectedZone,
+      "offence" : this.selectedOffence,
+      "Filter_From_Date" : this.selectedFromDate,
+      "Filter_To_Date" : this.selectedToDate
+    }
+  }
+  callAllfunction(){
     this.getDropdowns();
-    this.getDashboardValues();
-    this.getStatusOfCase(body);
-    this.getAnnualOverView(body);
-    this.getPendingCaseZone(body);
-    this.getPiechartdata(body);
+    this.getOtherValues();
   }
   getDropdowns() {
-    this.dashboardService.getFilterOptions().subscribe(data => {
-      this.filterOptions.status = this.filterOptions.status;
-      this.filterOptions.gender = this.filterOptions.gender;
-      this.filterOptions.district = data.district || [];
-      this.filterOptions.caste = data.caste || [];
-      this.filterOptions.subcaste = data.subcaste || [];
-    });
-  }
-  getDashboardValues() {
-    this.dashboardService.getDashboardCountData().subscribe((res: any) => {
-      const cardsValue = {
-        totalCases: res.totalCases,
-        minorCases: res.minorCases,
-        pendingTrials: res.pendingTrials,
-        acquitted: res.acquittedCases,
-        convicted: res.convictedCases,
-        cases: res.cases,
-        uicases: res.uicases
-      }
-      this.hcs.setCardData(cardsValue);
-      this.hcs.setDwcdmPt(res.map1)
-      this.hcs.setDwcdmUi(res.map2);
-      this.hcs.setPtbar(res.ptBar);
-      this.hcs.setUibar(res.uiBar);
+    this.dashboardService.userGetMethod('districts').subscribe((res:any)=>{
+      this.districts = res;
+    })
+    this.dashboardService.userGetMethod('fir/communities').subscribe((res:any)=>{
+      this.communities = res;
+    })
+    this.dashboardService.userGetMethod('Zone_Filter_Data').subscribe((res:any)=>{
+      this.zones = res.data;
+    })
+    this.dashboardService.userGetMethod('GetOffence').subscribe((res:any)=>{
+      this.offences = res.data;
+    })
+    this.dashboardService.userGetMethod('Police_City_filtet_data').subscribe((res:any)=>{
+      this.policeCities = res.data;
     })
   }
-  getStatusOfCase(body:any){
-    this.dashboardService.userPostMethod('GetNatureOfOffenceChartValue',body).subscribe((res:any)=>{
-      const data = {gcr:res.data[0].gcr,non_gcr:res.data[0].non_gcr};
-      this.hcs.setStatus(data);
-    })
+  getCaste(){
+    if(this.selectedCommunity){
+      this.dashboardService.userGetMethod(`fir/castes-by-community?community=${this.selectedCommunity}`).subscribe((res:any)=>{
+        this.castes = res;
+      })
+    }
+    this.getOtherValues();
   }
-  getAnnualOverView(body:any){
-    this.dashboardService.userPostMethod('GetAnnualOverViewRegisterdCases',body).subscribe((res:any)=>{
-      const Annualcases = {
-        year: res.data.map((item:any) => item.year),
-        cases: res.data.map((item:any) => item.total_cases)
-      };
-      this.hcs.setAnnual(Annualcases);
-    })
+  getOtherValues(){
+    this.hcs.setFilterJson(this.filterJson);
   }
-  getPendingCaseZone(body: any) {
-    this.dashboardService.userPostMethod('GetPendingCaseZoneWise', body).subscribe((res: any) => {
-      const data = res.data;
-      let values = [0, 0, 0, 0];
-      const yearWiseData:any = [];
-      for (let i = 0; i < data.length; i++) {
-        // 'South Zone', 'Central Zone', 'North Zone', 'West Zone'
-        if (data[i].zone === 'South Zone') {
-          values[0] += data[i].total_cases;
-        }
-        else if (data[i].zone === 'Central Zone') {
-          values[1] += data[i].total_cases;
-        }
-        else if (data[i].zone === 'North Zone') {
-          values[2] += data[i].total_cases;
-        }
-        else if (data[i].zone === 'West Zone') {
-          values[3] += data[i].total_cases;
-        }
-      }
-      this.hcs.setHorizontal(values);
-      // this.values = values;
-      
-
-      data.forEach((entry:any) => {
-        let yearData = yearWiseData.find((y:any) => y.year === entry.year);
-        if (!yearData) {
-          yearData = { year: entry.year, sz: 0, cz: 0, nz: 0, wz: 0 };
-          yearWiseData.push(yearData);
-        }
-        if (entry.zone === 'South Zone') yearData.sz += entry.total_cases;
-        else if (entry.zone === 'Central Zone') yearData.cz += entry.total_cases;
-        else if (entry.zone === 'North Zone') yearData.nz += entry.total_cases;
-        else if (entry.zone === 'West Zone') yearData.wz += entry.total_cases;
-      });
-      this.hcs.setTable(yearWiseData);
-      // this.years = yearWiseData;
-    });
-
-  }
-
-  getPiechartdata(body:any){
-    this.dashboardService.userPostMethod('ReasonForPendingUICases', body).subscribe((res: any) => {
-      const newValue = res.data[0].ui_total_cases;
-      this.hcs.setPieChart(newValue);
-    });
-  }
-
-  applyFilters() {
-
+  clear(){
+    this.selectedStatus ='';
+    this.selectedDistricts ='';
+    this.selectedCommunity ='';
+    this.selectedCaste ='';
+    this.selectedZone ='';
+    this.selectedOffence ='';
+    this.selectedPoliceCity ='';
+    this.selectedFromDate ='';
+    this.selectedToDate ='';
+    this.selectedPoliceCity='';
+    this.getOtherValues();
   }
 }

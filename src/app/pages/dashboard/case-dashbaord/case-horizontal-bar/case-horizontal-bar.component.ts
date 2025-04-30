@@ -1,5 +1,6 @@
-import { Component, SimpleChanges, ViewChild, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, SimpleChanges, ViewChild, OnInit, ChangeDetectorRef,OnDestroy } from '@angular/core';
 import { homeCaseService } from '../home-case.service';
+import { Subscription } from 'rxjs';
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -23,15 +24,21 @@ export type ChartOptions = {
   templateUrl: './case-horizontal-bar.component.html',
   styleUrl: './case-horizontal-bar.component.scss'
 })
-export class CaseHorizontalBarComponent implements OnInit {
+export class CaseHorizontalBarComponent implements OnInit,OnDestroy {
+  private subscription = new Subscription();
   constructor(private hcs:homeCaseService, private cdr:ChangeDetectorRef){}
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
   ngOnInit(): void {
-    this.hcs.horizontal$.subscribe((res:any)=>{
-      if(res){
-        this.createBar(res);
-      }
-      this.cdr.detectChanges();
-    })
+    this.subscription.add(
+      this.hcs.horizontal$.subscribe((res:any)=>{
+        if(res){
+          this.createBar(res);
+        }
+        this.cdr.detectChanges();
+      })
+    )
   }
   @ViewChild("chart", { static: false }) chart!: ChartComponent;
   

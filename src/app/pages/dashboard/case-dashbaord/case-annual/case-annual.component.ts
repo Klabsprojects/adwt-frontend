@@ -1,23 +1,30 @@
-import { Component,OnInit,ChangeDetectorRef } from '@angular/core';
+import { Component,OnInit,ChangeDetectorRef,OnDestroy } from '@angular/core';
 import { Chart, ChartData, ChartType } from 'chart.js/auto';
 import { homeCaseService } from '../home-case.service';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-case-annual',
   templateUrl: './case-annual.component.html',
   styleUrl: './case-annual.component.scss'
 })
-export class CaseAnnualComponent implements OnInit {
+export class CaseAnnualComponent implements OnInit,OnDestroy {
+  private subscription = new Subscription(); 
   constructor(private hcs:homeCaseService,private cdr:ChangeDetectorRef){}
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
   public Annualcases:any={}
 ngOnInit(): void {
-  this.hcs.annual$.subscribe((res:any)=>{
-    if(res){
-      this.Annualcases = res;
-      console.log('Annualcases',this.Annualcases);
-      this.createBarChart();
-    }
-    this.cdr.detectChanges();
-  })
+  this.subscription.add(
+    this.hcs.annual$.subscribe((res:any)=>{
+      if(res){
+        this.Annualcases = res;
+        console.log('Annualcases',this.Annualcases);
+        this.createBarChart();
+      }
+      this.cdr.detectChanges();
+    })
+  )
 }
 barChartannual:Chart | null = null;
 createBarChart(): void {

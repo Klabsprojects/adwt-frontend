@@ -5,70 +5,70 @@
     <div class="filters">
         <div class="filter">
             <p>Status Of Case</p>
-            <select class="filter-select" [(ngModel)]="selectedFilters.status" (change)="applyFilters()">
-                <option value="" disabled selected>Status of the Case</option>
-                <option *ngFor="let option of filterOptions.status" [value]="option.key">
+            <select class="filter-select" [(ngModel)]="selectedStatus" (change)="getOtherValues()">
+                <option value="" selected>Select</option>
+                <option *ngFor="let option of status" [value]="option.key">
                     {{ option.value }}
                 </option>
             </select>
         </div>
         <div class="filter">
             <p>Disctrict</p>
-            <select class="filter-select" [(ngModel)]="selectedFilters.district" (change)="applyFilters()">
-                <option value="" disabled selected>Districts</option>
-                <option *ngFor="let option of filterOptions.district" [value]="option">
-                    {{ option }}
+            <select class="filter-select" [(ngModel)]="selectedDistricts" (change)="getOtherValues()">
+                <option value="" selected>Select</option>
+                <option *ngFor="let option of districts" [value]="option.district_name">
+                    {{ option.district_name }}
                 </option>
             </select>
         </div>
         <div class="filter">
             <p>Community</p>
-            <select name="" id="">
-                <option value="All">All</option>
+            <select name="" id="" [(ngModel)]="selectedCommunity" (change)="getCaste()">
+                <option value="">Select</option>
+                <option [value]="community" *ngFor="let community of communities">{{community}}</option>
             </select>
         </div>
         <div class="filter">
             <p>Caste</p>
-            <select class="filter-select" [(ngModel)]="selectedFilters.caste" (change)="applyFilters()">
-                <option value="" disabled selected>Caste</option>
-                <option *ngFor="let option of filterOptions.caste" [value]="option">
+            <select class="filter-select" [(ngModel)]="selectedCaste" (change)="getOtherValues()">
+                <option value="" selected>Select</option>
+                <option *ngFor="let option of castes" [value]="option">
                     {{ option }}
                 </option>
             </select>
         </div>
         <div class="filter">
-            <p>Zone</p>
-            <select name="" id="">
-                <option value="All">All</option>
+            <p>Police Zone</p>
+            <select name="" id="" [(ngModel)]="selectedZone" (change)="getOtherValues()">
+                <option value="">Select</option>
+                <option [value]="zone.police_zone" *ngFor="let zone of zones">{{zone.police_zone}}</option>
             </select>
         </div>
+
         <div class="filter">
-            <p>Date Category</p>
-            <select name="" id="">
-                <option value="All">All</option>
+            <p>Police City</p>
+            <select name="" id="" [(ngModel)]="selectedPoliceCity" (change)="getOtherValues()">
+                <option value="">Select</option>
+                <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
             </select>
         </div>
+
         <div class="filter">
             <p>Nature of Offence</p>
-            <select name="" id="">
-                <option value="All">All</option>
-            </select>
-        </div>
-        <div class="filter">
-            <p>Court</p>
-            <select name="" id="">
-                <option value="All">All</option>
+            <select name="" id="" [(ngModel)]="selectedOffence" (change)="getOtherValues()">
+                <option value="">Select</option>
+                <option [value]="offence" *ngFor="let offence of offences">{{offence}}</option>
             </select>
         </div>
         <div class="filter">
             <p>Date</p>
             <div>
-                <input type="date" class="filter-input" [(ngModel)]="selectedFilters.fromDate" placeholder="From Date" />
-                <input type="date" class="filter-input" [(ngModel)]="selectedFilters.toDate" placeholder="To Date" />
+                <input type="date" class="filter-input" [(ngModel)]="selectedFromDate" (ngModelChange)="getOtherValues()"/>
+                <input type="date" class="filter-input" [(ngModel)]="selectedToDate" (ngModelChange)="getOtherValues()"/>
             </div>
         </div>
         <div class="filter img-container">
-            <img src="assets/images/filter.png" alt="filter" width="40px">
+            <img src="assets/images/filter.png" alt="filter" width="40px" (click)="clear()">
         </div>
     </div>
 </section>

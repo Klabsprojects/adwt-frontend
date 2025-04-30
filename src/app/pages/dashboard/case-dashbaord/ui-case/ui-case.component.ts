@@ -1,25 +1,39 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { homeCaseService } from '../home-case.service';
 import { Chart} from 'chart.js/auto';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-ui-case',
   templateUrl: './ui-case.component.html',
   styleUrl: './ui-case.component.scss'
 })
-export class UiCaseComponent {
+export class UiCaseComponent implements OnInit, OnDestroy {
+  private subscription = new Subscription();
   constructor(private hcs:homeCaseService, private cdr:ChangeDetectorRef){}
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
   barChart2: Chart | null = null;
   uiBar: number[] = [];
   ngOnInit(): void {
-    this.hcs.uibar$.subscribe((res:any)=>{
-      if(res){
-        this.uiBar = res;
-        this.createbarChart2();
-      }
-      this.cdr.detectChanges();
-    })
+    this.subscription.add(
+      this.hcs.uibar$.subscribe((res: any) => {
+        if (res) {
+          this.uiBar = [
+            Number(res.ui_less_than_2_month) || 0,
+            Number(res.ui_2_to_4_month) || 0,
+            Number(res.ui_4_to_6_month) || 0,
+            Number(res.ui_6_to_12_month) || 0,
+            Number(res.ui_greater_than_1_year) || 0,
+          ];
+          this.createbarChart2();
+        }
+        this.cdr.detectChanges();
+      })
+    )
   }
+  
   createbarChart2(): void {
     const uiBar = this.uiBar;
 

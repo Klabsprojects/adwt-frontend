@@ -1,27 +1,35 @@
-import { Component,OnInit,ChangeDetectorRef } from '@angular/core';
+import { Component,OnInit,ChangeDetectorRef,OnDestroy } from '@angular/core';
 import { homeCaseService } from '../home-case.service';
-
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-case-table',
   templateUrl: './case-table.component.html',
   styleUrl: './case-table.component.scss'
 })
-export class CaseTableComponent implements OnInit {
+export class CaseTableComponent implements OnInit,OnDestroy {
+  private subscription = new Subscription();
   constructor(private cdr:ChangeDetectorRef, private hcs:homeCaseService){}
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
   ngOnInit(): void {
-    this.hcs.table$.subscribe((res:any)=>{
-      if(res){
-        this.zonewise = res;
-      }
-      this.cdr.detectChanges();
-    })
-    this.hcs.zoneEmit$.subscribe((res:any)=>{
-      if(res){
-        res = res==='null'?'':res;
-        this.zone = res;
-      }
-      this.cdr.detectChanges();
-    })
+    this.subscription.add(
+      this.hcs.table$.subscribe((res:any)=>{
+        if(res){
+          this.zonewise = res;
+        }
+        this.cdr.detectChanges();
+      })
+    )
+    this.subscription.add(
+      this.hcs.zoneEmit$.subscribe((res:any)=>{
+        if(res){
+          res = res==='null'?'':res;
+          this.zone = res;
+        }
+        this.cdr.detectChanges();
+      })
+    )
   }
   public tabletop = [
     {year:'2023',UIB:'734',report:'2,068',charge:'1,706',refer:'514',UIE:'582'},
@@ -51,7 +59,7 @@ export class CaseTableComponent implements OnInit {
 
   emitYear(item:any){
     const data = [item.sz,item.cz,item.nz,item.wz]
-    this.hcs.setHorizontal(data);
+    this.hcs.setTable(data);
   }
 
 }
