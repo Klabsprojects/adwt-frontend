@@ -14,7 +14,7 @@
         </div>
         <div class="filter">
             <p>Disctrict</p>
-            <select class="filter-select" [(ngModel)]="selectedDistricts" (change)="getOtherValues()">
+            <select class="filter-select" [(ngModel)]="selectedDistricts" (change)="getOtherValues()" [disabled]="isDistrictDisabled">
                 <option value="" selected>Select</option>
                 <option *ngFor="let option of districts" [value]="option.district_name">
                     {{ option.district_name }}

@@ -22,7 +22,9 @@ export class FilterNavComponent implements OnInit, OnDestroy {
   policeCities:any[]=[];
   fromdate:any;
   todate:any;
+  
   private userData:any;
+  public isDistrictDisabled:boolean=false;
 
   selectedStatus:string='';
   selectedDistricts:string='';
@@ -118,6 +120,11 @@ export class FilterNavComponent implements OnInit, OnDestroy {
     this.getOtherValues();
   }
   getOtherValues(){
+    if(this.userData.access_type==="District"){
+      this.filterJson.district = this.userData.district;
+      this.selectedDistricts = this.userData.district;
+      this.isDistrictDisabled = true;
+    }
     this.hcs.setFilterJson(this.filterJson);
   }
   clear(){
