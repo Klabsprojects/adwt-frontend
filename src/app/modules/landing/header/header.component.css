@@ -255,7 +255,7 @@
 }
 
 .dropdown-menu-about {
-  width: 800% !important;
+  width: 850% !important;
 }
 
 /* Show dropdown when active */
@@ -337,6 +337,13 @@
 
 .mob-tiru h3 {
   display: none;
+}
+
+.eng-title{
+  font-size: 1rem !important;
+}
+.tamil-title{
+  font-size: 0.8rem !important;
 }
 
 @media(max-width:1297px) {

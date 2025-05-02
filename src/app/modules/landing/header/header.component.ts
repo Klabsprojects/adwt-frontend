@@ -24,7 +24,7 @@ export class HeaderComponent implements OnInit {
   ];
   public is_user:boolean=false;
   selLang:any="en";
-  phoneNumbers: string[] = ['1800 202 1989', '1800 202 14566'];
+  phoneNumbers: string[] = ['1800 202 1989', '14566'];
   currentPhone: string = this.phoneNumbers[0];
 
 

@@ -7,7 +7,7 @@ import { LandingService } from '../landing.service';
 })
 export class PoaHelplineComponent {
   constructor(public lang:LandingService,private cdRef:ChangeDetectorRef){}
-  phoneNumbers: string[] = ['1800 202 1989', '1800 202 14566'];
+  phoneNumbers: string[] = ['1800 202 1989', '14566'];
   currentPhone: string = this.phoneNumbers[0];
 
   ngOnInit() {

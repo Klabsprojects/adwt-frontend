@@ -50,39 +50,39 @@
     <div *ngIf="isMenuOpen" class="mobile-overlay" (click)="toggleMenu()"></div>
     <div class="mobile-menu" [class.open]="isMenuOpen">
       <ng-container>
-        <a routerLink="landing" class="mobile-link">
+        <a routerLink="landing" class="mobile-link" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
           {{ lang.lang.home}}
         </a>
         <div class="dropdown nav-item">
           <a href="#" class="mobile-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown"
-            routerLink="about">
+            routerLink="about" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
             {{ lang.lang.about}}
           </a>
           <ul class="dropdown-menu dropdown-menu-mob">
-            <li><a class="dropdown-item" routerLink="about">{{lang.lang.adwt}}</a></li>
-            <li><a class="dropdown-item" routerLink="about-sjhr">{{lang.lang.sjhrw}}</a></li>
-            <li><a class="dropdown-item" href="#">{{lang.lang.tnsc}}</a></li>
+            <li><a class="dropdown-item" routerLink="about" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">{{lang.lang.adwt}}</a></li>
+            <li><a class="dropdown-item" routerLink="about-sjhr" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">{{lang.lang.sjhrw}}</a></li>
+            <li><a class="dropdown-item" routerLink="about-tnsc" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">{{lang.lang.tnsc}}</a></li>
           </ul>
         </div>
-        <a routerLink="poa" class="mobile-link">
+        <a routerLink="poa" class="mobile-link" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
           {{ lang.lang.poa}}
         </a>
-        <a routerLink="services" class="mobile-link">
+        <a routerLink="services" class="mobile-link" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
           {{ lang.lang.acts_rules}}
         </a>
         <div class="dropdown nav-item">
-          <a href="#" class="mobile-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown">
+          <a href="#" class="mobile-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
             {{ lang.lang.news_events}}
           </a>
           <ul class="dropdown-menu dropdown-menu-mob">
-            <li><a class="dropdown-item" routerLink="gallery">{{lang.lang.gallery}}</a></li>
-            <li><a class="dropdown-item" href="#">{{lang.lang.press_releases}}</a></li>
+            <li><a class="dropdown-item" routerLink="gallery" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">{{lang.lang.gallery}}</a></li>
+            <li><a class="dropdown-item" href="#" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">{{lang.lang.press_releases}}</a></li>
           </ul>
         </div>
-        <a routerLink="poahelpline" class="mobile-link">
+        <a routerLink="poahelpline" class="mobile-link" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
           {{ lang.lang.poa_helpline}}
         </a>
-        <a routerLink="faq" class="mobile-link">
+        <a routerLink="faq" class="mobile-link" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
           {{ lang.lang.faq}}
         </a>
         <button role="button" class="btn mobile-link loginout" data-bs-toggle="modal" data-bs-target="#exampleModal"
@@ -95,39 +95,39 @@
   <nav class="nav-links">
     <ng-container>
       <div class="other-links">
-        <a routerLink="landing" class="nav-link">
+        <a routerLink="landing" class="nav-link" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
           {{ lang.lang.home}}
         </a>
         <div class="dropdown nav-item">
           <a href="#" class="nav-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown"
-            routerLink="about">
+            routerLink="about" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
             {{ lang.lang.about}}
           </a>
           <ul class="dropdown-menu dropdown-menu-about">
-            <li><a class="dropdown-item" routerLink="about">{{lang.lang.adwt}}</a></li>
-            <li><a class="dropdown-item" routerLink="about-sjhr">{{lang.lang.sjhrw}}</a></li>
-            <li><a class="dropdown-item" href="#">{{lang.lang.tnsc}}</a></li>
+            <li><a class="dropdown-item" routerLink="about" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">{{lang.lang.adwt}}</a></li>
+            <li><a class="dropdown-item" routerLink="about-sjhr" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">{{lang.lang.sjhrw}}</a></li>
+            <li><a class="dropdown-item" routerLink="about-tnsc" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">{{lang.lang.tnsc}}</a></li>
           </ul>
         </div>
-        <a routerLink="poa" class="nav-link">
+        <a routerLink="poa" class="nav-link" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
           {{ lang.lang.poa}}
         </a>
-        <a routerLink="services" class="nav-link">
+        <a routerLink="services" class="nav-link" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
           {{ lang.lang.acts_rules}}
         </a>
         <div class="dropdown nav-item">
-          <a href="#" class="nav-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown">
+          <a href="#" class="nav-link dropdown-toggle" id="newsDropdown" role="button" data-bs-toggle="dropdown" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
             {{ lang.lang.news_events}}
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" routerLink="gallery">{{lang.lang.gallery}}</a></li>
-            <li><a class="dropdown-item" href="#">{{lang.lang.press_releases}}</a></li>
+            <li><a class="dropdown-item" routerLink="gallery" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">{{lang.lang.gallery}}</a></li>
+            <li><a class="dropdown-item" href="#" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">{{lang.lang.press_releases}}</a></li>
           </ul>
         </div>
-        <a routerLink="poahelpline" class="nav-link">
+        <a routerLink="poahelpline" class="nav-link" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
           {{ lang.lang.poa_helpline}}
         </a>
-        <a routerLink="faq" class="nav-link">
+        <a routerLink="faq" class="nav-link" [ngClass]="{'tamil-title':selLang=='tn','eng-title':selLang=='en'}">
           {{ lang.lang.faq}}
         </a>
       </div>

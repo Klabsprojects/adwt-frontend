@@ -17,6 +17,7 @@ import { GalleryComponent } from './gallery/gallery.component';
 import { FaqComponent } from './faq/faq.component';
 import { FormsModule } from '@angular/forms';
 import { AboutSjhrComponent } from './about-sjhr/about-sjhr.component';
+import { AboutTnscComponent } from './about-tnsc/about-tnsc.component';
 @NgModule({
   declarations: [
     CarouselComponent,
@@ -24,6 +25,7 @@ import { AboutSjhrComponent } from './about-sjhr/about-sjhr.component';
     HomeComponent,
     AboutComponent,
     AboutSjhrComponent,
+    AboutTnscComponent,
     DownloadsComponent,
     ContactComponent,
     POAComponent,
