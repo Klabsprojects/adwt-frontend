@@ -546,9 +546,14 @@ export class DashboardComponent implements AfterViewInit  {
 
   }
 
-
+  private userData:any;
+  public isSjhr:boolean=false;
   ngOnInit(): void {
-
+    const JsonData = sessionStorage.getItem('user_data');
+    this.userData = JsonData ? JSON.parse(JsonData) : {};
+    if(this.userData.role==='3'){
+      this.isSjhr = true;
+    }
     // this.dashboardService.getFilterOptions().subscribe(data => {
     //   this.filterOptions.status = this.filterOptions.status;
     //   this.filterOptions.gender = this.filterOptions.gender;

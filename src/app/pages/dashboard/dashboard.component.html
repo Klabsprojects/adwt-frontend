@@ -409,8 +409,10 @@ frameborder="0" allowFullScreen="true"></iframe> -->
 
 	<div [ngSwitch]="currentDashboard" class="card shadow-sm p-4">
 		<app-case-dashbaord *ngSwitchCase="'case'"></app-case-dashbaord>
-		<app-home-meeting-dashboard *ngSwitchCase="'meeting'"></app-home-meeting-dashboard>
-		<app-case-relief-dashboard *ngSwitchCase="'relief'"></app-case-relief-dashboard>
+		<ng-container *ngIf="!isSjhr">
+			<app-home-meeting-dashboard *ngSwitchCase="'meeting'"></app-home-meeting-dashboard>
+			<app-case-relief-dashboard *ngSwitchCase="'relief'"></app-case-relief-dashboard>
+		</ng-container>
 		<!-- <iframe title="attrocities" width="1200" height="800"
 			src="https://app.powerbi.com/view?r=eyJrIjoiYzdhNzVmZmEtNTlmZi00MDExLTkxMjMtY2EyN2M2MmViODE2IiwidCI6ImI1OTZjYmNlLTBmNDktNDcyZi1iODgyLTAwZjFiZjNhMjI2MSJ9"
 			frameborder="0" allowFullScreen="true" *ngSwitchCase="'relief'"></iframe> -->

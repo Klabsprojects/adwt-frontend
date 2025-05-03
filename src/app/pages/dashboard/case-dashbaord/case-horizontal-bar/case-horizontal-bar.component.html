@@ -3,6 +3,6 @@
   <div class="d-flex justify-content-end align-items-center px-3 mb-3">
     <button (click)="clear()">Clear</button>
   </div>
-  <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [dataLabels]="chartOptions.dataLabels"
-    [plotOptions]="chartOptions.plotOptions" [xaxis]="chartOptions.xaxis"></apx-chart>
+  <apx-chart [series]="chartOptions!.series" [chart]="chartOptions!.chart" [dataLabels]="chartOptions!.dataLabels"
+    [plotOptions]="chartOptions!.plotOptions" [xaxis]="chartOptions!.xaxis"></apx-chart>
 </div>

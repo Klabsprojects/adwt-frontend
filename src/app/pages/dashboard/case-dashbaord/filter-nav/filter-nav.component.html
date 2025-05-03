@@ -47,7 +47,7 @@
 
         <div class="filter">
             <p>Police City</p>
-            <select name="" id="" [(ngModel)]="selectedPoliceCity" (change)="getOtherValues()">
+            <select name="" id="" [(ngModel)]="selectedPoliceCity" (change)="getOtherValues()" [disabled]="isPolicecityDisabled">
                 <option value="">Select</option>
                 <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
             </select>

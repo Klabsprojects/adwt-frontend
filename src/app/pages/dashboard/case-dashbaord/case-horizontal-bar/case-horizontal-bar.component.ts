@@ -47,7 +47,23 @@ export class CaseHorizontalBarComponent implements OnInit,OnDestroy {
     //     this.createBar({});
     //   }
     // }
-    public chartOptions: ChartOptions;
+    // public chartOptions: ChartOptions;
+    chartOptions: {
+      series: ApexAxisChartSeries;
+      chart: ApexChart;
+      dataLabels: ApexDataLabels;
+      plotOptions: ApexPlotOptions;
+      xaxis: ApexXAxis;
+    } = {
+      series: [/* your data */],
+      chart: {
+        type: 'bar'
+      },
+      dataLabels: { /* config */ },
+      plotOptions: { /* config */ },
+      xaxis: { /* x-axis config */ }
+    };
+    
     createBar(values: any) {
       this.chartOptions = {
         series: [
@@ -84,11 +100,6 @@ export class CaseHorizontalBarComponent implements OnInit,OnDestroy {
             fontSize: "12px",
             colors: ["#fff"]
           }
-        },
-        stroke: {
-          show: true,
-          width: 1,
-          colors: ["#fff"]
         },
         xaxis: {
           categories: ['South Zone', 'Central Zone', 'North Zone', 'West Zone']

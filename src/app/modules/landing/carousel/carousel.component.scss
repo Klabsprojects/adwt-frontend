@@ -44,8 +44,19 @@ img {
     aspect-ratio: 16/9;
     height: 55dvh;
 }
+@media(max-width:1025px){
+    img{
+        height: 45dvh;
+    }
+}
+
 @media(max-width:769px){
     img{
-        height: 50%;
+        height: 35dvh;
+    }
+}
+@media(max-width:426px){
+    img{
+        height: 20dvh;
     }
 }

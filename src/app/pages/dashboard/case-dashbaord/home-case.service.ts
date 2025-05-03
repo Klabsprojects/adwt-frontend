@@ -59,6 +59,7 @@ export class homeCaseService {
         this.setStatus(data);
         this.setAnnual(data);
         this.setHorizontal(data);
+        this.setPieChart(data);
     }
     setStaticCardData(data: any) {
         const body = {};
@@ -151,7 +152,7 @@ export class homeCaseService {
     }
 
     setPieChart(data: any) {
-        this.dashboardService.userPostMethod('',data).subscribe((res:any)=>{
+        this.dashboardService.userPostMethod('ReasonForPendingUICases',data).subscribe((res:any)=>{
             this.pieChart.next(res.data[0].ui_total_cases);
         })
     }
