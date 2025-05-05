@@ -2170,9 +2170,9 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
         victimId:relief.victimId,
         victimName:relief.victimName,
         communityCertificate: relief.communityCertificate,
-        // reliefAmountScst: relief.reliefAmountScst,
-        // reliefAmountExGratia: relief.reliefAmountExGratia,
-        // reliefAmountFirstStage: relief.reliefAmountFirstStage,
+        reliefAmountScst: relief.reliefAmountScst,
+        reliefAmountExGratia: relief.reliefAmountExGratia,
+        reliefAmountFirstStage: relief.reliefAmountFirstStage,
         additionalRelief: relief.additionalRelief,
       })),
       totalCompensation: this.firForm.get('totalCompensation')?.value,
@@ -2298,9 +2298,12 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
       // If age is below 18, disable the name field
       if (ageValue < 18) {
         nameControl?.disable({ emitEvent: false });
-        nameControl?.reset();
+        nameControl?.setValue('Minor', { emitEvent: false });
       } else {
         nameControl?.enable({ emitEvent: false });
+        if (nameControl?.value === 'Minor') {
+          nameControl.setValue('', { emitEvent: false });
+        }
         if(index===0){
           this.onVictimSameAsComplainantChange(this.wasVictimSame);
           this.wasVictimSame && nameControl?.disable({ emitEvent: false });
@@ -2416,7 +2419,7 @@ onAccusedAgeChange(index: number): void {
       dateOfOccurrence: ['', [Validators.required, this.maxDateValidator()]],
       date_of_occurrence_to: ['', [Validators.required, this.maxDateValidator()]],
       timeOfOccurrence: ['', Validators.required],
-      time_of_occurrence_to:['',Validators.required],
+      time_of_occurrence_to:[''],
       proceedingsDate_1: ['', Validators.required],
       placeOfOccurrence: ['', Validators.required],
       dateOfRegistration: ['', Validators.required],
@@ -3132,7 +3135,73 @@ uploadedImageSrc: any | ArrayBuffer;
   
 
 
+// temporary stop by surya
+  // populateVictimsRelief(victimsReliefDetails: any[]): void {
+  //   const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
+  //   victimsReliefArray.clear();
+  
+  //   // console.log(victimsReliefDetails, "victimsReliefDetails");
+  
+  //   let totalReliefFirstStage = 0; 
+  //   let totalReliefSecondStage = 0;
+  //   let totalReliefThirdStage = 0;
+  
+  //   victimsReliefDetails.forEach((victimReliefDetail) => {
+  //     const additionalRelief = victimReliefDetail.additional_relief
+  //       ? JSON.parse(victimReliefDetail.additional_relief)
+  //       : [];
+   
+  //     const reliefAmountFirstStage = (
+  //       (parseFloat(victimReliefDetail.fir_stage_as_per_act || '0') || 0) + 
+  //       (parseFloat(victimReliefDetail.fir_stage_ex_gratia || '0') || 0)
+  //     );
+  
+  //     totalReliefFirstStage += reliefAmountFirstStage;
+  
+  //     const reliefAmountSecondStage = (
+  //       (parseFloat(victimReliefDetail.chargesheet_stage_as_per_act || '0') || 0) + 
+  //       (parseFloat(victimReliefDetail.chargesheet_stage_ex_gratia || '0') || 0)
+  //     );
+  
+  //     totalReliefSecondStage += reliefAmountSecondStage;
 
+  //     const reliefAmountThirdStage = (
+  //       (parseFloat(victimReliefDetail.final_stage_as_per_act || '0') || 0) + 
+  //       (parseFloat(victimReliefDetail.final_stage_ex_gratia || '0') || 0)
+  //     );
+  
+  //     totalReliefThirdStage += reliefAmountThirdStage;
+  
+  //     const victimGroup = this.fb.group({
+  //       victimId: [victimReliefDetail.victim_id || ''],
+  //       victimName: [victimReliefDetail.victim_name || ''],
+  //       communityCertificate: [victimReliefDetail.community_certificate || ''],
+  //       reliefAmountScst: [victimReliefDetail.relief_amount_scst || victimReliefDetail.fir_stage_as_per_act],
+  //       reliefAmountExGratia: [victimReliefDetail.relief_amount_exgratia || victimReliefDetail.fir_stage_ex_gratia],
+  //       reliefAmountFirstStage: [reliefAmountFirstStage.toFixed(2)], 
+  //       reliefAmountScst_1: [victimReliefDetail.chargesheet_stage_as_per_act],
+  //       reliefAmountExGratia_1: [victimReliefDetail.chargesheet_stage_ex_gratia],
+  //       reliefAmountSecondStage: [reliefAmountSecondStage.toFixed(2)], 
+  //       reliefAmountScst_2: [victimReliefDetail.final_stage_as_per_act],
+  //       reliefAmountExGratia_2: [victimReliefDetail.final_stage_ex_gratia],
+  //       reliefAmountThirdStage: [reliefAmountThirdStage.toFixed(2)], 
+  //       additionalRelief: [additionalRelief]
+  //     });
+      
+  
+  //     victimsReliefArray.push(victimGroup);
+  //   });
+  
+  
+  //   this.firForm.patchValue({ totalCompensation: totalReliefFirstStage.toFixed(2) });
+  
+  //   // console.log(`Total Comp ${totalReliefFirstStage.toFixed(2)}`);
+  // }
+
+
+
+
+  
   populateVictimsRelief(victimsReliefDetails: any[]): void {
     const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
     victimsReliefArray.clear();
@@ -3147,46 +3216,36 @@ uploadedImageSrc: any | ArrayBuffer;
       const additionalRelief = victimReliefDetail.additional_relief
         ? JSON.parse(victimReliefDetail.additional_relief)
         : [];
-   
-      const reliefAmountFirstStage = (
-        (parseFloat(victimReliefDetail.fir_stage_as_per_act || '0') || 0) + 
-        (parseFloat(victimReliefDetail.fir_stage_ex_gratia || '0') || 0)
-      );
-  
-      totalReliefFirstStage += reliefAmountFirstStage;
-  
-      const reliefAmountSecondStage = (
-        (parseFloat(victimReliefDetail.chargesheet_stage_as_per_act || '0') || 0) + 
-        (parseFloat(victimReliefDetail.chargesheet_stage_ex_gratia || '0') || 0)
-      );
-  
-      totalReliefSecondStage += reliefAmountSecondStage;
 
-      const reliefAmountThirdStage = (
-        (parseFloat(victimReliefDetail.final_stage_as_per_act || '0') || 0) + 
-        (parseFloat(victimReliefDetail.final_stage_ex_gratia || '0') || 0)
-      );
+        const reliefAmountFirstStage = (
+                (parseFloat(victimReliefDetail.relief_amount_scst) || 0) + 
+                (parseFloat(victimReliefDetail.relief_amount_exgratia) || 0)
+              );
+          
+              totalReliefFirstStage += reliefAmountFirstStage;
   
-      totalReliefThirdStage += reliefAmountThirdStage;
   
       const victimGroup = this.fb.group({
         victimId: [victimReliefDetail.victim_id || ''],
         victimName: [victimReliefDetail.victim_name || ''],
         communityCertificate: [victimReliefDetail.community_certificate || ''],
-        reliefAmountScst: [victimReliefDetail.relief_amount_scst || victimReliefDetail.fir_stage_as_per_act],
-        reliefAmountExGratia: [victimReliefDetail.relief_amount_exgratia || victimReliefDetail.fir_stage_ex_gratia],
-        reliefAmountFirstStage: [reliefAmountFirstStage.toFixed(2)], 
-        reliefAmountScst_1: [victimReliefDetail.chargesheet_stage_as_per_act],
-        reliefAmountExGratia_1: [victimReliefDetail.chargesheet_stage_ex_gratia],
-        reliefAmountSecondStage: [reliefAmountSecondStage.toFixed(2)], 
-        reliefAmountScst_2: [victimReliefDetail.final_stage_as_per_act],
-        reliefAmountExGratia_2: [victimReliefDetail.final_stage_ex_gratia],
-        reliefAmountThirdStage: [reliefAmountThirdStage.toFixed(2)], 
+        reliefAmountScst: [victimReliefDetail.relief_amount_scst || 0],
+        reliefAmountExGratia: [victimReliefDetail.relief_amount_exgratia || 0 ],
+        reliefAmountFirstStage: [victimReliefDetail.relief_amount_first_stage || 0],  // 1 total
+        reliefAmountScst_1: [victimReliefDetail.relief_amount_scst_1 || 0],
+        reliefAmountExGratia_1: [victimReliefDetail.relief_amount_ex_gratia_1 || 0],
+        reliefAmountSecondStage: [victimReliefDetail.relief_amount_second_stage || 0], // 2 total
+        reliefAmountScst_2: [victimReliefDetail.relief_amount_act],
+        reliefAmountExGratia_2: [victimReliefDetail.relief_amount_government],
+        reliefAmountThirdStage: [victimReliefDetail.relief_amount_final_stage || 0], // 3 total
         additionalRelief: [additionalRelief]
       });
       
   
       victimsReliefArray.push(victimGroup);
+      this.updateTotalCompensation();
+      this.updateTotalCompensation_1();
+      this.updateTotalCompensation_2();
     });
   
   
@@ -3195,6 +3254,34 @@ uploadedImageSrc: any | ArrayBuffer;
     // console.log(`Total Comp ${totalReliefFirstStage.toFixed(2)}`);
   }
   
+  
+  updateTotalCompensation(): void {
+    let total = 0;
+    this.victimsRelief.controls.forEach((group) => {
+      const firstStage = parseFloat(group.get('reliefAmountFirstStage')?.value || '0');
+      total += firstStage;
+    });
+    this.firForm.patchValue({ totalCompensation: total.toFixed(2) });
+  }
+
+  updateTotalCompensation_1(): void {
+    let total = 0;
+    this.victimsRelief.controls.forEach((group) => {
+      const secondStage = parseFloat(group.get('reliefAmountSecondStage')?.value || '0');
+      total += secondStage;
+    });
+    this.firForm.patchValue({ totalCompensation_1: total.toFixed(2) });
+  }
+
+  updateTotalCompensation_2(): void {
+    let total = 0;
+    this.victimsRelief.controls.forEach((group) => {
+      const thirdStage = parseFloat(group.get('reliefAmountThirdStage')?.value || '0');
+      total += thirdStage;
+    });
+    this.firForm.patchValue({ totalCompensation_2: total.toFixed(2) });
+  }
+
 
 
   get totalCompensationControl(): FormControl {
@@ -3203,15 +3290,15 @@ uploadedImageSrc: any | ArrayBuffer;
   
 
 
-  updateTotalCompensation(): void {
-    let total = 0;
-    this.victimsRelief.controls.forEach((group) => {
-      const firstStage = parseFloat(group.get('reliefAmountFirstStage')?.value || '0');
-      total += firstStage;
-      console.log("total value",firstStage);
-    });
-    this.firForm.patchValue({ totalCompensation: total.toFixed(2) });
-  }
+  // updateTotalCompensation(): void {
+  //   let total = 0;
+  //   this.victimsRelief.controls.forEach((group) => {
+  //     const firstStage = parseFloat(group.get('reliefAmountFirstStage')?.value || '0');
+  //     total += firstStage;
+  //     console.log("total value",firstStage);
+  //   });
+  //   this.firForm.patchValue({ totalCompensation: total.toFixed(2) });
+  // }
 
 
 
@@ -5849,4 +5936,9 @@ getPoliceStation(district: string): void {
     return excluded.includes(act);
   }
 
+  removeSelectedOffence(index: number, offenceName: string): void {
+    const selected = this.victims.at(index).get('offenceCommitted')?.value || [];
+    const updated = selected.filter((item: string) => item !== offenceName);
+    this.victims.at(index).get('offenceCommitted')?.setValue(updated);
+  }
 }

@@ -240,7 +240,7 @@
             <input type="time" id="timeOfOccurrence" class="form-control" formControlName="timeOfOccurrence" required />
           </div>
           <div class="col-md-4 mb-3">
-            <label for="totimeOfOccurrence" class="form-label">11a. To Time of Occurrence *</label>
+            <label for="totimeOfOccurrence" class="form-label">11a. To Time of Occurrence</label>
             <input
                 type="time"
                 id="totimeOfOccurrence"
@@ -440,7 +440,7 @@
                   </mat-form-field>
                 </div> -->
 
-                <div class="col-md-12 mb-3">
+                <!-- <div class="col-md-12 mb-3">
                   <label class="form-label">30. Sections of the SC/ST POA Act Invoked for the Offence *</label>
                   <ng-select
                   class="form-select"
@@ -454,21 +454,61 @@
                   [placeholder]="victims.at(i).get('offenceCommitted')?.value?.length ? '' : 'Select offences'"
                   (change)="onOffenceCommittedChange($event, i)"
                   [id]="'victimOffence' + i"
-                  required>
+                  required> -->
 
                   <!-- Custom selected label -->
-                  <ng-template ng-label-tmp let-item="item">
+                  <!-- <ng-template ng-label-tmp let-item="item">
                     <span>{{ item.offence_act_name }}</span>
                     <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
-                  </ng-template>
+                  </ng-template> -->
 
                   <!-- Custom dropdown option -->
-                  <ng-template ng-option-tmp let-item="item">
+                  <!-- <ng-template ng-option-tmp let-item="item">
                     {{ item.offence_act_name }}
                     <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
                   </ng-template>
                 </ng-select>
+                </div> -->
+
+                <div class="col-md-12 mb-3">
+                  <label class="form-label">30. Sections of the SC/ST POA Act Invoked for the Offence *</label>
+
+                  
+                <ng-select
+                class="form-select"
+                [items]="offenceOptions"
+                bindLabel="offence_name"
+                bindValue="offence_name"
+                [multiple]="true"
+                formControlName="offenceCommitted"
+                [searchable]="true"
+                [clearable]="true"
+                [placeholder]="victims.at(i).get('offenceCommitted')?.value?.length ? '' : 'Select offences'"
+                (change)="onOffenceCommittedChange($event, i)"
+                [id]="'victimOffence' + i"
+                required
+              >
+                <!-- Custom selected label -->
+                <ng-template ng-label-tmp let-item="item" let-clear="clear">
+                  <span>
+                    {{ item.offence_act_name }}
+                    <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
+                  </span>
+                  <span class="remove-icon" (click)="removeSelectedOffence(i, item.offence_name)">
+                    &times;
+                  </span>
+                </ng-template>
+
+                <!-- Custom dropdown option -->
+                <ng-template ng-option-tmp let-item="item">
+                  {{ item.offence_act_name }}
+                  <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
+                </ng-template>
+              </ng-select>
                 </div>
+
+
+
 
                 <div class="col-md-12 mb-3"> 
                   <label class="form-label">31. Sections of the SC/ST POA Act Invoked for the Offence *</label><br>
@@ -813,7 +853,7 @@
                 <label for="reliefAmountScst" class="form-label">54. Eligible relief amount for the victim as per SC/ST Act *</label>
               </div>
               <div class="col-4">
-                <input id="reliefAmountScst" type="text" class="form-control text-end" formControlName="reliefAmountScst"readonly />
+                <input id="reliefAmountScst" type="text" class="form-control text-end" formControlName="reliefAmountScst" (keypress)="allowOnlyNumbers($event)" />
               </div>
             </div>
             <div class="row mb-3">
@@ -821,7 +861,7 @@
                 <label class="form-label">55. Eligible relief amount for the victim (ex-gratia) by Govt. of Tamil Nadu *</label>
               </div>
               <div class="col-4">
-                <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia" placeholder="₹ 100" readonly />
+                <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia" placeholder="0" (keypress)="allowOnlyNumbers($event)" />
               </div>
             </div>
             <div class="row mb-3">
@@ -829,7 +869,7 @@
                 <label class="form-label">56. Eligible amount for the 1st Stage of Relief *</label>
               </div>
               <div class="col-4">
-                <input type="text" class="form-control text-end" formControlName="reliefAmountFirstStage" placeholder="₹ 100" readonly />
+                <input type="text" class="form-control text-end" formControlName="reliefAmountFirstStage" placeholder="0" (keypress)="allowOnlyNumbers($event)"  />
               </div>
             </div>
             <div class="mb-4" *ngIf="showRelief">
@@ -868,8 +908,7 @@
             <input 
             type="text" 
             class="form-control text-end" 
-            [formControl]="totalCompensationControl" 
-            readonly />
+            [formControl]="totalCompensationControl" readonly />
           
           
           </div>
@@ -1112,7 +1151,7 @@
                     <label class="form-label">72. Eligible second stage relief amount for the victim as per the SC and ST Prevention of Atrocities Act (amended upto 2016) *</label>
                   </div>
                   <div class="col-4">
-                    <input type="text" class="form-control text-end" formControlName="reliefAmountScst_1"  />
+                    <input type="text" class="form-control text-end" formControlName="reliefAmountScst_1" (keypress)="allowOnlyNumbers($event)" />
                   </div>
                 </div>
                 <div class="row mb-3">
@@ -1120,7 +1159,7 @@
                     <label class="form-label">73. Eligible second stage relief amount for the victim (ex-gratia) by the Govt. of Tamil Nadu *</label>
                   </div>
                   <div class="col-4">
-                    <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia_1"  />
+                    <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia_1" (keypress)="allowOnlyNumbers($event)" />
                   </div>
                 </div>
                 <div class="row mb-3">
@@ -1128,7 +1167,7 @@
                     <label class="form-label">74. Total eligible amount for the victim for the second stage of relief *</label>
                   </div>
                   <div class="col-4">
-                    <input type="text" class="form-control text-end" formControlName="reliefAmountSecondStage" readonly  />
+                    <input type="text" class="form-control text-end" formControlName="reliefAmountSecondStage" (keypress)="allowOnlyNumbers($event)"  />
                   </div>
                 </div>
               </div>
@@ -1456,7 +1495,7 @@ maxlength="10"
                         </select>
                       </div>
 
-                      <div class="col-md-6">
+                      <div *ngIf="firForm.get('judgementDetails.judgementNature')?.value === 'Convicted'" class="col-md-6">
                         <label class="form-label">Conviction Type</label>
                         <select
                           class="form-select"
@@ -1751,7 +1790,7 @@ maxlength="10"
                                 </select>
                               </div>
 
-                              <div class="col-md-6">
+                              <div *ngIf="firForm.get('judgementDetails_one.judgementNature_one')?.value === 'Convicted_one'" class="col-md-6">
                                 <label class="form-label">Conviction Type</label>
                                 <select
                                   class="form-select"
@@ -2029,7 +2068,7 @@ maxlength="10"
                                 </select>
                               </div>
 
-                              <div class="col-md-6">
+                              <div *ngIf="firForm.get('judgementDetails_two.judgementNature_two')?.value === 'Convicted_two'" class="col-md-6">
                                 <label class="form-label">Conviction Type</label>
                                 <select
                                   class="form-select"
@@ -2167,7 +2206,7 @@ maxlength="10"
                           <label class="form-label">86. Eligible third stage relief amount for the victim as per the SC and ST Prevention of Atrocities Act *</label>
                       </div>
                       <div class="col-4 text-end">
-                          <input type="text" class="form-control text-end" formControlName="reliefAmountScst_2"  />
+                          <input type="text" class="form-control text-end" formControlName="reliefAmountScst_2"  (keypress)="allowOnlyNumbers($event)"/>
                       </div>
                   </div>
 
@@ -2176,7 +2215,7 @@ maxlength="10"
                           <label class="form-label">90. Eligible third stage relief amount for the victim (ex-gratia) by the Govt. of Tamil Nadu *</label>
                       </div>
                       <div class="col-4 text-end">
-                          <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia_2"  />
+                          <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia_2"  (keypress)="allowOnlyNumbers($event)"/>
                       </div>
                   </div>
 
@@ -2185,7 +2224,7 @@ maxlength="10"
                           <label class="form-label">91. Total Eligible amount for the victim for the Third stage of relief *</label>
                       </div>
                       <div class="col-4 text-end">
-                          <input type="text" class="form-control text-end" formControlName="reliefAmountThirdStage"  readonly />
+                          <input type="text" class="form-control text-end" formControlName="reliefAmountThirdStage" (keypress)="allowOnlyNumbers($event)"/>
                       </div>
                   </div>
               </div>

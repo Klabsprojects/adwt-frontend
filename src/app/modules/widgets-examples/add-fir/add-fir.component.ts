@@ -723,9 +723,12 @@ onFileSelect_3(event: Event, controlName: string): void {
       // If age is below 18, disable the name field
       if (ageValue < 18) {
         nameControl?.disable({ emitEvent: false });
-        nameControl?.reset();
+        nameControl?.setValue('Minor', { emitEvent: false });
       } else {
         nameControl?.enable({ emitEvent: false });
+        if (nameControl?.value === 'Minor') {
+          nameControl.setValue('', { emitEvent: false });
+        }
         if(index===0){
           this.onVictimSameAsComplainantChange(this.wasVictimSame);
           this.wasVictimSame && nameControl?.disable({ emitEvent: false });
@@ -829,7 +832,7 @@ onFileSelect_3(event: Event, controlName: string): void {
       dateOfOccurrence: ['', [Validators.required, this.maxDateValidator()]],
       date_of_occurrence_to: ['', [Validators.required, this.maxDateValidator()]],
       timeOfOccurrence: ['', Validators.required],
-      time_of_occurrence_to:['',Validators.required],
+      time_of_occurrence_to:[''],
       placeOfOccurrence: ['', Validators.required],
       dateOfRegistration: ['', Validators.required],
       is_case_altered: [''],
@@ -1402,6 +1405,94 @@ console.log(additionalReliefControl,"additionalReliefControl")
     });
   }
 
+  // command it tem by surya for manual calcualte
+  // populateVictimsRelief(victimsReliefDetails: any[]): void {
+  //   const victimsReliefArray = this.victimsRelief;
+
+  // // Ensure the value is retrieved as a number
+  // let selectedVictimCount = Number(this.firForm.get('complainantDetails.numberOfVictims')?.value) || 0;
+  // console.log("count ----------> ",selectedVictimCount);
+  // console.log("Selected Number of Victims from Dropdown:", selectedVictimCount);
+
+  // console.log("Before Clearing: victimsRelief.controls.length =", victimsReliefArray.controls.length);
+
+  // victimsReliefArray.clear(); // Clear existing form controls
+
+  // for (let i = 0; i < selectedVictimCount; i++) {
+  //   const victim = victimsReliefDetails[i] || {}; // Use existing data if available
+  //     console.log(`Adding victim #${i + 1}:`, victim);
+  //     const reliefGroup = this.createVictimReliefGroup();
+
+  //     // Set initial values for each victim
+  //     reliefGroup.patchValue({
+  //       victimId: victim.victim_id || '',
+  //       communityCertificate: victim.communityCertificate || '',
+  //       reliefAmountScst: victim.fir_stage_as_per_act || '0',
+  //       reliefAmountExGratia: victim.fir_stage_ex_gratia || '0',
+  //       reliefAmountFirstStage: (
+  //         parseFloat(victim.fir_stage_as_per_act || '0') +
+  //         parseFloat(victim.fir_stage_ex_gratia || '0')
+  //       ).toFixed(2),
+  //       reliefAmountScst_1: victim.chargesheet_stage_as_per_act || '0',
+  //       reliefAmountExGratia_1: victim.chargesheet_stage_ex_gratia || '0',
+  //       reliefAmountSecondStage: (
+  //         parseFloat(victim.chargesheet_stage_as_per_act || '0') +
+  //         parseFloat(victim.chargesheet_stage_ex_gratia || '0')
+  //       ).toFixed(2),
+  //       reliefAmountScst_2: victim.final_stage_as_per_act || '0',
+  //       reliefAmountExGratia_2: victim.final_stage_ex_gratia || '0',
+  //       reliefAmountThirdStage: (
+  //         parseFloat(victim.final_stage_as_per_act || '0') +
+  //         parseFloat(victim.final_stage_ex_gratia || '0')
+  //       ).toFixed(2),
+  //       totalCompensation: '0', // Start with 0 and calculate dynamically for each step
+  //     });
+
+  //     // Subscribe to value changes for each stage
+  //     reliefGroup.get('reliefAmountScst')?.valueChanges.subscribe(() => {
+  //       this.updateFirstStageRelief(reliefGroup);
+  //       this.updateTotalCompensation(); // Update first stage totals
+  //     });
+
+  //     reliefGroup.get('reliefAmountExGratia')?.valueChanges.subscribe(() => {
+  //       this.updateFirstStageRelief(reliefGroup);
+  //       this.updateTotalCompensation(); // Update first stage totals
+  //     });
+
+  //     reliefGroup.get('reliefAmountScst_1')?.valueChanges.subscribe(() => {
+  //       this.updateSecondStageRelief(reliefGroup);
+  //       this.updateTotalCompensation_1(); // Update second stage totals
+  //     });
+
+  //     reliefGroup.get('reliefAmountExGratia_1')?.valueChanges.subscribe(() => {
+  //       this.updateSecondStageRelief(reliefGroup);
+  //       this.updateTotalCompensation_1(); // Update second stage totals
+  //     });
+
+  //     reliefGroup.get('reliefAmountScst_2')?.valueChanges.subscribe(() => {
+  //       this.updateThirdStageRelief(reliefGroup);
+  //       this.updateTotalCompensation_2(); // Update third stage totals
+  //     });
+
+  //     reliefGroup.get('reliefAmountExGratia_2')?.valueChanges.subscribe(() => {
+  //       this.updateThirdStageRelief(reliefGroup);
+  //       this.updateTotalCompensation_2(); // Update third stage totals
+  //     });
+
+  //     victimsReliefArray.push(reliefGroup); // Add the relief group to the FormArray
+  //   }
+
+  //   console.log("After Adding: victimsRelief.controls.length =", this.victimsRelief.controls.length);
+
+  //   // Perform initial calculation
+  //   this.updateTotalCompensation();
+  //   this.updateTotalCompensation_1();
+  //   this.updateTotalCompensation_2();
+
+  //   this.cdr.detectChanges(); // Trigger UI updates
+  // }
+
+  
   populateVictimsRelief(victimsReliefDetails: any[]): void {
     const victimsReliefArray = this.victimsRelief;
 
@@ -1420,26 +1511,50 @@ console.log(additionalReliefControl,"additionalReliefControl")
       const reliefGroup = this.createVictimReliefGroup();
 
       // Set initial values for each victim
+      // reliefGroup.patchValue({
+      //   victimId: victim.victim_id || '',
+      //   communityCertificate: victim.communityCertificate || '',
+      //   reliefAmountScst: victim.fir_stage_as_per_act || '0',
+      //   reliefAmountExGratia: victim.fir_stage_ex_gratia || '0',
+      //   reliefAmountFirstStage: (
+      //     parseFloat(victim.fir_stage_as_per_act || '0') +
+      //     parseFloat(victim.fir_stage_ex_gratia || '0')
+      //   ).toFixed(2),
+      //   reliefAmountScst_1: victim.chargesheet_stage_as_per_act || '0',
+      //   reliefAmountExGratia_1: victim.chargesheet_stage_ex_gratia || '0',
+      //   reliefAmountSecondStage: (
+      //     parseFloat(victim.chargesheet_stage_as_per_act || '0') +
+      //     parseFloat(victim.chargesheet_stage_ex_gratia || '0')
+      //   ).toFixed(2),
+      //   reliefAmountScst_2: victim.final_stage_as_per_act || '0',
+      //   reliefAmountExGratia_2: victim.final_stage_ex_gratia || '0',
+      //   reliefAmountThirdStage: (
+      //     parseFloat(victim.final_stage_as_per_act || '0') +
+      //     parseFloat(victim.final_stage_ex_gratia || '0')
+      //   ).toFixed(2),
+      //   totalCompensation: '0', // Start with 0 and calculate dynamically for each step
+      // });
+
       reliefGroup.patchValue({
         victimId: victim.victim_id || '',
-        communityCertificate: victim.communityCertificate || '',
-        reliefAmountScst: victim.fir_stage_as_per_act || '0',
-        reliefAmountExGratia: victim.fir_stage_ex_gratia || '0',
+        communityCertificate: '',
+        reliefAmountScst: '0',
+        reliefAmountExGratia: '0',
         reliefAmountFirstStage: (
-          parseFloat(victim.fir_stage_as_per_act || '0') +
-          parseFloat(victim.fir_stage_ex_gratia || '0')
+          parseFloat('0') +
+          parseFloat('0')
         ).toFixed(2),
-        reliefAmountScst_1: victim.chargesheet_stage_as_per_act || '0',
-        reliefAmountExGratia_1: victim.chargesheet_stage_ex_gratia || '0',
+        reliefAmountScst_1: '0',
+        reliefAmountExGratia_1: '0',
         reliefAmountSecondStage: (
-          parseFloat(victim.chargesheet_stage_as_per_act || '0') +
-          parseFloat(victim.chargesheet_stage_ex_gratia || '0')
+          parseFloat('0') +
+          parseFloat('0')
         ).toFixed(2),
-        reliefAmountScst_2: victim.final_stage_as_per_act || '0',
-        reliefAmountExGratia_2: victim.final_stage_ex_gratia || '0',
+        reliefAmountScst_2: '0',
+        reliefAmountExGratia_2: '0',
         reliefAmountThirdStage: (
-          parseFloat(victim.final_stage_as_per_act || '0') +
-          parseFloat(victim.final_stage_ex_gratia || '0')
+          parseFloat('0') +
+          parseFloat('0')
         ).toFixed(2),
         totalCompensation: '0', // Start with 0 and calculate dynamically for each step
       });
@@ -4573,6 +4688,12 @@ isSubmitButtonEnabled(): boolean {
       'Murder'
     ];
     return excluded.includes(act);
+  }
+
+  removeSelectedOffence(index: number, offenceName: string): void {
+    const selected = this.victims.at(index).get('offenceCommitted')?.value || [];
+    const updated = selected.filter((item: string) => item !== offenceName);
+    this.victims.at(index).get('offenceCommitted')?.setValue(updated);
   }
 }
   
