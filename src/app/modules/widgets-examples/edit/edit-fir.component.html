@@ -1144,7 +1144,7 @@
               <div class="card-body">
                 <div class="mb-4 col-lg-4">
                   <label class="form-label">71. Name of the Victim *</label>
-                  <input type="text" class="form-control mb-3" [value]="victimNames[i]" placeholder="Name of the Victim" disabled />
+                  <input type="text" class="form-control mb-3" [value]="victimNames?.[i] || ''" placeholder="Name of the Victim" disabled />
                 </div>
                 <div class="row mb-3">
                   <div class="col-8">
@@ -1276,13 +1276,13 @@
                     <!-- Item 74 -->
                   
                     <!-- Item 75 -->
-                    <div class="col-md-6 mb-3">
-                      <label class="form-label">80. District in which court is present *</label>
+                    <!-- <div class="col-md-6 mb-3">
+                      <label class="form-label">80. District in which court is present *</label> -->
                       <!-- <select class="form-select" formControlName="trialCourtDistrict" required>
                         <option value="" disabled selected>Select District</option>
                         <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
                       </select> -->
-                      <ng-select
+                      <!-- <ng-select
                         class="form-select"
                         [items]="courtDistricts"
                         bindLabel="district"
@@ -1298,7 +1298,26 @@
                     <div class="col-md-6 mb-3">
                       <label class="form-label">81. Name of the Designated / Special court *</label>
                       <input type="text" class="form-control" formControlName="Court_name1" placeholder="Enter Name" required />
+                  </div> -->
+
+
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">80. District in which court is present *</label>
+                    <ng-select class="form-select" [items]="courtDistricts" bindLabel="district" bindValue="district"
+                      formControlName="courtDistrict" [searchable]="true" [clearable]="false"
+                      [placeholder]="firForm.get('courtDistrict')?.value ? '' : 'Select District'" (change)="onCourtDivisionChange2($event)" required>
+                    </ng-select>
                   </div>
+            
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">81. Name of the Designated / Special court *</label>
+                    <!-- <input type="text" class="form-control" formControlName="Court_name1" placeholder="Enter Name" required /> -->
+                    <ng-select class="form-select" [items]="courtRanges5" bindLabel="label" bindValue="value"
+                      formControlName="Court_name1" [searchable]="true" [clearable]="false"
+                      [placeholder]="firForm.get('Court_name1')?.value ? '' : 'Select Court Range'" required>
+                    </ng-select>
+                  </div>
+
                     <!-- Item 76 -->
                     <div class="col-md-6 mb-3">
                         <label class="form-label">82. Case Number Report (CNR) / Special SC number *</label>
@@ -1487,7 +1506,7 @@ maxlength="10"
                           (change)="onJudgementNatureChange()"
                           required
                         >
-                          <option value="" disabled selected>Select Nature of Judgement</option>
+                          <!-- <option value="" selected disabled>Select Nature of Judgement</option> -->
                           <option value="Convicted">Accused person(s) has been Convicted</option>
                           <option value="Acquitted">Accused person(s) have been Acquitted</option>
                           <option value="Charge_Abated">Charge Abated</option>
@@ -1895,7 +1914,7 @@ maxlength="10"
                                 <select class="form-select" formControlName="designatedCourt_one" (change)="onDesignatedCourtChange_one($event)">
                                   <option value="" disabled>Select Option</option>
                                   <!-- <option value="highCourt_one">High Court</option> -->
-                                  <option value="supremeCourt">Supreme Court</option>
+                                  <option value="supremeCourt_one">Supreme Court</option>
                                 </select>
                               </div>
                             </div>
@@ -2198,7 +2217,7 @@ maxlength="10"
                  
                   <div class="mb-4 col-lg-4">
                       <label class="form-label">89. Name of the Victim *</label>
-                      <input type="text" class="form-control mb-3" [value]="victimNames[i]" placeholder="Name of the Victim" disabled />
+                      <input type="text" class="form-control mb-3" [value]="victimNames?.[i] || ''" placeholder="Name of the Victim" disabled />
                   </div>
 
                   <div class="row mb-3">

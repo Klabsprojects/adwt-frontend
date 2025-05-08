@@ -495,7 +495,7 @@ export class FirListComponent implements OnInit {
     { label: 'Created By', field: 'created_by', sortable: true, visible: true },
     { label: 'Created At', field: 'created_at', sortable: true, visible: true },
     { label: 'Data Entry Status', field: 'status', sortable: false, visible: true },
-    { label: 'Case Status', field: 'Case_Status', sortable: false, visible: false },
+    { label: 'Case Status', field: 'Case_Status', sortable: false, visible: true },
     { label: 'Actions', field: 'actions', sortable: false, visible: true },
   ];
 

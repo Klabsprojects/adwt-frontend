@@ -2091,12 +2091,30 @@ handleCaseTypeChange() {
     }
   }
 
+  // temrorary command by surya because of new requirenment.
   // Dropdown and option loading methods
+  // loadOptions() {
+  //   this.firService.getOffences().subscribe(
+  //     (offences: any) => {
+  //       console.log(offences);
+  //       this.offenceOptions = offences.map((offence: any) => offence);
+  //     },
+  //     (error: any) => {
+  //       Swal.fire('Error', 'Failed to load offence options.', 'error');
+  //     }
+  //   );
+  // }
+
   loadOptions() {
     this.firService.getOffences().subscribe(
       (offences: any) => {
         console.log(offences);
-        this.offenceOptions = offences.map((offence: any) => offence);
+        this.offenceOptions = offences
+          .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
+          this.offenceOptions.push(
+            { offence_act_name: '3(2)(va)', offence_name: '', id : 24 },
+            { offence_act_name: '3(2)(v), 3(2)(va)', offence_name: '', id: 25 }
+          );
       },
       (error: any) => {
         Swal.fire('Error', 'Failed to load offence options.', 'error');
@@ -3377,6 +3395,15 @@ Conviction_Type: this.firForm.get('judgementDetails.Conviction_Type')?.value,
       judgementNature: this.firForm.get('judgementDetails.judgementNature_two')?.value,
 
     },
+
+    victimsRelief: this.victimsRelief.value.map((relief: any, index: number) => ({
+
+      victimId: relief.victimId || null,
+      victimName: this.victimNames[index] || '',
+      reliefAmountScst_2: parseFloat(relief.reliefAmountScst_2 || '0.00').toFixed(2),
+      reliefAmountExGratia_2: parseFloat(relief.reliefAmountExGratia_2 || '0.00').toFixed(2),
+      reliefAmountThirdStage: parseFloat(relief.reliefAmountThirdStage || '0.00').toFixed(2),
+    })),
     
     // Submission Status
     status: isSubmit ? 7 : undefined,
@@ -4685,7 +4712,9 @@ isSubmitButtonEnabled(): boolean {
       'Disability: Incapacitation less than 50',
       'Rape',
       'Gang Rape',
-      'Murder'
+      'Murder',
+      '3(2)(v), 3(2)(va)',
+      '3(2)(va)'
     ];
     return excluded.includes(act);
   }

@@ -127,6 +127,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   showDesignatedCourt: boolean = false;
   courtDivisions: string[] = [];
   courtRanges: string[] = [];
+  courtRanges5: any;
 
   showDuplicateSection_1: boolean = false;
   showLegalOpinionObtained_two: boolean = false;  
@@ -976,7 +977,7 @@ loadAccusedCommunities(): void {
   // }
   // imagePaths: string[] = [];
 
-  loadFirDetails(firId: string): void {
+  loadFirDetails_old(firId: string): void {
 
     this.firService.getFirDetails(firId).subscribe(
       (response) => {
@@ -989,7 +990,7 @@ loadAccusedCommunities(): void {
           response.appeal_details.forEach((appealDetail:any) => {
             this.firForm.patchValue({
               judgementDetails: {
-                judgementNature: appealDetail.judgementNature || '',
+                // judgementNature: appealDetail.judgementNature || '',
                 // Conviction_Type: response.data5.Conviction_Type || '',
           legalOpinionObtained: appealDetail.legal_opinion_obtained || '',
           filedBy:appealDetail.filed_by || '',
@@ -1039,8 +1040,8 @@ console.log(response.casedetail_one,"casedetail_onee")
         
                         this.firForm.patchValue({
                           judgementDetails_one: {
-                judgementNature_one: appealDetail.judgementNature || '',
-                Conviction_Type_one:appealDetail.Conviction_Type || '',
+                // judgementNature_one: appealDetail.judgementNature || '',
+                // Conviction_Type_one:appealDetail.Conviction_Type || '',
                 legalOpinionObtained_one: appealDetail.legal_opinion_obtained || '',
                 caseFitForAppeal_one:appealDetail.case_fit_for_appeal || '',
                 filedBy_one: appealDetail.filed_by || '',
@@ -1126,14 +1127,6 @@ console.log(response.casedetail_one,"casedetail_onee")
         });
       }
       
-      // if (this.firForm && response.data5 && response.data5.length > 0) {
-      //   console.log("ConvictionType from API:", response.data5[0].Conviction_Type);
-      //   console.log("Form Control before setting:", this.firForm.get('Conviction_Type')?.value);
-      //   const convictionType = response.data5[0].Conviction_Type || ''; 
-      //   this.firForm.get('Conviction_Type')?.setValue(convictionType);
-      //   console.log("Form Control after setting:", this.firForm.get('Conviction_Type')?.value);
-      // }
-
       if (this.firForm && response.data5 && response.data5.length > 0) {
         console.log("ConvictionType from API:", response.data5[0].Conviction_Type);
       
@@ -1596,9 +1589,9 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
           this.firForm.get('proceedingsDate')?.setValue(formattedDate);
         }
 
-        if (response && response.data && response.data.nature_of_judgement) {
-            this.firForm.get('judgementDetails.judgementNature')?.setValue(response.data.nature_of_judgement);
-        }
+        // if (response && response.data && response.data.nature_of_judgement) {
+        //     this.firForm.get('judgementDetails.judgementNature')?.setValue(response.data.nature_of_judgement);
+        // }
 
         if (response && response.data && response.data.judgement_copy) {
           this.firForm.get('judgementDetails.uploadJudgement')?.setValue(response.data.judgement_copy);
@@ -1766,7 +1759,708 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
         console.error('Error loading FIR details:', error);
       }
     );
+
   }
+
+
+  
+
+
+
+  loadFirDetails(firId: string){
+    this.firService.getFirDetails(firId).subscribe(
+      (response) => {
+    this.showDuplicateSection = false;
+    this.showDuplicateSection_1 = false;   
+    
+    // step 1 & 2 load
+
+    if(response && response.data){
+      this.loadPoliceStations(response.data.police_city,response.data.police_station);
+
+      // step 1 load
+    if(response.data.police_city){
+      this.firForm.get('policeCity')?.setValue(response.data.police_city);
+      this.onCityChange({ target: { value: response.data.police_city } });
+    }
+    if(response.data.police_range){
+      this.firForm.get('policeRange')?.setValue(response.data.police_range); 
+    }
+    if(response.data.police_zone){
+      this.firForm.get('policeZone')?.setValue(response.data.police_zone); 
+    }
+    if(response.data.revenue_district){
+      this.firForm.get('revenueDistrict')?.setValue(response.data.revenue_district); 
+    }
+    if(response.data.officer_name){
+      this.firForm.get('officerName')?.setValue(response.data.officer_name); 
+    }
+    if(response.data.complaintReceivedType){
+      this.firForm.get('complaintReceivedType')?.setValue(response.data.complaintReceivedType);
+    }
+    if(response.data.complaintRegisteredBy){
+      this.firForm.get('complaintRegisteredBy')?.setValue(response.data.complaintRegisteredBy);
+    }
+    if(response.data.complaintReceiverName){
+      this.firForm.get('complaintReceiverName')?.setValue(response.data.complaintReceiverName);
+    }
+    if(response.data.officer_designation){
+      this.firForm.get('officerDesignation')?.setValue(response.data.officer_designation); 
+    }
+    if(response.data.officer_phone){
+      this.firForm.get('officerPhone')?.setValue(response.data.officer_phone); 
+    }
+
+    // step 2 load
+    this.firForm.get('is_case_altered')?.setValue('No');
+    if(response.data.fir_number){
+      this.firForm.get('firNumber')?.setValue(response.data.fir_number); 
+    }
+    if(response.data.fir_number_suffix){
+      this.firForm.get('firNumberSuffix')?.setValue(response.data.fir_number_suffix); 
+    }
+    if(response.data.date_of_occurrence) { 
+      const dateObj = new Date(response.data.date_of_occurrence);
+      const formattedDate = dateObj.toISOString().split('T')[0];
+      this.firForm.get('dateOfOccurrence')?.setValue(formattedDate);
+    }
+    if(response.data.date_of_occurrence_to){
+      const dateObj = new Date(response.data.date_of_occurrence_to);
+      const formattedDate = dateObj.toISOString().split('T')[0];
+      this.firForm.get('date_of_occurrence_to')?.setValue(formattedDate);
+    }
+    if(response.data.time_of_occurrence){
+      this.firForm.get('timeOfOccurrence')?.setValue(response.data.time_of_occurrence); 
+    }
+    if(response.data.time_of_occurrence_to){
+      this.firForm.get('time_of_occurrence_to')?.setValue(response.data.time_of_occurrence_to); 
+    }
+    if(response.data.place_of_occurrence){
+      this.firForm.get('placeOfOccurrence')?.setValue(response.data.place_of_occurrence); 
+    }
+    if(response.data.date_of_registration){
+      const dateObj1 = new Date(response.data.date_of_registration);
+      const formattedDate1 = dateObj1.toISOString().split('T')[0];
+      this.firForm.get('dateOfRegistration')?.setValue(formattedDate1); 
+    }
+    if(response.data.is_case_altered){
+      this.firForm.get('is_case_altered')?.setValue(response.data.is_case_altered); 
+    }
+    if(response.data.altered_date){
+      const dateObj1 = new Date(response.data.altered_date);
+      const formattedDate1 = dateObj1.toISOString().split('T')[0];
+      this.firForm.get('altered_date')?.setValue(formattedDate1); 
+    }
+    
+    if(response.data.time_of_registration){
+      this.firForm.get('timeOfRegistration')?.setValue(response.data.time_of_registration); 
+    }
+
+      // step 3
+
+    if(response.data.name_of_complainant){ 
+      this.firForm.get('complainantDetails.nameOfComplainant')?.setValue(response.data.name_of_complainant); 
+    }
+    if(response.data.mobile_number_of_complainant){
+      this.firForm.get('complainantDetails.mobileNumberOfComplainant')?.setValue(response.data.mobile_number_of_complainant); 
+    }
+    if(response.data.is_victim_same_as_complainant){
+      if(response.data.is_victim_same_as_complainant == 'true'){
+        this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.setValue(response.data.is_victim_same_as_complainant);
+      } else {
+        this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.setValue('false');
+      }
+    }
+    if (response.data.number_of_accused) {
+      this.firForm.get('numberOfAccused')?.setValue(response.data.number_of_accused);
+    }
+    // if (response.data.nature_of_judgement) {
+    //   this.firForm.get('judgementDetails.judgementNature')?.setValue(response.data.nature_of_judgement);
+    // }
+    if (response.data.judgement_copy) {
+      this.firForm.get('judgementDetails.uploadJudgement')?.setValue(response.data.judgement_copy);
+    }
+    if(response.data.number_of_victim){ 
+      this.firForm.get('complainantDetails.numberOfVictims')?.setValue(response.data.number_of_victim); 
+    }
+    if(response.data.is_deceased){ 
+      if(response.data.is_deceased == 1){
+        this.firForm.get('isDeceased')?.setValue("yes");
+      }
+      else{
+        this.firForm.get('isDeceased')?.setValue("no");
+      }
+    }
+    if (response.data.deceased_person_names) {
+      let deceased_person_names: any[] = [];
+      if (typeof response.data.deceased_person_names === 'string') {
+        try {
+          deceased_person_names = JSON.parse(response.data.deceased_person_names);
+        } catch (error) {
+          console.error("Error parsing deceased_person_names:", error);
+        }
+      } else {
+        deceased_person_names = response.data.deceased_person_names;
+      }
+      
+      this.firForm.get('deceasedPersonNames')?.setValue(deceased_person_names);
+    }
+    }
+
+
+    const accusedFormArray = this.firForm.get('accuseds') as FormArray;
+    if (response && response.data1 && response.data1.length > 0) {
+      this.victimNames = response.data1.map((victim: any) => victim.victim_name);
+      // Resetting the victims array in case of a previous value
+      const victimsFormArray = this.firForm.get('victims') as FormArray;
+      victimsFormArray.clear(); // Clear any existing victims data
+      console.log('arryresp',response.data1);
+
+      response.data1.forEach((victim: any, index: number) => {
+
+        const victimGroup = this.createVictimGroup();
+        let offence_committed_data: any[] = [];
+        let scst_sections_data: any[] = [];
+
+        if (victim.offence_committed && this.isValidJSON(victim.offence_committed)) {
+          offence_committed_data = JSON.parse(victim.offence_committed);
+        }
+        if (victim.scst_sections && this.isValidJSON(victim.scst_sections)) {
+          scst_sections_data = JSON.parse(victim.scst_sections);
+        }
+    
+        victimGroup.patchValue({
+          victim_id: victim.victim_id,
+          name: victim.victim_name,
+          age: victim.victim_age,
+          gender: victim.victim_gender,
+          mobileNumber: victim.mobile_number,
+          address: victim.address,
+          victimPincode: victim.victim_pincode,
+          community: victim.community,
+          caste: victim.caste,
+          guardianName: victim.guardian_name,
+          isNativeDistrictSame: victim.is_native_district_same,
+          nativeDistrict: victim.native_district,
+          offenceCommitted: offence_committed_data,
+          scstSections: scst_sections_data,
+          sectionsIPC: victim.sectionsIPC
+        });
+    
+        this.firService.getCastesByCommunity(victim.community).subscribe(
+          (castes: string[]) => {
+            victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+          },
+          (error) => {
+            console.error('Error fetching castes:', error);
+            Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+          }
+        );
+
+        victimsFormArray.push(victimGroup);
+
+        this.onVictimAgeChange(index)
+      });
+      const sectionsArray = JSON.parse(response.data1[0].sectionsIPC_JSON);
+
+      // Get the form array for the specific victim index (assuming index 0 for example)
+      const victimIndex = 0; // Adjust this based on your logic
+      const sectionDetails = this.getSectionDetails(victimIndex);
+
+      // Clear existing form array
+      while (sectionDetails.length !== 0) {
+        sectionDetails.removeAt(0);
+      }
+
+      // Populate form array with parsed data
+      sectionsArray.forEach((section: any) => {
+        sectionDetails.push(this.fb.group({
+          SectionType: [section.SectionType || '', Validators.required],
+          Section: [section.Section || '', Validators.required]
+        }));
+      });   
+    }
+
+
+    if (response && response.data2 && response.data2.length > 0) {
+      accusedFormArray.clear(); 
+      this.firCopyValue = [];
+      response.data2.forEach((accused: any,index:number) => {
+        console.log(accused.upload_fir_copy,"uploadFIRCopy")
+        const selectedCommunity = accused.community;
+   
+        if (selectedCommunity) {
+          this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
+          (castes: string[]) => {
+          this.scstSectionsOptions = castes;
+
+          this.cdr.detectChanges();
+          },
+          (error) => {
+          console.error('Error fetching accused castes:', error);
+          Swal.fire('Error', 'Failed to load castes for the selected accused community.', 'error');
+          }
+          );
+          }
+
+        const accusedGroup = this.createAccusedGroup();
+        
+        accusedGroup.patchValue({
+          accusedId: accused.accused_id,
+          age: accused.age,
+          name: accused.name,
+          gender: accused.gender,
+          address: accused.address,
+          pincode: accused.pincode,
+          community: accused.community,
+          caste: accused.caste,
+          guardianName: accused.guardian_name,
+          previousIncident: accused.previous_incident == 1 ? "true" : "false",
+          previousFIRNumber: accused.previous_fir_number,
+          previousFIRNumberSuffix: accused.previous_fir_number_suffix,
+          scstOffence: accused.scst_offence == 1 ? "true" : "false",
+          scstFIRNumber: accused.scst_fir_number,
+          scstFIRNumberSuffix: accused.scst_fir_number_suffix,
+          antecedentsOption:accused.antecedentsOption,
+          antecedents: accused.antecedents,
+          landOIssueOption:accused.landOIssueOption,
+          landOIssues: accused.land_o_issues,
+          gistOfCurrentCase: accused.gist_of_current_case,
+          uploadFIRCopy:accused.upload_fir_copy,
+
+        });
+
+        accusedFormArray.push(accusedGroup);
+        console.log(accusedFormArray,"accusedFormArrayaccusedFormArrayaccusedFormArray")
+      });
+    }
+
+    if(response && response.data3){
+
+      if (response.data3.proceedings_date) {
+        const dateObj = new Date(response.data3.proceedings_date);
+        const formattedDate = dateObj.toISOString().split('T')[0]; // Format to 'yyyy-mm-dd'
+        this.firForm.get('proceedingsDate')?.setValue(formattedDate);
+      }
+
+      // 1. Total Compensation
+      if (response.data3.total_compensation) {
+        this.firForm.get('totalCompensation')?.setValue(response.data3.total_compensation);
+      }
+
+      // 2. Proceedings File No.
+      if (response.data3.proceedings_file_no) {
+        this.firForm.get('proceedingsFileNo')?.setValue(response.data3.proceedings_file_no);
+      }
+
+      if (response.data3.proceedings_file) {
+  
+        const data = response.data3.proceedings_file
+        this.firForm.get('proceedingsFile')?.setValue(data);
+        this.filePath_attachment = response.data3.file_paths?.length
+        ? response.data3.file_paths.map((file:any) => `${this.apiUrl}uploads/${file}`)
+        : [];
+        
+        if (!this.attachmentss_1) {
+          this.attachmentss_1 = [];
+        }
+        this.filePath_attachment.forEach((filePath: any) => {
+          this.attachmentss_1.push({ id: "", path: filePath, file: filePath });
+        });
+        console.log("Updated attachmentss_1:", this.attachmentss_1);  
+      }
+
+      if (response.data3.all_attachments) {
+        try {
+          // Split the concatenated string by commas to get each attachment's id and file path
+          const allFilesArray: { chargesheet_attachment_id: number, file_path: string }[] = response.data3.all_attachments.split(',').map((attachment: string) => {
+            const [attachmentId, filePath] = attachment.split('||'); // Split by colon to get id and path
+            return { chargesheet_attachment_id: attachmentId, file_path: filePath };
+          });
+      
+          this.allFiles = allFilesArray;
+
+          console.log(response,"this.allFiles")
+        } catch (error) {
+          console.error('Error parsing all_attachments:', error);
+          this.allFiles = [];
+        }
+      }
+    }
+
+    if(response && response.data4){
+
+    const chargesheetDetails = response.data4;
+
+    if (response.data4.total_compensation_1) {
+      this.firForm.get('totalCompensation_1')?.setValue(response.data4.total_compensation_1);
+    } 
+    if (response.data4.proceedings_file_no) {
+      this.firForm.get('proceedingsFileNo_1')?.setValue(response.data4.proceedings_file_no);
+    }
+    if (response.data4.upload_proceedings_path) { 
+      this.firForm.get('uploadProceedings_1')?.setValue(response.data4.upload_proceedings_path);
+    }  
+    if (response.data4.attachments) { 
+      this.attachmentss_1 =  response.data4.attachments
+    }
+    if (response && response.data4 && response.data4.proceedings_date) {
+      const dateObj = new Date(response.data4.proceedings_date);
+      const formattedDate = dateObj.toISOString().split('T')[0]; // Format to 'yyyy-mm-dd'
+      this.firForm.get('proceedingsDate_1')?.setValue(formattedDate);
+    }
+
+    if (chargesheetDetails.charge_sheet_filed) {
+      if(chargesheetDetails.charge_sheet_filed == "yes")
+      {
+        this.firForm.get('chargeSheetFiled')?.setValue("yes");
+      }
+      else{
+        this.firForm.get('chargeSheetFiled')?.setValue("no");
+      }
+      
+    }
+
+    if(chargesheetDetails.chargesheet_id){
+      this.chargesheet_id = chargesheetDetails.chargesheet_id;
+    }
+
+    if (chargesheetDetails.court_district) {
+      
+      this.firForm.get('courtDivision')?.setValue(chargesheetDetails.court_district);
+    }
+    if (chargesheetDetails.court_name) { 
+    
+    this.selectedCourtName = chargesheetDetails.court_name;
+    this.onCourtDivisionChange1(chargesheetDetails.court_district);
+
+    this.firForm.get('courtName')?.setValue(this.selectedCourtName);
+    }
+    if (chargesheetDetails.case_type) {
+      this.firForm.get('caseType')?.setValue(chargesheetDetails.case_type);
+    }
+    if (chargesheetDetails.case_number) {
+      this.firForm.get('caseNumber')?.setValue(chargesheetDetails.case_number);
+    }
+    if (chargesheetDetails.chargesheetDate){
+      const date = new Date(chargesheetDetails.chargesheetDate);
+      const formattedDate = date.toISOString().split('T')[0];
+      this.firForm.get('chargeSheetDate')?.setValue(formattedDate);
+    }
+
+    if (chargesheetDetails.rcs_file_number) {
+      this.firForm.get('rcsFileNumber')?.setValue(chargesheetDetails.rcs_file_number);
+    }
+    if (chargesheetDetails.rcs_filing_date) {
+      const rcsFilingDate = new Date(chargesheetDetails.rcs_filing_date);
+      const formattedDate = rcsFilingDate.toISOString().split('T')[0];
+      this.firForm.get('rcsFilingDate')?.setValue(formattedDate);
+    }
+
+    if (response.data4.all_attachments) {
+      try {
+        // Split the concatenated string by commas to get each attachment's id and file path
+        const allFilesArray: { chargesheet_attachment_id: number, file_path: string }[] = response.data4.all_attachments.split(',').map((attachment: string) => {
+          const [attachmentId, filePath] = attachment.split('||'); // Split by colon to get id and path
+          return { chargesheet_attachment_id: attachmentId, file_path: filePath };
+        });
+    
+        this.allFiles1 = allFilesArray;
+      } catch (error) {
+        console.error('Error parsing all_attachments:', error);
+        this.allFiles1 = [];
+      }
+    }
+    }
+    
+    if(response.data5 && response.data5.length){
+
+      if (this.firForm && response.data5 && response.data5.length > 0) {
+        console.log("ConvictionType from API:", response.data5[0].Conviction_Type);
+      
+        const convictionType = response.data5[0].Conviction_Type || '';
+      
+        // Check if the form group exists before setting the value
+        if (this.firForm.get('judgementDetails.Conviction_Type')) {
+          this.firForm.get('judgementDetails.Conviction_Type')?.setValue(convictionType);
+          console.log("Form Control after setting:", this.firForm.get('judgementDetails.Conviction_Type')?.value);
+        } else {
+          console.error("Conviction_Type is missing inside judgementDetails!");
+        }
+      }
+
+
+      if (response.data5 && response.data5.length > 0) {
+
+        this.onCourtDivisionChange2(response.data5[0].court_district);
+        this.AutoOnCaseHandledByChange(response.data5[0].CaseHandledBy);
+    
+          response.data5.forEach((item: any, index: number) => {
+
+          if (index === 0) {
+
+            this.case_id = item.case_id || '';
+            // Populate main section
+            this.firForm.patchValue({
+              trialCaseNumber: item.trial_case_number || '',
+              courtDistrict: item.court_district || '',
+              Court_name1: item.court_name || '',
+              publicProsecutor: item.public_prosecutor || '',
+              prosecutorPhone: item.prosecutor_phone || '',
+              firstHearingDate: item.first_hearing_date ? formatDate(item.first_hearing_date, 'yyyy-MM-dd', 'en') : '',
+              judgementAwarded: item.judgement_awarded || '',
+              CaseHandledBy:item.CaseHandledBy || '',
+              judgementAwarded1:item.judgementAwarded1 ||'',
+              judgementNature:item.judgementNature ||'',
+              Conviction_Type:item.Conviction_Type ||'',
+              NameOfAdvocate:item.NameOfAdvocate ||'',
+              advocateMobNumber:item.advocateMobNumber ||'',
+         
+            });
+
+            this.firForm.get('judgementDetails.judgementNature')?.setValue(item.judgementNature);
+
+            if (item.hearingDetails && Array.isArray(item.hearingDetails)) {
+
+              const hearingDetailsControl = this.firForm.get('hearingDetails') as FormArray;
+
+              hearingDetailsControl.clear();
+              item.hearingDetails.forEach((hearing: HearingDetail) => {
+                hearingDetailsControl.push(this.createHearingDetailGroup());
+              });
+            }
+          } else if (index === 1) {
+            this.case_id1 = item.case_id || '';
+            // Populate duplicate section 1
+            this.showDuplicateSection = true;
+            this.firForm.patchValue({
+              Court_one: item.court_name || '',
+              courtDistrict_one: item.court_district || '',
+              caseNumber_one: item.trial_case_number || '',
+              publicProsecutor_one: item.public_prosecutor || '',
+              prosecutorPhone_one: item.prosecutor_phone || '',
+              firstHearingDate_one: item.first_hearing_date ? formatDate(item.first_hearing_date, 'yyyy-MM-dd', 'en') : '',
+              judgementAwarded_one: item.judgement_awarded || '',
+            });
+      
+          
+            if (item.hearingDetails_one && Array.isArray(item.hearingDetails_one)) {
+              const hearingDetailsControl = this.firForm.get('hearingDetails_one') as FormArray;
+
+              console.log(hearingDetailsControl,"hearingDetailsControl")
+              hearingDetailsControl.clear();
+              item.hearingDetails_one.forEach((hearing: HearingDetail) => {
+                hearingDetailsControl.push(this.createHearingDetailGroup_one());
+              });
+            }
+          } else if (index === 2) {
+            this.case_id2 = item.case_id || '';
+        
+            this.showDuplicateSection_1 = true;
+            this.firForm.patchValue({
+              Court_three: item.court_name || '',
+              courtDistrict_two: item.court_district || '',
+              caseNumber_two: item.trial_case_number || '',
+              publicProsecutor_two: item.public_prosecutor || '',
+              prosecutorPhone_two: item.prosecutor_phone || '',
+              firstHearingDate_two: item.first_hearing_date ? formatDate(item.first_hearing_date, 'yyyy-MM-dd', 'en') : '',
+              judgementAwarded_two: item.judgement_awarded || '',
+            });
+ 
+            if (item.hearingDetails_two && Array.isArray(item.hearingDetails_two)) {
+              const hearingDetailsControl = this.firForm.get('hearingDetails_two') as FormArray;
+              hearingDetailsControl.clear();
+              item.hearingDetails_two.forEach((hearing: HearingDetail) => {
+                hearingDetailsControl.push(this.createHearingDetailGroup_two());
+              });
+            }
+          }
+        });
+      }
+    }
+
+
+    if(response && response.data6){
+      if (response.data6.Commissionerate_file) {
+        this.firForm.get('uploadProceedings')?.setValue(response.data6.Commissionerate_file);
+      }
+
+      if (response.data6.proceedings_file_no) {
+        this.firForm.get('proceedingsFileNo')?.setValue(response.data6.proceedings_file_no);
+      }
+
+      if (response.data6.proceedings_date) {
+        const dateObj = new Date(response.data6.proceedings_date);
+        const formattedDate = dateObj.toISOString().split('T')[0]; 
+        this.firForm.get('proceedingsDate')?.setValue(formattedDate);
+      }
+    }
+
+    if (response.casedetail_one && response.casedetail_one.length > 0) {
+
+      response.casedetail_one.forEach((item:any) => {
+
+        this.firForm.patchValue({
+          Court_one: item.court_name || '',
+          courtDistrict_one: item.court_district || '',
+          caseNumber_one: item.case_number || '',
+          publicProsecutor_one: item.public_prosecutor || '',
+          prosecutorPhone_one: item.prosecutor_phone || '',
+          firstHearingDate_one: item.second_hearing_date ? formatDate(item.second_hearing_date, 'yyyy-MM-dd', 'en') : '',
+          judgementAwarded_one: item.judgement_awarded || '',
+          judgementNature_one:item.judgementNature || '',
+          Conviction_Type_one:item.Conviction_Type || '',
+        });
+      });
+    }
+
+    if (response.casedetail_two && response.casedetail_two.length > 0) {
+
+        response.casedetail_two.forEach((item:any) => {
+
+          const judgementAwardedValue = item.judgement_awarded || '';
+          this.firForm.patchValue({
+            judgementAwarded3: judgementAwardedValue,
+
+            courtDistrict_two : item.court_district,
+            caseNumber_two:item.case_number,
+            publicProsecutor_two:item.public_prosecutor,
+            prosecutorPhone_two:item.prosecutor_phone,
+
+            firstHearingDate_two:item.second_hearing_date ? formatDate(item.second_hearing_date, 'yyyy-MM-dd', 'en') : '',
+          });
+          this.applyJudgementAwardedValidators(judgementAwardedValue);
+          
+        });
+      }
+
+           
+      if (response.appeal_details && response.appeal_details.length > 0) {
+        response.appeal_details.forEach((appealDetail:any) => {
+        this.firForm.patchValue({
+        judgementDetails: {
+        // judgementNature: appealDetail.judgementNature || '',
+        legalOpinionObtained: appealDetail.legal_opinion_obtained || '',
+        filedBy:appealDetail.filed_by || '',
+        designatedCourt:appealDetail.designated_court || '',
+        caseFitForAppeal:appealDetail.case_fit_for_appeal || '',
+
+        governmentApprovalForAppeal: appealDetail.government_approval_for_appeal || '',
+            }
+            // trialCourtDistrict: appealDetail.court_district || '',
+            // trialCaseNumber: appealDetail.trial_case_number || '',
+            // publicProsecutor: appealDetail.public_prosecutor || '',
+           
+          });
+
+          console.log(this.firForm.get('judgementDetails')?.value,"sasasasasasa");
+
+          this.onLegalOpinionChange();
+          this.onDesignatedCourtChange_demo();
+          this.onJudgementNatureChange();
+        });
+    }
+
+
+    if (response.appeal_details_one && response.appeal_details_one.length > 0) {
+      console.log(response.appeal_details_one,"appeal_details_one")
+        response.appeal_details_one.forEach((appealDetail:any) => {
+
+        this.firForm.patchValue({
+        judgementDetails_one: {
+        // judgementNature_one: appealDetail.judgementNature || '',
+        // Conviction_Type_one:appealDetail.Conviction_Type || '',
+        legalOpinionObtained_one: appealDetail.legal_opinion_obtained || '',
+        caseFitForAppeal_one:appealDetail.case_fit_for_appeal || '',
+        filedBy_one: appealDetail.filed_by || '',
+
+        designatedCourt_one: appealDetail.designated_court || '',
+    
+        governmentApprovalForAppeal_one:appealDetail.government_approval_for_appeal || '',
+
+      }
+    });
+
+      this.onJudgementNatureChange_one();
+      this.onLegalOpinionChange_one();
+      this.onDesignatedCourtChange_one_fromapi();
+    });
+    }
+
+    if (response.hearingDetails && response.hearingDetails.length > 0) {
+      const hearingDetailsControl = this.firForm.get('hearingDetails') as FormArray;
+      hearingDetailsControl.clear();
+    
+      response.hearingDetails.forEach((hearing: any) => {
+        const hearingGroup = this.createHearingDetailGroup();
+    
+        hearingGroup.patchValue({
+   
+          nextHearingDate: hearing.next_hearing_date ? formatDate(hearing.next_hearing_date, 'yyyy-MM-dd', 'en') : '',
+          reasonNextHearing: hearing.reason_next_hearing,
+        });
+    
+        hearingDetailsControl.push(hearingGroup);
+      });
+    }
+
+    if (response.hearingDetails_one && response.hearingDetails_one.length > 0) {
+      console.log(response.hearingDetails_one, "response.hearingDetails_one");
+    
+      const hearingDetailsControl = this.firForm.get('hearingDetails_one') as FormArray;
+    
+      console.log(hearingDetailsControl, "hearingDetailsControl");
+    
+      hearingDetailsControl.clear(); 
+    
+      response.hearingDetails_one.forEach((hearing: any) => {
+        const hearingGroup = this.createHearingDetailGroup_one();
+    
+        hearingGroup.patchValue({
+          nextHearingDate_one: hearing.next_hearing_date ? formatDate(hearing.next_hearing_date, 'yyyy-MM-dd', 'en') : '',
+          reasonNextHearing_one: hearing.reason_next_hearing,
+        });
+    
+        hearingDetailsControl.push(hearingGroup);
+      });
+    }
+
+    if (response.compensation_details_2 && response.compensation_details_2.length > 0) {
+        console.log(response.compensation_details_2,"compensation_details_2")
+        response.compensation_details_2.forEach((item:any) => {
+        this.firForm.patchValue({
+          totalCompensation_2: item.total_compensation,
+          proceedingsFileNo_2: item.proceedings_file_no,
+          proceedingsDate_2: item.proceedings_date  ? formatDate(item.proceedings_date, 'yyyy-MM-dd', 'en') : '',
+          uploadProceedings_2: item.upload_proceedings
+
+        });
+        if (item.upload_proceedings) {
+          this.uploadProceedings_2_preview = `${this.image_access2}${item.upload_proceedings}`;
+
+          console.log( this.uploadProceedings_2_preview," this.uploadProceedings_2_preview")
+        }
+      });
+    }
+
+
+  },
+  (error) => {
+    console.error('Error loading FIR details:', error);
+  }
+
+  )}
+
+
+
+
+
+
+
+
+
+
+
   createSection(): FormGroup {
     return this.fb.group({
       SectionType: ['', Validators.required],
@@ -2606,6 +3300,13 @@ uploadedImageSrc: any | ArrayBuffer;
   
   onCaseHandledByChange(event: Event) {
     const selectedValue = (event.target as HTMLSelectElement).value;
+    this.show94BAnd94C = selectedValue === 'Empanelled advocate' || selectedValue === 'Private advocate selected by the victim';
+    this.show95Onwards = selectedValue === 'Special Public Prosecutor';
+    this.show97Onwards = selectedValue === 'Empanelled advocate' || selectedValue === 'Private advocate selected by the victim';
+  }
+
+  AutoOnCaseHandledByChange(value: any) {
+    const selectedValue = value;
     this.show94BAnd94C = selectedValue === 'Empanelled advocate' || selectedValue === 'Private advocate selected by the victim';
     this.show95Onwards = selectedValue === 'Special Public Prosecutor';
     this.show97Onwards = selectedValue === 'Empanelled advocate' || selectedValue === 'Private advocate selected by the victim';
@@ -3538,18 +4239,35 @@ console.log(victimReliefDetail,"cretaieg")
   }
 
   // Dropdown and option loading methods
-  loadOptions() {
-    this.firService.getOffences().subscribe(
-      (offences: any) => {
-        // this.offenceOptions = offences.map((offence: any) => offence.offence_name);
-        this.offenceOptions = offences;
-        this.offenceOptionData = offences.map((offence: any) => offence);
-      },
-      (error: any) => {
-        Swal.fire('Error', 'Failed to load offence options.', 'error');
-      }
-    );
-  }
+  // loadOptions() {
+  //   this.firService.getOffences().subscribe(
+  //     (offences: any) => {
+  //       // this.offenceOptions = offences.map((offence: any) => offence.offence_name);
+  //       this.offenceOptions = offences;
+  //       this.offenceOptionData = offences.map((offence: any) => offence);
+  //     },
+  //     (error: any) => {
+  //       Swal.fire('Error', 'Failed to load offence options.', 'error');
+  //     }
+  //   );
+  // }
+
+    loadOptions() {
+      this.firService.getOffences().subscribe(
+        (offences: any) => {
+          console.log(offences);
+          this.offenceOptions = offences
+            .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
+            this.offenceOptions.push(
+              { offence_act_name: '3(2)(va)', offence_name: '', id : 24 },
+              { offence_act_name: '3(2)(v), 3(2)(va)', offence_name: '', id: 25 }
+            );
+        },
+        (error: any) => {
+          Swal.fire('Error', 'Failed to load offence options.', 'error');
+        }
+      );
+    }
 
   // loadnativedistrict() {
   //   this.firService.getPoliceRevenue().subscribe(
@@ -4646,7 +5364,7 @@ console.log(formFields,"formFieldsformFields")
       firId: this.firId,
       trialDetails: {
           courtName: this.firForm.get('Court_name1')?.value,
-          courtDistrict: this.firForm.get('trialCourtDistrict')?.value,
+          courtDistrict: this.firForm.get('courtDistrict')?.value,
           trialCaseNumber: this.firForm.get('caseNumber')?.value,
           publicProsecutor: this.firForm.get('publicProsecutor')?.value,
           prosecutorPhone: this.firForm.get('prosecutorPhone')?.value,
@@ -4744,6 +5462,15 @@ console.log(formFields,"formFieldsformFields")
           judgementNature: this.firForm.get('judgementDetails_two.judgementNature_two')?.value,
       },
 
+      victimsRelief: this.victimsRelief.value.map((relief: any, index: number) => ({
+
+        victimId: relief.victimId || null,
+        victimName: this.victimNames[index] || '',
+        reliefAmountScst_2: parseFloat(relief.reliefAmountScst_2 || '0.00').toFixed(2),
+        reliefAmountExGratia_2: parseFloat(relief.reliefAmountExGratia_2 || '0.00').toFixed(2),
+        reliefAmountThirdStage: parseFloat(relief.reliefAmountThirdStage || '0.00').toFixed(2),
+      })),
+
 attachment:this.attachments_2.value
    
       
@@ -4788,6 +5515,22 @@ attachment:this.attachments_2.value
       this.firService.getCourtRangesByDivision(selectedDivision).subscribe(
         (ranges: string[]) => {
           this.courtRanges = ranges; 
+          this.firForm.patchValue({ courtName: '' }); 
+        },
+        (error) => {
+          console.error('Error fetching court ranges:', error);
+          Swal.fire('Error', 'Failed to load court ranges for the selected division.', 'error');
+        }
+      );
+    }
+  }
+
+  onCourtDivisionChange2(event: any): void {
+    const selectedDivision = event; 
+    if (selectedDivision) {
+      this.firService.getCourtRangesByDivision(selectedDivision).subscribe(
+        (ranges: string[]) => {
+          this.courtRanges5 = ranges; 
           this.firForm.patchValue({ courtName: '' }); 
         },
         (error) => {
@@ -5931,7 +6674,9 @@ getPoliceStation(district: string): void {
       'Disability: Incapacitation less than 50',
       'Rape',
       'Gang Rape',
-      'Murder'
+      'Murder',
+      '3(2)(v), 3(2)(va)',
+      '3(2)(va)'
     ];
     return excluded.includes(act);
   }

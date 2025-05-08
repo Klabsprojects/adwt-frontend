@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment.prod';
   providedIn: 'root'
 })
 export class UserService {
-  private baseUrl = environment.apiUrl+`/apps/users_new`; // Use environment variable
+  private baseUrl = environment.apiUrl+`apps/users_new`; // Use environment variable
 
 
 
@@ -40,6 +40,6 @@ export class UserService {
 
   // Get all roles
   getAllRoles(): Observable<any> {
-    return this.http.get(environment.apiUrl+`/apps/roles`); // Use environment variable
+    return this.http.get(environment.apiUrl+`apps/roles`); // Use environment variable
   }
 }
