@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, TemplateRe
 import { Router, NavigationStart, RouterEvent } from '@angular/router';
 // import { FormControl, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { NgxFileDropModule } from 'ngx-file-drop';
+import { VmcMeetingService } from 'src/app/services/vmc-meeting.service';
 // import {
 //   FormsModule,
 //   ReactiveFormsModule,
@@ -27,6 +28,7 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, FormsM
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { environment } from '../../../../environments/environment';
+import { environment as env } from 'src/environments/environment.prod';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -79,7 +81,7 @@ export class AddFirComponent implements OnInit, OnDestroy {
   courtDivisions: string[] = [];
   courtRanges: string[] = [];
   proceedingsFile: File | null = null;
-  proceedingsFile_1: File | null = null;
+  proceedingsFile_1: any | null = null;
   showDuplicateSection_1: boolean = false;
   showLegalOpinionObtained_two: boolean = false;
   showFiledBy_two: boolean = false;
@@ -169,7 +171,8 @@ sectionFields: string[] = [''];
     private cdr: ChangeDetectorRef,
     private router: Router,
     private modalService: NgbModal,
-    private policeDivisionService :PoliceDivisionService
+    private policeDivisionService :PoliceDivisionService,
+    private vmcSerive:VmcMeetingService
   ) {}
   private wasVictimSame: boolean = false; // Track the previous state of on Victim same as Complainant
 
@@ -823,8 +826,8 @@ onFileSelect_3(event: Event, controlName: string): void {
       officerDesignation: ['', Validators.required], // Dropdown selection
       officerPhone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]], // 10-digit phone validation
 
-      attachments_1: this.fb.array([this.createAttachmentGroup()]),
-      attachments_2: this.fb.array([this.createAttachmentGroup_2()]),
+      attachments_1: this.fb.array([this.createNewAttachmentGroup()]),
+      attachments_2: this.fb.array([this.createAttachmentGroup()]),
       // Step 2 Fields - FIR Details
       // firNumber: ['', Validators.required],
       firNumber: ['', [Validators.required, Validators.pattern(/^[1-9][0-9]*$/)]], 
@@ -986,7 +989,7 @@ onFileSelect_3(event: Event, controlName: string): void {
       uploadProceedings: ['', Validators.required],
       // attachments: this.fb.array([]) 
 
-      attachments: this.fb.array([this.createAttachmentGroup()]),
+      attachments: this.fb.array([this.createNewAttachmentGroup()]),
     },
     { validators: this.dateTimeValidator() }
 
@@ -1117,6 +1120,29 @@ onFileSelect_1(event: any, index: number): void {
   }
 }
 
+onFileSelect_1New(event: any, index: number, fileControl: string, fileNameControl: string): void {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+  
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    
+    this.vmcSerive.uploadFile(formData).subscribe({
+      next: (response: any) => {
+        const uploadedFileReference = response.filePath;
+        const attachment = this.attachments_1.at(index);
+         attachment.patchValue({
+          [fileControl]: uploadedFileReference,
+          [fileNameControl]: selectedFile.name,
+        });
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('File upload failed:', err);
+      }
+    });
+  }
+
 // onFileSelect_2(event: any, index: number): void {
 //   const file = event.target.files[0];
 //   if (file) {
@@ -1174,8 +1200,20 @@ addAttachment_1(): void {
 removeAttachment_1(index: number): void {
   if (this.attachments_1.length > 1) {
     this.attachments_1.removeAt(index);
+  } else {
+    this.attachments_1.at(0).reset();
+    this.cdr.detectChanges();
   }
 }
+viewAttachment_1(index: number): void {
+  const filePath = this.attachments_1.at(index).get('file')?.value;
+  if (filePath) {
+    const url = `${env.file_access}${filePath}`;
+    window.open(url, '_blank');
+  }
+}
+
+
 
 
   onJudgementNatureChange_one(): void {
@@ -2392,15 +2430,29 @@ handleCaseTypeChange() {
     this.firForm.get('revenueDistrict')?.enable();
   }
     // Create a FormGroup for a single attachment
+    // createAttachmentGroup(): FormGroup {
+    //   return this.fb.group({
+    //     fileName: [''], // Holds the file name
+    //     file: [null, Validators.required], // Holds the file itself
+    //     file_1: [null, Validators.required], // File control
+    //     fileName_1: [''],
+    //     file_2: [null, Validators.required], // File control
+    //     fileName_2: [''],
+    //   });
+    // }
     createAttachmentGroup(): FormGroup {
       return this.fb.group({
-        fileName: [''], // Holds the file name
-        file: [null, Validators.required], // Holds the file itself
-        file_1: [null, Validators.required], // File control
-        fileName_1: [''],
-        file_2: [null, Validators.required], // File control
-        fileName_2: [''],
+        file: [null, Validators.required],
+        fileName: ['']
       });
+    }
+
+
+    createNewAttachmentGroup():FormGroup {
+      return this.fb.group({
+      file: ['', Validators.required],       // Stores uploaded file path
+      fileName: ['', Validators.required],   // Stores original file name
+    });
     }
 
 
@@ -2425,14 +2477,16 @@ handleCaseTypeChange() {
   }
   // Add a new attachment entry
   addAttachment(): void {
-    this.attachments.push(this.createAttachmentGroup());
+    this.attachments.push(this.createNewAttachmentGroup());
   }
 
   // Remove an attachment entry
   removeAttachment(index: number): void {
-    if (this.attachments.length > 1) {
-      this.attachments.removeAt(index);
-    }
+   if (this.attachments.length > 1) {
+    this.attachments.removeAt(index);
+  } else {
+    this.attachments.at(0).reset(); // Clear the values
+  }
   }
 
   // Getter for attachments FormArray
@@ -2450,6 +2504,36 @@ handleCaseTypeChange() {
       });
     }
   }
+
+  onFileChangeNew(event: any, index: number, fileControl: string, fileNameControl: string): void {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+  
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    
+    this.vmcSerive.uploadFile(formData).subscribe({
+      next: (response: any) => {
+        const uploadedFileReference = response.filePath;
+        const attachment = this.attachments.at(index);
+         attachment.patchValue({
+          [fileControl]: uploadedFileReference,
+          [fileNameControl]: selectedFile.name,
+        });
+      },
+      error: (err) => {
+        console.error('File upload failed:', err);
+      }
+    });
+  }
+  view62(index: any): void {
+    const filePath = this.attachments.at(index).get('file')?.value;
+    if (filePath) {
+      const url = `${env.file_access}${filePath}`;
+      window.open(url, '_blank');
+    }
+  }
+
   
 
   saveStepThreeAsDraft() {
@@ -2557,6 +2641,72 @@ console.log(isVictimSameAsComplainant,"sasa")
    
     this.uploadedFiles[i] = true;
   }
+
+  uploadedFIRFileName: string = '';
+  proceedingFileName: string = '';
+
+  onFIRFileUpload(event: any): void {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+  
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+  
+    this.vmcSerive.uploadFile(formData).subscribe({
+      next: (response: any) => {
+        const uploadedFileReference = response.filePath;
+        this.firForm.get('uploadFIRCopy')?.setValue(uploadedFileReference);
+        this.uploadedFIRFileName = selectedFile.name;
+      },
+      error: (err) => {
+        console.error('File upload failed:', err);
+      }
+    });
+  }  
+  viewFIRCopy(): void {
+    if (this.firForm.get('uploadFIRCopy')?.value) {
+      const url = `${env.file_access}${this.firForm.get('uploadFIRCopy')?.value}`;
+      window.open(url, '_blank');
+    }
+  }
+  
+  
+  removeFIRCopy(): void {
+    this.firForm.get('uploadFIRCopy')?.setValue(null);
+    this.uploadedFIRFileName = '';
+  }
+
+  onProceedingsFileUpload(event: any): void {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+    console.log("selectedFile",selectedFile);
+  
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+  
+    this.vmcSerive.uploadFile(formData).subscribe({
+      next: (response: any) => {
+        const uploadedFileReference = response.filePath;
+        this.proceedingFileName = selectedFile.name;
+        this.firForm.get('proceedingsFile')?.setValue(uploadedFileReference);
+      },
+      error: (err) => {
+        console.error('File upload failed:', err);
+      }
+    });
+  }  
+  viewProceedingsCopy(): void {
+    if (this.firForm.get('proceedingsFile')?.value) {
+      const url = `${env.file_access}${this.firForm.get('proceedingsFile')?.value}`;
+      window.open(url, '_blank');
+    }
+  }
+  
+  
+  removeProceedingsCopy(): void {
+    this.firForm.get('proceedingsFile')?.setValue(null);
+    this.proceedingFileName = '';
+  }
   
   onDeleteFile(i: number): void {
 
@@ -2579,14 +2729,12 @@ saveStepFourAsDraft(): void {
     accuseds: this.firForm.get('accuseds')?.value.map((accused: any, index: number) => ({
       ...accused,
       accusedId: accused.accusedId || null,
-      uploadFIRCopy: this.multipleFiles[index] || null
-  
-
-
+      // uploadFIRCopy: this.multipleFiles[index] || null
+      uploadFIRCopy: this.firForm.get('uploadFIRCopy')?.value || null
     })),
   };
 
-  console.log('FIR Data:', firData);
+  console.log('FIR Data 4:', firData);
 
 
   this.firService.saveStepFourAsDraft(firData).subscribe(
@@ -2698,7 +2846,8 @@ saveStepFiveAsDraft(isSubmit: boolean = false): void {
     totalCompensation: this.firForm.get('totalCompensation')?.value || '0.00',
     proceedingsFileNo: this.firForm.get('proceedingsFileNo')?.value || '',
     proceedingsDate: this.firForm.get('proceedingsDate')?.value || null,
-    proceedingsFile: this.proceedingsFile || '',
+    // proceedingsFile: this.proceedingsFile || '',
+    proceedingsFile: this.firForm.get('proceedingsFile')?.value || '',
     attachments: this.attachments.value || '',
     status: isSubmit ? 5 : null, 
   };
@@ -2856,6 +3005,40 @@ onProceedingsFileChange_1(event: Event): void {
     // Save the selected file
   }
 }
+
+CommissionerateSPFile:string='';
+
+uploadCommissionerateSPFile(event: any): void {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+  
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+  
+    this.vmcSerive.uploadFile(formData).subscribe({
+      next: (response: any) => {
+        const uploadedFileReference = response.filePath;
+        this.proceedingsFile_1 = uploadedFileReference
+        this.CommissionerateSPFile = selectedFile.name;
+        console.log("CommissionerateSPFile",this.CommissionerateSPFile)
+      },
+      error: (err) => {
+        console.error('File upload failed:', err);
+      }
+    });
+  }  
+  viewCommissionerateSPFile(): void {
+    if (this.proceedingsFile_1) {
+      const url = `${env.file_access}${this.proceedingsFile_1}`;
+      window.open(url, '_blank');
+    }
+  }
+  
+  
+  removeCommissionerateSPFile(): void {
+    this.proceedingsFile_1 = ''
+    this.CommissionerateSPFile = '';
+  }
 
 saveAsDraft_6(isSubmit: boolean = false): void {
   // if (!this.firId) {
@@ -3152,6 +3335,73 @@ uploadJudgementSelect_one(event: any): void {
   }
 }
 
+JudgementSelect_oneNew:string='';
+uploadJudgementSelect_oneNew(event:any){
+  const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+  
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+  
+    this.vmcSerive.uploadFile(formData).subscribe({
+      next: (response: any) => {
+        const uploadedFileReference = response.filePath;
+        this.firForm.get('judgementDetails_one.uploadJudgement_one')?.setValue(uploadedFileReference);
+        this.JudgementSelect_oneNew = selectedFile.name;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('File upload failed:', err);
+      }
+    });
+}
+
+viewUploadJudgementSelect_oneNew(){
+  if (this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value) {
+      const url = `${env.file_access}${this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value}`;
+      window.open(url, '_blank');
+    }
+}
+
+removeuploadJudgementSelect_oneNew(){
+this.firForm.get('judgementDetails_one.uploadJudgement_one')?.setValue(null);
+    this.JudgementSelect_oneNew = '';
+}
+
+
+JudgementSelect_Two:string='';
+uploadJudgementSelect_twoNew(event:any){
+  const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+  
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+  
+    this.vmcSerive.uploadFile(formData).subscribe({
+      next: (response: any) => {
+        const uploadedFileReference = response.filePath;
+        this.firForm.get('judgementDetails_one.uploadJudgement_two')?.setValue(uploadedFileReference);
+        this.JudgementSelect_Two = selectedFile.name;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('File upload failed:', err);
+      }
+    });
+}
+
+viewUploadJudgementSelect_TwoNew(){
+  if (this.firForm.get('judgementDetails_one.uploadJudgement_two')?.value) {
+      const url = `${env.file_access}${this.firForm.get('judgementDetails_one.uploadJudgement_two')?.value}`;
+      window.open(url, '_blank');
+    }
+}
+
+removeuploadJudgementSelect_TwoNew(){
+  this.firForm.get('judgementDetails_one.uploadJudgement_two')?.setValue(null);
+  this.JudgementSelect_Two = '';
+}
+
 
 uploadJudgementPreview_two: any | ArrayBuffer;
 uploadJudgementSelect_two(event: any): void {
@@ -3183,6 +3433,39 @@ uploadJudgementSelect_two(event: any): void {
     console.log('No file selected');
     this.uploadJudgementPreview_two = null; 
   }
+}
+
+judgementnew:string='';
+uploadJudgementSelectNew(event:any){
+  const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+  
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+  
+    this.vmcSerive.uploadFile(formData).subscribe({
+      next: (response: any) => {
+        const uploadedFileReference = response.filePath;
+        this.firForm.get('judgementDetails.uploadJudgement')?.setValue(uploadedFileReference);
+        this.judgementnew = selectedFile.name;
+        console.log('judgementnew',this.judgementnew);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('File upload failed:', err);
+      }
+    });
+}
+  
+viewjudgementnew(){
+   if (this.firForm.get('judgementDetails.uploadJudgement')?.value) {
+      const url = `${env.file_access}${this.firForm.get('judgementDetails.uploadJudgement')?.value}`;
+      window.open(url, '_blank');
+    }
+}
+removejudgementnew(){
+  this.firForm.get('judgementDetails.uploadJudgement')?.setValue(null);
+    this.judgementnew = '';
 }
 // .... thisis for proceeeding file 
 uploadProceedings_2_preview: string | ArrayBuffer | null = null; 
@@ -4644,22 +4927,85 @@ isSubmitButtonEnabled(): boolean {
     });
   }
 
+  proceedingfile2:string='';
+
   onuploadproceedSelect(event: any): void {
-    const file = event.target.files[0];  // Get the first selected file
+    // const file = event.target.files[0];  // Get the first selected file
   
-    if (file) {
+    // if (file) {
    
-      // Patch the file into the form (this assumes you have the form control set up correctly)
-      this.firForm.patchValue({
-        uploadProceedings_2: file,  // Storing the file in the form control
-      });
+    //   // Patch the file into the form (this assumes you have the form control set up correctly)
+    //   this.firForm.patchValue({
+    //     uploadProceedings_2: file,  // Storing the file in the form control
+    //   });
   
-      // Optionally, display the file name
-      console.log('File selected:', file.name);
-    } else {
-      console.log('No file selected');
+    //   // Optionally, display the file name
+    //   console.log('File selected:', file.name);
+    // } else {
+    //   console.log('No file selected');
+    // }
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+  
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+  
+    this.vmcSerive.uploadFile(formData).subscribe({
+      next: (response: any) => {
+        const uploadedFileReference = response.filePath;
+        this.firForm.get('uploadProceedings_2')?.setValue(uploadedFileReference);
+        this.proceedingfile2 = selectedFile.name;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('File upload failed:', err);
+      }
+    });
+  }
+
+  viewProceed2(): void {
+    if (this.firForm.get('uploadProceedings_2')?.value) {
+      const url = `${env.file_access}${this.firForm.get('uploadProceedings_2')?.value}`;
+      window.open(url, '_blank');
     }
   }
+  
+  
+  removeProceed2(): void {
+    this.firForm.get('uploadProceedings_2')?.setValue(null);
+    this.proceedingfile2 = '';
+  }
+
+  onFileSelect_2New(event: any, index: number, fileControl: string, fileNameControl: string): void {
+  const selectedFile = event.target.files[0];
+  if (!selectedFile) return;
+
+  const formData = new FormData();
+  formData.append('file', selectedFile);
+
+  this.vmcSerive.uploadFile(formData).subscribe({
+    next: (response: any) => {
+      const uploadedFileReference = response.filePath;
+      const attachment = this.attachments_2.at(index);
+      attachment.patchValue({
+        [fileControl]: uploadedFileReference,
+        [fileNameControl]: selectedFile.name,
+      });
+      this.cdr.detectChanges();
+    },
+    error: (err) => {
+      console.error('File upload failed:', err);
+    }
+  });
+}
+viewAttachment_2(index: number): void {
+  const filePath = this.attachments_2.at(index)?.get('file')?.value;
+  if (filePath) {
+    const url = `${env.file_access}${filePath}`;
+    window.open(url, '_blank');
+  }
+}
+
 
   uploadJudgementSelect(event: Event): void {
     const fileInput = event.target as HTMLInputElement;

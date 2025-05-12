@@ -6,7 +6,8 @@
   padding: 0;
   margin: 20px 0;
   position: relative;
-  gap: 20px; /* Add space between items */
+  gap: 20px;
+  /* Add space between items */
 }
 
 /* Step Item */
@@ -22,16 +23,19 @@
 
 .step-item.disabled {
   cursor: not-allowed;
-  opacity: 0.6; /* Reduced opacity for disabled items */
+  opacity: 0.6;
+  /* Reduced opacity for disabled items */
 }
 
 .step-item.active .step-circle {
-  background-color: #0066ff; /* Active step color */
+  background-color: #0066ff;
+  /* Active step color */
   color: #fff;
 }
 
 .step-item.completed .step-circle {
-  background-color: #4caf50; /* Completed step color */
+  background-color: #4caf50;
+  /* Completed step color */
   color: #fff;
 }
 
@@ -43,18 +47,22 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background-color: #ddd; /* Default circle color */
-  color: #666; /* Default text color */
+  background-color: #ddd;
+  /* Default circle color */
+  color: #666;
+  /* Default text color */
   font-weight: bold;
   transition: background-color 0.3s ease, color 0.3s ease;
-  z-index: 2; /* Higher z-index to keep step above the line */
+  z-index: 2;
+  /* Higher z-index to keep step above the line */
 }
 
 /* Step Label */
 .step-label {
   margin-top: 8px;
   font-size: 0.85rem;
-  color: #666; /* Default label color */
+  color: #666;
+  /* Default label color */
 }
 
 /* Connecting Line */
@@ -63,8 +71,10 @@
   top: 20px;
   left: 50%;
   height: 4px;
-  background: #ccc; /* Default line color */
-  z-index: 1; /* Lower z-index to be behind the circles */
+  background: #ccc;
+  /* Default line color */
+  z-index: 1;
+  /* Lower z-index to be behind the circles */
   transition: background-color 0.3s ease, width 0.3s ease;
   width: 100%;
 }
@@ -80,8 +90,9 @@
 // }
 
 /* Ensure Inactive Lines Stay Gray */
-.step-item:not(.completed):not(.active) + .step-item .step-line {
-  background: #ccc; /* Gray for inactive steps */
+.step-item:not(.completed):not(.active)+.step-item .step-line {
+  background: #ccc;
+  /* Gray for inactive steps */
 }
 
 /* Main Tabs Container */
@@ -105,17 +116,20 @@
   border-radius: 8px;
   transition: all 0.3s ease;
   padding: 10px;
-  background: #f8f9fa; /* Light gray for tabs */
+  background: #f8f9fa;
+  /* Light gray for tabs */
 }
 
 .stepper-item.active {
-  background-color: #0066ff; /* Active tab color */
+  background-color: #0066ff;
+  /* Active tab color */
   color: #fff;
   border-color: #0066ff;
 }
 
 .stepper-item.completed {
-  background-color: #e9f5e9; /* Light green for completed tabs */
+  background-color: #e9f5e9;
+  /* Light green for completed tabs */
   color: #4caf50;
   border-color: #4caf50;
 }
@@ -169,21 +183,25 @@
 }
 
 
-.float-left{
+.float-left {
   float: left;
 }
-.mr-2{
+
+.mr-2 {
   margin-right: 10px;
 }
-.float-right{
+
+.float-right {
   float: right;
 }
-.form-check{
-  padding-left:10px;
+
+.form-check {
+  padding-left: 10px;
   font-size: 14px;
-  margin-right:10px;
+  margin-right: 10px;
 }
-.radio-button{
+
+.radio-button {
   float: left;
   margin-top: 4px;
   margin-right: 6px;
@@ -212,4 +230,13 @@
   color: red;
   cursor: pointer;
   font-weight: bold;
+}
+
+.uploaded {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+}
+.fa-times{
+  padding: 0;
 }

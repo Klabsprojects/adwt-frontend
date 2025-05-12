@@ -1038,7 +1038,16 @@
                               <div class="col-md-6 mb-3">
                                 <label class="form-label">51. Upload FIR Copy *</label>
                                 <input type="file" [id]="'uploadFIRCopy' + i" class="form-control" formControlName="uploadFIRCopy"
-                                       required (change)="onFileSelected($event, i)"  multiple />
+                                       required (change)="onFIRFileUpload($event)"  multiple *ngIf="!uploadedFIRFileName"/>
+                                <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="uploadedFIRFileName">
+                                  <div class="d-flex justify-content-start align-items-center">
+                                    {{uploadedFIRFileName}}
+                                  </div>
+                                  <div class="d-flex justify-content-between align-items-center">
+                                    <button class="btn btn-primary btn-sm me-2" (click)="viewFIRCopy()">View</button>
+                                    <button class="btn btn-danger btn-sm" (click)="removeFIRCopy()"><i class="fas fa-times"></i></button>
+                                  </div>
+                                </div>
                               </div>
                               
                               <div *ngIf="uploadedFiles[i]; ">
@@ -1188,9 +1197,19 @@
 
                 <div class="col-md-6 mb-3">
                   <label class="form-label">61. Upload Commissionerate / S.P. Office Proceedings *</label>
+                  {{proceedingsFile}}
                   <input type="file" [id]="'proceedingsFile' + i" class="form-control" 
-                         formControlName="proceedingsFile" required 
-                         (change)="onProceedingsFileChange($event, i)" multiple />
+                          required 
+                         (change)="onProceedingsFileUpload($event)" multiple *ngIf="!proceedingFileName"/>
+                  <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingFileName">
+                    <div class="d-flex justify-content-start align-items-center">
+                      {{proceedingFileName}}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <button class="btn btn-primary btn-sm me-2" (click)="viewProceedingsCopy()">View</button>
+                      <button class="btn btn-danger btn-sm" (click)="removeProceedingsCopy()"><i class="fas fa-times"></i></button>
+                    </div>
+                  </div>
                 </div>
                 
              
@@ -1210,9 +1229,9 @@
                 
                   <div class="input-group mb-2" *ngFor="let attachment of attachments.controls; let j = index" [formGroupName]="j">
                     <!-- File Input 1 -->
-                    <input type="file" class="form-control mb-1" 
-                           (change)="onFileChange($event, j, 'file', 'fileName')" />
-                    <div class="file-names" *ngIf="attachment.get('fileName')?.value">
+                    <!-- <input type="file" class="form-control mb-1" 
+                           (change)="onFileChangeNew($event, j, 'file', 'fileName')" /> -->
+                    <!-- <div class="file-names" *ngIf="attachment.get('fileName')?.value">
                       <span class="badge bg-secondary">{{ attachment.get('fileName')?.value }}</span>
                     </div>
                 
@@ -1221,7 +1240,18 @@
                             *ngIf="attachments.length > 1" 
                             title="Remove Attachment">
                       <i class="bi bi-trash"></i>
-                    </button>
+                    </button> -->
+                    <input type="file" class="form-control" 
+                           (change)="onFileChangeNew($event, j, 'file', 'fileName')" *ngIf="!attachment.get('fileName')?.value"/><button class="btn btn-danger btn-sm" (click)="removeAttachment(j)"><i class="fas fa-times"></i></button>
+                    <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="attachment.get('fileName')?.value">
+                      <div class="d-flex justify-content-start align-items-center">
+                        {{ attachment.get('fileName')?.value}}
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-primary btn-sm me-2"  (click)="view62(j)">View</button>
+                        <button class="btn btn-danger btn-sm" (click)="removeAttachment(j)"><i class="fas fa-times"></i></button>
+                      </div>
+                    </div>
                   </div>
                 
                   <button type="button" class="btn btn-primary btn-sm mt-3" (click)="addAttachment()">
@@ -1496,34 +1526,33 @@
                             <input
                             type="file"
                             class="form-control"
-                            (change)="onProceedingsFileChange_1($event)" required
-                          />
+                            (change)="uploadCommissionerateSPFile($event)" required *ngIf="!CommissionerateSPFile"/>
+                            <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="CommissionerateSPFile">
+                              <div class="d-flex justify-content-start align-items-center">
+                                {{CommissionerateSPFile}}
+                              </div>
+                              <div class="d-flex justify-content-between align-items-center">
+                                <button class="btn btn-primary btn-sm me-2" (click)="viewCommissionerateSPFile()">View</button>
+                                <button class="btn btn-danger btn-sm" (click)="removeCommissionerateSPFile()"><i class="fas fa-times"></i></button>
+                              </div>
+                            </div>
                         </div>
 
                         <!-- Additional Attachments -->
-                        <div class="mb-4" formArrayName="attachments_1">
+                        <!-- <div class="mb-4" formArrayName="attachments_1">
                           <label class="form-label">79. Upload Other Attachments (If any)</label>
                           <div
                             class="input-group mb-2"
                             *ngFor="let attachment of attachments_1.controls; let j = index"
                             [formGroupName]="j"
                           >
-                            <!-- File Input -->
                             <input
                               type="file"
                               class="form-control"
                               (change)="onFileSelect_1($event, j)"
                               formControlName="file_1" required
                             />
-
-                            <!-- Display File Name -->
-                            <!-- <div class="file-names mt-2" *ngIf="attachment.get('fileName_1')?.value">
-                              <span class="badge bg-secondary me-1">
-                                {{ attachment.get('fileName_1')?.value }}
-                              </span>
-                            </div> -->
-
-                            <!-- Remove Button -->
+                            
                             <button
                               type="button"
                               class="btn btn-danger btn-sm mt-2 ms-2"
@@ -1535,7 +1564,7 @@
                             </button>
                           </div>
 
-                          <!-- Add Button -->
+                          
                           <button
                             type="button"
                             class="btn btn-primary btn-sm mt-3"
@@ -1543,7 +1572,68 @@
                           >
                             Add Attachment
                           </button>
-                        </div>
+                        </div> -->
+                        <div class="mb-4" formArrayName="attachments_1">
+  <label class="form-label">79. Upload Other Attachments (If any)</label>
+
+  <div
+    class="input-group mb-2"
+    *ngFor="let attachment of attachments_1.controls; let j = index"
+    [formGroupName]="j"
+  >
+    <!-- File Input (only if no fileName yet) -->
+    <input
+      type="file"
+      class="form-control"
+      (change)="onFileSelect_1New($event, j, 'file', 'fileName')"
+      *ngIf="!attachment.get('fileName')?.value"
+    />
+    <button
+      type="button"
+      class="btn btn-danger btn-sm"
+      (click)="removeAttachment_1(j)"
+      title="Remove Attachment"
+      *ngIf="!attachment.get('fileName')?.value"
+    >
+      <i class="fas fa-times"></i>
+    </button>
+
+    <!-- Display Uploaded File Name & Actions -->
+    <div
+      class="d-flex justify-content-between align-items-center uploaded mt-2"
+      *ngIf="attachment.get('fileName')?.value"
+    >
+      <div>{{ attachment.get('fileName')?.value }}</div>
+      <div class="d-flex">
+        <button
+          class="btn btn-primary btn-sm me-2"
+          (click)="viewAttachment_1(j)"
+        >
+          View
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger btn-sm"
+          (click)="removeAttachment_1(j)"
+          title="Remove Attachment"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Attachment Button -->
+  <button
+    type="button"
+    class="btn btn-primary btn-sm mt-3"
+    (click)="addAttachment_1()"
+  >
+    Add Attachment
+  </button>
+</div>
+
+
 
 
                     </div>
@@ -1793,10 +1883,19 @@
                                 type="file"
                                 class="form-control"
                                 id="uploadJudgement"
-                                (change)="uploadJudgementSelect($event)"
-                                formControlName="uploadJudgement"
+                                (change)="uploadJudgementSelectNew($event)"
                                 required
+                                *ngIf="!judgementnew"
                               />
+                              <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="judgementnew">
+                                  <div class="d-flex justify-content-start align-items-center">
+                                    {{judgementnew}}
+                                  </div>
+                                  <div class="d-flex justify-content-between align-items-center">
+                                    <button class="btn btn-primary btn-sm me-2" (click)="viewjudgementnew()">View</button>
+                                    <button class="btn btn-danger btn-sm" (click)="removejudgementnew()"><i class="fas fa-times"></i></button>
+                                  </div>
+                                </div>
                             </div>
                           </div>
                         </div>
@@ -2069,11 +2168,20 @@
                                         type="file"
                                         class="form-control"
                                         id="uploadJudgement_one"
-                                        (change)="uploadJudgementSelect_one($event)"
-                                        formControlName="uploadJudgement_one"
+                                        (change)="uploadJudgementSelect_oneNew($event)"
                                         accept="image/*"
                                         required
+                                        *ngIf="!JudgementSelect_oneNew"
                                       />
+                                      <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="JudgementSelect_oneNew">
+                                        <div class="d-flex justify-content-start align-items-center">
+                                          {{JudgementSelect_oneNew}}
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                          <button class="btn btn-primary btn-sm me-2" (click)="viewUploadJudgementSelect_oneNew()">View</button>
+                                          <button class="btn btn-danger btn-sm" (click)="removeuploadJudgementSelect_oneNew()"><i class="fas fa-times"></i></button>
+                                        </div>
+                                      </div>
                                     
                                       <!-- Image Preview -->
                                       <div *ngIf="uploadJudgementPreview_one" class="mt-2">
@@ -2346,11 +2454,20 @@
                                         type="file"
                                         class="form-control"
                                         id="uploadJudgement_two"
-                                        (change)="uploadJudgementSelect_two($event)"
-                                        formControlName="uploadJudgement_two"
+                                        (change)="uploadJudgementSelect_twoNew($event)"
                                         accept="image/*"
                                         required
+                                        *ngIf="JudgementSelect_Two"
                                       />
+                                      <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="JudgementSelect_Two">
+                                        <div class="d-flex justify-content-start align-items-center">
+                                          {{JudgementSelect_Two}}
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                          <button class="btn btn-primary btn-sm me-2" (click)="viewUploadJudgementSelect_TwoNew()">View</button>
+                                          <button class="btn btn-danger btn-sm" (click)="removeuploadJudgementSelect_TwoNew()"><i class="fas fa-times"></i></button>
+                                        </div>
+                                      </div>
                                     
                                       <!-- Image Preview -->
                                       <div *ngIf="uploadJudgementPreview_two" class="mt-2">
@@ -2507,19 +2624,27 @@
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">95. Upload Commissionerate / S.P. Office Proceedings *</label>
-                                <input type="file" (change)="onuploadproceedSelect($event)" class="form-control" formControlName="uploadProceedings_2" />
+                                <input type="file" (change)="onuploadproceedSelect($event)" class="form-control" *ngIf="!proceedingfile2" />
+                                <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingfile2">
+                                  <div class="d-flex justify-content-start align-items-center">
+                                    {{proceedingfile2}}
+                                  </div>
+                                  <div class="d-flex justify-content-between align-items-center">
+                                    <button class="btn btn-primary btn-sm me-2" (click)="viewProceed2()">View</button>
+                                    <button class="btn btn-danger btn-sm" (click)="removeProceed2()"><i class="fas fa-times"></i></button>
+                                  </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Additional Attachments -->
-                        <div class="mb-4" formArrayName="attachments_2">
+                        <!-- <div class="mb-4" formArrayName="attachments_2">
                           <label class="form-label">96. Upload Other Attachments (If any)</label>
                           <div
                             class="input-group mb-2"
                             *ngFor="let attachment of attachments_2.controls; let j = index"
                             [formGroupName]="j"
                           >
-                            <!-- File Input -->
                             <input
                               type="file"
                               class="form-control"
@@ -2527,7 +2652,7 @@
                               formControlName="file_2"
                             />
 
-                            <!-- Remove Button -->
+                           
                             <button
                               type="button"
                               class="btn btn-danger btn-sm mt-2 ms-2"
@@ -2539,7 +2664,66 @@
                             </button>
                           </div>
 
-                          <!-- Add Button -->
+                          
+                          <button
+                            type="button"
+                            class="btn btn-primary btn-sm mt-3"
+                            (click)="addAttachment_2()"
+                          >
+                            Add Attachment
+                          </button>
+                        </div> -->
+                        <div class="mb-4" formArrayName="attachments_2">
+                          <label class="form-label">96. Upload Other Attachments (If any)</label>
+
+                          <div
+                            class="input-group mb-2"
+                            *ngFor="let attachment of attachments_2.controls; let j = index"
+                            [formGroupName]="j"
+                          >
+                            <!-- File input (only if not yet uploaded) -->
+                            <input
+                              type="file"
+                              class="form-control"
+                              (change)="onFileSelect_2New($event, j, 'file', 'fileName')"
+                              *ngIf="!attachment.get('fileName')?.value"
+                            />
+                            <button
+                              type="button"
+                              class="btn btn-danger btn-sm"
+                              (click)="removeAttachment_2(j)"
+                              title="Remove Attachment"
+                              *ngIf="!attachment.get('fileName')?.value"
+                            >
+                              <i class="fas fa-times"></i>
+                            </button>
+
+                            <!-- Display uploaded file info -->
+                            <div
+                              class="d-flex justify-content-between align-items-center uploaded mt-2"
+                              *ngIf="attachment.get('fileName')?.value"
+                            >
+                              <div>{{ attachment.get('fileName')?.value }}</div>
+                              <div class="d-flex">
+                                <button
+                                  class="btn btn-primary btn-sm me-2"
+                                  (click)="viewAttachment_2(j)"
+                                >
+                                  View
+                                </button>
+                                <button
+                                  type="button"
+                                  class="btn btn-danger btn-sm"
+                                  (click)="removeAttachment_2(j)"
+                                  title="Remove Attachment"
+                                >
+                                  <i class="fas fa-times"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Add button -->
                           <button
                             type="button"
                             class="btn btn-primary btn-sm mt-3"
