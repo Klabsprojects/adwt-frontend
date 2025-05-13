@@ -152,42 +152,61 @@ saveStepFourAsDraft(firData: any): Observable<any> {
   // }
 
 
-  saveStepFiveAsDraft(firData: any): Observable<any> {
-    const formData = new FormData();
+  // saveStepFiveAsDraft(firData: any): Observable<any> {
+  //   const formData = new FormData();
   
 
-    formData.append('firId', firData.firId || '');
-    formData.append('totalCompensation', firData.totalCompensation || '0.00');
-    formData.append('proceedingsFileNo', firData.proceedingsFileNo || '');
-    formData.append('proceedingsDate', firData.proceedingsDate || '');
+  //   formData.append('firId', firData.firId || '');
+  //   formData.append('totalCompensation', firData.totalCompensation || '0.00');
+  //   formData.append('proceedingsFileNo', firData.proceedingsFileNo || '');
+  //   formData.append('proceedingsDate', firData.proceedingsDate || '');
   
 
-    if (firData.proceedingsFile) {
-      formData.append('proceedingsFile', firData.proceedingsFile);
-    }
+  //   if (firData.proceedingsFile) {
+  //     formData.append('proceedingsFile', firData.proceedingsFile);
+  //   }
  
-    if (firData.victimsRelief && firData.victimsRelief.length) {
-      formData.append('victimsRelief', JSON.stringify(firData.victimsRelief));
-    }
+  //   if (firData.victimsRelief && firData.victimsRelief.length) {
+  //     formData.append('victimsRelief', JSON.stringify(firData.victimsRelief));
+  //   }
  
-    if (firData.attachments && firData.attachments.length > 0) {
-      firData.attachments.forEach((attachment:any) => {
-        // console.log(attachment,"firData.filefilefile")
+  //   if (firData.attachments && firData.attachments.length > 0) {
+  //     firData.attachments.forEach((attachment:any) => {
+  //       // console.log(attachment,"firData.filefilefile")
 
         
-        if (attachment.file) {
-          formData.append('attachments', attachment.file); // Correct key: 'attachments'
-        }
-      });
-    }
+  //       if (attachment.file) {
+  //         formData.append('attachments', attachment.file); // Correct key: 'attachments'
+  //       }
+  //     });
+  //   }
     
-  // console.log(firData.attachments,"firData.attachments")
-    return this.http.post(`${this.baseUrl}/handle-step-five`, formData);
+  // // console.log(firData.attachments,"firData.attachments")
+  //   return this.http.post(`${this.baseUrl}/handle-step-five`, formData);
+  // }
+  saveStepFiveAsDraft(firData: any): Observable<any> {
+  const payload: any = {
+    firId: firData.firId || '',
+    totalCompensation: firData.totalCompensation || '0.00',
+    proceedingsFileNo: firData.proceedingsFileNo || '',
+    proceedingsDate: firData.proceedingsDate || '',
+    proceedingsFile: firData.proceedingsFile || '', // file path as string
+    victimsRelief: firData.victimsRelief || [],
+    attachments: []
+  };
+
+  if (firData.attachments && firData.attachments.length > 0) {
+    payload.attachments = firData.attachments.map((attachment: any) => {
+      return attachment.file || ''; // assuming `file` holds the file path
+    });
   }
-  
 
-
-
+  return this.http.post(`${this.baseUrl}/handle-step-five`, payload, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+}
 
   updatestep5(firData: any): Observable<any> {
     const formData = new FormData();
@@ -222,35 +241,58 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/save-step-fiveedit`, formData);
   }
 
-  saveStepSixAsDraft(firData: any): Observable<any> {
+  // saveStepSixAsDraft(firData: any): Observable<any> {
   
-    const formData = new FormData();
+  //   const formData = new FormData();
   
-    formData.append('firId', firData.firId);
-    formData.append('chargesheetDetails', JSON.stringify(firData.chargesheetDetails));
-    formData.append('victimsRelief', JSON.stringify(firData.victimsRelief));
-    formData.append('status', firData.status);
-  
-
-    if (firData.uploadProceedingsPath) {
-
-      formData.append('proceedingsFile', firData.uploadProceedingsPath); 
-    }
+  //   formData.append('firId', firData.firId);
+  //   formData.append('chargesheetDetails', JSON.stringify(firData.chargesheetDetails));
+  //   formData.append('victimsRelief', JSON.stringify(firData.victimsRelief));
+  //   formData.append('status', firData.status);
   
 
-    if (firData.attachments && firData.attachments.length > 0) {
-      firData.attachments.forEach((attachment: any, index: number) => {
-        if (attachment.file) {
+  //   if (firData.uploadProceedingsPath) {
+
+  //     formData.append('proceedingsFile', firData.uploadProceedingsPath); 
+  //   }
+  
+
+  //   if (firData.attachments && firData.attachments.length > 0) {
+  //     firData.attachments.forEach((attachment: any, index: number) => {
+  //       if (attachment.file) {
     
    
-          formData.append(`attachments`, attachment.file); 
-        }
-      });
-    }
-  console.log(formData,"formDataformData")
+  //         formData.append(`attachments`, attachment.file); 
+  //       }
+  //     });
+  //   }
+  //   console.log(formData,"formDataformData")
 
-    return this.http.post(`${this.baseUrl}/save-step-six`, formData);
+  //   return this.http.post(`${this.baseUrl}/save-step-six`, formData);
+  // }
+  saveStepSixAsDraft(firData: any): Observable<any> {
+  const payload: any = {
+    firId: firData.firId || '',
+    chargesheetDetails: firData.chargesheetDetails || {},
+    victimsRelief: firData.victimsRelief || [],
+    status: firData.status || '',
+    proceedingsFile: firData.uploadProceedingsPath || '', // file path as string
+    attachments: []
+  };
+
+  if (firData.attachments && firData.attachments.length > 0) {
+    payload.attachments = firData.attachments.map((attachment: any) => {
+      return attachment.file || ''; // assuming `file` holds the file path
+    });
   }
+
+  return this.http.post(`${this.baseUrl}/save-step-six`, payload, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+}
+
   
 
  updateStep6(firData: any): Observable<any> {
