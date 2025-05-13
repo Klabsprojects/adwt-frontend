@@ -127,14 +127,16 @@ saveStepFourAsDraft(firData: any): Observable<any> {
 
   formData.append('accuseds', JSON.stringify(firData.accuseds || []));
 
+  console.log("formData",formData);
 
-  firData.accuseds.forEach((accused: any, index: number) => {
-    if (accused.uploadFIRCopy && accused.uploadFIRCopy.length > 0) {
-      accused.uploadFIRCopy.forEach((file: File) => {
-        formData.append(`uploadFIRCopy[]`, file, file.name);
-      });
-    }
-  });
+
+  // firData.accuseds.forEach((accused: any, index: number) => {
+  //   if (accused.uploadFIRCopy && accused.uploadFIRCopy.length > 0) {
+  //     accused.uploadFIRCopy.forEach((file: File) => {
+  //       formData.append(`uploadFIRCopy[]`, file, file.name);
+  //     });
+  //   }
+  // });
   return this.http.post(`${this.baseUrl}/handle-step-four`, formData);
 }
 

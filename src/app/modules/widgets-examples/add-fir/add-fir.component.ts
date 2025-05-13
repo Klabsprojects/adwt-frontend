@@ -2622,24 +2622,49 @@ console.log(isVictimSameAsComplainant,"sasa")
   
   uploadedFiles: { [key: number]: boolean } = {};
   fileUrls: { [key: number]: string } = {};
+  uploadedFileNames: { [key: number]: string } = {};
 
   onFileSelected(event: any, i: number): void {
-    const selectedFile = event.target.files[0]; 
-    if (!selectedFile) return;
+    // const selectedFile = event.target.files[0]; 
+    // if (!selectedFile) return;
 
-    this.accuseds.get('uploadFIRCopy')?.setValue(null);
+    // this.accuseds.get('uploadFIRCopy')?.setValue(null);
   
-    if (!this.multipleFiles[i]) {
-      this.multipleFiles[i] = [];
-    }
+    // if (!this.multipleFiles[i]) {
+    //   this.multipleFiles[i] = [];
+    // }
   
-    this.multipleFiles[i].push(selectedFile);
+    // this.multipleFiles[i].push(selectedFile);
   
 
-    this.fileUrls[i] = URL.createObjectURL(selectedFile);
+    // this.fileUrls[i] = URL.createObjectURL(selectedFile);
     
    
-    this.uploadedFiles[i] = true;
+    // this.uploadedFiles[i] = true;
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    this.vmcSerive.uploadFile(formData).subscribe({
+      next: (response: any) => {
+        const filePath = response.filePath;
+
+        // Set value in accused FormArray at index `i`
+        const accusedFormGroup = this.accuseds.at(i);
+        accusedFormGroup.get('uploadFIRCopy')?.setValue(filePath);
+
+        // Track upload visually
+        this.uploadedFiles[i] = true;
+        this.uploadedFileNames[i] = selectedFile.name;
+        this.fileUrls[i] = URL.createObjectURL(selectedFile);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('File upload failed:', err);
+      }
+    });
   }
 
   uploadedFIRFileName: string = '';
@@ -2663,18 +2688,22 @@ console.log(isVictimSameAsComplainant,"sasa")
       }
     });
   }  
-  viewFIRCopy(): void {
-    if (this.firForm.get('uploadFIRCopy')?.value) {
-      const url = `${env.file_access}${this.firForm.get('uploadFIRCopy')?.value}`;
-      window.open(url, '_blank');
-    }
+  viewFIRCopy(i: number): void {
+  const accusedFormGroup = this.accuseds.at(i);
+  const filePath = accusedFormGroup.get('uploadFIRCopy')?.value;
+  if (filePath) {
+    const url = `${env.file_access}${filePath}`;
+    window.open(url, '_blank');
   }
-  
-  
-  removeFIRCopy(): void {
-    this.firForm.get('uploadFIRCopy')?.setValue(null);
-    this.uploadedFIRFileName = '';
-  }
+}
+
+removeFIRCopy(i: number): void {
+  const accusedFormGroup = this.accuseds.at(i);
+  accusedFormGroup.get('uploadFIRCopy')?.setValue('');
+  this.uploadedFiles[i] = false;
+  this.uploadedFileNames[i] = '';
+  this.fileUrls[i] = '';
+}
 
   onProceedingsFileUpload(event: any): void {
     const selectedFile = event.target.files[0];
@@ -2723,16 +2752,27 @@ console.log(isVictimSameAsComplainant,"sasa")
 
 // Save Step 4 as Draft
 saveStepFourAsDraft(): void {
+  // const firData = {
+  //   firId: this.firId,
+  //   numberOfAccused: this.firForm.get('numberOfAccused')?.value || '',
+  //   accuseds: this.firForm.get('accuseds')?.value.map((accused: any, index: number) => ({
+  //     ...accused,
+  //     accusedId: accused.accusedId || null,
+  //     // uploadFIRCopy: this.multipleFiles[index] || null
+  //     uploadFIRCopy: this.firForm.get('uploadFIRCopy')?.value || null
+  //   })),
+  // };
+
   const firData = {
-    firId: this.firId,
-    numberOfAccused: this.firForm.get('numberOfAccused')?.value || '',
-    accuseds: this.firForm.get('accuseds')?.value.map((accused: any, index: number) => ({
-      ...accused,
-      accusedId: accused.accusedId || null,
-      // uploadFIRCopy: this.multipleFiles[index] || null
-      uploadFIRCopy: this.firForm.get('uploadFIRCopy')?.value || null
-    })),
-  };
+  firId: this.firId,
+  numberOfAccused: this.firForm.get('numberOfAccused')?.value || '',
+  accuseds: this.firForm.get('accuseds')?.value.map((accused: any) => ({
+    ...accused,
+    accusedId: accused.accusedId || null,
+    uploadFIRCopy: accused.uploadFIRCopy || null
+  })),
+};
+
 
   console.log('FIR Data 4:', firData);
 
