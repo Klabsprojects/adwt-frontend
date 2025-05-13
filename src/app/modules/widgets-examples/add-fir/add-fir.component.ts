@@ -3060,6 +3060,7 @@ uploadCommissionerateSPFile(event: any): void {
         const uploadedFileReference = response.filePath;
         this.proceedingsFile_1 = uploadedFileReference
         this.CommissionerateSPFile = selectedFile.name;
+        this.cdr.detectChanges();
         console.log("CommissionerateSPFile",this.CommissionerateSPFile)
       },
       error: (err) => {
@@ -4548,6 +4549,39 @@ isStep4Valid(): boolean {
 
 
 // mahi changes 
+// isStep5Valid(): boolean {
+//   const mandatoryFields = ['proceedingsFileNo', 'proceedingsDate'];
+
+//   const isFormValid = mandatoryFields.every((field) => {
+//     const control = this.firForm.get(field);
+//     const value = control?.value;
+//     const isValid = control?.disabled || (control?.valid && value !== null && value !== '');
+
+//     console.log(`Field: ${field}, Value: ${value}, Valid: ${isValid}`);
+
+//     return isValid;
+//   });
+
+
+//   const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
+//   const isCommunityCertificateValid = victimsReliefArray.controls.every((victimGroup: any, index: any) => {
+//     const control = victimGroup.get('communityCertificate');
+//     const value = control?.value;
+//     const isValid = control?.disabled || (control?.valid && value !== null && value !== '');
+
+//     console.log(`Victim ${index + 1} - Community Certificate: ${value}, Valid: ${isValid}`);
+
+//     return isValid;
+//   });
+
+
+//   const hasAttachments = Array.isArray(this.attachments?.value) && this.attachments.value.length > 0;
+
+ 
+//   const hasProceedingsFile = this.proceedingsFile instanceof File;
+
+//   return isFormValid && isCommunityCertificateValid && hasAttachments && hasProceedingsFile;
+// }
 isStep5Valid(): boolean {
   const mandatoryFields = ['proceedingsFileNo', 'proceedingsDate'];
 
@@ -4555,32 +4589,26 @@ isStep5Valid(): boolean {
     const control = this.firForm.get(field);
     const value = control?.value;
     const isValid = control?.disabled || (control?.valid && value !== null && value !== '');
-
-    console.log(`Field: ${field}, Value: ${value}, Valid: ${isValid}`);
-
     return isValid;
   });
 
-
   const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
-  const isCommunityCertificateValid = victimsReliefArray.controls.every((victimGroup: any, index: any) => {
+  const isCommunityCertificateValid = victimsReliefArray.controls.every((victimGroup: any) => {
     const control = victimGroup.get('communityCertificate');
     const value = control?.value;
     const isValid = control?.disabled || (control?.valid && value !== null && value !== '');
-
-    console.log(`Victim ${index + 1} - Community Certificate: ${value}, Valid: ${isValid}`);
-
     return isValid;
   });
 
+  const hasAttachments = Array.isArray(this.attachments?.value)
+    && this.attachments.value.length > 0
+    && this.attachments.controls.every(control => !!control.get('file')?.value);
 
-  const hasAttachments = Array.isArray(this.attachments?.value) && this.attachments.value.length > 0;
-
- 
-  const hasProceedingsFile = this.proceedingsFile instanceof File;
+  const hasProceedingsFile = !!this.firForm.get('proceedingsFile')?.value;
 
   return isFormValid && isCommunityCertificateValid && hasAttachments && hasProceedingsFile;
 }
+
 
 
 isSubmitButtonEnabled(): boolean {

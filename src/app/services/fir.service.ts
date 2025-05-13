@@ -240,7 +240,7 @@ saveStepFourAsDraft(firData: any): Observable<any> {
 
     if (firData.attachments && firData.attachments.length > 0) {
       firData.attachments.forEach((attachment: any, index: number) => {
-        if (attachment.file_1) {
+        if (attachment.file) {
     
    
           formData.append(`attachments`, attachment.file); 
