@@ -2,6 +2,8 @@ import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy,
 // import { ActivatedRoute, Router, NavigationStart, Event as RouterEvent } from '@angular/router';
 // import { FormControl, AbstractControl } from '@angular/forms';
 import { NgxDropzoneModule } from 'ngx-dropzone';
+import { environment as env } from 'src/environments/environment.prod';
+import { VmcMeetingService } from 'src/app/services/vmc-meeting.service';
 // import {
 //   FormsModule,
 //   ReactiveFormsModule,
@@ -213,9 +215,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
     private router: Router,
     private firServiceAPI : FirServiceAPI,
     private sanitizer: DomSanitizer,
-    private policeDivisionService :PoliceDivisionService
-   
-  
+    private policeDivisionService :PoliceDivisionService,
+    private vmcSerive : VmcMeetingService
    ) {}
    private wasVictimSame: boolean = false; // Track the previous state of on Victim same as Complainant
 
@@ -1766,6 +1767,145 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
   
 
 
+  uploadedFIRFileName:string='';
+  onFIRFileUpload(event: any): void {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+  
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+  
+    this.vmcSerive.uploadFile(formData).subscribe({
+      next: (response: any) => {
+        const uploadedFileReference = response.filePath;
+        console.log("uploadedFileReference",uploadedFileReference);
+        const accusedsArray = this.firForm.get('accuseds') as FormArray;
+        accusedsArray.at(0).get('uploadFIRCopy')?.setValue(uploadedFileReference);
+        this.uploadedFIRFileName = selectedFile.name;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('File upload failed:', err);
+      }
+    });
+  }
+  viewFIRCopy(){
+    const accusedsArray = this.firForm.get('accuseds') as FormArray;
+    const path = accusedsArray.at(0).get('uploadFIRCopy')?.value;
+    if(path){
+      const url = `${env.file_access}${'/'}${path}`;
+      window.open(url, '_blank');
+    }
+  }
+  removeFIRCopy(){
+    const accusedsArray = this.firForm.get('accuseds') as FormArray;
+    accusedsArray.at(0).get('uploadFIRCopy')?.setValue('');
+    this.uploadedFIRFileName = '';
+  }
+
+  proceedingFileName:string='';
+  proceedingFileName2:string='';
+  onProceedingsFileUpload(event: any): void {
+      const selectedFile = event.target.files[0];
+      if (!selectedFile) return;
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+    
+      this.vmcSerive.uploadFile(formData).subscribe({
+        next: (response: any) => {
+          const uploadedFileReference = response.filePath;
+          this.proceedingFileName = selectedFile.name;
+          this.firForm.get('proceedingsFile')?.setValue(uploadedFileReference);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('File upload failed:', err);
+        }
+      });
+    }  
+    viewProceedingsCopy(): void {
+      if (this.firForm.get('proceedingsFile')?.value) {
+        const url = `${env.file_access}${this.firForm.get('proceedingsFile')?.value}`;
+        window.open(url, '_blank');
+      }
+    }
+    
+    
+    removeProceedingsCopy(): void {
+      this.firForm.get('proceedingsFile')?.setValue(null);
+      this.proceedingFileName = '';
+    }
+
+    view62(path: any): void {
+        if (path) {
+          const url = `${env.file_access}${path}`;
+          window.open(url, '_blank');
+        }
+    }
+    onProceedingsFileUpload2(event: any): void {
+      const selectedFile = event.target.files[0];
+      if (!selectedFile) return;
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+    
+      this.vmcSerive.uploadFile(formData).subscribe({
+        next: (response: any) => {
+          const uploadedFileReference = response.filePath;
+          this.proceedingFileName2 = selectedFile.name;
+          this.firForm.get('uploadProceedings_1')?.setValue(uploadedFileReference);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('File upload failed:', err);
+        }
+      });
+    }  
+    viewProceedingsCopy2(): void {
+      if (this.firForm.get('uploadProceedings_1')?.value) {
+        const url = `${env.file_access}${this.firForm.get('uploadProceedings_1')?.value}`;
+        window.open(url, '_blank');
+      }
+    }
+    
+    
+    removeProceedingsCopy2(): void {
+      this.firForm.get('uploadProceedings_1')?.setValue(null);
+      this.proceedingFileName2 = '';
+    }
+
+    file95:string='';
+    uploadProceedings_2New(event:any){
+      const selectedFile = event.target.files[0];
+      if (!selectedFile) return;
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+    
+      this.vmcSerive.uploadFile(formData).subscribe({
+        next: (response: any) => {
+          const uploadedFileReference = response.filePath;
+          this.file95 = selectedFile.name;
+          this.firForm.get('uploadProceedings_2')?.setValue(uploadedFileReference);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('File upload failed:', err);
+        }
+      });
+    }
+    view95(){
+      if (this.firForm.get('uploadProceedings_2')?.value) {
+        const url = `${env.file_access}${this.firForm.get('uploadProceedings_2')?.value}`;
+        window.open(url, '_blank');
+      }
+    }
+    remove95(){
+      this.firForm.get('uploadProceedings_2')?.setValue('');
+      this.file95 = '';
+    }
+    uploadJudgement:string=''
 
   loadFirDetails(firId: string){
     this.firService.getFirDetails(firId).subscribe(
@@ -1878,6 +2018,7 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
     //   this.firForm.get('judgementDetails.judgementNature')?.setValue(response.data.nature_of_judgement);
     // }
     if (response.data.judgement_copy) {
+      this.uploadJudgement = response.data.judgement_copy;
       this.firForm.get('judgementDetails.uploadJudgement')?.setValue(response.data.judgement_copy);
     }
     if(response.data.number_of_victim){ 
@@ -2030,8 +2171,9 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
 
         });
 
+        this.uploadedFIRFileName = accused.upload_fir_copy.split('uploads/')[1];
         accusedFormArray.push(accusedGroup);
-        console.log(accusedFormArray,"accusedFormArrayaccusedFormArrayaccusedFormArray")
+        console.log(accusedFormArray,"accusedFormArrayaccusedFormArrayaccusedFormArray",'accused.upload_fir_copy',accused.upload_fir_copy);
       });
     }
 
@@ -2056,6 +2198,8 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
       if (response.data3.proceedings_file) {
   
         const data = response.data3.proceedings_file
+        this.proceedingFileName = data;
+        console.log('data',data);
         this.firForm.get('proceedingsFile')?.setValue(data);
         this.filePath_attachment = response.data3.file_paths?.length
         ? response.data3.file_paths.map((file:any) => `${this.apiUrl}uploads/${file}`)
@@ -2100,6 +2244,7 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
     }
     if (response.data4.upload_proceedings_path) { 
       this.firForm.get('uploadProceedings_1')?.setValue(response.data4.upload_proceedings_path);
+      this.proceedingFileName2 = response.data4.upload_proceedings_path;
     }  
     if (response.data4.attachments) { 
       this.attachmentss_1 =  response.data4.attachments
@@ -2435,10 +2580,12 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
           uploadProceedings_2: item.upload_proceedings
 
         });
+        this.file95 = item.upload_proceedings;
+        console.log('file95',this.file95);
         if (item.upload_proceedings) {
           this.uploadProceedings_2_preview = `${this.image_access2}${item.upload_proceedings}`;
 
-          console.log( this.uploadProceedings_2_preview," this.uploadProceedings_2_preview")
+          console.log( this.uploadProceedings_2_preview," this.uploadProceedings_2_preview",'item.upload_proceedings',item.upload_proceedings);
         }
       });
     }
@@ -2707,49 +2854,102 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
   }
  
  
+  // onFileChangee(event: any, index: number): void {
+  //   const file = event.target.files[0];
+  
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = (e: any) => {
+  //       this.attachmentss_1[index].path = e.target.result; // Direct Base64 conversion
+  //     };
+  //     reader.readAsDataURL(file); // Convert file to Base64 for direct preview
+  
+  //     if (!this.attachmentss_1) {
+  //       this.attachmentss_1 = [];
+  //     }
+  
+  //     while (this.attachmentss_1.length <= index) {
+  //       this.attachmentss_1.push({ id: "", path: "", file: null });
+  //       console.log('attachmentss_1',this.attachmentss_1);
+  //     }
+  
+  //     this.attachmentss_1[index].file = file;
+  
+  //     // Update FormArray
+  //     const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
+  //     if (attachmentsControl.length <= index) {
+  //       attachmentsControl.push(this.fb.group({
+  //         file: [null],
+  //         filePath: [''],
+  //         fileName: ['']
+  //       }));
+  //     }
+  
+  //     const attachmentControl = attachmentsControl.at(index);
+  //     if (!attachmentControl) {
+  //       console.error(`Form control at index ${index} is undefined`);
+  //       return;
+  //     }
+  
+  //     attachmentControl.patchValue({
+  //       file: file,
+  //       filePath: file,
+  //       fileName: file.name
+  //     });
+  //   }
+  // }
   onFileChangee(event: any, index: number): void {
-    const file = event.target.files[0];
-  
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.attachmentss_1[index].path = e.target.result; // Direct Base64 conversion
-      };
-      reader.readAsDataURL(file); // Convert file to Base64 for direct preview
-  
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  this.vmcSerive.uploadFile(formData).subscribe({
+    next: (response: any) => {
+      const uploadedFilePath = response.filePath; // Assuming server returns this
+
+      // Ensure attachmentss_1 exists and has an entry at this index
       if (!this.attachmentss_1) {
         this.attachmentss_1 = [];
       }
-  
       while (this.attachmentss_1.length <= index) {
         this.attachmentss_1.push({ id: "", path: "", file: null });
       }
-  
-      this.attachmentss_1[index].file = file;
-  
+
+      this.attachmentss_1[index].path = uploadedFilePath;
+      this.attachmentss_1[index].file = null;
+
       // Update FormArray
       const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
-      if (attachmentsControl.length <= index) {
+      while (attachmentsControl.length <= index) {
         attachmentsControl.push(this.fb.group({
           file: [null],
           filePath: [''],
           fileName: ['']
         }));
       }
-  
+
       const attachmentControl = attachmentsControl.at(index);
       if (!attachmentControl) {
         console.error(`Form control at index ${index} is undefined`);
         return;
       }
-  
+
       attachmentControl.patchValue({
         file: file,
-        filePath: file,
+        filePath: uploadedFilePath,
         fileName: file.name
       });
+
+      this.cdr.detectChanges(); // Optional, for UI refresh
+    },
+    error: (err) => {
+      console.error('File upload failed:', err);
     }
-  }
+  });
+}
+
   
   
   isImage(filePath: string | File | null): boolean {
@@ -2827,7 +3027,8 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
       accuseds: this.firForm.get('accuseds')?.value.map((accused: any, index: number) => ({
         ...accused,
         accusedId: accused.accusedId || null,
-        uploadFIRCopy: this.multipleFiles[index] || null
+        // uploadFIRCopy: this.multipleFiles[index] || null
+        uploadFIRCopy: this.firForm.value.accuseds[0].uploadFIRCopy || null
     
   
   
@@ -2874,7 +3075,8 @@ console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
       proceedingsDate: this.firForm.get('proceedingsDate')?.value,
       // uploadFIRCopy: this.multipleFiles[index] || null
       // this.multipleFilesForproceeding[i]
-      proceedingsFile: this.multipleFilesForproceeding || '',
+      // proceedingsFile: this.multipleFilesForproceeding || '',
+      proceedingsFile : this.firForm.get('proceedingsFile')?.value || '',
       attachments:this.attachmentss_1,
       status: isSubmit ? 5 : undefined,
     };
@@ -5316,37 +5518,82 @@ console.log(formFields,"formFieldsformFields")
   fileObjects: { [index: number]: File[] } = {};
   uploadedPaths: { [key: string]: string } = {};
   
+  // onFileSelect_2(event: any, index: number): void {
+  //   const files: FileList = event.target.files;
+  //   console.log(files, "Selected Files");
+  
+  //   if (!files || files.length === 0) return;
+  
+  //   const attachmentGroup = this.attachments_2.at(index) as FormGroup;
+  //   console.log(attachmentGroup);
+  
+  //   const selectedFiles: File[] = [];
+  
+  //   for (let i = 0; i < files.length; i++) {
+  //     const file = files[i];
+  //     console.log("File selected:", file.name, file);
+  
+  //     const reader = new FileReader();
+  //     reader.onload = (e: any) => {
+  //       this.filePreviews[index] = e.target.result; // Store preview per index
+  //       this.cdr.detectChanges();
+  //     };
+  //     reader.readAsDataURL(file);
+  
+  //     selectedFiles.push(file);
+  //   }
+  
+  //   // ✅ Store actual files separately
+  //   this.fileObjects[index] = selectedFiles;
+  
+  //   console.log(this.fileObjects, "Stored File Objects");
+
+  // }
+  viewAttachment_2(path: string): void {
+  if (path) {
+    const url = `${env.file_access}${path}`;
+    window.open(url, '_blank');
+  }
+}
+
   onFileSelect_2(event: any, index: number): void {
-    const files: FileList = event.target.files;
-    console.log(files, "Selected Files");
-  
-    if (!files || files.length === 0) return;
-  
-    const attachmentGroup = this.attachments_2.at(index) as FormGroup;
-    console.log(attachmentGroup);
-  
-    const selectedFiles: File[] = [];
-  
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      console.log("File selected:", file.name, file);
-  
+  const file: File = event.target.files?.[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  // Upload to server
+  this.vmcSerive.uploadFile(formData).subscribe({
+    next: (response: any) => {
+      const uploadedFilePath = response.filePath; // Server should return the path
+
+      // Update preview
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.filePreviews[index] = e.target.result; // Store preview per index
+        this.filePreviews[index] = e.target.result;
         this.cdr.detectChanges();
       };
       reader.readAsDataURL(file);
-  
-      selectedFiles.push(file);
-    }
-  
-    // ✅ Store actual files separately
-    this.fileObjects[index] = selectedFiles;
-  
-    console.log(this.fileObjects, "Stored File Objects");
 
-  }
+      // Update FormGroup
+      const attachmentGroup = this.attachments_2.at(index) as FormGroup;
+      if (attachmentGroup) {
+        attachmentGroup.patchValue({
+          fileName_2: file.name,
+          file_2: uploadedFilePath,
+          file: '', // Still storing raw file for reference if needed
+        });
+      }
+
+      console.log(`File uploaded and path saved for index ${index}:`, uploadedFilePath);
+    },
+    error: (err) => {
+      console.error('File upload failed:', err);
+    }
+  });
+}
+
   
  async UpdateAsDraft_7() {
   if (!this.firId) {
@@ -6380,100 +6627,200 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
 
   // uploadJudgementPreview: string | null = null; // To store the image preview
 
+  // uploadJudgementSelect(event: any): void {
+  //   const file = event.target.files?.[0];
+  
+  //   if (file) {
+  //     console.log('File selected:', file.name, file);
+  
+  //     const reader = new FileReader();
+  //     reader.onload = (e: any) => {
+  //       this.uploadJudgementPreview = e.target.result;
+  //     };
+  //     reader.readAsDataURL(file);
+  
+  //     this.uploadMultipleFiles(file)
+  //       .then(paths => {
+  //         console.log('Uploaded file path:', paths[0]);
+  
+  //         this.firForm.patchValue({
+  //           judgementDetails: {
+  //             uploadJudgement: paths[0]  
+  //           }
+  //         });
+  //       })
+  //       .catch(error => {
+  //         console.error('Error uploading file:', error);
+  //       });
+  //   } else {
+  //     console.log('No file selected');
+  //     this.uploadJudgementPreview = null; 
+  //   }
+  // }
   uploadJudgementSelect(event: any): void {
-    const file = event.target.files?.[0];
-  
-    if (file) {
-      console.log('File selected:', file.name, file);
-  
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.uploadJudgementPreview = e.target.result;
-      };
-      reader.readAsDataURL(file);
-  
-      this.uploadMultipleFiles(file)
-        .then(paths => {
-          console.log('Uploaded file path:', paths[0]);
-  
+    const selectedFile = event.target.files[0];
+      if (!selectedFile) return;
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+    
+      this.vmcSerive.uploadFile(formData).subscribe({
+        next: (response: any) => {
+          const uploadedFileReference = response.filePath;
+          this.uploadJudgement = selectedFile.name;
           this.firForm.patchValue({
             judgementDetails: {
-              uploadJudgement: paths[0]  
+              uploadJudgement: uploadedFileReference
             }
           });
-        })
-        .catch(error => {
-          console.error('Error uploading file:', error);
-        });
-    } else {
-      console.log('No file selected');
-      this.uploadJudgementPreview = null; 
-    }
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('File upload failed:', err);
+        }
+      });
+  }
+
+  viewuploadJudgement(){
+    if (this.firForm.get('judgementDetails.uploadJudgement')?.value) {
+        const url = `${env.file_access}${this.firForm.get('judgementDetails.uploadJudgement')?.value}`;
+        window.open(url, '_blank');
+      }
+  }
+  removeuploadJudgement(){
+    this.firForm.get('judgementDetails.uploadJudgement')?.setValue('');
+      this.uploadJudgement = '';
   }
   uploadJudgementPreview_one: any | ArrayBuffer;
+  uploadJudgement_one:string='';
+  uploadJudgement_two:string='';
   uploadJudgementSelect_one(event: any): void {
-    const file = event.target.files?.[0];
+    // const file = event.target.files?.[0];
   
-    if (file) {
-      console.log('File selected:', file.name, file);
+    // if (file) {
+    //   console.log('File selected:', file.name, file);
   
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.uploadJudgementPreview_one = e.target.result;
-      };
-      reader.readAsDataURL(file);
+    //   const reader = new FileReader();
+    //   reader.onload = (e: any) => {
+    //     this.uploadJudgementPreview_one = e.target.result;
+    //   };
+    //   reader.readAsDataURL(file);
   
-      this.uploadMultipleFiles(file)
-        .then(paths => {
-          console.log('Uploaded file path:', paths[0]);
+    //   this.uploadMultipleFiles(file)
+    //     .then(paths => {
+    //       console.log('Uploaded file path:', paths[0]);
   
+    //       this.firForm.patchValue({
+    //         judgementDetails_one: {
+    //           uploadJudgement_one: paths[0]  
+    //         }
+    //       });
+    //     })
+    //     .catch(error => {
+    //       console.error('Error uploading file:', error);
+    //     });
+    // } else {
+    //   console.log('No file selected');
+    //   this.uploadJudgementPreview_one = null; 
+    // }
+     const selectedFile = event.target.files[0];
+      if (!selectedFile) return;
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+    
+      this.vmcSerive.uploadFile(formData).subscribe({
+        next: (response: any) => {
+          const uploadedFileReference = response.filePath;
+          this.uploadJudgement_one = selectedFile.name;
           this.firForm.patchValue({
             judgementDetails_one: {
-              uploadJudgement_one: paths[0]  
+              uploadJudgement_one: uploadedFileReference
             }
           });
-        })
-        .catch(error => {
-          console.error('Error uploading file:', error);
-        });
-    } else {
-      console.log('No file selected');
-      this.uploadJudgementPreview_one = null; 
-    }
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('File upload failed:', err);
+        }
+      });
   }
+  viewuploadJudgementone(){
+    console.log(this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value);
+     if (this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value) {
+        const url = `${env.file_access}${this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value}`;
+        window.open(url, '_blank');
+      }
+  }
+removeuploadJudgementone(){
+  this.firForm.get('judgementDetails_one.uploadJudgement_one')?.setValue('');
+      this.uploadJudgement_one = '';
+}
 
 
   uploadJudgementPreview_two: any | ArrayBuffer;
   uploadJudgementSelect_two(event: any): void {
-    const file = event.target.files?.[0];
+    // const file = event.target.files?.[0];
   
-    if (file) {
-      console.log('File selected:', file.name, file);
+    // if (file) {
+    //   console.log('File selected:', file.name, file);
   
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.uploadJudgementPreview_two = e.target.result;
-      };
-      reader.readAsDataURL(file);
+    //   const reader = new FileReader();
+    //   reader.onload = (e: any) => {
+    //     this.uploadJudgementPreview_two = e.target.result;
+    //   };
+    //   reader.readAsDataURL(file);
   
-      this.uploadMultipleFiles(file)
-        .then(paths => {
-          console.log('Uploaded file path:', paths[0]);
+    //   this.uploadMultipleFiles(file)
+    //     .then(paths => {
+    //       console.log('Uploaded file path:', paths[0]);
   
+    //       this.firForm.patchValue({
+    //         judgementDetails_two: {
+    //           uploadJudgement_two: paths[0]  
+    //         }
+    //       });
+    //     })
+    //     .catch(error => {
+    //       console.error('Error uploading file:', error);
+    //     });
+    // } else {
+    //   console.log('No file selected');
+    //   this.uploadJudgementPreview_two = null; 
+    // }
+    const selectedFile = event.target.files[0];
+      if (!selectedFile) return;
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+    
+      this.vmcSerive.uploadFile(formData).subscribe({
+        next: (response: any) => {
+          const uploadedFileReference = response.filePath;
+          this.uploadJudgement_two = selectedFile.name;
           this.firForm.patchValue({
             judgementDetails_two: {
-              uploadJudgement_two: paths[0]  
+              uploadJudgement_two: uploadedFileReference
             }
           });
-        })
-        .catch(error => {
-          console.error('Error uploading file:', error);
-        });
-    } else {
-      console.log('No file selected');
-      this.uploadJudgementPreview_two = null; 
-    }
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('File upload failed:', err);
+        }
+      });
   }
+  viewuploadJudgementtwo(){
+    console.log(this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value);
+     if (this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value) {
+        const url = `${env.file_access}${this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value}`;
+        window.open(url, '_blank');
+      }
+  }
+removeuploadJudgementtwo(){
+  this.firForm.get('judgementDetails_two.uploadJudgement_two')?.setValue('');
+      this.uploadJudgement_two = '';
+}
   // .... thisis for proceeeding file 
  uploadProceedings_2(event: any): void {
   const file = event.target.files?.[0];

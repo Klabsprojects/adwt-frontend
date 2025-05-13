@@ -1197,7 +1197,6 @@
 
                 <div class="col-md-6 mb-3">
                   <label class="form-label">61. Upload Commissionerate / S.P. Office Proceedings *</label>
-                  {{proceedingsFile}}
                   <input type="file" [id]="'proceedingsFile' + i" class="form-control" 
                           required 
                          (change)="onProceedingsFileUpload($event)" multiple *ngIf="!proceedingFileName"/>
