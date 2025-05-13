@@ -118,26 +118,31 @@ saveStepThreeAsDraft(firData: any): Observable<any> {
 
 
 // step 4 has been changed api payload
+// saveStepFourAsDraft(firData: any): Observable<any> {
+//   const formData = new FormData();
+
+//   formData.append('firId', firData.firId);
+//   formData.append('numberOfAccused', firData.numberOfAccused.toString()); 
+
+
+//   formData.append('accuseds', JSON.stringify(firData.accuseds || []));
+
+//   console.log("formData",formData);
+
+
+//   // firData.accuseds.forEach((accused: any, index: number) => {
+//   //   if (accused.uploadFIRCopy && accused.uploadFIRCopy.length > 0) {
+//   //     accused.uploadFIRCopy.forEach((file: File) => {
+//   //       formData.append(`uploadFIRCopy[]`, file, file.name);
+//   //     });
+//   //   }
+//   // });
+//   return this.http.post(`${this.baseUrl}/handle-step-four`, formData);
+// }
+
 saveStepFourAsDraft(firData: any): Observable<any> {
-  const formData = new FormData();
-
-  formData.append('firId', firData.firId);
-  formData.append('numberOfAccused', firData.numberOfAccused.toString()); 
-
-
-  formData.append('accuseds', JSON.stringify(firData.accuseds || []));
-
-  console.log("formData",formData);
-
-
-  // firData.accuseds.forEach((accused: any, index: number) => {
-  //   if (accused.uploadFIRCopy && accused.uploadFIRCopy.length > 0) {
-  //     accused.uploadFIRCopy.forEach((file: File) => {
-  //       formData.append(`uploadFIRCopy[]`, file, file.name);
-  //     });
-  //   }
-  // });
-  return this.http.post(`${this.baseUrl}/handle-step-four`, formData);
+  let body = {firId :  firData.firId, numberOfAccused : firData.numberOfAccused.toString(), accuseds : JSON.stringify(firData.accuseds || [])}
+  return this.http.post(`${this.baseUrl}/handle-step-four`, body);
 }
 
 
