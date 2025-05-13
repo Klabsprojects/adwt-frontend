@@ -1,0 +1,98 @@
+<div class="card">
+  <div class="card-header border-0 pt-6">
+    <div class="card-title">
+      <div class="d-flex align-items-center position-relative my-1">
+        <i class="fas fa-search fs-3 position-absolute ms-5"></i>
+        <input type="text" [(ngModel)]="searchText" (input)="applyFilters()"
+          class="form-control form-control-solid w-250px ps-12" placeholder="Search Reports" />
+      </div>
+    </div>
+    <!-- Drop List for columns -->
+    <div class="toolbar mb-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Select Columns</mat-label>
+        <mat-select [(ngModel)]="selectedColumns" (selectionChange)="onColumnSelectionChange()" multiple>
+          <mat-option *ngFor="let column of displayedColumns" [value]="column.field">
+            {{ column.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+  </div>
+
+  <div class="card-body pt-0">
+    <!-- Filters -->
+    <div class="d-flex gap-3 mb-3">
+      <select class="form-select" [(ngModel)]="selectedYear" (change)="applyFilters()">
+        <option value="" selected>Year</option>
+        <option *ngFor="let item of year" [value]="item">{{ item }}</option>
+      </select>
+
+      <select class="form-select" [(ngModel)]="selectedMeetingType" (change)="applyFilters()">
+        <option value="" selected>Meeting Type</option>
+        <option *ngFor="let item of meeting_type_list" [value]="item">{{ item }}</option>
+      </select>
+
+      <select class="form-select" [(ngModel)]="selectedMeetingQuarter" (change)="applyFilters()">
+        <option value="" selected>Meeting Quarter</option>
+        <option *ngFor="let item of meeting_quater_list" [value]="item">{{ item }}</option>
+      </select>
+
+      <select *ngIf="Parsed_UserInfo.access_type == 'State'" class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters();getSubdivisions()">
+        <option value="" selected>district</option>
+        <option *ngFor="let item of districts" [value]="item">{{ item }}</option>
+      </select>
+
+      <select class="form-select" [(ngModel)]="selectedSubDivision" (change)="applyFilters()">
+        <option value="" selected>Sub Division</option>
+        <option *ngFor="let item of subdivisionsMap" [value]="item">{{ item }}</option>
+      </select>
+
+      <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
+    </div>
+
+    <div class="card-body pt-0 overflow-auto">
+      <table class="table table-bordered table-responsive">
+        <thead>
+          <tr>
+            <th *ngFor="let column of displayedColumns" [hidden]="!column.visible" (click)="column.sortable ? sortTable(column.field) : null">
+              {{ column.label }}
+              <i *ngIf="column.sortable" class="fas" [ngClass]="getSortIcon(column.field)"></i>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let report of paginatedData()">
+            <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
+              <ng-container [ngSwitch]="column.field">
+                <span *ngSwitchDefault>{{ report[column.field] }}</span>
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Show message if data is loading -->
+      <div *ngIf="loading" class="alert alert-warning">Loading...</div>
+      <!-- Show message if filtered data is empty -->
+      <div *ngIf="filteredData.length === 0 && !loading" class="alert alert-warning">No FIR data available.</div>
+      <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button>
+      <nav *ngIf="filteredData.length > itemsPerPage" class="d-flex justify-content-end mt-3">
+        <ul class="pagination">
+          <li class="page-item" [class.disabled]="page === 1">
+            <button class="page-link" (click)="previousPage()">Previous</button>
+          </li>
+          <li class="page-item" *ngFor="let pageNum of totalPagesArray()">
+            <button class="page-link" (click)="goToPage(pageNum)" [class.active]="page === pageNum">
+              {{ pageNum }}
+            </button>
+          </li>
+          <li class="page-item" [class.disabled]="page === totalPages()">
+            <button class="page-link" (click)="nextPage()">Next</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</div>

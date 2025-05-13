@@ -35,33 +35,35 @@
   </div>
   <div class="d-flex gap-3 mb-3 p-4">
     <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
-      <option value="" selected>Select One</option>
+      <option value="" selected>District</option>
       <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
     </select>
 
     <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
-      <option value="" selected>Select One</option>
+      <option value="" selected>Offence</option>
       <option *ngFor="let nature of natureOfOffences" [value]="nature">{{ nature }}</option>
     </select>
 
 
     <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
-      <option value="" selected>Select One</option>
+      <option value="" selected>Status</option>
       <option *ngFor="let status of caseStatuses" [value]="status">{{ status }}</option>
     </select>
 
     <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
-      <option value="" selected>Select One</option>
+      <option value="" selected>Relief Status</option>
       <option *ngFor="let reliefStatus of statusesOfRelief" [value]="reliefStatus">
         {{ reliefStatus }}
       </option>
     </select>
 
+    <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
+
   </div>
 
   <div class="card-body pt-0 overflow-auto">
-    <table class="table table-bordered table-responsive">
-      <thead>
+    <table class="table table-bordered  tab-border">
+      <thead  class="table-dark side_border">
         <tr>
           <th *ngFor="let column of displayedColumns" [hidden]="!column.visible"
             (click)="column.sortable ? sortTable(column.field) : null">
@@ -156,7 +158,7 @@
     
     <!-- Bootstrap Table -->
     <div class="table-responsive">
-      <table class="table table-striped table-hover table-bordered">
+      <table class="table table-bordered tab-border">
         <thead class="table-dark">
           <tr>
             <!-- Regular columns -->
@@ -185,9 +187,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of TypeReport1; let i = index">
-            <td style="text-align: center;">{{ i + 1 }}</td>
-            <td style="text-align: center;">{{ item.revenue_district }}</td>
+          <tr  [ngClass]="{ 'grandTotalStyle side_border': item.revenue_district === 'Grand Total' }" *ngFor="let item of TypeReport1; let i = index">
+            <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
+            <td *ngIf="item.revenue_district == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{ item.revenue_district }}</td>
+            <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ item.revenue_district }}</td>
             <td style="text-align: center;">{{ item.ui_total_cases }}</td>
             <td style="text-align: center;">{{ item.less_than_60_days }}</td>
             <td style="text-align: center;">{{ item.more_than_60_current_year }}</td>
@@ -234,7 +237,7 @@
     
     <!-- Bootstrap Table -->
     <div class="table-responsive">
-      <table class="table table-striped table-hover table-bordered">
+      <table class="table table-bordered tab-border">
         <thead class="table-dark">
           <tr>
             <!-- Regular columns -->
@@ -263,9 +266,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of TypeReport2; let i = index">
-            <td style="text-align: center;">{{ i + 1 }}</td>
-            <td style="text-align: center;">{{ item.reason_for_status }}</td>
+          <tr  [ngClass]="{ 'grandTotalStyle side_border': item.reason_for_status === 'Grand Total' }" *ngFor="let item of TypeReport2; let i = index">
+            <td *ngIf="item.reason_for_status != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
+            <td *ngIf="item.reason_for_status == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{ item.reason_for_status }}</td>
+            <td *ngIf="item.reason_for_status != 'Grand Total'" style="text-align: center;">{{ item.reason_for_status }}</td>
+            <!-- <td style="text-align: center;">{{ i + 1 }}</td>
+            <td style="text-align: center;">{{ item.reason_for_status }}</td> -->
             <td style="text-align: center;">{{ item.ui_total_cases }}</td>
             <td style="text-align: center;">{{ item.less_than_60_days }}</td>
             <td style="text-align: center;">{{ item.more_than_60_current_year }}</td>
@@ -312,7 +318,7 @@
     
     <!-- Bootstrap Table -->
     <div class="table-responsive">
-      <table class="table table-striped table-hover table-bordered">
+      <table class="table table-bordered tab-border">
         <thead class="table-dark">
           <tr>
             <!-- Regular columns -->
@@ -341,9 +347,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of TypeReport3; let i = index">
-            <td style="text-align: center;">{{ i + 1 }}</td>
-            <td style="text-align: center;">{{ item.revenue_district }}</td>
+          <tr  [ngClass]="{ 'grandTotalStyle side_border': item.revenue_district === 'Grand Total' }" *ngFor="let item of TypeReport3; let i = index">
+            <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
+            <td *ngIf="item.revenue_district == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{ item.revenue_district }}</td>
+            <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ item.revenue_district }}</td>
+            <!-- <td style="text-align: center;">{{ i + 1 }}</td>
+            <td style="text-align: center;">{{ item.revenue_district }}</td> -->
             <td style="text-align: center;">{{ item.ui_total_cases }}</td>
             <td style="text-align: center;">{{ item.less_than_60_days }}</td>
             <td style="text-align: center;">{{ item.more_than_60_current_year }}</td>
@@ -392,7 +401,7 @@
     
     <!-- Bootstrap Table -->
     <div class="table-responsive">
-      <table class="table table-striped table-hover table-bordered">
+      <table class="table table-bordered tab-border">
         <thead class="table-dark">
           <tr>
             <!-- Regular columns -->
@@ -409,9 +418,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of TypeReport4; let i = index">
-            <td style="text-align: center;">{{ i + 1 }}</td>
-            <td style="text-align: center;">{{ item.revenue_district }}</td>
+             <tr  [ngClass]="{ 'grandTotalStyle side_border': item.revenue_district === 'Grand Total' }" *ngFor="let item of TypeReport4; let i = index">
+            <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
+            <td *ngIf="item.revenue_district == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{ item.revenue_district }}</td>
+            <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ item.revenue_district }}</td>
+            <!-- <td style="text-align: center;">{{ i + 1 }}</td>
+            <td style="text-align: center;">{{ item.revenue_district }}</td> -->
             <td style="text-align: center;">{{ item.total }}</td>
             <td style="text-align: center;">{{ item.less_than_one_year }}</td>
             <td style="text-align: center;">{{ item.between_1_and_5_years }}</td>
@@ -460,7 +472,7 @@
     
     <!-- Bootstrap Table -->
     <div class="table-responsive">
-      <table class="table table-striped table-hover table-bordered">
+      <table class="table table-bordered tab-border">
         <thead class="table-dark">
           <tr>
             <!-- Regular columns -->
@@ -470,9 +482,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of TypeReport5; let i = index">
-            <td style="text-align: center;">{{ i + 1 }}</td>
-            <td style="text-align: center;">{{ item.Conviction_Type }}</td>
+          <tr  [ngClass]="{ 'grandTotalStyle side_border': item.Conviction_Type === 'Grand Total' }" *ngFor="let item of TypeReport5; let i = index">
+            <td *ngIf="item.Conviction_Type != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
+            <td *ngIf="item.Conviction_Type == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{ item.Conviction_Type }}</td>
+            <td *ngIf="item.Conviction_Type != 'Grand Total'" style="text-align: center;">{{ item.Conviction_Type }}</td>
+            <!-- <td style="text-align: center;">{{ i + 1 }}</td>
+            <td style="text-align: center;">{{ item.Conviction_Type }}</td> -->
             <td style="text-align: center;">{{ item.case_count }}</td>
           </tr>
         </tbody>

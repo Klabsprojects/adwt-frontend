@@ -295,6 +295,14 @@
             <span class="menu-title">Additional Reports</span>
           </a>
         </div>
+        <div class="menu-item" *ngIf="hasPermission('VMC reports')">
+          <a routerLink="/widgets-examples/Vmc-Report" class="menu-link without-sub" routerLinkActive="active">
+            <span class="menu-bullet">
+             <span class="bullet bullet-dot"></span>  
+            </span>
+            <span class="menu-title">VMC reports</span>
+          </a>
+        </div>
       </div>
     </div>
 

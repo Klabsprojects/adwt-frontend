@@ -23,6 +23,10 @@
   text-align: center !important;
 }
 
+.tab-border{
+  border: solid #1f497d 1px;
+}
+
 // .modal-content {
 //   position: relative;
 //   top: 280px;
@@ -54,4 +58,9 @@
   border-radius: var(--bs-modal-border-radius);
   box-shadow: var(--bs-modal-box-shadow);
   outline: 0;
+}
+
+::ng-deep tr.grandTotalStyle td {
+  color: #fff !important;
+  background-color: #1f497d !important;
 }

@@ -328,6 +328,16 @@ export class MonthlyReportComponent implements OnInit {
     this.filteredData = this.filteredData.map((report, index) => ({...report, sl_no: index + 1 })); // Assign sl_no starting from 1
     this.page = 1; // Reset to the first page
   }
+  
+
+  clearfilter(){
+      this.searchText = '';
+      this.selectedDistrict = '';
+      this.selectedNatureOfOffence = '';
+      this.selectedStatusOfCase = '';
+      this.selectedStatusOfRelief = '';
+      this.applyFilters();
+  }
 
   // Sorting logic
   sortTable(field: string) {
@@ -602,6 +612,26 @@ exportToExcel1(): void {
     });
   });
 
+// Apply header style to the last row (total row)
+const lastRowIndex = this.TypeReport1.length + 2; // +2 because of header rows
+const lastRow = worksheet.getRow(lastRowIndex);
+
+// Merge first two cells for grand total and set the text
+lastRow.getCell(1).value = 'Grand Total'; // Clear the first cell
+lastRow.getCell(2).value = ''; // Set the text in the second cell
+worksheet.mergeCells(`A${lastRowIndex}:B${lastRowIndex}`);
+
+lastRow.eachCell((cell: any) => {
+  cell.style = {
+    ...headerStyle,
+    font: {
+      color: { argb: 'FFFFFF' },
+      bold: true
+    }
+  };
+  cell.alignment = { horizontal: 'center', vertical: 'middle' };
+});
+
   // Generate Excel file
   workbook.xlsx.writeBuffer().then((buffer:any) => {
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -733,6 +763,27 @@ exportToExcel2(): void {
     });
   });
 
+// Apply header style to the last row (total row)
+const lastRowIndex = this.TypeReport2.length + 2; // +2 because of header rows
+const lastRow = worksheet.getRow(lastRowIndex);
+
+// Merge first two cells for grand total and set the text
+lastRow.getCell(1).value = 'Grand Total'; // Clear the first cell
+lastRow.getCell(2).value = ''; // Set the text in the second cell
+worksheet.mergeCells(`A${lastRowIndex}:B${lastRowIndex}`);
+
+lastRow.eachCell((cell: any) => {
+  cell.style = {
+    ...headerStyle,
+    font: {
+      color: { argb: 'FFFFFF' },
+      bold: true
+    }
+  };
+  cell.alignment = { horizontal: 'center', vertical: 'middle' };
+});
+
+
   // Generate Excel file
   workbook.xlsx.writeBuffer().then((buffer:any) => {
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -862,6 +913,42 @@ exportToExcel3(): void {
       cell.alignment = { horizontal: 'center', vertical: 'middle' };
     });
   });
+
+  //   // Apply header style to the last row (total row)
+  // const lastRowIndex = this.TypeReport3.length + 2; // +2 because of header rows
+  // const lastRow = worksheet.getRow(lastRowIndex);
+  
+  // lastRow.eachCell((cell: any) => {
+  //   cell.style = {
+  //     ...headerStyle,
+  //     font: {
+  //       color: { argb: 'FFFFFF' },
+  //       bold: true
+  //     }
+  //   };
+  //   cell.alignment = { horizontal: 'center', vertical: 'middle' };
+  // });
+
+  // Apply header style to the last row (total row)
+  const lastRowIndex = this.TypeReport3.length + 2; // +2 because of header rows
+  const lastRow = worksheet.getRow(lastRowIndex);
+
+  // Merge first two cells for grand total and set the text
+  lastRow.getCell(1).value = 'Grand Total'; // Clear the first cell
+  lastRow.getCell(2).value = ''; // Set the text in the second cell
+  worksheet.mergeCells(`A${lastRowIndex}:B${lastRowIndex}`);
+
+  lastRow.eachCell((cell: any) => {
+    cell.style = {
+      ...headerStyle,
+      font: {
+        color: { argb: 'FFFFFF' },
+        bold: true
+      }
+    };
+    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+  });
+
 
   // Generate Excel file
   workbook.xlsx.writeBuffer().then((buffer:any) => {
@@ -1031,6 +1118,48 @@ exportToExcel4(): void {
     }
   });
 
+    // Style the headers - get the exact blue color you want
+  const headerStyle = {
+    fill: {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: '1F497D' } // This is the hex color without the #
+    },
+    font: {
+      color: { argb: 'FFFFFF' },
+      bold: true
+    },
+    alignment: {
+      horizontal: 'center',
+      vertical: 'middle'
+    },
+    border: {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' }
+    }
+  };
+  // Apply header style to the last row (total row)
+const lastRowIndex = this.TypeReport4.length + 1; // +2 because of header rows
+const lastRow = worksheet.getRow(lastRowIndex);
+
+// Merge first two cells for grand total and set the text
+lastRow.getCell(1).value = 'Grand Total'; // Clear the first cell
+lastRow.getCell(2).value = ''; // Set the text in the second cell
+worksheet.mergeCells(`A${lastRowIndex}:B${lastRowIndex}`);
+
+lastRow.eachCell((cell: any) => {
+  cell.style = {
+    ...headerStyle,
+    font: {
+      color: { argb: 'FFFFFF' },
+      bold: true
+    }
+  };
+  cell.alignment = { horizontal: 'center', vertical: 'middle' };
+});
+
   // Generate Excel file
   workbook.xlsx.writeBuffer().then((buffer:any) => {
     const blob = new Blob([buffer], { 
@@ -1188,6 +1317,48 @@ exportToExcel5(): void {
       }
     }
   });
+
+    const headerStyle = {
+    fill: {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: '1F497D' } // This is the hex color without the #
+    },
+    font: {
+      color: { argb: 'FFFFFF' },
+      bold: true
+    },
+    alignment: {
+      horizontal: 'center',
+      vertical: 'middle'
+    },
+    border: {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' }
+    }
+  };
+
+    // Apply header style to the last row (total row)
+const lastRowIndex = this.TypeReport5.length + 1; // +2 because of header rows
+const lastRow = worksheet.getRow(lastRowIndex);
+
+// Merge first two cells for grand total and set the text
+lastRow.getCell(1).value = 'Grand Total'; // Clear the first cell
+lastRow.getCell(2).value = ''; // Set the text in the second cell
+worksheet.mergeCells(`A${lastRowIndex}:B${lastRowIndex}`);
+
+lastRow.eachCell((cell: any) => {
+  cell.style = {
+    ...headerStyle,
+    font: {
+      color: { argb: 'FFFFFF' },
+      bold: true
+    }
+  };
+  cell.alignment = { horizontal: 'center', vertical: 'middle' };
+});
 
   // Generate Excel file
   const file_name = 'Conviction_for_the_Year_'+this.currentYear+'.xlsx'
