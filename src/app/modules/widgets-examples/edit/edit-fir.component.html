@@ -790,19 +790,21 @@
 
                 <div class="col-md-6 mb-3">
                   <label class="form-label">51. Upload FIR Copy *</label>
-                  {{uploadedFIRFileName}}
                   <input type="file" [id]="'uploadFIRCopy' + i" class="form-control"
-                         required (change)="onFIRFileUpload($event)"  multiple *ngIf="!uploadedFIRFileName"/>
-                  <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="uploadedFIRFileName">
+                        required (change)="onFIRFileUpload($event, i)" multiple *ngIf="!uploadedFIRFileNames[i]" />
+                  <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="uploadedFIRFileNames[i]">
                     <div class="d-flex justify-content-start align-items-center">
-                      {{uploadedFIRFileName}}
+                      {{ uploadedFIRFileNames[i] }}
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
-                      <button class="btn btn-primary btn-sm me-2" (click)="viewFIRCopy()">View</button>
-                      <button class="btn btn-danger btn-sm" (click)="removeFIRCopy()"><i class="fas fa-times"></i></button>
+                      <button class="btn btn-primary btn-sm me-2" (click)="viewFIRCopy(i)">View</button>
+                      <button class="btn btn-danger btn-sm" (click)="removeFIRCopy(i)">
+                        <i class="fas fa-times"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
+
                 
                 <!-- <div *ngIf="uploadedFiles[i]; else existingFile">
                   <img [src]="fileUrls[i]" class="img-thumbnail" alt="FIR Copy" style="max-width: 150px; margin-bottom: 10px;">

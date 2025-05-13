@@ -1767,21 +1767,39 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
   
 
 
-  uploadedFIRFileName:string='';
-  onFIRFileUpload(event: any): void {
+  uploadedFIRFileNames: string[] = [];
+  onFIRFileUpload(event: any,index:number): void {
+    // const selectedFile = event.target.files[0];
+    // if (!selectedFile) return;
+  
+    // const formData = new FormData();
+    // formData.append('file', selectedFile);
+  
+    // this.vmcSerive.uploadFile(formData).subscribe({
+    //   next: (response: any) => {
+    //     const uploadedFileReference = response.filePath;
+    //     console.log("uploadedFileReference",uploadedFileReference);
+    //     const accusedsArray = this.firForm.get('accuseds') as FormArray;
+    //     accusedsArray.at(0).get('uploadFIRCopy')?.setValue(uploadedFileReference);
+    //     this.uploadedFIRFileNames = selectedFile.name;
+    //     this.cdr.detectChanges();
+    //   },
+    //   error: (err) => {
+    //     console.error('File upload failed:', err);
+    //   }
+    // });
     const selectedFile = event.target.files[0];
     if (!selectedFile) return;
-  
+
     const formData = new FormData();
     formData.append('file', selectedFile);
-  
+
     this.vmcSerive.uploadFile(formData).subscribe({
       next: (response: any) => {
         const uploadedFileReference = response.filePath;
-        console.log("uploadedFileReference",uploadedFileReference);
         const accusedsArray = this.firForm.get('accuseds') as FormArray;
-        accusedsArray.at(0).get('uploadFIRCopy')?.setValue(uploadedFileReference);
-        this.uploadedFIRFileName = selectedFile.name;
+        accusedsArray.at(index).get('uploadFIRCopy')?.setValue(uploadedFileReference);
+        this.uploadedFIRFileNames[index] = selectedFile.name;
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -1789,19 +1807,21 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
       }
     });
   }
-  viewFIRCopy(){
-    const accusedsArray = this.firForm.get('accuseds') as FormArray;
-    const path = accusedsArray.at(0).get('uploadFIRCopy')?.value;
-    if(path){
-      const url = `${env.file_access}${'/'}${path}`;
-      window.open(url, '_blank');
-    }
+  viewFIRCopy(index: number): void {
+  const accusedsArray = this.firForm.get('accuseds') as FormArray;
+  const path = accusedsArray.at(index).get('uploadFIRCopy')?.value;
+  if (path) {
+    const url = `${env.file_access}${path}`;
+    window.open(url, '_blank');
   }
-  removeFIRCopy(){
-    const accusedsArray = this.firForm.get('accuseds') as FormArray;
-    accusedsArray.at(0).get('uploadFIRCopy')?.setValue('');
-    this.uploadedFIRFileName = '';
-  }
+}
+
+removeFIRCopy(index: number): void {
+  const accusedsArray = this.firForm.get('accuseds') as FormArray;
+  accusedsArray.at(index).get('uploadFIRCopy')?.setValue('');
+  this.uploadedFIRFileNames[index] = '';
+}
+
 
   proceedingFileName:string='';
   proceedingFileName2:string='';
@@ -2102,6 +2122,7 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
 
         this.onVictimAgeChange(index)
       });
+      console.log('response.data3.proceedings_file',response.data3.proceedings_file);
       const sectionsArray = JSON.parse(response.data1[0].sectionsIPC_JSON);
 
       // Get the form array for the specific victim index (assuming index 0 for example)
@@ -2170,14 +2191,15 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
           uploadFIRCopy:accused.upload_fir_copy,
 
         });
-
-        this.uploadedFIRFileName = accused.upload_fir_copy.split('uploads/')[1];
+        this.uploadedFIRFileNames.push(accused.upload_fir_copy.split('/uploads/')[1]);
+        // this.uploadedFIRFileNames = accused.upload_fir_copy.split('uploads/')[1];
         accusedFormArray.push(accusedGroup);
         console.log(accusedFormArray,"accusedFormArrayaccusedFormArrayaccusedFormArray",'accused.upload_fir_copy',accused.upload_fir_copy);
       });
     }
 
     if(response && response.data3){
+      console.log('response.data3-response.data3',response.data3);
 
       if (response.data3.proceedings_date) {
         const dateObj = new Date(response.data3.proceedings_date);
@@ -2199,7 +2221,7 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
   
         const data = response.data3.proceedings_file
         this.proceedingFileName = data;
-        console.log('data',data);
+        console.log('data-data-data',data);
         this.firForm.get('proceedingsFile')?.setValue(data);
         this.filePath_attachment = response.data3.file_paths?.length
         ? response.data3.file_paths.map((file:any) => `${this.apiUrl}uploads/${file}`)
@@ -3021,21 +3043,49 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
   
   saveStepFourAsDraft(): void {
   
+    // const firData = {
+    //   firId: this.firId,
+    //   numberOfAccused: this.firForm.get('numberOfAccused')?.value,
+    //   accuseds: this.firForm.get('accuseds')?.value.map((accused: any, index: number) => ({
+    //     ...accused,
+    //     accusedId: accused.accusedId || null,
+    //     // uploadFIRCopy: this.multipleFiles[index] || null
+    //     uploadFIRCopy: this.firForm.value.accuseds[0].uploadFIRCopy || null
+    //   })),
+    // };
+    // console.log(firData,"firDatafirDatafirData")
+    // console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
+    // this.firService.saveStepFourAsDraft(firData).subscribe(
+    //   (response: any) => {
+    //     this.firId = response.fir_id;
+    //     if (this.firId) {
+    //       sessionStorage.setItem('firId', this.firId);
+    //     }
+    //     Swal.fire('Success', 'FIR saved as draft for step 4.', 'success');
+    //   },
+    //   (error) => {
+    //     console.error('Error saving FIR for step 4:', error);
+    //     Swal.fire('Error', 'Failed to save FIR as draft for step 4.', 'error');
+    //   }
+    // );
+    const accusedFormArray = this.firForm.get('accuseds') as FormArray;
+
     const firData = {
       firId: this.firId,
       numberOfAccused: this.firForm.get('numberOfAccused')?.value,
-      accuseds: this.firForm.get('accuseds')?.value.map((accused: any, index: number) => ({
-        ...accused,
-        accusedId: accused.accusedId || null,
-        // uploadFIRCopy: this.multipleFiles[index] || null
-        uploadFIRCopy: this.firForm.value.accuseds[0].uploadFIRCopy || null
-    
-  
-  
-      })),
+      accuseds: accusedFormArray.controls.map((accusedControl, index) => {
+        const accusedValue = accusedControl.value;
+
+        return {
+          ...accusedValue,
+          accusedId: accusedValue.accusedId || null,
+          uploadFIRCopy: accusedValue.uploadFIRCopy || null
+        };
+      })
     };
-console.log(firData,"firDatafirDatafirData")
-console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
+
+    console.log(firData, "firDatafirDatafirData");
+
     this.firService.saveStepFourAsDraft(firData).subscribe(
       (response: any) => {
         this.firId = response.fir_id;

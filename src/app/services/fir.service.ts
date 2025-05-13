@@ -212,8 +212,8 @@ saveStepFourAsDraft(firData: any): Observable<any> {
         // console.log(attachment,"firData.filefilefile")
 
         
-        if (attachment.file) {
-          formData.append('attachments', attachment.file); // Correct key: 'attachments'
+        if (attachment.path) {
+          formData.append('attachments', attachment.path); // Correct key: 'attachments'
         }
       });
     }
