@@ -201,7 +201,7 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     });
   }
 
-  return this.http.post(`${this.baseUrl}/handle-step-five`, payload, {
+  return this.http.post(`${this.baseUrl}/save-step-fiveedit`, payload, {
     headers: {
       'Content-Type': 'application/json'
     }
@@ -270,62 +270,77 @@ saveStepFourAsDraft(firData: any): Observable<any> {
 
   //   return this.http.post(`${this.baseUrl}/save-step-six`, formData);
   // }
+//   saveStepSixAsDraft(firData: any): Observable<any> {
+//   const payload: any = {
+//     firId: firData.firId || '',
+//     chargesheetDetails: firData.chargesheetDetails || {},
+//     victimsRelief: firData.victimsRelief || [],
+//     status: firData.status || '',
+//     proceedingsFile: firData.uploadProceedingsPath || '', // file path as string
+//     attachments: []
+//   };
+
+//   if (firData.attachments && firData.attachments.length > 0) {
+//     payload.attachments = firData.attachments.map((attachment: any) => {
+//       return attachment.file || ''; // assuming `file` holds the file path
+//     });
+//   }
+
+//   return this.http.post(`${this.baseUrl}/save-step-six`, payload, {
+//     headers: {
+//       'Content-Type': 'application/json'
+//     }
+//   });
+// }
+
   saveStepSixAsDraft(firData: any): Observable<any> {
-  const payload: any = {
-    firId: firData.firId || '',
-    chargesheetDetails: firData.chargesheetDetails || {},
-    victimsRelief: firData.victimsRelief || [],
-    status: firData.status || '',
-    proceedingsFile: firData.uploadProceedingsPath || '', // file path as string
-    attachments: []
-  };
-
-  if (firData.attachments && firData.attachments.length > 0) {
-    payload.attachments = firData.attachments.map((attachment: any) => {
-      return attachment.file || ''; // assuming `file` holds the file path
-    });
-  }
-
-  return this.http.post(`${this.baseUrl}/save-step-six`, payload, {
+    let body = firData;
+  return this.http.post(`${this.baseUrl}/save-step-sixedit`, body, {
     headers: {
       'Content-Type': 'application/json'
     }
   });
 }
-
   
 
- updateStep6(firData: any): Observable<any> {
+//  updateStep6(firData: any): Observable<any> {
   
-    const formData = new FormData();
+//     const formData = new FormData();
   
-    formData.append('firId', firData.firId);
-    formData.append('chargesheet_id', firData.chargesheet_id);
-    formData.append('chargesheetDetails', JSON.stringify(firData.chargesheetDetails));
-    formData.append('victimsRelief', JSON.stringify(firData.victimsRelief));
-    formData.append('status', firData.status);
-  
-
-    if (firData.uploadProceedingsPath) {
-
-      formData.append('proceedingsFile', firData.uploadProceedingsPath); 
-    }
+//     formData.append('firId', firData.firId);
+//     formData.append('chargesheet_id', firData.chargesheet_id);
+//     formData.append('chargesheetDetails', JSON.stringify(firData.chargesheetDetails));
+//     formData.append('victimsRelief', JSON.stringify(firData.victimsRelief));
+//     formData.append('status', firData.status);
   
 
-    if (firData.attachments && firData.attachments.length > 0) {
-      firData.attachments.forEach((attachment: any, index: number) => {
-        if (attachment) {
+//     if (firData.uploadProceedingsPath) {
+
+//       formData.append('proceedingsFile', firData.uploadProceedingsPath); 
+//     }
+  
+
+//     if (firData.attachments && firData.attachments.length > 0) {
+//       firData.attachments.forEach((attachment: any, index: number) => {
+//         if (attachment) {
     
    
-          formData.append(`attachments`, attachment); 
-        }
-      });
-    }
+//           formData.append(`attachments`, attachment); 
+//         }
+//       });
+//     }
   
 
-    return this.http.post(`${this.baseUrl}/save-step-sixedit`, formData);
-  }
+//     return this.http.post(`${this.baseUrl}/save-step-sixedit`, formData);
+//   }
 
+
+
+
+ updateStep6(firData: any): Observable<any> {
+  let body = firData;
+    return this.http.post(`${this.baseUrl}/save-step-sixedit`, body);
+  }
 
 
   

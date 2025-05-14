@@ -919,7 +919,7 @@
             <input 
             type="text" 
             class="form-control text-end" 
-            [formControl]="totalCompensationControl" readonly />
+            [formControl]="totalCompensationControl" />
           
           
           </div>
@@ -1215,7 +1215,7 @@
                 <label class="form-label">75. Total amount for second stage of compensation (total of relief across all victims) *</label>
               </div>
               <div class="col-4">
-                <input type="text" class="form-control text-end" formControlName="totalCompensation_1"  readonly/>
+                <input type="text" class="form-control text-end" formControlName="totalCompensation_1" />
               </div>
             </div>
             <div class="row mb-4">
@@ -1271,7 +1271,9 @@
                    class="img-thumbnail" alt="FIR Copy" style="max-width: 150px; margin-bottom: 10px;">
             </div>
           </ng-template> -->
-            <div class="mb-4">
+
+
+            <!-- <div class="mb-4">
               <label class="form-label">79. Upload Other Attachment (If any)</label>
               <div class="file-drop-container">
                 <ngx-dropzone (drop)="onDrop2($event)" (fileOver)="onFileOver2($event)" (click)="triggerFileInputClick2()" [accept]="'image/*'" [multiple]="true" class="dropzone">
@@ -1295,7 +1297,70 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
+
+                <div class="mb-4" formArrayName="attachments_1">
+                  <label class="form-label">79. Upload Other Attachments (If any)</label>
+
+                  <div
+                    class="input-group mb-2"
+                    *ngFor="let attachment of attachments_1.controls; let j = index"
+                    [formGroupName]="j"
+                  >
+                    <!-- File Input (only if no fileName yet) -->
+                    <input
+                      type="file"
+                      class="form-control"
+                      (change)="onFileSelect_1New($event, j, 'file', 'fileName')"
+                      *ngIf="!attachment.get('fileName')?.value"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-sm"
+                      (click)="removeAttachment_1_new(j)"
+                      title="Remove Attachment"
+                      *ngIf="!attachment.get('fileName')?.value"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+
+                    <!-- Display Uploaded File Name & Actions -->
+                    <div
+                      class="d-flex justify-content-between align-items-center uploaded mt-2"
+                      *ngIf="attachment.get('fileName')?.value"
+                    >
+                      <div>{{ attachment.get('fileName')?.value }}</div>
+                      <div class="d-flex">
+                        <button
+                          class="btn btn-primary btn-sm me-2"
+                          (click)="viewAttachment_1(j)"
+                        >
+                          View
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-danger btn-sm"
+                          (click)="removeAttachment_1_new(j)"
+                          title="Remove Attachment"
+                        >
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Add Attachment Button -->
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm mt-3"
+                    (click)="addAttachment_1_new()"
+                  >
+                    Add Attachment
+                  </button>
+                </div>
+
+
+
           </div>
         </div>
         <div class="mt-4">

@@ -1882,6 +1882,7 @@ removeFIRCopy(index: number): void {
         }
       });
     }  
+
     viewProceedingsCopy2(): void {
       if (this.firForm.get('uploadProceedings_1')?.value) {
         const url = `${env.file_access}${this.firForm.get('uploadProceedings_1')?.value}`;
@@ -2122,7 +2123,6 @@ removeFIRCopy(index: number): void {
 
         this.onVictimAgeChange(index)
       });
-      console.log('response.data3.proceedings_file',response.data3.proceedings_file);
       const sectionsArray = JSON.parse(response.data1[0].sectionsIPC_JSON);
 
       // Get the form array for the specific victim index (assuming index 0 for example)
@@ -2223,9 +2223,7 @@ removeFIRCopy(index: number): void {
         this.proceedingFileName = data;
         console.log('data-data-data',data);
         this.firForm.get('proceedingsFile')?.setValue(data);
-        this.filePath_attachment = response.data3.file_paths?.length
-        ? response.data3.file_paths.map((file:any) => `${this.apiUrl}uploads/${file}`)
-        : [];
+        this.filePath_attachment = response.data3.file_paths?.length ? response.data3.file_paths.map((file:any) => `${file}`): [];
         
         if (!this.attachmentss_1) {
           this.attachmentss_1 = [];
@@ -2339,6 +2337,26 @@ removeFIRCopy(index: number): void {
         this.allFiles1 = [];
       }
     }
+
+      this.filePath_attachment = response.data4.attachments?.length ? response.data4.attachments.map((item:any) => `${item.path}`): [];
+
+        if(this.filePath_attachment && this.filePath_attachment.length > 0 ) {
+           const fileControl = 'file';
+           const fileNameControl = 'fileName';
+          for(let index = 0; this.filePath_attachment.length > index; index++){
+            console.log('looping')
+            if(index > 0){
+              this.addAttachment_1_new();
+            }
+            const uploadedFileReference = this.filePath_attachment[index];
+            const attachment = this.attachments_1.at(index);
+            attachment.patchValue({
+              [fileControl]: uploadedFileReference,
+              [fileNameControl]: this.filePath_attachment[index],
+            });
+          }
+        }
+
     }
     
     if(response.data5 && response.data5.length){
@@ -6121,8 +6139,8 @@ async UpdateAsDraft_7() {
         reliefAmountExGratia: parseFloat(relief.reliefAmountExGratia || '0.00').toFixed(2),
         reliefAmountSecondStage: parseFloat(relief.reliefAmountSecondStage || '0.00').toFixed(2),
       })),
-      uploadProceedingsPath: this.multipleFilesForproceeding1,
-      attachments: this.selectedFiles || '',
+      uploadProceedingsPath: this.firForm.get('uploadProceedings_1')?.value || '',
+      attachments: this.attachments_1.value ? this.attachments_1.value.map((item: any) => item.file) : [],
       status: 6, // Update status to 6 for the FIR
     };
   
@@ -7227,4 +7245,50 @@ getPoliceStation(district: string): void {
     const updated = selected.filter((item: string) => item !== offenceName);
     this.victims.at(index).get('offenceCommitted')?.setValue(updated);
   }
+
+
+  
+  
+onFileSelect_1New(event: any, index: number, fileControl: string, fileNameControl: string): void {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+  
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    
+    this.vmcSerive.uploadFile(formData).subscribe({
+      next: (response: any) => {
+        const uploadedFileReference = response.filePath;
+        const attachment = this.attachments_1.at(index);
+         attachment.patchValue({
+          [fileControl]: uploadedFileReference,
+          [fileNameControl]: selectedFile.name,
+        });
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('File upload failed:', err);
+      }
+    });
+  }
+
+  removeAttachment_1_new(index: number): void {
+  if (this.attachments_1.length > 1) {
+    this.attachments_1.removeAt(index);
+  } else {
+    this.attachments_1.at(0).reset();
+    this.cdr.detectChanges();
+  }
+}
+
+viewAttachment_1(index: number): void {
+  const filePath = this.attachments_1.at(index).get('file')?.value;
+  if (filePath) {
+    const url = `${env.file_access}${filePath}`;
+    window.open(url, '_blank');
+  }
+}
+addAttachment_1_new(): void {
+  this.attachments_1.push(this.createAttachmentGroup());
+}
 }

@@ -3122,8 +3122,8 @@ saveAsDraft_6(isSubmit: boolean = false): void {
       reliefAmountExGratia: parseFloat(relief.reliefAmountExGratia_1 || '0.00').toFixed(2),
       reliefAmountSecondStage: parseFloat(relief.reliefAmountSecondStage || '0.00').toFixed(2),
     })),
-    uploadProceedingsPath: this.proceedingsFile_1 ,
-    attachments: this.attachments_1.value || '',
+   uploadProceedingsPath: this.firForm.get('proceedingsFile_1')?.value || '',
+  attachments: this.attachments_1.value ? this.attachments_1.value.map((item: any) => item.file) : [],
     status: 6, // Update status to 6 for the FIR
   };
 
