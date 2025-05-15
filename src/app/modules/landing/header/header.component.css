@@ -165,7 +165,7 @@
 
 /* Ensure proper positioning */
 .dropdown-menu {
-  margin-top: 0;
+  /* margin-top: 0; */
   /* Remove any unnecessary space */
 }
 
@@ -241,13 +241,13 @@
 
 /* Hide dropdown by default */
 .dropdown-menu {
-  display: none;
+  /* display: none;
   list-style: none;
   padding: 0;
   margin: 0;
   background: #043c6c;
   border: 1px solid #ddd;
-  width: 250%;
+  width: 250%; */
 }
 
 .dropdown-menu-mob {
@@ -255,7 +255,12 @@
 }
 
 .dropdown-menu-about {
-  width: 850% !important;
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: #043c6c;
+  border: 1px solid #ddd;
 }
 
 /* Show dropdown when active */

@@ -43,7 +43,7 @@ export class LandingService {
     address: "Directorate of Adi Dravidar Welfare, First Floor, Ezhilagam Annexure building, Chepauk, Chennai, Tamil Nadu - 600 005.",
     tribal_research_centres: "Tribal Research Centres",
     //poa
-    POA: "Prevention of Atrocities",
+    POA: "Scheduled Castes and Scheduled Tribes (Prevention of Atrocities) Act, 1989, and Rules, 1995",
     poa_page: [
       "The Scheduled Castes and Scheduled Tribes (Prevention of Atrocities) Act, 1989 is a landmark law enacted by the Government of India to protect the rights and dignity of Scheduled Castes (SCs) and Scheduled Tribes (STs).",
       "This Act seeks to prevent and punish caste-based discrimination, violence, and social exclusion by ensuring strict penalties for perpetrators and timely relief and rehabilitation for victims. It covers a wide range of offences—from physical violence and land alienation to denial of access to public places and social boycotts.",
@@ -107,7 +107,7 @@ This SOP is for the call centre representatives on setting up the call centre he
     "sjhr_administrative_setup": "ADMINISTRATIVE SET-UP OF SJ&HR",
     //about-tnsc
     tnsc_title: 'TN State Commission for Scheduled Castes & Scheduled Tribes',
-    tnsc_description: `Tamil Nadu's official body protecting the rights of Scheduled Castes and Scheduled Tribes.`,
+    tnsc_description: `Committed to empowering Tamil Nadu’s Scheduled Castes and Scheduled Tribes and upholding their rights and dignity.`,
     tnsc_content: [
       'Constituted in 2021, this statutory body ensures protection, justice, and equitable development for Scheduled Castes and Scheduled Tribes in Tamil Nadu.',
       'A retired High Court Judge who belongs to any of the SC/ST communities as Chairperson',
@@ -180,8 +180,69 @@ This SOP is for the call centre representatives on setting up the call centre he
         "question": "What are the responsibilities of the SPP?",
         "answer": "The SPP represents SC/ST victims in court, ensures fair and speedy trials, works with police and welfare officials, and protects victims and witnesses from intimidation."
       }
-    ]
+    ],
+    documents :[
+    {
+      title: "1. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act, 1989",
+     
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/1. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act, 1989.pdf"
+    },
+    {
+      title: "2. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Act, 2015",
+     
+      
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/2. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Act, 2015.pdf"
+    },
+    {
+      title: "3. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Act, 2018",
+     
 
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/3. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Act, 2018.pdf"
+    },
+    {
+      title: "4. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Rules, 1995",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/4. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Rules, 1995.pdf"
+    },
+    {
+      title: "5. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Rules, 2016",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/5. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Rules, 2016.pdf"
+    },
+    {
+      title: "6. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Rules, 2018",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/6. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Rules, 2018.pdf"
+    },
+    {
+      title: "7. Model Contingency Plan Tamil Nadu, 2017",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/7. Model Contingency Plan Tamil Nadu, 2017.pdf"
+    },
+    {
+      title: "8. G.O. for enhancement of relief given to SC ST victims of Atrocities 2022",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/8. G.O. for enhancement of relief given to SC ST victims of Atrocities 2022.pdf"
+    },
+    {
+      title: "9. Standard Operating Procedure for implementation of the Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act, 1989 & Rules, 1995 (English)",
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/Prevention of Atrocities Act_Eng_Web-compressed.pdf"
+    }
+  ]
   };
 
   tamil = {
@@ -219,7 +280,7 @@ This SOP is for the call centre representatives on setting up the call centre he
     address: "ஆதிதிராவிடர் நல ஆணையரகம், முதல் தளம், எழிலகம் இணைப்பு கட்டிடம், சேப்பாக்கம், சென்னை, தமிழ்நாடு - 600005.",
     tribal_research_centres: "பழங்குடி ஆய்வு மையங்கள்",
     //poa
-    POA: "அதிர்ச்சிகரமான குற்றங்களை தடுப்பது",
+    POA: "ஆதிதிராவிடர் மற்றும் பழங்குடியினர் (வன்கொடுமைகள் தடுப்புச்) சட்டம், 1989, மற்றும் விதிகள், 1995",
     poa_page: [
       "ஆதிதிராவிடர் மற்றும் பழங்குடியினர் (வன்கொடுமைகள் தடுப்புச்) சட்டம், 1989 என்பது, ஆதிதிராவிடர் (SCs) மற்றும் பழங்குடியினர் (STs) ஆகியோரின் உரிமைகள் மற்றும் கண்ணியத்தைப் பாதுகாப்பதற்காக அரசால் இயற்றப்பட்ட ஒரு முக்கிய சட்டமாகும்.",
       "இந்தச் சட்டம், குற்றவாளிகளுக்கு கடுமையான தண்டனைகள் மற்றும் பாதிக்கப்பட்டவர்களுக்கு சரியான நேரத்தில் நிவாரணம் மற்றும் மறுவாழ்வு ஆகியவற்றை உறுதி செய்வதன் மூலம் சாதி அடிப்படையிலான பாகுபாடு, வன்முறை மற்றும் சமூக விலக்கு ஆகியவற்றைத் தடுக்கவும் தண்டிக்கவும் முயல்கிறது. இது உடல் ரீதியான வன்முறை மற்றும் நிலம் அந்நியப்படுத்துதல் முதல் பொது இடங்களுக்குச் செல்ல மறுப்பு மற்றும் சமூக புறக்கணிப்புகள் வரை பல்வேறு குற்றங்களை உள்ளடக்கியது.",
@@ -281,7 +342,7 @@ This SOP is for the call centre representatives on setting up the call centre he
     "sjhr_administrative_setup": "SJ&HR நிர்வாக அமைப்பு படம்",
     //about-tnsc
     tnsc_title: 'தமிழ்நாடு ஆதி திராவிடர் மற்றும் பழங்குடியினர் மாநில ஆணையம்',
-    tnsc_description: 'தமிழ்நாட்டின் அதிகாரப்பூர்வ அமைப்பு, ஆதி திராவிடர் மற்றும் பழங்குடியினரின் உரிமைகளைப் பாதுகாக்கிறது.',
+    tnsc_description: 'தமிழ்நாட்டின் ஆதிதிராவிடர் பட்டியல் பழங்குடியினருக்கு அதிகாரம் அளிப்பதற்கும் அவர்களின் உரிமைகள் மற்றும் கண்ணியத்தை நிலைநிறுத்துதல்.',
     tnsc_content: [
       '2021 ஆம் ஆண்டு நிறுவப்பட்ட இந்த சட்டப்பூர்வ அமைப்பு, தமிழ்நாட்டில் உள்ள ஆதிதிராவிடர் மற்றும் பழங்குடியினருக்கு பாதுகாப்பு, நீதி மற்றும் சமமான வளர்ச்சியை உறுதி செய்கிறது.',
       'தலைவராக, SC/ST சமூகத்தைச் சேர்ந்த ஓய்வுபெற்ற உயர்நீதிமன்ற நீதிபதி',
@@ -354,7 +415,69 @@ This SOP is for the call centre representatives on setting up the call centre he
         "question": "SPP-யின் பொறுப்புகள் என்ன?",
         "answer": "வழக்குகளை விரைவாகவும் நியாயமாகவும் முடிக்க நடவடிக்கை எடுப்பது, காவல்துறை மற்றும் நலத்துறை அலுவலர்களுடன் இணைந்து வலுவான ஆதாரங்களை சமர்ப்பிப்பது, சாட்சிகளையும் பாதிக்கப்பட்டவர்களையும் பாதுகாப்பது ஆகியவை."
       }
-    ]
+    ],
+    documents :[
+    {
+      title: "1. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act, 1989",
+     
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/1. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act, 1989.pdf"
+    },
+    {
+      title: "2. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Act, 2015",
+     
+      
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/2. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Act, 2015.pdf"
+    },
+    {
+      title: "3. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Act, 2018",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/3. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Act, 2018.pdf"
+    },
+    {
+      title: "4. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Rules, 1995",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/4. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Rules, 1995.pdf"
+    },
+    {
+      title: "5. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Rules, 2016",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/5. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Rules, 2016.pdf"
+    },
+    {
+      title: "6. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Rules, 2018",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/6. Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Amendment Rules, 2018.pdf"
+    },
+    {
+      title: "7. Model Contingency Plan Tamil Nadu, 2017",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/7. Model Contingency Plan Tamil Nadu, 2017.pdf"
+    },
+    {
+      title: "8. G.O. for enhancement of relief given to SC ST victims of Atrocities 2022",
+     
+
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/8. G.O. for enhancement of relief given to SC ST victims of Atrocities 2022.pdf"
+    },
+    {
+      title: "9. Standard Operating Procedure for implementation of the Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act, 1989 & Rules, 1995 (Tamil)",
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/Prevention of Atrocities Act_Tam_Web-compressed.pdf"
+    }
+  ]
   };
 
   lang = this.en;

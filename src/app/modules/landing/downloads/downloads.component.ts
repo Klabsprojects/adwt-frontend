@@ -64,6 +64,11 @@ export class DownloadsComponent {
 
       fileType: "PDF",
       downloadUrl: "assets/pdf/8. G.O. for enhancement of relief given to SC ST victims of Atrocities 2022.pdf"
+    },
+    {
+      title: "9. Standard Operating Procedure for implementation of the Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act, 1989 & Rules, 1995",
+      fileType: "PDF",
+      downloadUrl: "assets/pdf/8. G.O. for enhancement of relief given to SC ST victims of Atrocities 2022.pdf"
     }
   ];
   downloadPdf(pdfPath: string) {
