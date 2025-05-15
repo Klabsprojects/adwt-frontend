@@ -2194,7 +2194,7 @@ removeFIRCopy(index: number): void {
         this.uploadedFIRFileNames.push(accused.upload_fir_copy.split('/uploads/')[1]);
         // this.uploadedFIRFileNames = accused.upload_fir_copy.split('uploads/')[1];
         accusedFormArray.push(accusedGroup);
-        console.log(accusedFormArray,"accusedFormArrayaccusedFormArrayaccusedFormArray",'accused.upload_fir_copy',accused.upload_fir_copy);
+        // console.log(accusedFormArray,"accusedFormArrayaccusedFormArrayaccusedFormArray",'accused.upload_fir_copy',accused.upload_fir_copy);
       });
     }
 
@@ -2231,7 +2231,7 @@ removeFIRCopy(index: number): void {
         this.filePath_attachment.forEach((filePath: any) => {
           this.attachmentss_1.push({ id: "", path: filePath, file: filePath });
         });
-        console.log("Updated attachmentss_1:", this.attachmentss_1);  
+        // console.log("Updated attachmentss_1:", this.attachmentss_1);  
       }
 
       if (response.data3.all_attachments) {
@@ -2631,6 +2631,30 @@ removeFIRCopy(index: number): void {
           console.log( this.uploadProceedings_2_preview," this.uploadProceedings_2_preview",'item.upload_proceedings',item.upload_proceedings);
         }
       });
+    }
+
+    if(response.trialAttachments && response.trialAttachments.length > 0){
+
+        const filePath_attachment = response.trialAttachments?.length ? response.trialAttachments.map((item:any) => `${item.file_name}`): [];
+
+        if(filePath_attachment && filePath_attachment.length > 0 ) {
+           const fileControl = 'file';
+           const fileNameControl = 'fileName';
+          for(let index = 0; filePath_attachment.length > index; index++){
+            console.log('looping')
+            if(index > 0){
+              this.addAttachment_2();
+            }
+            const attachmentGroup = this.attachments_2.at(index) as FormGroup;
+            if (attachmentGroup) {
+                attachmentGroup.patchValue({
+                fileName_2: filePath_attachment[index],
+                file_2: filePath_attachment[index],
+                file: '', // Still storing raw file for reference if needed
+              });
+            }
+          }
+        }
     }
 
 
@@ -5942,26 +5966,11 @@ async UpdateAsDraft_7() {
       reliefAmountThirdStage: parseFloat(relief.reliefAmountThirdStage || '0.00').toFixed(2),
     })),
 
-    attachment: this.attachments_2.value
+    // attachment: this.attachments_2.value
+    attachments: this.attachments_2.value ? this.attachments_2.value.map((item: any) => item.file_2) : [],
   };
 
-  Object.keys(formFields).forEach((key) => {
-    const value = formFields[key];
-    if (value !== null && value !== undefined) {
-      formData.append(key, JSON.stringify(value));
-    }
-  });
-
-  // Debugging output
-  const formDataObject: any = {};
-  formData.forEach((value, key) => {
-    formDataObject[key] = value;
-  });
-
-  console.log(formDataObject, '📝 Final formDataObject');
-  console.log(this.attachments_2.value, '📎 Attachments');
-
-  this.firService.UpdateStepSevenAsDraft(formDataObject).subscribe({
+  this.firService.UpdateStepSevenAsDraft(formFields).subscribe({
     next: () => Swal.fire('Success', 'Draft data saved successfully.', 'success'),
     error: () => Swal.fire('Error', 'Failed to save draft data.', 'error')
   });
