@@ -362,6 +362,7 @@ export class FirListComponent implements OnInit {
   selectedStatusOfCase: string = '';
   selectedStatusOfRelief: string = '';
   selectedOffenceGroup: string = '';
+  RegistredYear: string = '';
   selectedPoliceZone: string = '';
   selectedPoliceRange: string = '';
   selectedRevenue_district: string = '';
@@ -475,6 +476,7 @@ export class FirListComponent implements OnInit {
     { label: 'Police Range', field: 'police_range', sortable: true, visible: true },
     { label: 'Revenue District', field: 'revenue_district', sortable: true, visible: true },
     { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
+    { label: 'Registration Year', field: 'year', sortable: true, visible: true },
 
     { label: 'Offence', field: 'Offence_group', sortable: true, visible: false },
     { label: 'Officer Name', field: 'officer_name', sortable: true, visible: false },
@@ -499,6 +501,7 @@ export class FirListComponent implements OnInit {
     { label: 'Actions', field: 'actions', sortable: false, visible: true },
   ];
 
+  years: number[] = [];
 
   selectedColumns: any[] = [...this.displayedColumns];
 
@@ -530,6 +533,7 @@ export class FirListComponent implements OnInit {
     this.loadPoliceDivision();
     this.loadPoliceRanges();
     this.loadRevenue_district();
+    this.generateYearOptions();
 
     setTimeout(() => {
       this.route.queryParams.subscribe(params => {
@@ -550,6 +554,13 @@ export class FirListComponent implements OnInit {
     this.isPreviewVisible = !this.isPreviewVisible;
   }  
   courtDetails: any = {};
+
+  generateYearOptions(): void {
+  const currentYear = new Date().getFullYear();
+  for (let year = currentYear; year >= 1980; year--) {
+    this.years.push(year);
+  }
+}
   // funtions
   fetchFirDetails(firId:any): void {
 
@@ -1134,6 +1145,10 @@ getFilterParams() {
   if (this.selectedOffenceGroup) {
     params.Offence_group = this.selectedOffenceGroup;
   }
+
+  if (this.RegistredYear) {
+    params.year = this.RegistredYear;
+  }
   
   // Add other filters as needed
   
@@ -1200,6 +1215,7 @@ getFilterParams() {
     this.selectedStatusOfCase = '';
     this.selectedStatusOfRelief = '';
     this.selectedOffenceGroup = '';
+    this.RegistredYear = '';
     this.startDate = '';
     this.endDate = '';
     this.selectedUIPT = '';

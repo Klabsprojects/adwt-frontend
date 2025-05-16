@@ -832,9 +832,9 @@ onFileSelect_3(event: Event, controlName: string): void {
       // firNumber: ['', Validators.required],
       firNumber: ['', [Validators.required, Validators.pattern(/^[1-9][0-9]*$/)]], 
       firNumberSuffix: ['', Validators.required],
-      dateOfOccurrence: ['', [Validators.required, this.maxDateValidator()]],
-      date_of_occurrence_to: ['', [Validators.required, this.maxDateValidator()]],
-      timeOfOccurrence: ['', Validators.required],
+      dateOfOccurrence: ['', [ this.maxDateValidator()]],
+      date_of_occurrence_to: ['', [ this.maxDateValidator()]],
+      timeOfOccurrence: [''],
       time_of_occurrence_to:[''],
       placeOfOccurrence: ['', Validators.required],
       dateOfRegistration: ['', Validators.required],
@@ -1955,7 +1955,7 @@ createVictimGroup(): FormGroup {
     address: [''],
     victimPincode: [
       '',
-      [Validators.required, Validators.pattern('^[0-9]{6}$')] // 6-digit validation
+      [ Validators.pattern('^[0-9]{6}$')] // 6-digit validation
     ],
     community: ['', Validators.required],
     caste: ['', Validators.required],
@@ -1978,8 +1978,8 @@ createVictimGroup(): FormGroup {
 
 createSection(): FormGroup {
   return this.fb.group({
-    SectionType: ['', Validators.required],
-    Section: ['', Validators.required]
+    SectionType: [''],
+    Section: ['']
   });
 }
 
@@ -4109,10 +4109,10 @@ formDataToObject(formData: FormData): Record<string, any> {
     return deceasedNameControl?.invalid && deceasedNameControl?.touched ? true : false;
   }
 
-  isVictimPincodeInvalid(index: number): boolean {
-    const pincodeControl = this.victims.at(index)?.get('victimPincode');
-    return !!(pincodeControl?.invalid && pincodeControl?.touched);
-  }
+  // isVictimPincodeInvalid(index: number): boolean {
+  //   const pincodeControl = this.victims.at(index)?.get('victimPincode');
+  //   return !!(pincodeControl?.invalid && pincodeControl?.touched);
+  // }
   handleStepOne(type: string) {
     const firData = {
       ...this.firForm.value,
@@ -4308,8 +4308,6 @@ isStep2Valid(): boolean {
   const controls = [
     'firNumber',
     'firNumberSuffix',
-    'dateOfOccurrence',
-    'timeOfOccurrence',
     'placeOfOccurrence',
     'dateOfRegistration',
     'timeOfRegistration',
@@ -4471,7 +4469,7 @@ trackStepOneChanges() {
 }
 
 validateStepTwo(mode: 'next' | 'draft'): boolean {
-  const stepOneFields = ['firNumber', 'firNumberSuffix', 'dateOfOccurrence', 'timeOfOccurrence', 'placeOfOccurrence', 'dateOfRegistration', 'timeOfRegistration'];
+  const stepOneFields = ['firNumber', 'firNumberSuffix', 'placeOfOccurrence', 'dateOfRegistration', 'timeOfRegistration'];
 
   if (mode === 'draft') {
     return stepOneFields.some(field => {

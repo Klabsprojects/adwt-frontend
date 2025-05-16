@@ -227,37 +227,34 @@
 
 
                     <div class="col-md-4 mb-3">
-                      <label for="dateOfOccurrence" class="form-label">10.From Date of Occurrence *</label>
+                      <label for="dateOfOccurrence" class="form-label">10.From Date of Occurrence</label>
                       <input
                           type="date"
                           id="dateOfOccurrence"
                           class="form-control"
                           formControlName="dateOfOccurrence"
                           [max]="today"
-                          required
                       />
                   </div>
 
                   <div class="col-md-4 mb-3">
-                    <label for="todateOfOccurrence" class="form-label">10a. To Date of Occurrence *</label>
+                    <label for="todateOfOccurrence" class="form-label">10a. To Date of Occurrence</label>
                     <input
                         type="date"
                         id="todateOfOccurrence"
                         class="form-control"
                         formControlName="date_of_occurrence_to"
                         [max]="today"
-                        required
                     />
                 </div>
 
                   <div class="col-md-4 mb-3">
-                      <label for="timeOfOccurrence" class="form-label">11. From Time of Occurrence *</label>
+                      <label for="timeOfOccurrence" class="form-label">11. From Time of Occurrence</label>
                       <input
                           type="time"
                           id="timeOfOccurrence"
                           class="form-control"
                           formControlName="timeOfOccurrence"
-                          required
                       />
                   </div>
 
@@ -268,7 +265,6 @@
                         id="totimeOfOccurrence"
                         class="form-control"
                         formControlName="time_of_occurrence_to"
-                        required
                     />
                 </div>
 
@@ -446,11 +442,11 @@
                                 </div>
 
                                 <div class="col-md-4 mb-3">
-                                    <label for="victimPincode{{ i }}" class="form-label">24. Pincode *</label>
+                                    <label for="victimPincode{{ i }}" class="form-label">24. Pincode</label>
                                     <input type="text" [id]="'victimPincode' + i" class="form-control" formControlName="victimPincode" placeholder="Enter Pincode" maxlength="6" (keypress)="allowOnlyNumbers($event)" />
-                                    <div *ngIf="isVictimPincodeInvalid(i)" class="text-danger mt-1">
+                                    <!-- <div *ngIf="isVictimPincodeInvalid(i)" class="text-danger mt-1">
                                         Please enter a valid 6-digit pincode.
-                                    </div>
+                                    </div> -->
                                 </div>
 
 
@@ -636,7 +632,7 @@
                                 <input type="text"  formControlName="scstSections" class="form-control" readonly />
                               </div>
                       <div class="col-md-12 mb-3 mt-3">
-                        <label for="sectionsIPC" class="form-label w-100">32. Section Invoked Under IPC/POCSO/etc. *
+                        <label for="sectionsIPC" class="form-label w-100">32. Section Invoked Under IPC/POCSO/etc.
                           <!-- <button type="button" class="btn btn-primary mt-2 float-right py-2" (click)="addField()">Add</button> -->
                           <button type="button" class="btn btn-primary mt-2 float-right py-2" (click)="addSection(i)">Add Section</button>
 
@@ -672,7 +668,7 @@
                               <div class="row">
                                 <div class="col-md-4 float-left mr-2">
                                   <!-- <label for="sectionType{{ i }}-{{ j }}" class="form-label">Section Type *</label> -->
-                                  <select id="sectionType{{ i }}-{{ j }}" class="form-control" formControlName="SectionType" required>
+                                  <select id="sectionType{{ i }}-{{ j }}" class="form-control" formControlName="SectionType">
                                     <option selected value="">Select</option>
                                     <option value="IPC">IPC</option>
                                     <option value="BNS">BNS</option>

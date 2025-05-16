@@ -221,33 +221,26 @@
             </div>
           </div>
           <div class="col-md-4 mb-3">
-            <label for="dateOfOccurrence" class="form-label">10. From Date of Occurrence *</label>
-            <input type="date" id="dateOfOccurrence" class="form-control" formControlName="dateOfOccurrence" [max]="today" required />
+            <label for="dateOfOccurrence" class="form-label">10. From Date of Occurrence</label>
+            <input type="date" id="dateOfOccurrence" class="form-control" formControlName="dateOfOccurrence" [max]="today" />
           </div>
           <div class="col-md-4 mb-3">
-            <label for="todateOfOccurrence" class="form-label">10a. To Date of Occurrence *</label>
+            <label for="todateOfOccurrence" class="form-label">10a. To Date of Occurrence</label>
             <input
                 type="date"
                 id="todateOfOccurrence"
                 class="form-control"
                 formControlName="date_of_occurrence_to"
                 [max]="today"
-                required
             />
         </div>
           <div class="col-md-4 mb-3">
-            <label for="timeOfOccurrence" class="form-label">11. From Time of Occurrence *</label>
-            <input type="time" id="timeOfOccurrence" class="form-control" formControlName="timeOfOccurrence" required />
+            <label for="timeOfOccurrence" class="form-label">11. From Time of Occurrence</label>
+            <input type="time" id="timeOfOccurrence" class="form-control" formControlName="timeOfOccurrence" />
           </div>
           <div class="col-md-4 mb-3">
             <label for="totimeOfOccurrence" class="form-label">11a. To Time of Occurrence</label>
-            <input
-                type="time"
-                id="totimeOfOccurrence"
-                class="form-control"
-                formControlName="time_of_occurrence_to"
-                required
-            />
+            <input type="time" id="totimeOfOccurrence" class="form-control" formControlName="time_of_occurrence_to"/>
         </div>
           <div class="col-md-4 mb-3">
             <label for="placeOfOccurrence" class="form-label">12. Place of Occurrence *</label>
@@ -359,9 +352,9 @@
                   <input type="text" [id]="'victimAddress' + i" class="form-control" formControlName="address" placeholder="Enter Address" style="text-transform: capitalize;" />
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label for="victimPincode{{ i }}" class="form-label">24. Pincode *</label>
+                  <label for="victimPincode{{ i }}" class="form-label">24. Pincode</label>
                   <input type="text" [id]="'victimPincode' + i" class="form-control" formControlName="victimPincode" placeholder="Enter Pincode" maxlength="6" (keypress)="allowOnlyNumbers($event)" />
-                  <div *ngIf="isVictimPincodeInvalid(i)" class="text-danger mt-1">Please enter a valid 6-digit pincode.</div>
+                  <!-- <div class="text-danger mt-1">Please enter a valid 6-digit pincode.</div> -->
                 </div>
                 <div class="col-md-4 mb-3">
                   <label for="victimCommunity{{ i }}" class="form-label">25. Community of the Victim *</label>
@@ -522,7 +515,7 @@
 
                 </div>
                 <div class="col-md-12 mb-3">
-                  <label for="sectionsIPC" class="form-label w-100">32. Section Invoked Under IPC/POCSO/etc. *
+                  <label for="sectionsIPC" class="form-label w-100">32. Section Invoked Under IPC/POCSO/etc.
                     <button type="button" class="btn btn-primary mt-2 float-right py-2" (click)="addSection(i)" style="float: right!important;">Add Section</button>
 
                   </label>
@@ -530,7 +523,7 @@
                     <div *ngFor="let section of getSectionDetails(i).controls; let j = index" [formGroupName]="j" class="section-entry mb-3">
                       <div class="row">
                         <div class="col-md-4 float-left mr-2">
-                          <select id="sectionType{{ i }}-{{ j }}" class="form-control" formControlName="SectionType" required>
+                          <select id="sectionType{{ i }}-{{ j }}" class="form-control" formControlName="SectionType">
                             <option selected value="">Select</option>
                             <option value="IPC">IPC</option>
                             <option value="BNS">BNS</option>

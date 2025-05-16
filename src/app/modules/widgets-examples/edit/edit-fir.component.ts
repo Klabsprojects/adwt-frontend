@@ -1683,8 +1683,8 @@ this.firForm.get('courtName')?.setValue(this.selectedCourtName);
           // Populate form array with parsed data
           sectionsArray.forEach((section: any) => {
             sectionDetails.push(this.fb.group({
-              SectionType: [section.SectionType || '', Validators.required],
-              Section: [section.Section || '', Validators.required]
+              SectionType: [section.SectionType || ''],
+              Section: [section.Section || '']
             }));
           });   
         }
@@ -2137,8 +2137,8 @@ removeFIRCopy(index: number): void {
       // Populate form array with parsed data
       sectionsArray.forEach((section: any) => {
         sectionDetails.push(this.fb.group({
-          SectionType: [section.SectionType || '', Validators.required],
-          Section: [section.Section || '', Validators.required]
+          SectionType: [section.SectionType || ''],
+          Section: [section.Section || '']
         }));
       });   
     }
@@ -2677,8 +2677,8 @@ removeFIRCopy(index: number): void {
 
   createSection(): FormGroup {
     return this.fb.group({
-      SectionType: ['', Validators.required],
-      Section: ['', Validators.required]
+      SectionType: [''],
+      Section: ['']
     });
   }
   getSectionDetails(victimIndex: number): FormArray {
@@ -3407,9 +3407,9 @@ onAccusedAgeChange(index: number): void {
       // Step 2 Fields - FIR Details
       firNumber: ['', [Validators.required, Validators.pattern(/^[1-9][0-9]*$/)]], 
       firNumberSuffix: ['', Validators.required],
-      dateOfOccurrence: ['', [Validators.required, this.maxDateValidator()]],
-      date_of_occurrence_to: ['', [Validators.required, this.maxDateValidator()]],
-      timeOfOccurrence: ['', Validators.required],
+      dateOfOccurrence: ['', [this.maxDateValidator()]],
+      date_of_occurrence_to: ['', [this.maxDateValidator()]],
+      timeOfOccurrence: [''],
       time_of_occurrence_to:[''],
       proceedingsDate_1: ['', Validators.required],
       placeOfOccurrence: ['', Validators.required],
@@ -4443,7 +4443,7 @@ uploadedImageSrc: any | ArrayBuffer;
       address: [''],
       victimPincode: [
         '',
-        [Validators.required, Validators.pattern('^[0-9]{6}$')] // 6-digit validation
+        [ Validators.pattern('^[0-9]{6}$')] // 6-digit validation
       ],
       community: ['', Validators.required],
       caste: ['', Validators.required],
@@ -4559,6 +4559,7 @@ console.log(victimReliefDetail,"cretaieg")
               { offence_act_name: '3(2)(va)', offence_name: '', id : 24 },
               { offence_act_name: '3(2)(v), 3(2)(va)', offence_name: '', id: 25 }
             );
+            this.offenceOptionData = offences.map((offence: any) => offence);
         },
         (error: any) => {
           Swal.fire('Error', 'Failed to load offence options.', 'error');
@@ -6203,10 +6204,10 @@ async UpdateAsDraft_7() {
     return deceasedNameControl?.invalid && deceasedNameControl?.touched ? true : false;
   }
 
-  isVictimPincodeInvalid(index: number): boolean {
-    const pincodeControl = this.victims.at(index)?.get('victimPincode');
-    return !!(pincodeControl?.invalid && pincodeControl?.touched);
-  }
+  // isVictimPincodeInvalid(index: number): boolean {
+  //   const pincodeControl = this.victims.at(index)?.get('victimPincode');
+  //   return !!(pincodeControl?.invalid && pincodeControl?.touched);
+  // }
   handleStepOne(type: string) {
     const firData = {
       ...this.firForm.value,
@@ -6321,8 +6322,6 @@ async UpdateAsDraft_7() {
     const controls = [
       'firNumber',
       'firNumberSuffix',
-      'dateOfOccurrence',
-      'timeOfOccurrence',
       'placeOfOccurrence',
       'dateOfRegistration',
       'timeOfRegistration',
