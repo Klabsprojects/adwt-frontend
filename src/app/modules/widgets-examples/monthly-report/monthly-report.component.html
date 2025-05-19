@@ -1,4 +1,9 @@
+
+
 <div id="scrollbar" class="card">
+    <div class="loader-overlay" *ngIf="loader">
+       <mat-spinner></mat-spinner>
+      </div>
   <div class=" p-4" >
     <label style="padding: 5px;font-size: 16px;font-weight: 500;" for="ReportType">Report Type</label>
     <select class="form-select w-250px" (change)="getReportData()" [(ngModel)]="ReportType">

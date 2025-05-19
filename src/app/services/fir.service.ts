@@ -185,23 +185,8 @@ saveStepFourAsDraft(firData: any): Observable<any> {
   //   return this.http.post(`${this.baseUrl}/handle-step-five`, formData);
   // }
   saveStepFiveAsDraft(firData: any): Observable<any> {
-  const payload: any = {
-    firId: firData.firId || '',
-    totalCompensation: firData.totalCompensation || '0.00',
-    proceedingsFileNo: firData.proceedingsFileNo || '',
-    proceedingsDate: firData.proceedingsDate || '',
-    proceedingsFile: firData.proceedingsFile || '', // file path as string
-    victimsRelief: firData.victimsRelief || [],
-    attachments: []
-  };
 
-  if (firData.attachments && firData.attachments.length > 0) {
-    payload.attachments = firData.attachments.map((attachment: any) => {
-      return attachment.file || ''; // assuming `file` holds the file path
-    });
-  }
-
-  return this.http.post(`${this.baseUrl}/save-step-fiveedit`, payload, {
+  return this.http.post(`${this.baseUrl}/save-step-fiveedit`, firData, {
     headers: {
       'Content-Type': 'application/json'
     }
@@ -209,36 +194,9 @@ saveStepFourAsDraft(firData: any): Observable<any> {
 }
 
   updatestep5(firData: any): Observable<any> {
-    const formData = new FormData();
-  
-
-    formData.append('firId', firData.firId || '');
-    formData.append('totalCompensation', firData.totalCompensation || '0.00');
-    formData.append('proceedingsFileNo', firData.proceedingsFileNo || '');
-    formData.append('proceedingsDate', firData.proceedingsDate || '');
-  
-
-    if (firData.proceedingsFile) {
-      formData.append('proceedingsFile', firData.proceedingsFile);
-    }
- 
-    if (firData.victimsRelief && firData.victimsRelief.length) {
-      formData.append('victimsRelief', JSON.stringify(firData.victimsRelief));
-    }
- 
-    if (firData.attachments && firData.attachments.length > 0) {
-      firData.attachments.forEach((attachment:any) => {
-        // console.log(attachment,"firData.filefilefile")
-
-        
-        if (attachment.path) {
-          formData.append('attachments', attachment.path); // Correct key: 'attachments'
-        }
-      });
-    }
-    
+   
   // console.log(firData.attachments,"firData.attachments")
-    return this.http.post(`${this.baseUrl}/save-step-fiveedit`, formData);
+    return this.http.post(`${this.baseUrl}/save-step-fiveedit`, firData);
   }
 
   // saveStepSixAsDraft(firData: any): Observable<any> {
@@ -361,8 +319,20 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     return this.http.get(`${this.baseUrl}/victims-details/${firId}`);
   }
 
+  GetVictimInformationDetails(firId: any): Observable<any> {
+    let body = {firId : firId}
+    return this.http.post(`${this.baseUrl}/GetVictimDetail`, body );
+  }
 
+    Getstep5Detail(firId: any): Observable<any> {
+    let body = {firId : firId}
+    return this.http.post(`${this.baseUrl}/Getstep5Detail`, body );
+  }
 
+    GetChargesheetDetail(firId: any): Observable<any> {
+    let body = {firId : firId}
+    return this.http.post(`${this.baseUrl}/GetChargesheetDetail`, body );
+  }
 
   getFirDetails(firId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/details`, {

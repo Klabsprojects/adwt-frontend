@@ -14,6 +14,8 @@ import { ReportsCommonService } from 'src/app/services/reports-common.service';
 import { inject, signal, TemplateRef, WritableSignal } from '@angular/core';
 
 import { ModalDismissReasons, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+
 
 
 declare var bootstrap: any;
@@ -28,6 +30,7 @@ declare var bootstrap: any;
     MatCheckboxModule,
     MatSelectModule,
     MatFormFieldModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './monthly-report.component.html',
   styleUrls: ['./monthly-report.component.scss'],
@@ -66,6 +69,7 @@ export class MonthlyReportComponent implements OnInit {
   isAdmin: boolean = true;
   selectedCaseStatus: string = '';
   loading: boolean = false;
+  loader: boolean = false;
   displayedColumns: {
     field: string;
     label: string;
@@ -236,6 +240,7 @@ export class MonthlyReportComponent implements OnInit {
     private reportsCommonService: ReportsCommonService,
     private monthlyReportService: MonthlyReportService
   ) {
+    this.loader = true;
     const currentYear = new Date().getFullYear();
     this.yearColumns1 = [currentYear, currentYear - 1, currentYear - 2];
   }
@@ -267,9 +272,11 @@ export class MonthlyReportComponent implements OnInit {
 
   // Load all fir reports details into UI
   fetchMonthlyReports(): void {
-      this.loading = true;
+      this.loader = true;
       this.monthlyReportService.getMonthlyReportDetail().subscribe({
         next: (response) => {
+          console.log(response,'response')
+           this.loader = false;
           //console.log('Monthly Reports:', response.data); // Debugging
           // Transform API response to match frontend structure
           this.reportData = response.data.map((item: { police_city: any; police_station: any; fir_number: any; offence_committed: any; scst_sections: any; number_of_victim: any; court_district: any; court_name: any; case_number: any; status: number; under_investigation_case_days: any; pending_trial_case_days: any; previous_month_reason_for_status: any; current_month_reason_for_status: any; fir_id : any }, index: number) => ({
@@ -292,11 +299,10 @@ export class MonthlyReportComponent implements OnInit {
           }));
           // Update filteredData to reflect the API data
           this.filteredData = [...this.reportData]; 
-          this.loading = false;
           this.cdr.detectChanges(); // Trigger change detection
         },
         error: (error) => {
-          this.loading = false;
+          this.loader = false;
           console.error('Error fetching reports:', error);
         }
       });

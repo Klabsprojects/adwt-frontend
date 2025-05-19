@@ -12,6 +12,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MonetaryReliefService } from 'src/app/services/monetary-relief.service';
 import { ReportsCommonService } from 'src/app/services/reports-common.service';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+
 
 @Component({
   selector: 'app-monetary-relief',
@@ -23,6 +25,7 @@ import { ReportsCommonService } from 'src/app/services/reports-common.service';
     MatCheckboxModule,
     FormsModule,
     DragDropModule,
+    MatProgressSpinnerModule
   ],
   providers: [FirListTestService], // Provide the service here
   templateUrl: './monetary-relief.component.html',
@@ -46,6 +49,7 @@ export class MonetaryReliefComponent implements OnInit {
   districts: string[] = [];
   naturesOfOffence: string[] = [];
   statusesOfCase: string[] = ['Just Starting', 'Pending', 'Completed'];
+   loader: boolean = false;
   statusesOfRelief: string[] = [
     'FIR Stage',
     'ChargeSheet Stage',
@@ -148,7 +152,9 @@ export class MonetaryReliefComponent implements OnInit {
     private reportsCommonService: ReportsCommonService,
     private monetaryReliefService: MonetaryReliefService,
     private router: Router
-  ) {}
+  ) {
+    this.loader = true;
+  }
 
   // Initializes component data and fetches necessary information on component load.
   ngOnInit(): void {
@@ -177,7 +183,7 @@ export class MonetaryReliefComponent implements OnInit {
 
   // Load all monetaty relief reports details into UI
   fetchMonetaryReliefDetails(): void {
-    this.loading = true;
+    this.loader = true;
     this.monetaryReliefService.getMonetaryReliefDetails().subscribe({
       next: (response) => {
         //console.log('Monetary Reliefs:', response.data); // Debugging
@@ -197,11 +203,11 @@ export class MonetaryReliefComponent implements OnInit {
         }));
         // Update filteredData to reflect the API data
         this.filteredData = [...this.reportData]; 
-        this.loading = false;
+        this.loader = false;
         this.cdr.detectChanges(); // Trigger change detection
       },
       error: (error) => {
-        this.loading = false;
+        this.loader = false;
         console.error('Error fetching reports:', error);
       }
     });

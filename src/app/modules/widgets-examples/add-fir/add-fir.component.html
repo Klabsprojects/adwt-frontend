@@ -46,6 +46,9 @@
 
 
     <div class="card-body border-top">
+      <div class="loader-overlay" *ngIf="loader">
+       <mat-spinner></mat-spinner>
+      </div>
         <form [formGroup]="firForm" enctype="multipart/form-data">
             <!-- Step 1: Basic Information -->
             <div *ngIf="mainStep === 1 && step === 1" class="form-step">
@@ -348,11 +351,11 @@
                 <div class="row mb-4" formGroupName="complainantDetails">
                     <div class="col-md-4 mb-3">
                         <label for="nameOfComplainant" class="form-label">15. Name of Complainant *</label>
-                        <input type="text" id="nameOfComplainant" class="form-control" formControlName="nameOfComplainant" placeholder="Enter Name of Complainant" required pattern="^[A-Za-z\s]*$" (keypress)="allowOnlyLetters($event)" style="text-transform: capitalize;" />
+                        <input type="text" id="nameOfComplainant" class="form-control" formControlName="nameOfComplainant" placeholder="Enter Name of Complainant" required style="text-transform: capitalize;" />
                         <!-- Error Message -->
-                        <div *ngIf="isNameInvalid()" class="text-danger mt-1">
+                        <!-- <div *ngIf="isNameInvalid()" class="text-danger mt-1">
                             Please enter a valid name (letters only).
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="col-md-4 mb-3">
@@ -397,10 +400,10 @@
 
                                 <div class="col-md-4 mb-3">
                                     <label for="victimName-{{ i }}" class="form-label">20. Name of the Victim *</label>
-                                    <input type="text" id="victimName-{{ i }}" class="form-control" formControlName="name" placeholder="Enter victim's name" required (input)="updateVictimNames()" (keypress)="allowOnlyLetters($event)" style="text-transform: capitalize;" />
-                                    <div *ngIf="isVictimNameInvalid(i)" class="text-danger mt-1">
+                                    <input type="text" id="victimName-{{ i }}" class="form-control" formControlName="name" placeholder="Enter victim's name" required (input)="updateVictimNames()" style="text-transform: capitalize;" />
+                                    <!-- <div *ngIf="isVictimNameInvalid(i)" class="text-danger mt-1">
                                         Please enter a valid name (letters only).
-                                    </div>
+                                    </div> -->
                                 </div>
 
 
@@ -509,10 +512,10 @@
 
                                 <div class="col-md-5 mb-3">
                                     <label for="victimGuardian{{ i }}" class="form-label">27. Name of Victim’s Father/ Mother/ Spouse/ Guardian *</label>
-                                    <input type="text" [id]="'victimGuardian' + i" class="form-control" formControlName="guardianName" placeholder="Enter Guardian's Name" required (keypress)="allowOnlyLetters($event)" style="text-transform: capitalize;" />
-                                    <div *ngIf="isGuardianNameInvalid(i)" class="text-danger mt-1">
+                                    <input type="text" [id]="'victimGuardian' + i" class="form-control" formControlName="guardianName" placeholder="Enter Guardian's Name" required  style="text-transform: capitalize;" />
+                                    <!-- <div *ngIf="isGuardianNameInvalid(i)" class="text-danger mt-1">
                                         Please enter a valid name (letters only).
-                                    </div>
+                                    </div> -->
                                 </div>
 
 
@@ -591,7 +594,7 @@
                                 [searchable]="true"
                                 [clearable]="true"
                                 [placeholder]="victims.at(i).get('offenceCommitted')?.value?.length ? '' : 'Select offences'"
-                                (change)="onOffenceCommittedChange($event, i)"
+                                (change)="onOffenceCommittedChange(i)"
                                 [id]="'victimOffence' + i"
                                 required
                               >
@@ -790,10 +793,10 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="accusedPincode{{ i }}" class="form-label">40. Pincode</label>
-                                    <input type="text" [id]="'accusedPincode' + i" class="form-control" formControlName="pincode" placeholder="Enter pincode" maxlength="6"  (keypress)="allowOnlyNumbers($event)" pattern="^[0-9]{6}$" required />
-                                    <div *ngIf="isPincodeInvalid(i)" class="text-danger mt-1">
+                                    <input type="text" [id]="'accusedPincode' + i" class="form-control" formControlName="pincode" placeholder="Enter pincode" maxlength="6"  (keypress)="allowOnlyNumbers($event)" pattern="^[0-9]{6}$" />
+                                    <!-- <div *ngIf="isPincodeInvalid(i)" class="text-danger mt-1">
                                         Please enter a valid 6-digit pincode.
-                                    </div>
+                                    </div> -->
                                 </div>
 
 
@@ -952,7 +955,7 @@
                                   <select class="form-control" formControlName="antecedentsOption">
                                     <option value="">Select</option>
                                     <option value="Yes">Yes</option>
-                                    <option value="NA">NA</option>
+                                    <option selected value="NA">NA</option>
                                   </select>
                                  </div>
 
@@ -984,7 +987,7 @@
                                   <select class="form-control" formControlName="landOIssueOption">
                                     <option value="">Select</option>
                                     <option value="Yes">Yes</option>
-                                    <option value="NA">NA</option>
+                                    <option selected value="NA">NA</option>
                                   </select>
                                  </div>
                                 <div class="col-md-6 mb-3" *ngIf="accused.get('landOIssueOption')?.value === 'Yes'">

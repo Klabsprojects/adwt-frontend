@@ -32,6 +32,8 @@ import { environment } from '../../../../environments/environment';
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { auditTime, distinctUntilChanged, skip } from 'rxjs';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+
 
 
 declare var $: any;
@@ -75,7 +77,8 @@ interface ImagePreview {
     MatFormFieldModule,
     MatRadioModule,
     NgxDropzoneModule,
-    NgSelectModule
+    NgSelectModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './edit-fir.component.html',
   styleUrl: './edit-fir.component.scss'
@@ -112,7 +115,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
         case_id2: string | undefined = '';
 
   userId: string = '';
-  loading: boolean = false;
+  loader: boolean = false;
   yearOptions: number[] = [];
   today: string = '';
   nextButtonDisabled: boolean = true;
@@ -796,9 +799,42 @@ loadAccusedCommunities(): void {
   }
 
   navigateToMainStep(stepNumber: number): void {
-    this.mainStep = stepNumber; // Update mainStep
-    this.step = 1; // Reset sub-step to 1 when switching main steps
-    this.cdr.detectChanges(); // Trigger UI update
+    console.log(stepNumber, 'main step')
+    if(stepNumber == 2){
+      this.firService.Getstep5Detail(this.firId).subscribe(
+        (response: any) => {
+          console.log(response)
+          if(response.datacount.id == 0){
+            Swal.fire('Warning', "Kindly Complete FIR Stage First!", 'warning');
+          } else {
+            this.mainStep = stepNumber;
+            this.step = 1; 
+            this.cdr.detectChanges();
+          }
+        },
+        (error) => {
+          console.error('Error updating FIR status:', error);
+        })
+    } else if (stepNumber == 3){
+         this.firService.GetChargesheetDetail(this.firId).subscribe(
+        (response: any) => {
+          console.log(response)
+          if(response.datacount.id == 0){
+            Swal.fire('Warning', "Kindly Complete Chargesheet Stage First!", 'warning');
+          } else {
+            this.mainStep = stepNumber;
+            this.step = 1; 
+            this.cdr.detectChanges();
+          }
+        },
+        (error) => {
+          console.error('Error updating FIR status:', error);
+        })
+    } else {
+    this.mainStep = stepNumber; 
+    this.step = 1; 
+    this.cdr.detectChanges();
+    }
   }
 
 
@@ -896,43 +932,158 @@ loadAccusedCommunities(): void {
   }
   
   // Calls firService to update victim details based on selected offences
-  onOffenceCommittedChange(event: any, index: number): void {
-    // const selectedOffences = event.value; // Get selected values from the 30th field
+  // onOffenceCommittedChange(event: any, index: number): void {
+  //   // const selectedOffences = event.value; // Get selected values from the 30th field
+  //   let selectedOffences: string[] = [];
 
-    let selectedOffences: string[] = [];
+  //   // If the items are objects, extract the offence_name
+  //   if (Array.isArray(event) && event.length && typeof event[0] === 'object') {
+  //     selectedOffences = event.map((item: any) => item.offence_name);
+  //   } else {
+  //     // If already strings, use as is
+  //     selectedOffences = event;
+  //   }
 
-    // If the items are objects, extract the offence_name
-    if (Array.isArray(event) && event.length && typeof event[0] === 'object') {
-      selectedOffences = event.map((item: any) => item.offence_name);
-    } else {
-      // If already strings, use as is
-      selectedOffences = event;
-    }
-
-    const getId = this.offenceOptionData
-    .filter(option => selectedOffences.includes(option.offence_name))
-    .map(option => option.id);
-    this.firService.onOffenceCommittedChange(
-      selectedOffences,
-      index,
-      this.offenceReliefDetails,
-      this.victims,
-      this.victimsRelief,
-      getId
-    );
-    selectedOffences.forEach((ele:any) => {
-      const selectedValue = ele.trim(); 
-      const validValues = ['Rape, etc., or unnatural Offences', 'Gang rape', 'Murder or Death'];
+  //   const getId = this.offenceOptionData
+  //   .filter(option => selectedOffences.includes(option.offence_name))
+  //   .map(option => option.id);
+  //   this.onOffenceCommittedChangenew(
+  //     selectedOffences,
+  //     index,
+  //     this.offenceReliefDetails,
+  //     this.victims,
+  //     this.victimsRelief,
+  //     getId
+  //   );
+  //   selectedOffences.forEach((ele:any) => {
+  //     const selectedValue = ele.trim(); 
+  //     const validValues = ['Rape, etc., or unnatural Offences', 'Gang rape', 'Murder or Death'];
     
-    if (validValues.includes(selectedValue)) {
-      this.showRelief = true;
+  //   if (validValues.includes(selectedValue)) {
+  //     this.showRelief = true;
+  //   }
+  //   else{
+  //     this.showRelief = false;
+  //   }
+  //   });
+  //   this.cdr.detectChanges();
+  // }
+
+
+onOffenceCommittedChange(index: number): void {
+  const victimGroup = this.victims.at(index) as FormGroup;
+
+  // Get the selected offence names (array of offence_name)
+  const selectedOffences: string[] = victimGroup.get('offenceCommitted')?.value || [];
+
+  // Filter the offence options that match selected offence names
+  const selectedActs = this.offenceOptions.filter((item: any) =>
+    selectedOffences.includes(item.offence_name)
+  );
+
+  // Get the offence_act_name of each matched item
+  const actNames = selectedActs.map(item => item.offence_act_name).filter(name => !!name);
+
+  // Patch scstSections with comma-separated act names
+  victimGroup.patchValue({
+    scstSections: actNames.join(', '),
+  });
+
+  this.cdr.detectChanges();
+}
+  
+  onOffenceCommittedChangenew(
+      selectedOffences: any[],
+      index: number,
+      offenceReliefDetails: any[],
+      victims: FormArray,
+      victimsRelief:FormArray,
+      getId:any) {
+      const victimGroup = victims.at(index) as FormGroup; // Access the victim's FormGroup
+      const victimsReliefGroup = victimsRelief.at(index) as FormGroup;
+      console.log(victimsReliefGroup);
+      // Filter to find matching poa_act_section values
+      const matchingSections = offenceReliefDetails
+        .filter(offence => selectedOffences.includes(offence.name_of_offence))
+        .map(offence => offence.poa_act_section);
+      if (matchingSections.length > 0) {
+        this.loader = true;
+        this.firService.getOffenceActsWithId(getId).subscribe(
+          (response: any[]) => {
+            console.log(response);
+            this.loader = false;
+            let responseArray = Array.isArray(response) ? response : [response];
+            const matchedActs = responseArray.filter((act) => {
+              const actNamesArray = act.offence_act_names.split(',');
+              console.log(actNamesArray, matchingSections);
+              return actNamesArray.some((name: any) => matchingSections.includes(name)); 
+            });
+            if (matchedActs.length > 0) {
+              // Update the victim's FormGroup with the fetched values
+              victimGroup.patchValue({
+                scstSections: matchedActs[0].offence_act_names || '',
+               // scstSections: matchedActs.map(act => act.offence_act_name), // Auto-select field 31
+                fir_stage_as_per_act: matchedActs[0].fir_stage_as_per_act || '',
+                fir_stage_ex_gratia: matchedActs[0].fir_stage_ex_gratia || '',
+                chargesheet_stage_as_per_act: matchedActs[0].chargesheet_stage_as_per_act || '',
+                chargesheet_stage_ex_gratia: matchedActs[0].chargesheet_stage_ex_gratia || '',
+                final_stage_as_per_act: matchedActs[0].final_stage_as_per_act || '',
+                final_stage_ex_gratia: matchedActs[0].final_stage_ex_gratia || '',
+              });
+              victimsReliefGroup.patchValue({
+                reliefAmountScst:matchedActs[0].fir_stage_as_per_act || '',
+                reliefAmountExGratia:matchedActs[0].fir_stage_ex_gratia || '',
+                reliefAmountFirstStage: (
+                  (parseFloat(matchedActs[0].fir_stage_as_per_act) || 0) +
+                  (parseFloat(matchedActs[0].fir_stage_ex_gratia) || 0)
+                ).toFixed(2),
+                reliefAmountScst_1:matchedActs[0].chargesheet_stage_as_per_act || '',
+                reliefAmountExGratia_1:matchedActs[0].chargesheet_stage_ex_gratia || '',
+                reliefAmountSecondStage : (
+                  (parseFloat(matchedActs[0].chargesheet_stage_as_per_act) || 0) +
+                  (parseFloat(matchedActs[0].chargesheet_stage_ex_gratia) || 0)
+                ).toFixed(2),
+                reliefAmountScst_2:matchedActs[0].final_stage_as_per_act || '',
+                reliefAmountExGratia_2:matchedActs[0].final_stage_ex_gratia || '',
+                reliefAmountThirdStage : (
+                  (parseFloat(matchedActs[0].final_stage_as_per_act) || 0) +
+                  (parseFloat(matchedActs[0].final_stage_ex_gratia) || 0)
+                ).toFixed(2),
+              })
+          } else {
+            this.loader = false;
+              // Reset the fields if no matched acts are found
+              victimGroup.patchValue({
+                scstSections: [],
+                fir_stage_as_per_act: '',
+                fir_stage_ex_gratia: '',
+                chargesheet_stage_as_per_act: '',
+                chargesheet_stage_ex_gratia: '',
+                final_stage_as_per_act: '',
+                final_stage_ex_gratia: '',
+                reliefAmountFirstStage: '', // Reset the 1st stage relief amount
+              });
+            }
+          },
+          (error) => {
+            this.loader = false;
+            console.error('Error fetching offence acts:', error);
+          }
+        );
+      } else {
+        // Reset the fields if no sections are selected
+        victimGroup.patchValue({
+          scstSections: [],
+          fir_stage_as_per_act: '',
+          fir_stage_ex_gratia: '',
+          chargesheet_stage_as_per_act: '',
+          chargesheet_stage_ex_gratia: '',
+          final_stage_as_per_act: '',
+          final_stage_ex_gratia: '',
+          reliefAmountFirstStage: '', // Reset the 1st stage relief amount
+        });
+      }
     }
-    else{
-      this.showRelief = false;
-    }
-    });
-    this.cdr.detectChanges();
-  }
 
   selectedCourtName: string = '';
   onCourtDivisionChange1(value: any): void {
@@ -978,790 +1129,788 @@ loadAccusedCommunities(): void {
   // }
   // imagePaths: string[] = [];
 
-  loadFirDetails_old(firId: string): void {
+//   loadFirDetails_old(firId: string): void {
 
-    this.firService.getFirDetails(firId).subscribe(
-      (response) => {
+//     this.firService.getFirDetails(firId).subscribe(
+//       (response) => {
 
-        console.log("response",response.data);
-        this.showDuplicateSection = false;
-        this.showDuplicateSection_1 = false;
-        this.loadPoliceStations(response.data.police_city,response.data.police_station);
-        if (response.appeal_details && response.appeal_details.length > 0) {
-          response.appeal_details.forEach((appealDetail:any) => {
-            this.firForm.patchValue({
-              judgementDetails: {
-                // judgementNature: appealDetail.judgementNature || '',
-                // Conviction_Type: response.data5.Conviction_Type || '',
-          legalOpinionObtained: appealDetail.legal_opinion_obtained || '',
-          filedBy:appealDetail.filed_by || '',
-          designatedCourt:appealDetail.designated_court || '',
-          caseFitForAppeal:appealDetail.case_fit_for_appeal || '',
+//         console.log("response",response.data);
+//         this.showDuplicateSection = false;
+//         this.showDuplicateSection_1 = false;
+//         this.loadPoliceStations(response.data.police_city,response.data.police_station);
+//         if (response.appeal_details && response.appeal_details.length > 0) {
+//           response.appeal_details.forEach((appealDetail:any) => {
+//             this.firForm.patchValue({
+//               judgementDetails: {
+//                 // judgementNature: appealDetail.judgementNature || '',
+//                 // Conviction_Type: response.data5.Conviction_Type || '',
+//           legalOpinionObtained: appealDetail.legal_opinion_obtained || '',
+//           filedBy:appealDetail.filed_by || '',
+//           designatedCourt:appealDetail.designated_court || '',
+//           caseFitForAppeal:appealDetail.case_fit_for_appeal || '',
 
-          governmentApprovalForAppeal: appealDetail.government_approval_for_appeal || '',
-              }
-              // trialCourtDistrict: appealDetail.court_district || '',
-              // trialCaseNumber: appealDetail.trial_case_number || '',
-              // publicProsecutor: appealDetail.public_prosecutor || '',
+//           governmentApprovalForAppeal: appealDetail.government_approval_for_appeal || '',
+//               }
+//               // trialCourtDistrict: appealDetail.court_district || '',
+//               // trialCaseNumber: appealDetail.trial_case_number || '',
+//               // publicProsecutor: appealDetail.public_prosecutor || '',
              
-            });
+//             });
 
-            console.log(this.firForm.get('judgementDetails')?.value,"sasasasasasa");
+//             console.log(this.firForm.get('judgementDetails')?.value,"sasasasasasa");
 
-            this.onLegalOpinionChange();
-            this.onDesignatedCourtChange_demo();
-            this.onJudgementNatureChange();
-          });
-      }
+//             this.onLegalOpinionChange();
+//             this.onDesignatedCourtChange_demo();
+//             this.onJudgementNatureChange();
+//           });
+//       }
       
 
-      if (response.casedetail_one && response.casedetail_one.length > 0) {
-console.log(response.casedetail_one,"casedetail_onee")
-        response.casedetail_one.forEach((item:any) => {
+//       if (response.casedetail_one && response.casedetail_one.length > 0) {
+// console.log(response.casedetail_one,"casedetail_onee")
+//         response.casedetail_one.forEach((item:any) => {
 
-          this.firForm.patchValue({
-            Court_one: item.court_name || '',
-            courtDistrict_one: item.court_district || '',
-            caseNumber_one: item.case_number || '',
-            publicProsecutor_one: item.public_prosecutor || '',
-            prosecutorPhone_one: item.prosecutor_phone || '',
-            firstHearingDate_one: item.second_hearing_date ? formatDate(item.second_hearing_date, 'yyyy-MM-dd', 'en') : '',
-            judgementAwarded_one: item.judgement_awarded || '',
-            judgementNature_one:item.judgementNature || '',
-            Conviction_Type_one:item.Conviction_Type || '',
-          });
+//           this.firForm.patchValue({
+//             Court_one: item.court_name || '',
+//             courtDistrict_one: item.court_district || '',
+//             caseNumber_one: item.case_number || '',
+//             publicProsecutor_one: item.public_prosecutor || '',
+//             prosecutorPhone_one: item.prosecutor_phone || '',
+//             firstHearingDate_one: item.second_hearing_date ? formatDate(item.second_hearing_date, 'yyyy-MM-dd', 'en') : '',
+//             judgementAwarded_one: item.judgement_awarded || '',
+//             judgementNature_one:item.judgementNature || '',
+//             Conviction_Type_one:item.Conviction_Type || '',
+//           });
 
           
-          // this.onJudgementNatureChange_two();
-        });
-      }
-      if (response.appeal_details_one && response.appeal_details_one.length > 0) {
-        console.log(response.appeal_details_one,"appeal_details_one")
-                response.appeal_details_one.forEach((appealDetail:any) => {
+//           // this.onJudgementNatureChange_two();
+//         });
+//       }
+//       if (response.appeal_details_one && response.appeal_details_one.length > 0) {
+//         console.log(response.appeal_details_one,"appeal_details_one")
+//                 response.appeal_details_one.forEach((appealDetail:any) => {
         
-                        this.firForm.patchValue({
-                          judgementDetails_one: {
-                // judgementNature_one: appealDetail.judgementNature || '',
-                // Conviction_Type_one:appealDetail.Conviction_Type || '',
-                legalOpinionObtained_one: appealDetail.legal_opinion_obtained || '',
-                caseFitForAppeal_one:appealDetail.case_fit_for_appeal || '',
-                filedBy_one: appealDetail.filed_by || '',
+//                         this.firForm.patchValue({
+//                           judgementDetails_one: {
+//                 // judgementNature_one: appealDetail.judgementNature || '',
+//                 // Conviction_Type_one:appealDetail.Conviction_Type || '',
+//                 legalOpinionObtained_one: appealDetail.legal_opinion_obtained || '',
+//                 caseFitForAppeal_one:appealDetail.case_fit_for_appeal || '',
+//                 filedBy_one: appealDetail.filed_by || '',
         
-                designatedCourt_one: appealDetail.designated_court || '',
+//                 designatedCourt_one: appealDetail.designated_court || '',
             
-                governmentApprovalForAppeal_one:appealDetail.government_approval_for_appeal || '',
+//                 governmentApprovalForAppeal_one:appealDetail.government_approval_for_appeal || '',
 
-              }
+//               }
             
              
-            });
-                  this.onJudgementNatureChange_one();
-                  this.onLegalOpinionChange_one();
-                  this.onDesignatedCourtChange_one_fromapi();
-                });
-              }
+//             });
+//                   this.onJudgementNatureChange_one();
+//                   this.onLegalOpinionChange_one();
+//                   this.onDesignatedCourtChange_one_fromapi();
+//                 });
+//               }
 
 
-      if (response.casedetail_two && response.casedetail_two.length > 0) {
-        console.log(response.casedetail_two,"casedetail_two")
-                response.casedetail_two.forEach((item:any) => {
+//       if (response.casedetail_two && response.casedetail_two.length > 0) {
+//         console.log(response.casedetail_two,"casedetail_two")
+//                 response.casedetail_two.forEach((item:any) => {
         
-                  const judgementAwardedValue = item.judgement_awarded || '';
-                  this.firForm.patchValue({
-                    judgementAwarded3: judgementAwardedValue,
+//                   const judgementAwardedValue = item.judgement_awarded || '';
+//                   this.firForm.patchValue({
+//                     judgementAwarded3: judgementAwardedValue,
 
-                    courtDistrict_two : item.court_district,
-                    caseNumber_two:item.case_number,
-                    publicProsecutor_two:item.public_prosecutor,
-                    prosecutorPhone_two:item.prosecutor_phone,
+//                     courtDistrict_two : item.court_district,
+//                     caseNumber_two:item.case_number,
+//                     publicProsecutor_two:item.public_prosecutor,
+//                     prosecutorPhone_two:item.prosecutor_phone,
 
-                    firstHearingDate_two:item.second_hearing_date ? formatDate(item.second_hearing_date, 'yyyy-MM-dd', 'en') : '',
-                  });
-                  this.applyJudgementAwardedValidators(judgementAwardedValue);
+//                     firstHearingDate_two:item.second_hearing_date ? formatDate(item.second_hearing_date, 'yyyy-MM-dd', 'en') : '',
+//                   });
+//                   this.applyJudgementAwardedValidators(judgementAwardedValue);
                   
-                });
-              }
+//                 });
+//               }
 
 
-              if (response.compensation_details_2 && response.compensation_details_2.length > 0) {
-                console.log(response.compensation_details_2,"compensation_details_2")
-                        response.compensation_details_2.forEach((item:any) => {
+//               if (response.compensation_details_2 && response.compensation_details_2.length > 0) {
+//                 console.log(response.compensation_details_2,"compensation_details_2")
+//                         response.compensation_details_2.forEach((item:any) => {
                     
                         
-                          this.firForm.patchValue({
-                            totalCompensation_2: item.total_compensation,
-                            proceedingsFileNo_2: item.proceedings_file_no,
-                            proceedingsDate_2: item.proceedings_date  ? formatDate(item.proceedings_date, 'yyyy-MM-dd', 'en') : '',
-                            uploadProceedings_2: item.upload_proceedings
+//                           this.firForm.patchValue({
+//                             totalCompensation_2: item.total_compensation,
+//                             proceedingsFileNo_2: item.proceedings_file_no,
+//                             proceedingsDate_2: item.proceedings_date  ? formatDate(item.proceedings_date, 'yyyy-MM-dd', 'en') : '',
+//                             uploadProceedings_2: item.upload_proceedings
 
-                          });
-                          if (item.upload_proceedings) {
-                            this.uploadProceedings_2_preview = `${this.image_access2}${item.upload_proceedings}`;
+//                           });
+//                           if (item.upload_proceedings) {
+//                             this.uploadProceedings_2_preview = `${this.image_access2}${item.upload_proceedings}`;
 
-                            console.log( this.uploadProceedings_2_preview," this.uploadProceedings_2_preview")
-                          }
+//                             console.log( this.uploadProceedings_2_preview," this.uploadProceedings_2_preview")
+//                           }
                           
-                        });
+//                         });
                         
-                      }
+//                       }
 
 
 
-      if (response.hearingDetails_one && response.hearingDetails_one.length > 0) {
-        console.log(response.hearingDetails_one, "response.hearingDetails_one");
+//       if (response.hearingDetails_one && response.hearingDetails_one.length > 0) {
+//         console.log(response.hearingDetails_one, "response.hearingDetails_one");
       
-        const hearingDetailsControl = this.firForm.get('hearingDetails_one') as FormArray;
+//         const hearingDetailsControl = this.firForm.get('hearingDetails_one') as FormArray;
       
-        console.log(hearingDetailsControl, "hearingDetailsControl");
+//         console.log(hearingDetailsControl, "hearingDetailsControl");
       
-        hearingDetailsControl.clear(); 
+//         hearingDetailsControl.clear(); 
       
-        response.hearingDetails_one.forEach((hearing: any) => {
-          const hearingGroup = this.createHearingDetailGroup_one();
+//         response.hearingDetails_one.forEach((hearing: any) => {
+//           const hearingGroup = this.createHearingDetailGroup_one();
       
-          hearingGroup.patchValue({
-            nextHearingDate_one: hearing.next_hearing_date ? formatDate(hearing.next_hearing_date, 'yyyy-MM-dd', 'en') : '',
-            reasonNextHearing_one: hearing.reason_next_hearing,
-          });
+//           hearingGroup.patchValue({
+//             nextHearingDate_one: hearing.next_hearing_date ? formatDate(hearing.next_hearing_date, 'yyyy-MM-dd', 'en') : '',
+//             reasonNextHearing_one: hearing.reason_next_hearing,
+//           });
       
-          hearingDetailsControl.push(hearingGroup);
-        });
-      }
+//           hearingDetailsControl.push(hearingGroup);
+//         });
+//       }
       
-      if (this.firForm && response.data5 && response.data5.length > 0) {
-        console.log("ConvictionType from API:", response.data5[0].Conviction_Type);
+//       if (this.firForm && response.data5 && response.data5.length > 0) {
+//         console.log("ConvictionType from API:", response.data5[0].Conviction_Type);
       
-        const convictionType = response.data5[0].Conviction_Type || '';
+//         const convictionType = response.data5[0].Conviction_Type || '';
       
-        // Check if the form group exists before setting the value
-        if (this.firForm.get('judgementDetails.Conviction_Type')) {
-          this.firForm.get('judgementDetails.Conviction_Type')?.setValue(convictionType);
-          console.log("Form Control after setting:", this.firForm.get('judgementDetails.Conviction_Type')?.value);
-        } else {
-          console.error("Conviction_Type is missing inside judgementDetails!");
-        }
-      }
+//         // Check if the form group exists before setting the value
+//         if (this.firForm.get('judgementDetails.Conviction_Type')) {
+//           this.firForm.get('judgementDetails.Conviction_Type')?.setValue(convictionType);
+//           console.log("Form Control after setting:", this.firForm.get('judgementDetails.Conviction_Type')?.value);
+//         } else {
+//           console.error("Conviction_Type is missing inside judgementDetails!");
+//         }
+//       }
 
 
-        if (response.data5 && response.data5.length > 0) {
+//         if (response.data5 && response.data5.length > 0) {
 
-          response.data5.forEach((item: any, index: number) => {
+//           response.data5.forEach((item: any, index: number) => {
 
-            if (index === 0) {
+//             if (index === 0) {
 
-              this.case_id = item.case_id || '';
-              // Populate main section
-              this.firForm.patchValue({
-                Court_name1: item.court_name || '',
-                trialCourtDistrict: item.court_district || '',
-                trialCaseNumber: item.trial_case_number || '',
-                publicProsecutor: item.public_prosecutor || '',
-                prosecutorPhone: item.prosecutor_phone || '',
-                firstHearingDate: item.first_hearing_date ? formatDate(item.first_hearing_date, 'yyyy-MM-dd', 'en') : '',
-                judgementAwarded: item.judgement_awarded || '',
-                // Conviction_Type: (item.Conviction_Type || '').trim(),
-                CaseHandledBy:item.CaseHandledBy || '',
-                judgementAwarded1:item.judgementAwarded1 ||'',
-                judgementAwarded2:item.judgementAwarded2 ||'',
-                judgementAwarded3:item.judgementAwarded3 ||'',
+//               this.case_id = item.case_id || '';
+//               // Populate main section
+//               this.firForm.patchValue({
+//                 Court_name1: item.court_name || '',
+//                 trialCourtDistrict: item.court_district || '',
+//                 trialCaseNumber: item.trial_case_number || '',
+//                 publicProsecutor: item.public_prosecutor || '',
+//                 prosecutorPhone: item.prosecutor_phone || '',
+//                 firstHearingDate: item.first_hearing_date ? formatDate(item.first_hearing_date, 'yyyy-MM-dd', 'en') : '',
+//                 judgementAwarded: item.judgement_awarded || '',
+//                 // Conviction_Type: (item.Conviction_Type || '').trim(),
+//                 CaseHandledBy:item.CaseHandledBy || '',
+//                 judgementAwarded1:item.judgementAwarded1 ||'',
+//                 judgementAwarded2:item.judgementAwarded2 ||'',
+//                 judgementAwarded3:item.judgementAwarded3 ||'',
            
-              });
+//               });
       
 
 
 
-              if (item.hearingDetails && Array.isArray(item.hearingDetails)) {
+//               if (item.hearingDetails && Array.isArray(item.hearingDetails)) {
 
 
 
-                const hearingDetailsControl = this.firForm.get('hearingDetails') as FormArray;
+//                 const hearingDetailsControl = this.firForm.get('hearingDetails') as FormArray;
 
-console.log(hearingDetailsControl,"hearingDetailsControl")
+// console.log(hearingDetailsControl,"hearingDetailsControl")
 
 
-                hearingDetailsControl.clear();
-                item.hearingDetails.forEach((hearing: HearingDetail) => {
-                  hearingDetailsControl.push(this.createHearingDetailGroup());
-                });
-              }
-            } else if (index === 1) {
-              this.case_id1 = item.case_id || '';
-              // Populate duplicate section 1
-              this.showDuplicateSection = true;
-              this.firForm.patchValue({
-                Court_one: item.court_name || '',
-                courtDistrict_one: item.court_district || '',
-                caseNumber_one: item.trial_case_number || '',
-                publicProsecutor_one: item.public_prosecutor || '',
-                prosecutorPhone_one: item.prosecutor_phone || '',
-                firstHearingDate_one: item.first_hearing_date ? formatDate(item.first_hearing_date, 'yyyy-MM-dd', 'en') : '',
-                judgementAwarded_one: item.judgement_awarded || '',
-              });
+//                 hearingDetailsControl.clear();
+//                 item.hearingDetails.forEach((hearing: HearingDetail) => {
+//                   hearingDetailsControl.push(this.createHearingDetailGroup());
+//                 });
+//               }
+//             } else if (index === 1) {
+//               this.case_id1 = item.case_id || '';
+//               // Populate duplicate section 1
+//               this.showDuplicateSection = true;
+//               this.firForm.patchValue({
+//                 Court_one: item.court_name || '',
+//                 courtDistrict_one: item.court_district || '',
+//                 caseNumber_one: item.trial_case_number || '',
+//                 publicProsecutor_one: item.public_prosecutor || '',
+//                 prosecutorPhone_one: item.prosecutor_phone || '',
+//                 firstHearingDate_one: item.first_hearing_date ? formatDate(item.first_hearing_date, 'yyyy-MM-dd', 'en') : '',
+//                 judgementAwarded_one: item.judgement_awarded || '',
+//               });
         
             
-              if (item.hearingDetails_one && Array.isArray(item.hearingDetails_one)) {
-                const hearingDetailsControl = this.firForm.get('hearingDetails_one') as FormArray;
+//               if (item.hearingDetails_one && Array.isArray(item.hearingDetails_one)) {
+//                 const hearingDetailsControl = this.firForm.get('hearingDetails_one') as FormArray;
 
-                console.log(hearingDetailsControl,"hearingDetailsControl")
-                hearingDetailsControl.clear();
-                item.hearingDetails_one.forEach((hearing: HearingDetail) => {
-                  hearingDetailsControl.push(this.createHearingDetailGroup_one());
-                });
-              }
-            } else if (index === 2) {
-              this.case_id2 = item.case_id || '';
+//                 console.log(hearingDetailsControl,"hearingDetailsControl")
+//                 hearingDetailsControl.clear();
+//                 item.hearingDetails_one.forEach((hearing: HearingDetail) => {
+//                   hearingDetailsControl.push(this.createHearingDetailGroup_one());
+//                 });
+//               }
+//             } else if (index === 2) {
+//               this.case_id2 = item.case_id || '';
           
-              this.showDuplicateSection_1 = true;
-              this.firForm.patchValue({
-                Court_three: item.court_name || '',
-                courtDistrict_two: item.court_district || '',
-                caseNumber_two: item.trial_case_number || '',
-                publicProsecutor_two: item.public_prosecutor || '',
-                prosecutorPhone_two: item.prosecutor_phone || '',
-                firstHearingDate_two: item.first_hearing_date ? formatDate(item.first_hearing_date, 'yyyy-MM-dd', 'en') : '',
-                judgementAwarded_two: item.judgement_awarded || '',
-              });
+//               this.showDuplicateSection_1 = true;
+//               this.firForm.patchValue({
+//                 Court_three: item.court_name || '',
+//                 courtDistrict_two: item.court_district || '',
+//                 caseNumber_two: item.trial_case_number || '',
+//                 publicProsecutor_two: item.public_prosecutor || '',
+//                 prosecutorPhone_two: item.prosecutor_phone || '',
+//                 firstHearingDate_two: item.first_hearing_date ? formatDate(item.first_hearing_date, 'yyyy-MM-dd', 'en') : '',
+//                 judgementAwarded_two: item.judgement_awarded || '',
+//               });
    
-              if (item.hearingDetails_two && Array.isArray(item.hearingDetails_two)) {
-                const hearingDetailsControl = this.firForm.get('hearingDetails_two') as FormArray;
-                hearingDetailsControl.clear();
-                item.hearingDetails_two.forEach((hearing: HearingDetail) => {
-                  hearingDetailsControl.push(this.createHearingDetailGroup_two());
-                });
-              }
-            }
-          });
+//               if (item.hearingDetails_two && Array.isArray(item.hearingDetails_two)) {
+//                 const hearingDetailsControl = this.firForm.get('hearingDetails_two') as FormArray;
+//                 hearingDetailsControl.clear();
+//                 item.hearingDetails_two.forEach((hearing: HearingDetail) => {
+//                   hearingDetailsControl.push(this.createHearingDetailGroup_two());
+//                 });
+//               }
+//             }
+//           });
 
 
 
-          // console.log('Case IDs:', { case_id, case_id1, case_id2 });
-        }
+//           // console.log('Case IDs:', { case_id, case_id1, case_id2 });
+//         }
         
 
-        if (response.hearingDetails && response.hearingDetails.length > 0) {
-          const hearingDetailsControl = this.firForm.get('hearingDetails') as FormArray;
-          hearingDetailsControl.clear();
+//         if (response.hearingDetails && response.hearingDetails.length > 0) {
+//           const hearingDetailsControl = this.firForm.get('hearingDetails') as FormArray;
+//           hearingDetailsControl.clear();
         
-          response.hearingDetails.forEach((hearing: any) => {
-            const hearingGroup = this.createHearingDetailGroup();
+//           response.hearingDetails.forEach((hearing: any) => {
+//             const hearingGroup = this.createHearingDetailGroup();
         
-            hearingGroup.patchValue({
+//             hearingGroup.patchValue({
        
-              nextHearingDate: hearing.next_hearing_date ? formatDate(hearing.next_hearing_date, 'yyyy-MM-dd', 'en') : '',
-              reasonNextHearing: hearing.reason_next_hearing,
-            });
+//               nextHearingDate: hearing.next_hearing_date ? formatDate(hearing.next_hearing_date, 'yyyy-MM-dd', 'en') : '',
+//               reasonNextHearing: hearing.reason_next_hearing,
+//             });
         
-            hearingDetailsControl.push(hearingGroup);
-          });
-        }
+//             hearingDetailsControl.push(hearingGroup);
+//           });
+//         }
         
         
 
 
-        // if(response.data.police_station)
-        // {
-        //   const str = response.data.police_station ?? ''; // Ensures that str is at least an empty string if null or undefined
-        //   const result = str.split("-");
-        //   this.firForm.get('alphabetSelection')?.setValue(result[0]);
-        //   this.firForm.get('stationNumber')?.setValue(result[1]);
-        //   this.firForm.get('stationName')?.setValue(result[2]);
-        // }  
+//         // if(response.data.police_station)
+//         // {
+//         //   const str = response.data.police_station ?? ''; // Ensures that str is at least an empty string if null or undefined
+//         //   const result = str.split("-");
+//         //   this.firForm.get('alphabetSelection')?.setValue(result[0]);
+//         //   this.firForm.get('stationNumber')?.setValue(result[1]);
+//         //   this.firForm.get('stationName')?.setValue(result[2]);
+//         // }  
 
-        // step 1
-        if(response.data.police_city){
-          this.firForm.get('policeCity')?.setValue(response.data.police_city);
-          this.onCityChange({ target: { value: response.data.police_city } });
-        }
-        if(response.data.police_range){
-          this.firForm.get('policeRange')?.setValue(response.data.police_range); 
-        }
-        if(response.data.police_zone){
-          this.firForm.get('policeZone')?.setValue(response.data.police_zone); 
-        }
-        if(response.data.revenue_district){
-          this.firForm.get('revenueDistrict')?.setValue(response.data.revenue_district); 
-        }
-        // if(response.data.police_station){
-        //   this.firForm.get('stationName')?.setValue(response.data.police_station); 
-        // }
-        if(response.data.officer_name){
-          this.firForm.get('officerName')?.setValue(response.data.officer_name); 
-        }
-        // "complaintReceivedType": "Written",
-        // "complaintRegisteredBy": "Inspector",
-        // "complaintReceiverName": "Test",
+//         // step 1
+//         if(response.data.police_city){
+//           this.firForm.get('policeCity')?.setValue(response.data.police_city);
+//           this.onCityChange({ target: { value: response.data.police_city } });
+//         }
+//         if(response.data.police_range){
+//           this.firForm.get('policeRange')?.setValue(response.data.police_range); 
+//         }
+//         if(response.data.police_zone){
+//           this.firForm.get('policeZone')?.setValue(response.data.police_zone); 
+//         }
+//         if(response.data.revenue_district){
+//           this.firForm.get('revenueDistrict')?.setValue(response.data.revenue_district); 
+//         }
+//         // if(response.data.police_station){
+//         //   this.firForm.get('stationName')?.setValue(response.data.police_station); 
+//         // }
+//         if(response.data.officer_name){
+//           this.firForm.get('officerName')?.setValue(response.data.officer_name); 
+//         }
+//         // "complaintReceivedType": "Written",
+//         // "complaintRegisteredBy": "Inspector",
+//         // "complaintReceiverName": "Test",
 
-        if(response.data.complaintReceivedType){
-          this.firForm.get('complaintReceivedType')?.setValue(response.data.complaintReceivedType);
-        }
-        if(response.data.complaintRegisteredBy){
-          this.firForm.get('complaintRegisteredBy')?.setValue(response.data.complaintRegisteredBy);
-        }
-        if(response.data.complaintReceiverName){
-          this.firForm.get('complaintReceiverName')?.setValue(response.data.complaintReceiverName);
-        }
-        if(response.data.officer_designation){
-          this.firForm.get('officerDesignation')?.setValue(response.data.officer_designation); 
-        }
-        if(response.data.officer_phone){
-          this.firForm.get('officerPhone')?.setValue(response.data.officer_phone); 
-        }
+//         if(response.data.complaintReceivedType){
+//           this.firForm.get('complaintReceivedType')?.setValue(response.data.complaintReceivedType);
+//         }
+//         if(response.data.complaintRegisteredBy){
+//           this.firForm.get('complaintRegisteredBy')?.setValue(response.data.complaintRegisteredBy);
+//         }
+//         if(response.data.complaintReceiverName){
+//           this.firForm.get('complaintReceiverName')?.setValue(response.data.complaintReceiverName);
+//         }
+//         if(response.data.officer_designation){
+//           this.firForm.get('officerDesignation')?.setValue(response.data.officer_designation); 
+//         }
+//         if(response.data.officer_phone){
+//           this.firForm.get('officerPhone')?.setValue(response.data.officer_phone); 
+//         }
 
-        // step 2
-        this.firForm.get('is_case_altered')?.setValue('No');
-        if(response.data.fir_number){
-          this.firForm.get('firNumber')?.setValue(response.data.fir_number); 
-        }
-        if(response.data.fir_number_suffix){
-          this.firForm.get('firNumberSuffix')?.setValue(response.data.fir_number_suffix); 
-        }
-        if(response.data.date_of_occurrence) { 
-          const dateObj = new Date(response.data.date_of_occurrence);
-          const formattedDate = dateObj.toISOString().split('T')[0];
-          this.firForm.get('dateOfOccurrence')?.setValue(formattedDate);
-        }
-        if(response.data.date_of_occurrence_to){
-          const dateObj = new Date(response.data.date_of_occurrence_to);
-          const formattedDate = dateObj.toISOString().split('T')[0];
-          this.firForm.get('date_of_occurrence_to')?.setValue(formattedDate);
-        }
-        if(response.data.time_of_occurrence){
-          this.firForm.get('timeOfOccurrence')?.setValue(response.data.time_of_occurrence); 
-        }
-        if(response.data.time_of_occurrence_to){
-          this.firForm.get('time_of_occurrence_to')?.setValue(response.data.time_of_occurrence_to); 
-        }
-        if(response.data.place_of_occurrence){
-          this.firForm.get('placeOfOccurrence')?.setValue(response.data.place_of_occurrence); 
-        }
-        if(response.data.date_of_registration){
-          const dateObj1 = new Date(response.data.date_of_registration);
-          const formattedDate1 = dateObj1.toISOString().split('T')[0];
-          this.firForm.get('dateOfRegistration')?.setValue(formattedDate1); 
-        }
-        if(response.data.is_case_altered){
-          this.firForm.get('is_case_altered')?.setValue(response.data.is_case_altered); 
-        }
-        if(response.data.altered_date){
-          const dateObj1 = new Date(response.data.altered_date);
-          const formattedDate1 = dateObj1.toISOString().split('T')[0];
-          this.firForm.get('altered_date')?.setValue(formattedDate1); 
-        }
+//         // step 2
+//         this.firForm.get('is_case_altered')?.setValue('No');
+//         if(response.data.fir_number){
+//           this.firForm.get('firNumber')?.setValue(response.data.fir_number); 
+//         }
+//         if(response.data.fir_number_suffix){
+//           this.firForm.get('firNumberSuffix')?.setValue(response.data.fir_number_suffix); 
+//         }
+//         if(response.data.date_of_occurrence) { 
+//           const dateObj = new Date(response.data.date_of_occurrence);
+//           const formattedDate = dateObj.toISOString().split('T')[0];
+//           this.firForm.get('dateOfOccurrence')?.setValue(formattedDate);
+//         }
+//         if(response.data.date_of_occurrence_to){
+//           const dateObj = new Date(response.data.date_of_occurrence_to);
+//           const formattedDate = dateObj.toISOString().split('T')[0];
+//           this.firForm.get('date_of_occurrence_to')?.setValue(formattedDate);
+//         }
+//         if(response.data.time_of_occurrence){
+//           this.firForm.get('timeOfOccurrence')?.setValue(response.data.time_of_occurrence); 
+//         }
+//         if(response.data.time_of_occurrence_to){
+//           this.firForm.get('time_of_occurrence_to')?.setValue(response.data.time_of_occurrence_to); 
+//         }
+//         if(response.data.place_of_occurrence){
+//           this.firForm.get('placeOfOccurrence')?.setValue(response.data.place_of_occurrence); 
+//         }
+//         if(response.data.date_of_registration){
+//           const dateObj1 = new Date(response.data.date_of_registration);
+//           const formattedDate1 = dateObj1.toISOString().split('T')[0];
+//           this.firForm.get('dateOfRegistration')?.setValue(formattedDate1); 
+//         }
+//         if(response.data.is_case_altered){
+//           this.firForm.get('is_case_altered')?.setValue(response.data.is_case_altered); 
+//         }
+//         if(response.data.altered_date){
+//           const dateObj1 = new Date(response.data.altered_date);
+//           const formattedDate1 = dateObj1.toISOString().split('T')[0];
+//           this.firForm.get('altered_date')?.setValue(formattedDate1); 
+//         }
         
-        if(response.data.time_of_registration){
-          this.firForm.get('timeOfRegistration')?.setValue(response.data.time_of_registration); 
-        }
+//         if(response.data.time_of_registration){
+//           this.firForm.get('timeOfRegistration')?.setValue(response.data.time_of_registration); 
+//         }
 
-        // step 3
-        // if(response.data.sections_ipc){
-        //   this.firForm.get('sectionsIPC')?.setValue(response.data.sections_ipc); 
-        // }
-        // if (response.data.nature_of_offence) {
-        //   // Split the comma-separated string into an array
-        //   const selectedOffences = response.data.nature_of_offence.split(',').map((offence: string) => offence.trim()); 
+//         // step 3
+//         // if(response.data.sections_ipc){
+//         //   this.firForm.get('sectionsIPC')?.setValue(response.data.sections_ipc); 
+//         // }
+//         // if (response.data.nature_of_offence) {
+//         //   // Split the comma-separated string into an array
+//         //   const selectedOffences = response.data.nature_of_offence.split(',').map((offence: string) => offence.trim()); 
         
-        //   // Set the selected offences to the form control
-        //   this.firForm.get('natureOfOffence')?.setValue(selectedOffences); 
-        // }
+//         //   // Set the selected offences to the form control
+//         //   this.firForm.get('natureOfOffence')?.setValue(selectedOffences); 
+//         // }
 
-        if(response.data.name_of_complainant){ 
-          this.firForm.get('complainantDetails.nameOfComplainant')?.setValue(response.data.name_of_complainant); 
-        }
-        if(response.data.mobile_number_of_complainant){
-          this.firForm.get('complainantDetails.mobileNumberOfComplainant')?.setValue(response.data.mobile_number_of_complainant); 
-        }
-        if(response.data.is_victim_same_as_complainant){
-          if(response.data.is_victim_same_as_complainant == 'true'){
-            this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.setValue(response.data.is_victim_same_as_complainant);
-          } else {
-            this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.setValue('false');
-          }
-        }
-
-
+//         if(response.data.name_of_complainant){ 
+//           this.firForm.get('complainantDetails.nameOfComplainant')?.setValue(response.data.name_of_complainant); 
+//         }
+//         if(response.data.mobile_number_of_complainant){
+//           this.firForm.get('complainantDetails.mobileNumberOfComplainant')?.setValue(response.data.mobile_number_of_complainant); 
+//         }
+//         if(response.data.is_victim_same_as_complainant){
+//           if(response.data.is_victim_same_as_complainant == 'true'){
+//             this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.setValue(response.data.is_victim_same_as_complainant);
+//           } else {
+//             this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.setValue('false');
+//           }
+//         }
 
 
-        if (response && response.data4 && response.data4.all_attachments) {
-          try {
-            // Split the concatenated string by commas to get each attachment's id and file path
-            const allFilesArray: { chargesheet_attachment_id: number, file_path: string }[] = response.data4.all_attachments.split(',').map((attachment: string) => {
-              const [attachmentId, filePath] = attachment.split('||'); // Split by colon to get id and path
-              return { chargesheet_attachment_id: attachmentId, file_path: filePath };
-            });
+
+
+//         if (response && response.data4 && response.data4.all_attachments) {
+//           try {
+//             // Split the concatenated string by commas to get each attachment's id and file path
+//             const allFilesArray: { chargesheet_attachment_id: number, file_path: string }[] = response.data4.all_attachments.split(',').map((attachment: string) => {
+//               const [attachmentId, filePath] = attachment.split('||'); // Split by colon to get id and path
+//               return { chargesheet_attachment_id: attachmentId, file_path: filePath };
+//             });
         
-            this.allFiles1 = allFilesArray;
-          } catch (error) {
-            console.error('Error parsing all_attachments:', error);
-            this.allFiles1 = [];
-          }
-        }
+//             this.allFiles1 = allFilesArray;
+//           } catch (error) {
+//             console.error('Error parsing all_attachments:', error);
+//             this.allFiles1 = [];
+//           }
+//         }
         
-        if (response && response.data3 && response.data3.all_attachments) {
-          try {
-            // Split the concatenated string by commas to get each attachment's id and file path
-            const allFilesArray: { chargesheet_attachment_id: number, file_path: string }[] = response.data3.all_attachments.split(',').map((attachment: string) => {
-              const [attachmentId, filePath] = attachment.split('||'); // Split by colon to get id and path
-              return { chargesheet_attachment_id: attachmentId, file_path: filePath };
-            });
+//         if (response && response.data3 && response.data3.all_attachments) {
+//           try {
+//             // Split the concatenated string by commas to get each attachment's id and file path
+//             const allFilesArray: { chargesheet_attachment_id: number, file_path: string }[] = response.data3.all_attachments.split(',').map((attachment: string) => {
+//               const [attachmentId, filePath] = attachment.split('||'); // Split by colon to get id and path
+//               return { chargesheet_attachment_id: attachmentId, file_path: filePath };
+//             });
         
-            this.allFiles = allFilesArray;
+//             this.allFiles = allFilesArray;
 
-            console.log(response,"this.allFiles")
-          } catch (error) {
-            console.error('Error parsing all_attachments:', error);
-            this.allFiles = [];
-          }
-        }
+//             console.log(response,"this.allFiles")
+//           } catch (error) {
+//             console.error('Error parsing all_attachments:', error);
+//             this.allFiles = [];
+//           }
+//         }
         
-        // if (response.data3.all_files) {
-        //   try {
-        //     const allFilesArray = JSON.parse(response.data3.all_files);  // Assuming this is a JSON string
-        //     this.allFiles = allFilesArray.map((fileUrl: string) => {
-        //       // Check if the fileUrl is relative and prepend the base URL
-        //       if (fileUrl) {
-        //         return fileUrl;  // Prepend the base URL to the relative path
-        //       }
-        //       return fileUrl;  // Already an absolute URL
-        //     }); 
-        //   } catch (error) {
-        //     console.error('Error parsing all_files:', error);
-        //     this.allFiles = [];
-        //   }
-        // }
+//         // if (response.data3.all_files) {
+//         //   try {
+//         //     const allFilesArray = JSON.parse(response.data3.all_files);  // Assuming this is a JSON string
+//         //     this.allFiles = allFilesArray.map((fileUrl: string) => {
+//         //       // Check if the fileUrl is relative and prepend the base URL
+//         //       if (fileUrl) {
+//         //         return fileUrl;  // Prepend the base URL to the relative path
+//         //       }
+//         //       return fileUrl;  // Already an absolute URL
+//         //     }); 
+//         //   } catch (error) {
+//         //     console.error('Error parsing all_files:', error);
+//         //     this.allFiles = [];
+//         //   }
+//         // }
 
-        if(response && response.data && response.data.number_of_victim){ 
-          this.firForm.get('complainantDetails.numberOfVictims')?.setValue(response.data.number_of_victim); 
-        }
-        if(response && response.data && response.data.is_deceased){ 
-          if(response.data.is_deceased == 1){
-            this.firForm.get('isDeceased')?.setValue("yes");
-          }
-          else{
-            this.firForm.get('isDeceased')?.setValue("no");
-          }
-        }
+//         if(response && response.data && response.data.number_of_victim){ 
+//           this.firForm.get('complainantDetails.numberOfVictims')?.setValue(response.data.number_of_victim); 
+//         }
+//         if(response && response.data && response.data.is_deceased){ 
+//           if(response.data.is_deceased == 1){
+//             this.firForm.get('isDeceased')?.setValue("yes");
+//           }
+//           else{
+//             this.firForm.get('isDeceased')?.setValue("no");
+//           }
+//         }
 
-        if (response && response.data && response.data.deceased_person_names) {
-          let deceased_person_names: any[] = [];
-          if (typeof response.data.deceased_person_names === 'string') {
-            try {
-              deceased_person_names = JSON.parse(response.data.deceased_person_names);
-            } catch (error) {
-              console.error("Error parsing deceased_person_names:", error);
-            }
-          } else {
-            deceased_person_names = response.data.deceased_person_names;
-          }
-          this.victimNames = response.data1
-          .map((victim: any) => victim.victim_name);
-          this.firForm.get('deceasedPersonNames')?.setValue(deceased_person_names);
-        }
+//         if (response && response.data && response.data.deceased_person_names) {
+//           let deceased_person_names: any[] = [];
+//           if (typeof response.data.deceased_person_names === 'string') {
+//             try {
+//               deceased_person_names = JSON.parse(response.data.deceased_person_names);
+//             } catch (error) {
+//               console.error("Error parsing deceased_person_names:", error);
+//             }
+//           } else {
+//             deceased_person_names = response.data.deceased_person_names;
+//           }
+//           this.victimNames = response.data1
+//           .map((victim: any) => victim.victim_name);
+//           this.firForm.get('deceasedPersonNames')?.setValue(deceased_person_names);
+//         }
 
-        if (response && response.data && response.data.number_of_accused) {
-          this.firForm.get('numberOfAccused')?.setValue(response.data.number_of_accused);
-        }
+//         if (response && response.data && response.data.number_of_accused) {
+//           this.firForm.get('numberOfAccused')?.setValue(response.data.number_of_accused);
+//         }
 
-          // 1. Total Compensation
-          if (response && response.data3 && response.data3.total_compensation) {
-            this.firForm.get('totalCompensation')?.setValue(response.data3.total_compensation);
-          }
+//           // 1. Total Compensation
+//           if (response && response.data3 && response.data3.total_compensation) {
+//             this.firForm.get('totalCompensation')?.setValue(response.data3.total_compensation);
+//           }
 
-          // 2. Proceedings File No.
-          if (response && response.data3 && response.data3.proceedings_file_no) {
-            this.firForm.get('proceedingsFileNo')?.setValue(response.data3.proceedings_file_no);
-          }
+//           // 2. Proceedings File No.
+//           if (response && response.data3 && response.data3.proceedings_file_no) {
+//             this.firForm.get('proceedingsFileNo')?.setValue(response.data3.proceedings_file_no);
+//           }
 
-          // 3. Proceeding File (judgement file URL)
-          if (response && response.data3 && response.data3.proceedings_file) {
-
-
-const data = response.data3.proceedings_file
+//           // 3. Proceeding File (judgement file URL)
+//           if (response && response.data3 && response.data3.proceedings_file) {
 
 
-this.firForm.get('proceedingsFile')?.setValue(data);
+// const data = response.data3.proceedings_file
 
 
-this.filePath_attachment = response.data3.file_paths?.length
-? response.data3.file_paths.map((file:any) => `${this.apiUrl}uploads/${file}`)
-: [];
+// this.firForm.get('proceedingsFile')?.setValue(data);
+
+
+// this.filePath_attachment = response.data3.file_paths?.length? response.data3.file_paths.map((file:any) => `${this.apiUrl}uploads/${file}`): [];
 
 
 
-if (!this.attachmentss_1) {
-  this.attachmentss_1 = [];
-}
+// if (!this.attachmentss_1) {
+//   this.attachmentss_1 = [];
+// }
 
 
-this.filePath_attachment.forEach((filePath: any) => {
-  this.attachmentss_1.push({ id: "", path: filePath, file: filePath });
-});
+// this.filePath_attachment.forEach((filePath: any) => {
+//   this.attachmentss_1.push({ id: "", path: filePath, file: filePath });
+// });
 
-console.log("Updated attachmentss_1:", this.attachmentss_1);
+// console.log("Updated attachmentss_1:", this.attachmentss_1);
 
 
 
-          }
+//           }
 
-          // 4. Proceedings Date
-          if (response && response.data3 && response.data3.proceedings_date) {
-            const dateObj = new Date(response.data3.proceedings_date);
-            const formattedDate = dateObj.toISOString().split('T')[0]; // Format to 'yyyy-mm-dd'
-            this.firForm.get('proceedingsDate')?.setValue(formattedDate);
-          }
-          console.log("response.data4",response);
-          const chargesheetDetails = response.data4;
-          if (chargesheetDetails && chargesheetDetails.charge_sheet_filed) {
-            if(chargesheetDetails && chargesheetDetails.charge_sheet_filed == "yes")
-            {
-              this.firForm.get('chargeSheetFiled')?.setValue("yes");
-            }
-            else{
-              this.firForm.get('chargeSheetFiled')?.setValue("no");
-            }
+//           // 4. Proceedings Date
+//           if (response && response.data3 && response.data3.proceedings_date) {
+//             const dateObj = new Date(response.data3.proceedings_date);
+//             const formattedDate = dateObj.toISOString().split('T')[0]; // Format to 'yyyy-mm-dd'
+//             this.firForm.get('proceedingsDate')?.setValue(formattedDate);
+//           }
+//           console.log("response.data4",response);
+//           const chargesheetDetails = response.data4;
+//           if (chargesheetDetails && chargesheetDetails.charge_sheet_filed) {
+//             if(chargesheetDetails && chargesheetDetails.charge_sheet_filed == "yes")
+//             {
+//               this.firForm.get('chargeSheetFiled')?.setValue("yes");
+//             }
+//             else{
+//               this.firForm.get('chargeSheetFiled')?.setValue("no");
+//             }
             
-          }
+//           }
 
-          if(chargesheetDetails && chargesheetDetails.chargesheet_id){
-            this.chargesheet_id = chargesheetDetails.chargesheet_id;
+//           if(chargesheetDetails && chargesheetDetails.chargesheet_id){
+//             this.chargesheet_id = chargesheetDetails.chargesheet_id;
 
 
-          }
+//           }
 
-        if (chargesheetDetails && chargesheetDetails.court_district) {
+//         if (chargesheetDetails && chargesheetDetails.court_district) {
           
-          this.firForm.get('courtDivision')?.setValue(chargesheetDetails.court_district);
-        }
-        if (chargesheetDetails && chargesheetDetails.court_name) { 
+//           this.firForm.get('courtDivision')?.setValue(chargesheetDetails.court_district);
+//         }
+//         if (chargesheetDetails && chargesheetDetails.court_name) { 
         
-this.selectedCourtName = chargesheetDetails.court_name;
-this.onCourtDivisionChange1(chargesheetDetails.court_district);
+// this.selectedCourtName = chargesheetDetails.court_name;
+// this.onCourtDivisionChange1(chargesheetDetails.court_district);
 
-// Now, patch the form with the court name value
-this.firForm.get('courtName')?.setValue(this.selectedCourtName);
-          // this.firForm.get('courtName')?.setValue(chargesheetDetails.court_name);
-          // this.firForm.patchValue({ courtName: chargesheetDetails.court_name });
-        }
-        if (chargesheetDetails && chargesheetDetails.case_type) {
-          this.firForm.get('caseType')?.setValue(chargesheetDetails.case_type);
-        }
-        if (chargesheetDetails && chargesheetDetails.case_number) {
-          this.firForm.get('caseNumber')?.setValue(chargesheetDetails.case_number);
-        }
-        if (chargesheetDetails && chargesheetDetails.chargesheetDate){
-          const date = new Date(chargesheetDetails.chargesheetDate);
-          const formattedDate = date.toISOString().split('T')[0];
-          this.firForm.get('chargeSheetDate')?.setValue(formattedDate);
-        }
+// // Now, patch the form with the court name value
+// this.firForm.get('courtName')?.setValue(this.selectedCourtName);
+//           // this.firForm.get('courtName')?.setValue(chargesheetDetails.court_name);
+//           // this.firForm.patchValue({ courtName: chargesheetDetails.court_name });
+//         }
+//         if (chargesheetDetails && chargesheetDetails.case_type) {
+//           this.firForm.get('caseType')?.setValue(chargesheetDetails.case_type);
+//         }
+//         if (chargesheetDetails && chargesheetDetails.case_number) {
+//           this.firForm.get('caseNumber')?.setValue(chargesheetDetails.case_number);
+//         }
+//         if (chargesheetDetails && chargesheetDetails.chargesheetDate){
+//           const date = new Date(chargesheetDetails.chargesheetDate);
+//           const formattedDate = date.toISOString().split('T')[0];
+//           this.firForm.get('chargeSheetDate')?.setValue(formattedDate);
+//         }
 
-        // Set RCS file number and filing date
-        if (chargesheetDetails && chargesheetDetails.rcs_file_number) {
-          this.firForm.get('rcsFileNumber')?.setValue(chargesheetDetails.rcs_file_number);
-        }
-        if (chargesheetDetails && chargesheetDetails.rcs_filing_date) {
-          const rcsFilingDate = new Date(chargesheetDetails.rcs_filing_date);
-          const formattedDate = rcsFilingDate.toISOString().split('T')[0];
-          this.firForm.get('rcsFilingDate')?.setValue(formattedDate);
-        }
+//         // Set RCS file number and filing date
+//         if (chargesheetDetails && chargesheetDetails.rcs_file_number) {
+//           this.firForm.get('rcsFileNumber')?.setValue(chargesheetDetails.rcs_file_number);
+//         }
+//         if (chargesheetDetails && chargesheetDetails.rcs_filing_date) {
+//           const rcsFilingDate = new Date(chargesheetDetails.rcs_filing_date);
+//           const formattedDate = rcsFilingDate.toISOString().split('T')[0];
+//           this.firForm.get('rcsFilingDate')?.setValue(formattedDate);
+//         }
 
-        if (response && response.data4 && response.data4.total_compensation_1) {
-          this.firForm.get('totalCompensation_1')?.setValue(response.data4.total_compensation_1);
-        } 
-        if (response && response.data4 && response.data4.proceedings_file_no) {
-          // console.log(response.data4.proceedings_file_no);
-          // console.log("response.data4.proceedings_file_no");
-          this.firForm.get('proceedingsFileNo_1')?.setValue(response.data4.proceedings_file_no);
-        }
+//         if (response && response.data4 && response.data4.total_compensation_1) {
+//           this.firForm.get('totalCompensation_1')?.setValue(response.data4.total_compensation_1);
+//         } 
+//         if (response && response.data4 && response.data4.proceedings_file_no) {
+//           // console.log(response.data4.proceedings_file_no);
+//           // console.log("response.data4.proceedings_file_no");
+//           this.firForm.get('proceedingsFileNo_1')?.setValue(response.data4.proceedings_file_no);
+//         }
 
-        if (response && response.data6 && response.data6.Commissionerate_file) {
-          // console.log(response.data6.Commissionerate_file);
-          // console.log("response.data6.Commissionerate_file");
-          this.firForm.get('uploadProceedings')?.setValue(response.data6.Commissionerate_file);
-        }
+//         if (response && response.data6 && response.data6.Commissionerate_file) {
+//           // console.log(response.data6.Commissionerate_file);
+//           // console.log("response.data6.Commissionerate_file");
+//           this.firForm.get('uploadProceedings')?.setValue(response.data6.Commissionerate_file);
+//         }
 
-        if (response && response.data6 && response.data6.proceedings_file_no) {
-          // console.log(response.data6.proceedings_file_no);
-          // console.log("response.data6.proceedings_file_no");
-          this.firForm.get('proceedingsFileNo')?.setValue(response.data6.proceedings_file_no);
-        }
+//         if (response && response.data6 && response.data6.proceedings_file_no) {
+//           // console.log(response.data6.proceedings_file_no);
+//           // console.log("response.data6.proceedings_file_no");
+//           this.firForm.get('proceedingsFileNo')?.setValue(response.data6.proceedings_file_no);
+//         }
 
-        if (response && response.data6 && response.data6.proceedings_date) {
-          const dateObj = new Date(response.data6.proceedings_date);
-          const formattedDate = dateObj.toISOString().split('T')[0]; // Format to 'yyyy-mm-dd'
-          this.firForm.get('proceedingsDate')?.setValue(formattedDate);
-        }
+//         if (response && response.data6 && response.data6.proceedings_date) {
+//           const dateObj = new Date(response.data6.proceedings_date);
+//           const formattedDate = dateObj.toISOString().split('T')[0]; // Format to 'yyyy-mm-dd'
+//           this.firForm.get('proceedingsDate')?.setValue(formattedDate);
+//         }
 
-        // if (response && response.data && response.data.nature_of_judgement) {
-        //     this.firForm.get('judgementDetails.judgementNature')?.setValue(response.data.nature_of_judgement);
-        // }
+//         // if (response && response.data && response.data.nature_of_judgement) {
+//         //     this.firForm.get('judgementDetails.judgementNature')?.setValue(response.data.nature_of_judgement);
+//         // }
 
-        if (response && response.data && response.data.judgement_copy) {
-          this.firForm.get('judgementDetails.uploadJudgement')?.setValue(response.data.judgement_copy);
-      }
+//         if (response && response.data && response.data.judgement_copy) {
+//           this.firForm.get('judgementDetails.uploadJudgement')?.setValue(response.data.judgement_copy);
+//       }
 
-        // 3. Proceeding File (judgement file URL)
-        if (response && response.data4 && response.data4.upload_proceedings_path) { 
-          this.firForm.get('uploadProceedings_1')?.setValue(response.data4.upload_proceedings_path);
-        }  if (response && response.data4 && response.data4.attachments) { 
+//         // 3. Proceeding File (judgement file URL)
+//         if (response && response.data4 && response.data4.upload_proceedings_path) { 
+//           this.firForm.get('uploadProceedings_1')?.setValue(response.data4.upload_proceedings_path);
+//         }  if (response && response.data4 && response.data4.attachments) { 
 
 
-          this.attachmentss_1 =  response.data4.attachments
+//           this.attachmentss_1 =  response.data4.attachments
 
-          console.log(this.attachmentss_1," response.data4.attachments")
-          // this.firForm.get('attachments')?.setValue(response.data4.attachments);
-        }
+//           console.log(this.attachmentss_1," response.data4.attachments")
+//           // this.firForm.get('attachments')?.setValue(response.data4.attachments);
+//         }
 
-          // 4. Proceedings Date
-          if (response && response.data4 && response.data4.proceedings_date) {
-            const dateObj = new Date(response.data4.proceedings_date);
-            const formattedDate = dateObj.toISOString().split('T')[0]; // Format to 'yyyy-mm-dd'
-            this.firForm.get('proceedingsDate_1')?.setValue(formattedDate);
-          }
+//           // 4. Proceedings Date
+//           if (response && response.data4 && response.data4.proceedings_date) {
+//             const dateObj = new Date(response.data4.proceedings_date);
+//             const formattedDate = dateObj.toISOString().split('T')[0]; // Format to 'yyyy-mm-dd'
+//             this.firForm.get('proceedingsDate_1')?.setValue(formattedDate);
+//           }
           
           
-        if (response && response.data1 && response.data1 && response.data1.length > 0) {
-          // Resetting the victims array in case of a previous value
-          const victimsFormArray = this.firForm.get('victims') as FormArray;
-          victimsFormArray.clear(); // Clear any existing victims data
-          console.log('arryresp',response.data1);
+//         if (response && response.data1 && response.data1 && response.data1.length > 0) {
+//           // Resetting the victims array in case of a previous value
+//           const victimsFormArray = this.firForm.get('victims') as FormArray;
+//           victimsFormArray.clear(); // Clear any existing victims data
+//           console.log('arryresp',response.data1);
 
-          response.data1.forEach((victim: any, index: number) => {
+//           response.data1.forEach((victim: any, index: number) => {
 
-            const victimGroup = this.createVictimGroup();
-            let offence_committed_data: any[] = [];
-            let scst_sections_data: any[] = [];
+//             const victimGroup = this.createVictimGroup();
+//             let offence_committed_data: any[] = [];
+//             let scst_sections_data: any[] = [];
 
-            if (victim.offence_committed && this.isValidJSON(victim.offence_committed)) {
-              offence_committed_data = JSON.parse(victim.offence_committed);
-            }
-            if (victim.scst_sections && this.isValidJSON(victim.scst_sections)) {
-              scst_sections_data = JSON.parse(victim.scst_sections);
-            }
+//             if (victim.offence_committed && this.isValidJSON(victim.offence_committed)) {
+//               offence_committed_data = JSON.parse(victim.offence_committed);
+//             }
+//             if (victim.scst_sections && this.isValidJSON(victim.scst_sections)) {
+//               scst_sections_data = JSON.parse(victim.scst_sections);
+//             }
         
-            victimGroup.patchValue({
-              victim_id: victim.victim_id,
-              name: victim.victim_name,
-              age: victim.victim_age,
-              gender: victim.victim_gender,
-              mobileNumber: victim.mobile_number,
-              address: victim.address,
-              victimPincode: victim.victim_pincode,
-              community: victim.community,
-              caste: victim.caste,
-              guardianName: victim.guardian_name,
-              isNativeDistrictSame: victim.is_native_district_same,
-              nativeDistrict: victim.native_district,
-              offenceCommitted: offence_committed_data,
-              scstSections: scst_sections_data,
-              sectionsIPC: victim.sectionsIPC
-            });
+//             victimGroup.patchValue({
+//               victim_id: victim.victim_id,
+//               name: victim.victim_name,
+//               age: victim.victim_age,
+//               gender: victim.victim_gender,
+//               mobileNumber: victim.mobile_number,
+//               address: victim.address,
+//               victimPincode: victim.victim_pincode,
+//               community: victim.community,
+//               caste: victim.caste,
+//               guardianName: victim.guardian_name,
+//               isNativeDistrictSame: victim.is_native_district_same,
+//               nativeDistrict: victim.native_district,
+//               offenceCommitted: offence_committed_data,
+//               scstSections: scst_sections_data,
+//               sectionsIPC: victim.sectionsIPC
+//             });
         
-            this.firService.getCastesByCommunity(victim.community).subscribe(
-              (castes: string[]) => {
-                victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
-              },
-              (error) => {
-                console.error('Error fetching castes:', error);
-                Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
-              }
-            );
+//             this.firService.getCastesByCommunity(victim.community).subscribe(
+//               (castes: string[]) => {
+//                 victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+//               },
+//               (error) => {
+//                 console.error('Error fetching castes:', error);
+//                 Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+//               }
+//             );
 
-            victimsFormArray.push(victimGroup);
+//             victimsFormArray.push(victimGroup);
 
-            this.onVictimAgeChange(index)
-          });
-          const sectionsArray = JSON.parse(response.data1[0].sectionsIPC_JSON);
+//             this.onVictimAgeChange(index)
+//           });
+//           const sectionsArray = JSON.parse(response.data1[0].sectionsIPC_JSON);
 
-          // Get the form array for the specific victim index (assuming index 0 for example)
-          const victimIndex = 0; // Adjust this based on your logic
-          const sectionDetails = this.getSectionDetails(victimIndex);
+//           // Get the form array for the specific victim index (assuming index 0 for example)
+//           const victimIndex = 0; // Adjust this based on your logic
+//           const sectionDetails = this.getSectionDetails(victimIndex);
 
-          // Clear existing form array
-          while (sectionDetails.length !== 0) {
-            sectionDetails.removeAt(0);
-          }
+//           // Clear existing form array
+//           while (sectionDetails.length !== 0) {
+//             sectionDetails.removeAt(0);
+//           }
 
-          // Populate form array with parsed data
-          sectionsArray.forEach((section: any) => {
-            sectionDetails.push(this.fb.group({
-              SectionType: [section.SectionType || ''],
-              Section: [section.Section || '']
-            }));
-          });   
-        }
-        const accusedFormArray = this.firForm.get('accuseds') as FormArray;
+//           // Populate form array with parsed data
+//           sectionsArray.forEach((section: any) => {
+//             sectionDetails.push(this.fb.group({
+//               SectionType: [section.SectionType || ''],
+//               Section: [section.Section || '']
+//             }));
+//           });   
+//         }
+//         const accusedFormArray = this.firForm.get('accuseds') as FormArray;
 
-        if (response && response.data2 && response.data2.length > 0) {
-          accusedFormArray.clear(); 
-          this.firCopyValue = [];
-          response.data2.forEach((accused: any,index:number) => {
+//         if (response && response.data2 && response.data2.length > 0) {
+//           accusedFormArray.clear(); 
+//           this.firCopyValue = [];
+//           response.data2.forEach((accused: any,index:number) => {
 
-            console.log(accused.upload_fir_copy,"uploadFIRCopy")
+//             console.log(accused.upload_fir_copy,"uploadFIRCopy")
             
 
-            const selectedCommunity = accused.community;
+//             const selectedCommunity = accused.community;
        
 
 
-                       if (selectedCommunity) {
-                    this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
-                  (castes: string[]) => {
-                     this.scstSectionsOptions = castes;
+//                        if (selectedCommunity) {
+//                     this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
+//                   (castes: string[]) => {
+//                      this.scstSectionsOptions = castes;
 
-                       this.cdr.detectChanges();
-                 },
-                             (error) => {
-                        console.error('Error fetching accused castes:', error);
-                    Swal.fire('Error', 'Failed to load castes for the selected accused community.', 'error');
-                       }
-                       );
-                         }
+//                        this.cdr.detectChanges();
+//                  },
+//                              (error) => {
+//                         console.error('Error fetching accused castes:', error);
+//                     Swal.fire('Error', 'Failed to load castes for the selected accused community.', 'error');
+//                        }
+//                        );
+//                          }
 
 
-            const accusedGroup = this.createAccusedGroup();
+//             const accusedGroup = this.createAccusedGroup();
             
-            // console.log('accusedGroupaccusedGroup:', accusedGroup);
+//             // console.log('accusedGroupaccusedGroup:', accusedGroup);
 
-            accusedGroup.patchValue({
-              accusedId: accused.accused_id,
-              age: accused.age,
-              name: accused.name,
-              gender: accused.gender,
-              address: accused.address,
-              pincode: accused.pincode,
-              community: accused.community,
-              caste: accused.caste,
-              guardianName: accused.guardian_name,
-              previousIncident: accused.previous_incident == 1 ? "true" : "false",
-              previousFIRNumber: accused.previous_fir_number,
-              previousFIRNumberSuffix: accused.previous_fir_number_suffix,
-              scstOffence: accused.scst_offence == 1 ? "true" : "false",
-              scstFIRNumber: accused.scst_fir_number,
-              scstFIRNumberSuffix: accused.scst_fir_number_suffix,
-              antecedentsOption:accused.antecedentsOption,
-              antecedents: accused.antecedents,
-              landOIssueOption:accused.landOIssueOption,
-              landOIssues: accused.land_o_issues,
-              gistOfCurrentCase: accused.gist_of_current_case,
-              uploadFIRCopy:accused.upload_fir_copy,
+//             accusedGroup.patchValue({
+//               accusedId: accused.accused_id,
+//               age: accused.age,
+//               name: accused.name,
+//               gender: accused.gender,
+//               address: accused.address,
+//               pincode: accused.pincode,
+//               community: accused.community,
+//               caste: accused.caste,
+//               guardianName: accused.guardian_name,
+//               previousIncident: accused.previous_incident == 1 ? "true" : "false",
+//               previousFIRNumber: accused.previous_fir_number,
+//               previousFIRNumberSuffix: accused.previous_fir_number_suffix,
+//               scstOffence: accused.scst_offence == 1 ? "true" : "false",
+//               scstFIRNumber: accused.scst_fir_number,
+//               scstFIRNumberSuffix: accused.scst_fir_number_suffix,
+//               antecedentsOption:accused.antecedentsOption,
+//               antecedents: accused.antecedents,
+//               landOIssueOption:accused.landOIssueOption,
+//               landOIssues: accused.land_o_issues,
+//               gistOfCurrentCase: accused.gist_of_current_case,
+//               uploadFIRCopy:accused.upload_fir_copy,
 
-            });
+//             });
 
 
 
 
             
-            accusedFormArray.push(accusedGroup);
-            console.log(accusedFormArray,"accusedFormArrayaccusedFormArrayaccusedFormArray")
-          });
-        }
+//             accusedFormArray.push(accusedGroup);
+//             console.log(accusedFormArray,"accusedFormArrayaccusedFormArrayaccusedFormArray")
+//           });
+//         }
 
-      },
-      (error) => {
-        console.error('Error loading FIR details:', error);
-      }
-    );
+//       },
+//       (error) => {
+//         console.error('Error loading FIR details:', error);
+//       }
+//     );
 
-  }
+//   }
 
 
   
@@ -2123,10 +2272,13 @@ removeFIRCopy(index: number): void {
 
         this.onVictimAgeChange(index)
       });
-      const sectionsArray = JSON.parse(response.data1[0].sectionsIPC_JSON);
+
+      response.data1.forEach((victim: any, index: number) => {
+
+      const sectionsArray = JSON.parse(victim.sectionsIPC_JSON);
 
       // Get the form array for the specific victim index (assuming index 0 for example)
-      const victimIndex = 0; // Adjust this based on your logic
+      const victimIndex = index; // Adjust this based on your logic
       const sectionDetails = this.getSectionDetails(victimIndex);
 
       // Clear existing form array
@@ -2141,6 +2293,8 @@ removeFIRCopy(index: number): void {
           Section: [section.Section || '']
         }));
       });   
+       
+      });
     }
 
 
@@ -2857,10 +3011,48 @@ removeFIRCopy(index: number): void {
 
   saveStepThreeAsDraft() {
 
+        const victimsArray = this.firForm.get('victims') as FormArray;
+        const firFormValues = this.firForm.value;
+        const complainantDetails = firFormValues.complainantDetails || {};
+        const isVictimSameAsComplainant = complainantDetails.isVictimSameAsComplainant === "true";
+        const numberOfVictims = this.firForm.get('complainantDetails.numberOfVictims')?.value;
+        const victims = [];
+
+       // Loop through each victim and add to the array
+      for (let i = 0; i < numberOfVictims; i++) {
+        const victimControl = victimsArray.at(i);
+        const victim = victimControl.value;
+        
+        victims.push({
+          victim_id: victim.victim_id || null,
+          name: isVictimSameAsComplainant ? complainantDetails.nameOfComplainant : victim?.name?.trim() || '', 
+          age: victim.age || '',
+          gender: victim.gender || '',
+          customGender: victim.gender === 'Other' ? victim.customGender || null : null,
+          mobileNumber: isVictimSameAsComplainant ? complainantDetails.mobileNumberOfComplainant : victim?.mobileNumber?.trim() || '', 
+          address: victim.address || null,
+          victimPincode: victim.victimPincode || null,
+          community: victim.community || '',
+          caste: victim.caste || '',
+          guardianName: victim.guardianName || '',
+          isNativeDistrictSame: victim.isNativeDistrictSame || '',
+          nativeDistrict: victim.nativeDistrict || null,
+          offenceCommitted: victim.offenceCommitted || [],
+          scstSections: victim.scstSections || [],
+          sectionDetails: victim.sectionDetails || [],
+          fir_stage_as_per_act: victim.fir_stage_as_per_act || null,
+          fir_stage_ex_gratia: victim.fir_stage_ex_gratia || null,
+          chargesheet_stage_as_per_act: victim.chargesheet_stage_as_per_act || null,
+          chargesheet_stage_ex_gratia: victim.chargesheet_stage_ex_gratia || null,
+          final_stage_as_per_act: victim.final_stage_as_per_act || null,
+          final_stage_ex_gratia: victim.final_stage_ex_gratia || null,
+        });
+      }
+
     const firData = {
       firId: this.firId,
       complainantDetails: this.firForm.get('complainantDetails')?.value,
-      victims: this.victims.value,
+      victims: victims,
       isDeceased: this.firForm.get('isDeceased')?.value,
       deceasedPersonNames: this.firForm.get('deceasedPersonNames')?.value || [],
     };
@@ -3172,7 +3364,7 @@ removeFIRCopy(index: number): void {
       // this.multipleFilesForproceeding[i]
       // proceedingsFile: this.multipleFilesForproceeding || '',
       proceedingsFile : this.firForm.get('proceedingsFile')?.value || '',
-      attachments:this.attachmentss_1,
+      attachments: this.attachmentss_1 ? this.attachmentss_1.map((item: any) => item.path) : [],
       status: isSubmit ? 5 : undefined,
     };
   console.log(firData,"firDatafirDatafirData")
@@ -4556,8 +4748,8 @@ console.log(victimReliefDetail,"cretaieg")
           this.offenceOptions = offences
             .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
             this.offenceOptions.push(
-              { offence_act_name: '3(2)(va)', offence_name: '', id : 24 },
-              { offence_act_name: '3(2)(v), 3(2)(va)', offence_name: '', id: 25 }
+              { offence_act_name: '3(2)(va)', offence_name: '3(2)(va)', id : 24 },
+              { offence_act_name: '3(2)(v), 3(2)(va)', offence_name: '3(2)(v), 3(2)(va)', id: 25 }
             );
             this.offenceOptionData = offences.map((offence: any) => offence);
         },
@@ -4799,8 +4991,8 @@ console.log(victimReliefDetail,"cretaieg")
       age: ['', Validators.required],
       name: ['', Validators.required],
       gender: ['', Validators.required],
-      address: ['', Validators.required],
-      pincode: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
+      address: [''],
+      pincode: ['', [ Validators.pattern('^[0-9]{6}$')]],
       community: ['', Validators.required],
       caste: ['', Validators.required],
       guardianName: ['', Validators.required],
@@ -6145,8 +6337,8 @@ async UpdateAsDraft_7() {
 
         victimId: relief.victimId || null,
         victimName: this.victimNames[index] || '',
-        reliefAmountScst: parseFloat(relief.reliefAmountScst || '0.00').toFixed(2),
-        reliefAmountExGratia: parseFloat(relief.reliefAmountExGratia || '0.00').toFixed(2),
+        reliefAmountScst: parseFloat(relief.reliefAmountScst_1 || '0.00').toFixed(2),
+        reliefAmountExGratia: parseFloat(relief.reliefAmountExGratia_1 || '0.00').toFixed(2),
         reliefAmountSecondStage: parseFloat(relief.reliefAmountSecondStage || '0.00').toFixed(2),
       })),
       uploadProceedingsPath: this.firForm.get('uploadProceedings_1')?.value || '',
@@ -6592,7 +6784,21 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
         this.updateFirStatus(4); 
         this.isStepFourModified = false;
       }
-      this.step++;
+      this.firService.GetVictimInformationDetails(this.firId).subscribe(
+        (response: any) => {
+          console.log(response)
+          if(response.datacount.id == 0){
+            this.step = 3;
+            this.cdr.detectChanges();
+          } else {
+            this.step = 5;
+            this.cdr.detectChanges();
+          }
+        },
+        (error) => {
+          console.error('Error updating FIR status:', error);
+          Swal.fire('Error', 'Unable to Get Detail.', 'error');
+        })
     } else if (this.step === 5 && this.isSubmitButtonEnabled()) {
       if(this.isStepFiveModified == true){
       this.submitStepFive(); // Final submission for Step 5
@@ -6628,8 +6834,28 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
 
 
   navigateToStep(stepNumber: number): void {
-    this.step = stepNumber; // Update the current step
-    this.cdr.detectChanges(); // Trigger UI update
+    console.log(stepNumber,'step_number')
+    // if(this.firId){
+    if(stepNumber == 5){
+      this.firService.GetVictimInformationDetails(this.firId).subscribe(
+        (response: any) => {
+          console.log(response)
+          if(response.datacount.id == 0){
+            Swal.fire('Warning', "Kindly Fill In The Victim's Information First!", 'warning');
+          } else {
+            this.step = stepNumber;
+            this.cdr.detectChanges();
+          }
+        },
+        (error) => {
+          console.error('Error updating FIR status:', error);
+          // Swal.fire('Error', 'Unable to Get Detail.', 'error');
+        })
+    } else{
+      this.step = stepNumber;
+      this.cdr.detectChanges();
+    }
+  // }
   }
 
 
@@ -7248,11 +7474,11 @@ getPoliceStation(district: string): void {
     return excluded.includes(act);
   }
 
-  removeSelectedOffence(index: number, offenceName: string): void {
-    const selected = this.victims.at(index).get('offenceCommitted')?.value || [];
-    const updated = selected.filter((item: string) => item !== offenceName);
-    this.victims.at(index).get('offenceCommitted')?.setValue(updated);
-  }
+  // removeSelectedOffence(index: number, offenceName: string): void {
+  //   const selected = this.victims.at(index).get('offenceCommitted')?.value || [];
+  //   const updated = selected.filter((item: string) => item !== offenceName);
+  //   this.victims.at(index).get('offenceCommitted')?.setValue(updated);
+  // }
 
 
   
@@ -7298,5 +7524,19 @@ viewAttachment_1(index: number): void {
 }
 addAttachment_1_new(): void {
   this.attachments_1.push(this.createAttachmentGroup());
+}
+
+
+  removeSelectedOffence(index: number, offenceName: string): void {
+  const control = this.victims.at(index).get('offenceCommitted');
+  const selected = control?.value || [];
+  const updated = selected.filter((item: string) => item !== offenceName);
+
+  control?.setValue(updated);
+  control?.markAsDirty();
+  control?.updateValueAndValidity();
+
+  // Manually trigger the (change) handler
+  this.onOffenceCommittedChange(index);
 }
 }

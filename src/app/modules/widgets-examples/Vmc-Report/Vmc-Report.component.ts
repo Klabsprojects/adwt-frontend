@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { VmcReportService } from 'src/app/services/Vmc-Report.service';
 import { ReportsCommonService } from 'src/app/services/reports-common.service';
 import { VmcMeetingService } from 'src/app/services/vmc-meeting.service';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-Vmc-Report',
@@ -24,6 +25,7 @@ import { VmcMeetingService } from 'src/app/services/vmc-meeting.service';
     MatCheckboxModule,
     FormsModule,
     DragDropModule,
+    MatProgressSpinnerModule
   ],
   providers: [FirListTestService], // Provide the service here
   templateUrl: './Vmc-Report.component.html',
@@ -38,6 +40,7 @@ export class VmcReportComponent implements OnInit {
   itemsPerPage: number = 10;
   isReliefLoading: boolean = true;
   loading: boolean = false;
+   loader: boolean = false;
   // Filters
   selectedYear: string = '';
   selectedDistrict: string = '';
@@ -143,6 +146,7 @@ export class VmcReportComponent implements OnInit {
     private vmcMeeting: VmcMeetingService,
     private router: Router
   ) {
+     this.loader = true;
     const UserInfo : any = sessionStorage.getItem('user_data');
     this.Parsed_UserInfo = JSON.parse(UserInfo)
     console.log(this.Parsed_UserInfo)
@@ -190,9 +194,10 @@ export class VmcReportComponent implements OnInit {
 
   // Load all monetaty relief reports details into UI
   getVmcReportList(): void {
-    this.loading = true;
+    this.loader = true;
     this.vmcReportService.getVmcReportList().subscribe({
       next: (response) => {
+        this.loader = false;
         //console.log('Monetary Reliefs:', response.data); // Debugging
         // Transform API response to match frontend structure
         this.reportData = response.data.map((item: { year: any; meeting_type: any; meeting_quarter: any; meeting_date: number; meeting_time: any; district: any; subdivision: any; meeting_status: any; uploaded_date: any;}, index: number) => ({
@@ -210,11 +215,10 @@ export class VmcReportComponent implements OnInit {
         }));
         // Update filteredData to reflect the API data
         this.filteredData = [...this.reportData]; 
-        this.loading = false;
         this.cdr.detectChanges(); // Trigger change detection
       },
       error: (error) => {
-        this.loading = false;
+        this.loader = false;
         console.error('Error fetching reports:', error);
       }
     });
@@ -257,7 +261,7 @@ getFilterParams() {
 
   // Applies filters, assigns serial numbers, and resets pagination
   applyFilters(): void {
-    this.loading = true;
+    this.loader = true;
     this.vmcReportService.getVmcReportList(this.getFilterParams()).subscribe({
       next: (response) => {
         //console.log('Monetary Reliefs:', response.data); // Debugging
@@ -277,11 +281,11 @@ getFilterParams() {
         }));
         // Update filteredData to reflect the API data
         this.filteredData = [...this.reportData]; 
-        this.loading = false;
+        this.loader = false;
         this.cdr.detectChanges(); // Trigger change detection
       },
       error: (error) => {
-        this.loading = false;
+        this.loader = false;
         console.error('Error fetching reports:', error);
       }
     });

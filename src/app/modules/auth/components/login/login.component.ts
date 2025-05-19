@@ -5,6 +5,8 @@ import { first } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LandingService } from 'src/app/modules/landing/landing.service';
+import { environment as env } from 'src/environments/environment.prod';
+import * as CryptoJS from 'crypto-js';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -95,13 +97,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       //console.error('Login form is invalid'); // Log invalid form
       return;
     }
+    const secretKey  = env.secretKey;
+    const ciphertext = CryptoJS.AES.encrypt(this.f.password.value, secretKey).toString();
 
     //console.log('Sending login request with email:', this.f.email.value);
-
-    const loginSubscr = this.authService
-      .login(this.f.email.value, this.f.password.value)
-      .pipe(first())
-      .subscribe(
+    const loginSubscr = this.authService.login(this.f.email.value, ciphertext).pipe(first()).subscribe(
         (response: any) => {
           //console.log('Login response received:', response); // Log the API response
 

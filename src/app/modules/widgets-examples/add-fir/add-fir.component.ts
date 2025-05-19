@@ -30,6 +30,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { environment } from '../../../../environments/environment';
 import { environment as env } from 'src/environments/environment.prod';
 import { Subscription } from 'rxjs';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-add-fir',
@@ -44,7 +45,8 @@ import { Subscription } from 'rxjs';
     MatFormFieldModule,
     MatRadioModule,
     NgxFileDropModule,
-    NgSelectModule
+    NgSelectModule,
+    MatProgressSpinnerModule
   ],
 })
 export class AddFirComponent implements OnInit, OnDestroy {
@@ -63,7 +65,7 @@ export class AddFirComponent implements OnInit, OnDestroy {
   firForm: FormGroup;
   firId: string | null = null;
   userId: string = '';
-  loading: boolean = false;
+ loader: boolean = false;
   yearOptions: number[] = [];
   today: string = '';
   nextButtonDisabled: boolean = true;
@@ -306,9 +308,45 @@ this.loadPoliceDivision();
   }
 
   navigateToMainStep(stepNumber: number): void {
-    this.mainStep = stepNumber; // Update mainStep
-    this.step = 1; // Reset sub-step to 1 when switching main steps
-    this.cdr.detectChanges(); // Trigger UI update
+    if(this.firId){
+      if(stepNumber == 2){
+            this.firService.Getstep5Detail(this.firId).subscribe(
+              (response: any) => {
+                console.log(response)
+                if(response.datacount.id == 0){
+                  Swal.fire('Warning', "Kindly Complete FIR Stage First!", 'warning');
+                } else {
+                  this.mainStep = stepNumber;
+                  this.step = 1; 
+                  this.cdr.detectChanges();
+                }
+              },
+              (error) => {
+                console.error('Error updating FIR status:', error);
+              })
+          } else if (stepNumber == 3){
+              this.firService.GetChargesheetDetail(this.firId).subscribe(
+              (response: any) => {
+                console.log(response)
+                if(response.datacount.id == 0){
+                  Swal.fire('Warning', "Kindly Complete Chargesheet Stage First!", 'warning');
+                } else {
+                  this.mainStep = stepNumber;
+                  this.step = 1; 
+                  this.cdr.detectChanges();
+                }
+              },
+              (error) => {
+                console.error('Error updating FIR status:', error);
+              })
+          } else {
+            this.mainStep = stepNumber; 
+            this.step = 1; 
+            this.cdr.detectChanges();
+          }
+      } else {
+      Swal.fire('Warning', "Kindly Fill In The Step 1 Information First!", 'warning');
+    }
 }
 
 
@@ -504,44 +542,162 @@ loadAllOffenceReliefDetails(): void {
 }
 
 // Calls firService to update victim details based on selected offences
-onOffenceCommittedChange(event: any, index: number): void {
-  // const selectedOffences = event.value; // Get selected values from the 30th field
-  let selectedOffences: string[] = [];
+// onOffenceCommittedChange(event: any, index: number): void {
+//   // const selectedOffences = event.value; // Get selected values from the 30th field
+//   let selectedOffences: string[] = [];
 
-  // If the items are objects, extract the offence_name
-  if (Array.isArray(event) && event.length && typeof event[0] === 'object') {
-    selectedOffences = event.map((item: any) => item.offence_name);
-  } else {
-    // If already strings, use as is
-    selectedOffences = event;
-  }
-  console.log(this.victimsRelief);
-  // const getId = selectedOffences.map((ele:any)=>ele.id);
-  const getId = this.offenceOptions
-    .filter(option => selectedOffences.includes(option.offence_name))
-    .map(option => option.id);
-  this.firService.onOffenceCommittedChange(
-    selectedOffences,
-    index,
-    this.offenceReliefDetails,
-    this.victims,
-    this.victimsRelief,
-    getId
-  );
-  selectedOffences.forEach((ele:any) => {
-    const selectedValue = ele.trim(); 
-    const validValues = ['Rape, etc., or unnatural Offences', 'Gang rape', 'Murder or Death'];
+//   // If the items are objects, extract the offence_name
+//   if (Array.isArray(event) && event.length && typeof event[0] === 'object') {
+//     selectedOffences = event.map((item: any) => item.offence_name);
+//   } else {
+//     // If already strings, use as is
+//     selectedOffences = event;
+//   }
+//   console.log(this.victimsRelief);
+//   // const getId = selectedOffences.map((ele:any)=>ele.id);
+//   const getId = this.offenceOptions
+//     .filter(option => selectedOffences.includes(option.offence_name))
+//     .map(option => option.id);
+//   this.onOffenceCommittedChangenew(
+//     selectedOffences,
+//     index,
+//     this.offenceReliefDetails,
+//     this.victims,
+//     this.victimsRelief,
+//     getId
+//   );
+
+
+//   selectedOffences.forEach((ele:any) => {
+//     const selectedValue = ele.trim(); 
+//     const validValues = ['Rape, etc., or unnatural Offences', 'Gang rape', 'Murder or Death'];
   
-  if (validValues.includes(selectedValue)) {
-    this.showRelief = true;
-  }
-  else{
-    this.showRelief = false;
-  }
+//   if (validValues.includes(selectedValue)) {
+//     this.showRelief = true;
+//   }
+//   else{
+//     this.showRelief = false;
+//   }
+//   });
+//   this.cdr.detectChanges();
+//   this.cdr.detectChanges();
+// }
+
+
+onOffenceCommittedChange(index: number): void {
+  const victimGroup = this.victims.at(index) as FormGroup;
+
+  // Get the selected offence names (array of offence_name)
+  const selectedOffences: string[] = victimGroup.get('offenceCommitted')?.value || [];
+
+  // Filter the offence options that match selected offence names
+  const selectedActs = this.offenceOptions.filter((item: any) =>
+    selectedOffences.includes(item.offence_name)
+  );
+
+  // Get the offence_act_name of each matched item
+  const actNames = selectedActs.map(item => item.offence_act_name).filter(name => !!name);
+
+  // Patch scstSections with comma-separated act names
+  victimGroup.patchValue({
+    scstSections: actNames.join(', '),
   });
-  this.cdr.detectChanges();
+
   this.cdr.detectChanges();
 }
+
+
+onOffenceCommittedChangenew(
+    selectedOffences: any[],
+    index: number,
+    offenceReliefDetails: any[],
+    victims: FormArray,
+    victimsRelief:FormArray,
+    getId:any) {
+    const victimGroup = victims.at(index) as FormGroup; // Access the victim's FormGroup
+    const victimsReliefGroup = victimsRelief.at(index) as FormGroup;
+    console.log(victimsReliefGroup);
+    // Filter to find matching poa_act_section values
+    // const matchingSections = offenceReliefDetails.filter(offence => selectedOffences.includes(offence.name_of_offence)).map(offence => offence.poa_act_section);
+    const matchingSections = offenceReliefDetails.filter(offence => selectedOffences.some(selected =>selected.trim().toLowerCase() === offence.name_of_offence.trim().toLowerCase())).map(offence => offence.poa_act_section);
+    if (getId) {
+      this.loader = true;
+      this.firService.getOffenceActsWithId(getId).subscribe(
+        (response: any[]) => {
+          console.log(response);
+          this.loader = false;
+          let responseArray = Array.isArray(response) ? response : [response];
+          const matchedActs = responseArray.filter((act) => {
+            const actNamesArray = act.offence_act_names.split(',');
+            console.log(actNamesArray, matchingSections);
+            return actNamesArray.some((name: any) => matchingSections.includes(name)); 
+          });
+          if (matchedActs.length > 0) {
+            // Update the victim's FormGroup with the fetched values
+            victimGroup.patchValue({
+              scstSections: matchedActs[0].offence_act_names || '',
+             // scstSections: matchedActs.map(act => act.offence_act_name), // Auto-select field 31
+              fir_stage_as_per_act: matchedActs[0].fir_stage_as_per_act || '',
+              fir_stage_ex_gratia: matchedActs[0].fir_stage_ex_gratia || '',
+              chargesheet_stage_as_per_act: matchedActs[0].chargesheet_stage_as_per_act || '',
+              chargesheet_stage_ex_gratia: matchedActs[0].chargesheet_stage_ex_gratia || '',
+              final_stage_as_per_act: matchedActs[0].final_stage_as_per_act || '',
+              final_stage_ex_gratia: matchedActs[0].final_stage_ex_gratia || '',
+            });
+            victimsReliefGroup.patchValue({
+              reliefAmountScst:matchedActs[0].fir_stage_as_per_act || '',
+              reliefAmountExGratia:matchedActs[0].fir_stage_ex_gratia || '',
+              reliefAmountFirstStage: (
+                (parseFloat(matchedActs[0].fir_stage_as_per_act) || 0) +
+                (parseFloat(matchedActs[0].fir_stage_ex_gratia) || 0)
+              ).toFixed(2),
+              reliefAmountScst_1:matchedActs[0].chargesheet_stage_as_per_act || '',
+              reliefAmountExGratia_1:matchedActs[0].chargesheet_stage_ex_gratia || '',
+              reliefAmountSecondStage : (
+                (parseFloat(matchedActs[0].chargesheet_stage_as_per_act) || 0) +
+                (parseFloat(matchedActs[0].chargesheet_stage_ex_gratia) || 0)
+              ).toFixed(2),
+              reliefAmountScst_2:matchedActs[0].final_stage_as_per_act || '',
+              reliefAmountExGratia_2:matchedActs[0].final_stage_ex_gratia || '',
+              reliefAmountThirdStage : (
+                (parseFloat(matchedActs[0].final_stage_as_per_act) || 0) +
+                (parseFloat(matchedActs[0].final_stage_ex_gratia) || 0)
+              ).toFixed(2),
+            })
+        } else {
+          this.loader = false;
+            // Reset the fields if no matched acts are found
+            victimGroup.patchValue({
+              scstSections: [],
+              fir_stage_as_per_act: '',
+              fir_stage_ex_gratia: '',
+              chargesheet_stage_as_per_act: '',
+              chargesheet_stage_ex_gratia: '',
+              final_stage_as_per_act: '',
+              final_stage_ex_gratia: '',
+              reliefAmountFirstStage: '', // Reset the 1st stage relief amount
+            });
+          }
+        },
+        (error) => {
+          this.loader = false;
+          console.error('Error fetching offence acts:', error);
+        }
+      );
+    } else {
+      // Reset the fields if no sections are selected
+      victimGroup.patchValue({
+        scstSections: [],
+        fir_stage_as_per_act: '',
+        fir_stage_ex_gratia: '',
+        chargesheet_stage_as_per_act: '',
+        chargesheet_stage_ex_gratia: '',
+        final_stage_as_per_act: '',
+        final_stage_ex_gratia: '',
+        reliefAmountFirstStage: '', // Reset the 1st stage relief amount
+      });
+    }
+  }
 
 onCaseTypeChange() {
   this.updateValidationForCaseType(); // Update validations whenever caseType is changed
@@ -2150,8 +2306,8 @@ handleCaseTypeChange() {
         this.offenceOptions = offences
           .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
           this.offenceOptions.push(
-            { offence_act_name: '3(2)(va)', offence_name: '', id : 24 },
-            { offence_act_name: '3(2)(v), 3(2)(va)', offence_name: '', id: 25 }
+              { offence_act_name: '3(2)(va)', offence_name: '3(2)(va)', id : 24 },
+              { offence_act_name: '3(2)(v), 3(2)(va)', offence_name: '3(2)(v), 3(2)(va)', id: 25 }
           );
       },
       (error: any) => {
@@ -2372,8 +2528,8 @@ handleCaseTypeChange() {
       age: ['', Validators.required],
       name: ['', Validators.required],
       gender: ['', Validators.required],
-      address: ['', Validators.required],
-      pincode: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
+      address: [''],
+      pincode: ['', [ Validators.pattern('^[0-9]{6}$')]],
       community: ['', Validators.required],
       caste: ['', Validators.required],
       guardianName: ['', Validators.required],
@@ -2538,25 +2694,19 @@ handleCaseTypeChange() {
 
   saveStepThreeAsDraft() {
     const victimsArray = this.firForm.get('victims') as FormArray;
-
     const firFormValues = this.firForm.value;
-const complainantDetails = firFormValues.complainantDetails || {};
+    const complainantDetails = firFormValues.complainantDetails || {};
+    const isVictimSameAsComplainant = complainantDetails.isVictimSameAsComplainant === "true";
+    const numberOfVictims = this.firForm.get('complainantDetails.numberOfVictims')?.value;
+    const victims = [];
 
-
-console.log(complainantDetails,"sasa")
-const isVictimSameAsComplainant = complainantDetails.isVictimSameAsComplainant === "true";
-
-console.log(isVictimSameAsComplainant,"sasa")
-
-
-    const firData = {
-      firId: this.firId,
-      complainantDetails: this.firForm.get('complainantDetails')?.value,
-
-      victims: victimsArray.controls.map((victimControl: AbstractControl) => {
-        const victim = victimControl.value; 
-        return {
-          victimId: victim.victimId || null,
+      // Loop through each victim and add to the array
+      for (let i = 0; i < numberOfVictims; i++) {
+        const victimControl = victimsArray.at(i);
+        const victim = victimControl.value;
+        
+        victims.push({
+          victim_id: victim.victim_id || null,
           name: isVictimSameAsComplainant ? complainantDetails.nameOfComplainant : victim?.name?.trim() || '', 
           age: victim.age || '',
           gender: victim.gender || '',
@@ -2571,18 +2721,20 @@ console.log(isVictimSameAsComplainant,"sasa")
           nativeDistrict: victim.nativeDistrict || null,
           offenceCommitted: victim.offenceCommitted || [],
           scstSections: victim.scstSections || [],
-          // sectionsIPC: victim.sectionsIPC || '',
-          sectionDetails:victim.sectionDetails || [],
+          sectionDetails: victim.sectionDetails || [],
           fir_stage_as_per_act: victim.fir_stage_as_per_act || null,
           fir_stage_ex_gratia: victim.fir_stage_ex_gratia || null,
           chargesheet_stage_as_per_act: victim.chargesheet_stage_as_per_act || null,
           chargesheet_stage_ex_gratia: victim.chargesheet_stage_ex_gratia || null,
           final_stage_as_per_act: victim.final_stage_as_per_act || null,
           final_stage_ex_gratia: victim.final_stage_ex_gratia || null,
-        };
-      }),
-    
-     
+        });
+      }
+    const firData = {
+
+      firId: this.firId,
+      complainantDetails: this.firForm.get('complainantDetails')?.value,
+      victims: victims,
       isDeceased: this.firForm.get('isDeceased')?.value,
       deceasedPersonNames: this.firForm.get('deceasedPersonNames')?.value || [],
     };
@@ -2888,7 +3040,7 @@ saveStepFiveAsDraft(isSubmit: boolean = false): void {
     proceedingsDate: this.firForm.get('proceedingsDate')?.value || null,
     // proceedingsFile: this.proceedingsFile || '',
     proceedingsFile: this.firForm.get('proceedingsFile')?.value || '',
-    attachments: this.attachments.value || '',
+    attachments: this.attachments.value ? this.attachments.value.map((item: any) => item.file) : [],
     status: isSubmit ? 5 : null, 
   };
 
@@ -4334,6 +4486,15 @@ isStep3Valid(): boolean {
   // Check if the victims form array is valid
   const victimsValid = this.victims.controls.every(victim => victim.valid === true);
 
+//  const excludedFields = ['victimPincode', 'sectionDetails', 'section'];
+
+// const victimsValid = this.victims.controls.every((victim) => {
+//   const victimGroup = victim as FormGroup;
+//   return Object.keys(victimGroup.controls)
+//     .filter(field => !excludedFields.includes(field))
+//     .every(field => victimGroup.get(field)?.valid);
+// });
+
   // Check if the 'isDeceased' and 'deceasedPersonNames' fields are valid
   const isDeceased = this.firForm.get('isDeceased')?.value;
   const isDeceasedValid = isDeceased !== '' &&
@@ -4653,7 +4814,22 @@ nextStep(): void {
     this.updateFirStatus(4); // Update status for step 4
     this.loadVictimsReliefDetails();
 
-    this.step++;
+    this.firService.GetVictimInformationDetails(this.firId).subscribe(
+    (response: any) => {
+      console.log(response)
+      if(response.datacount.id == 0){
+        this.step = 3;
+        this.cdr.detectChanges();
+      } else {
+        this.step = 5;
+        this.cdr.detectChanges();
+      }
+    },
+    (error) => {
+      console.error('Error updating FIR status:', error);
+      Swal.fire('Error', 'Unable to Get Detail.', 'error');
+    })
+
   } else if (this.step === 5 && this.isStep5Valid()) {
     this.submitStepFive(); // Final submission for Step 5
     this.updateFirStatus(5); // Update status for step 5 on submission
@@ -4687,11 +4863,31 @@ updateFirStatus(status: number): void {
 
 
 navigateToStep(stepNumber: number): void {
-  this.step = stepNumber; // Update the current step
-  this.cdr.detectChanges(); // Trigger UI update
-  if (stepNumber === 5) {
-    this.loadVictimsReliefDetails(); // Fetch victim relief details only for step 5
-  }
+  if(this.firId){
+
+      if (stepNumber === 5) {
+      this.firService.GetVictimInformationDetails(this.firId).subscribe(
+        (response: any) => {
+          // console.log(response)
+          if(response.datacount.id == 0){
+            Swal.fire('Warning', "Kindly Fill In The Victim's Information First!", 'warning');
+          } else {
+            this.loadVictimsReliefDetails(); 
+            this.step = stepNumber;
+            this.cdr.detectChanges();
+          }
+        },
+        (error) => {
+          console.error('Error updating FIR status:', error);
+          Swal.fire('Error', 'Unable to Get Detail.', 'error');
+        })
+        } else {
+        this.step = stepNumber;
+        this.cdr.detectChanges();
+        }
+    } else {
+      Swal.fire('Warning', "Kindly Fill In The Step 1 Information First!", 'warning');
+    }
 }
 
 
@@ -5295,10 +5491,23 @@ viewAttachment_2(index: number): void {
     return excluded.includes(act);
   }
 
+  // removeSelectedOffence(index: number, offenceName: string): void {
+  //   const selected = this.victims.at(index).get('offenceCommitted')?.value || [];
+  //   const updated = selected.filter((item: string) => item !== offenceName);
+  //   this.victims.at(index).get('offenceCommitted')?.setValue(updated);
+  // }
+
   removeSelectedOffence(index: number, offenceName: string): void {
-    const selected = this.victims.at(index).get('offenceCommitted')?.value || [];
-    const updated = selected.filter((item: string) => item !== offenceName);
-    this.victims.at(index).get('offenceCommitted')?.setValue(updated);
-  }
+  const control = this.victims.at(index).get('offenceCommitted');
+  const selected = control?.value || [];
+  const updated = selected.filter((item: string) => item !== offenceName);
+
+  control?.setValue(updated);
+  control?.markAsDirty();
+  control?.updateValueAndValidity();
+
+  // Manually trigger the (change) handler
+  this.onOffenceCommittedChange(index);
+}
 }
   

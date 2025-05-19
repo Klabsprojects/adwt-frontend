@@ -7,7 +7,7 @@ export const environment = {
   appVersion: 'v8.2.4',
   USERDATA_KEY: 'authf649fc9a5f55',
   isMockEnabled: true,
-  // file_access:'http://localhost:3010/',   
+  // file_access:'http://localhost:3010/CommonFileUpload',   
   // apiUrl: 'http://localhost:3010/', 
   // image_access:'http://localhost:3010/uploadedfile/',
 
@@ -16,6 +16,7 @@ export const environment = {
   image_access:'https://adwatrocity.onlinetn.com/api/v1/uploadedfile/',
   image_access2:'https://adwatrocity.onlinetn.com/api/v1/CommonFileUpload/',
 
+  secretKey :'dfTVcIUDU7QOWRm+j0nupwjOir1nya6qh1UTr+AJ3+eZbfoy0R9+AjRZwRBsurya',
   appThemeName: 'ADWT',
   appPurchaseUrl: 'https://1.envato.market/EA4JP',
   appHTMLIntegration: 'https://preview.keenthemes.com/metronic8/demo1/documentation/base/helpers/flex-layouts.html',

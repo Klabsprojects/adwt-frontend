@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReportsCommonService } from 'src/app/services/reports-common.service';
 import { AdditionalReportService } from 'src/app/services/additional-report.service';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-additional-relief-report',
@@ -23,6 +24,7 @@ import { AdditionalReportService } from 'src/app/services/additional-report.serv
     MatCheckboxModule,
     FormsModule,
     DragDropModule,
+    MatProgressSpinnerModule
   ],
   providers: [FirListTestService],
   templateUrl: './additional-relief-report.component.html',
@@ -46,6 +48,7 @@ export class AdditionalReliefReportComponent implements OnInit {
   selectedStatusOfRelief: string = '';
   // selectedtypeOfAdditionalReleif: string = '';
   // Filter options
+   loader: boolean = false;
   districts: string[] = [];
   naturesOfOffence: string[] = [];
   statusesOfCase: string[] = ['Just Starting', 'Pending', 'Completed'];
@@ -308,7 +311,9 @@ export class AdditionalReliefReportComponent implements OnInit {
     private reportsCommonService: ReportsCommonService,
     private additionalReportService: AdditionalReportService,
     private router: Router
-  ) {}
+  ) {
+    this.loader = true;
+  }
 
   // Initializes component data and fetches necessary information on component load.
   ngOnInit(): void {
@@ -381,7 +386,7 @@ export class AdditionalReliefReportComponent implements OnInit {
 
   // Load all fir reports details into UI
   fetchAdditionalReports(): void {
-    this.loading = true;
+    this.loader = true;
     this.additionalReportService.getAdditionalReportDetails().subscribe({
       next: (response) => {
         //console.log('Additional Reports:', response.data); // Debugging
@@ -400,11 +405,11 @@ export class AdditionalReliefReportComponent implements OnInit {
         }));
         // Update filteredData to reflect the API data
         this.filteredData = [...this.reportData]; 
-        this.loading = false;
+        this.loader = false;
         this.cdr.detectChanges(); // Trigger change detection
       },
       error: (error) => {
-        this.loading = false;
+        this.loader = false;
         console.error('Error fetching reports:', error);
       }
     });
