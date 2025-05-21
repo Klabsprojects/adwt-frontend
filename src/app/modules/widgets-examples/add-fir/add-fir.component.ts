@@ -167,6 +167,7 @@ isStepOneModified = false;
 isStepTwoModified = false; 
 isStepThreeModified = false;
 sectionFields: string[] = [''];
+Parsed_UserInfo : any;
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -183,6 +184,8 @@ sectionFields: string[] = [''];
     this.cdr.detectChanges();
   }
   ngOnInit(): void {
+    const UserInfo : any = sessionStorage.getItem('user_data');
+    this.Parsed_UserInfo = JSON.parse(UserInfo)
     this.generateVictimCount();
     this.clearSession();
     //console.log('Session cleared on component initialization');
@@ -723,7 +726,10 @@ onCaseTypeChange() {
 
 
 
-
+  openEditPage(firId: any,step:number) {
+    this.router.navigate(['/fir-edit-module'], { queryParams: { fir_id: firId,step:step+1 } });
+    console.log(step,"step");
+  }
 
 
 
@@ -732,12 +738,14 @@ onCaseTypeChange() {
     this.firForm.enable();
     const firData = {
       ...this.firForm.value,
+     user_id : this.Parsed_UserInfo.id
     };
     this.firService.handleStepOne(this.firId, firData).subscribe(
       (response: any) => {
         this.firId = response.fir_id;
         if (this.firId) {
           sessionStorage.setItem('firId', this.firId);
+          this.openEditPage(this.firId, 1)
         }
         Swal.fire('Success', 'FIR saved as draft for step 1.', 'success');
       },
@@ -1056,8 +1064,8 @@ onFileSelect_3(event: Event, controlName: string): void {
       Court_name: ['', Validators.required],
       trialCourtDistrict: ['', Validators.required],
       trialCaseNumber: ['', Validators.required],
-      publicProsecutor: ['', Validators.required],
-      prosecutorPhone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      publicProsecutor: [''],
+      prosecutorPhone: ['', [Validators.pattern('^[0-9]{10}$')]],
 
       firstHearingDate: ['', Validators.required],
       judgementAwarded: ['', Validators.required],
@@ -3960,8 +3968,8 @@ async saveAsDraft_7(isSubmit: boolean = false) {
       courtName: this.firForm.get('Court_name1')?.value,
       courtDistrict: this.firForm.get('courtDistrict')?.value,
       trialCaseNumber: this.firForm.get('caseNumber')?.value,
-      publicProsecutor: this.firForm.get('publicProsecutor')?.value,
-      prosecutorPhone: this.firForm.get('prosecutorPhone')?.value,
+      publicProsecutor: this.firForm.get('publicProsecutor')?.value || null,
+      prosecutorPhone: this.firForm.get('prosecutorPhone')?.value || null,
       firstHearingDate: this.firForm.get('firstHearingDate')?.value,
       CaseHandledBy: this.firForm.get('CaseHandledBy')?.value,
       NameOfAdvocate: this.firForm.get('NameOfAdvocate')?.value,

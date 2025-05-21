@@ -516,6 +516,7 @@ export class FirListComponent implements OnInit {
   totalRecords: number = 0; // Total number of records
   currentPage: number = 1; // Current page
   totalPages: number = 0;
+  Parsed_UserInfo : any;
 
 
   constructor(
@@ -528,6 +529,8 @@ export class FirListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const UserInfo : any = sessionStorage.getItem('user_data');
+    this.Parsed_UserInfo = JSON.parse(UserInfo)
     this.loadFirList(1, this.pageSize);
     this.updateSelectedColumns();
     this.loadPoliceDivision();
@@ -1149,6 +1152,17 @@ getFilterParams() {
   if (this.RegistredYear) {
     params.year = this.RegistredYear;
   }
+
+  if(this.Parsed_UserInfo.role == '3'){
+    params.district = this.Parsed_UserInfo.police_city
+  } 
+  else {
+    if(this.Parsed_UserInfo.access_type == 'District'){
+    params.district = this.Parsed_UserInfo.district;
+    } 
+  }
+
+
   
   // Add other filters as needed
   

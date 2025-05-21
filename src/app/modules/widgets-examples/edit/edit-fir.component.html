@@ -983,7 +983,7 @@
         
         
         <div class="mb-4">
-          <label class="form-label">62. Upload Key Attachments *</label>
+          <label class="form-label">62. Upload Key Attachments</label>
         
           <div class="mb-3" *ngFor="let attachment of attachmentss_1; let j = index">
             <div class="d-flex align-items-center">
@@ -1057,9 +1057,7 @@
         <div class="mt-4">
           <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-          <button *ngIf="step === 5" type="submit" class="btn btn-primary"
-         
-           (click)="submitStepFive()">Submit</button>
+          <button *ngIf="step === 5" type="submit" class="btn btn-primary" [disabled]="!firstageValid()" (click)="submitStepFive()">Submit</button>
         </div>
       </div>
 
@@ -1474,14 +1472,14 @@ maxlength="10"
 
 
                     <!-- Item 77 -->
-                    <div class="col-md-6 mb-3">
+                    <div *ngIf="firForm.get('CaseHandledBy')?.value === 'Special Public Prosecutor'" class="col-md-6 mb-3">
                         <label class="form-label">83. Special Public Prosecutor's Name *</label>
-                        <input type="text" class="form-control" formControlName="publicProsecutor" placeholder="Enter Name" required />
+                        <input type="text" class="form-control" formControlName="publicProsecutor" placeholder="Enter Name" />
                     </div>
                     <!-- Item 78 -->
-                    <div class="col-md-6 mb-3">
+                    <div *ngIf="firForm.get('CaseHandledBy')?.value === 'Special Public Prosecutor'" class="col-md-6 mb-3">
                         <label class="form-label">84. Special Public Prosecutor's Phone Number *</label>
-                        <input type="text" class="form-control" formControlName="prosecutorPhone" placeholder="Enter Phone Number" required  (keypress)="allowOnlyNumbers($event)"
+                        <input type="text" class="form-control" formControlName="prosecutorPhone" placeholder="Enter Phone Number"  (keypress)="allowOnlyNumbers($event)"
                         maxlength="10">
                     </div>
                 </div>
@@ -1617,6 +1615,17 @@ maxlength="10"
                           <option value="Quashed">Quashed</option>
                         </select>
                       </div>
+
+                        <div *ngIf="firForm.get('judgementDetails.judgementNature')?.value" class="col-md-4 mb-3">
+                          <label class="form-label">87a. Judgement Date *</label>
+                          <input
+                            type="date"
+                            class="form-control"
+                            formControlName="Judgement_Date"
+                            placeholder="Judgement Date"
+                          />
+                        </div>
+
 
                       <div *ngIf="firForm.get('judgementDetails.judgementNature')?.value === 'Convicted'" class="col-md-6">
                         <label class="form-label">Conviction Type</label>
@@ -1830,7 +1839,7 @@ maxlength="10"
 
 
 
-                <div *ngIf="firForm.get('judgementAwarded_one')?.value === 'no'">
+                <div >
                   <div class="border border-primary rounded p-3 mb-4">
                     <!-- Wrap the entire section with formArrayName -->
                     <div formArrayName="hearingDetails_one">
@@ -1919,6 +1928,16 @@ maxlength="10"
                                   <option value="Charge_Abated_one">Charge Abated</option>
                                   <option value="Quashed_one">Quashed</option>
                                 </select>
+                              </div>
+
+                              <div *ngIf="firForm.get('judgementDetails_one.judgementNature_one')?.value" class="col-md-4 mb-3">
+                                <label class="form-label">12a. Judgement Date *</label>
+                                <input
+                                  type="date"
+                                  class="form-control"
+                                  formControlName="Judgement_Date_one"
+                                  placeholder="Judgement Date"
+                                />
                               </div>
 
                               <div *ngIf="firForm.get('judgementDetails_one.judgementNature_one')?.value === 'Convicted_one'" class="col-md-6">
@@ -2205,6 +2224,16 @@ maxlength="10"
                                   <option value="Charge_Abated_two">Charge Abated</option>
                                   <option value="Quashed_two">Quashed</option>
                                 </select>
+                              </div>
+
+                              <div *ngIf="firForm.get('judgementDetails_two.judgementNature_two')?.value" class="col-md-4 mb-3">
+                                <label class="form-label">12a. Judgement Date *</label>
+                                <input
+                                  type="date"
+                                  class="form-control"
+                                  formControlName="Judgement_Date_two"
+                                  placeholder="Judgement Date"
+                                />
                               </div>
 
                               <div *ngIf="firForm.get('judgementDetails_two.judgementNature_two')?.value === 'Convicted_two'" class="col-md-6">
@@ -2541,10 +2570,7 @@ maxlength="10"
                 Previous
             </button>
             <!-- (click)="submitStepSeven()" -->
-            <button type="submit" class="btn btn-primary" 
-            (click)="saveAsDraft_7()" >
-                Submit
-            </button>
+            <button type="submit" class="btn btn-primary"  [disabled]="!isStep7Valid()" (click)="saveAsDraft_7();submitStep7()">Submit</button>
         </div>
 </div>
     </form>

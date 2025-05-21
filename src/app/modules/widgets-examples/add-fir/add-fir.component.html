@@ -1728,15 +1728,15 @@
                     </div>
               
                     <!-- Item 77 -->
-                    <div class="col-md-6 mb-3">
+                    <div *ngIf="firForm.get('CaseHandledBy')?.value === 'Special Public Prosecutor'" class="col-md-6 mb-3">
                       <label class="form-label">83. Special Public Prosecutor's Name *</label>
-                      <input type="text" class="form-control" formControlName="publicProsecutor" placeholder="Enter Name" required />
+                      <input type="text" class="form-control" formControlName="publicProsecutor" placeholder="Enter Name" />
                     </div>
                     <!-- Item 78 -->
-                    <div class="col-md-6 mb-3">
+                    <div *ngIf="firForm.get('CaseHandledBy')?.value === 'Special Public Prosecutor'" class="col-md-6 mb-3">
                       <label class="form-label">84. Special Public Prosecutor's Phone Number *</label>
                       <input type="text" class="form-control" formControlName="prosecutorPhone" placeholder="Enter Phone Number"
-                        required (keypress)="allowOnlyNumbers($event)" maxlength="10">
+                         (keypress)="allowOnlyNumbers($event)" maxlength="10">
                     </div>
                   </div>
                 </div>

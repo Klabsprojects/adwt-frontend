@@ -33,6 +33,7 @@ import { PoliceDivisionService } from 'src/app/services/police-division.service'
 import { NgSelectModule } from '@ng-select/ng-select';
 import { auditTime, distinctUntilChanged, skip } from 'rxjs';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { Location } from '@angular/common';
 
 
 
@@ -219,7 +220,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
     private firServiceAPI : FirServiceAPI,
     private sanitizer: DomSanitizer,
     private policeDivisionService :PoliceDivisionService,
-    private vmcSerive : VmcMeetingService
+    private vmcSerive : VmcMeetingService,
+    private location: Location
    ) {}
    private wasVictimSame: boolean = false; // Track the previous state of on Victim same as Complainant
 
@@ -655,6 +657,64 @@ loadAccusedCommunities(): void {
       this.trackStepThreeChanges();
       this.trackStepFourChanges();
       this.trackStepFiveChanges();
+      this.firId = this.getFirIdFromSession(); // Get FIR ID from session storage 
+    if(!this.firId)
+    { 
+      this.clearSession();
+    } 
+    this.loadOptions();
+    // this.loadOffenceActs();
+    // this.loadScstSections();
+    this.generateYearOptions();
+    // this.loadnativedistrict();
+    this.loadVictimsDetails();
+
+    this.loadCourtDivisions();
+    this.loadCommunities();
+
+    // this.loadPoliceDivisionDetails();
+
+    this.loadPoliceDivision();
+
+    this.loadDistricts();
+    this.updateValidationForCaseType(); 
+    this.loadAllOffenceReliefDetails();
+    this.loadAccusedCommunities();
+    if (this.firId) {
+      this.loadFirDetails(this.firId);
+      this.loadVictimsReliefDetails();
+      //console.log(`Using existing FIR ID: ${this.firId}`);
+    } else {
+      //console.log('Creating a new FIR entry');
+    }
+
+    // Listen for route changes
+      this.router.events.subscribe((event: any) => {
+        if (event instanceof NavigationStart) {
+          this.firId = this.getFirIdFromSession();
+          if(!this.firId)
+            { 
+              this.clearSession();
+            } 
+        }
+      });
+
+    this.userId = sessionStorage.getItem('userId') || '';
+
+    const currentDate = new Date();
+    this.today = currentDate.toISOString().split('T')[0];
+    // if (this.userId) {
+    //   this.loadUserData();
+    // }
+    this.ngAfterViewInit();
+    this.trackStep1FormValidity();
+    this.firForm.statusChanges.subscribe(() => {
+      if (!this.tabNavigation) {
+        // Only validate when not navigating tabs
+        this.nextButtonDisabled = !this.isStepValid();
+        this.cdr.detectChanges();
+      }
+    });
       // this.cdr.detectChanges();
 
       const stepNumber = Number(params['step']);
@@ -662,7 +722,24 @@ loadAccusedCommunities(): void {
         this.navigateToMainStep(stepNumber > 7 ? 3 : stepNumber - 4);
       }
       else{
-        this.navigateToStep(stepNumber);
+
+        if(stepNumber == 4){
+        this.firService.GetVictimInformationDetails(this.firId).subscribe(
+        (response: any) => {
+          console.log(response)
+          if(response.datacount.id == 0){
+            this.navigateToStep(3);
+          } else {
+            this.navigateToStep(5);
+          }
+        },
+        (error) => {
+          console.error('Error updating FIR status:', error);
+          Swal.fire('Error', 'Unable to Get Detail.', 'error');
+        })
+        } else {
+          this.navigateToStep(stepNumber);
+        }
       }
 
     });
@@ -804,12 +881,12 @@ loadAccusedCommunities(): void {
       this.firService.Getstep5Detail(this.firId).subscribe(
         (response: any) => {
           console.log(response)
-          if(response.datacount.id == 0){
-            Swal.fire('Warning', "Kindly Complete FIR Stage First!", 'warning');
-          } else {
-            this.mainStep = stepNumber;
+          if(response.datacount.id > 0 && response.datacount.status >= 5){
+             this.mainStep = stepNumber;
             this.step = 1; 
             this.cdr.detectChanges();
+          } else {
+            Swal.fire('Warning', "Kindly Complete FIR Stage First!", 'warning');
           }
         },
         (error) => {
@@ -2517,6 +2594,12 @@ removeFIRCopy(index: number): void {
 
       console.log('response.data5',response.data5);
 
+      if (response.data5[0].Judgement_Date){
+      const date = new Date(response.data5[0].Judgement_Date);
+      const formattedDate = date.toISOString().split('T')[0];
+      this.firForm.get('judgementDetails.Judgement_Date')?.setValue(formattedDate);
+    }
+
       if (this.firForm && response.data5 && response.data5.length > 0) {
         console.log("ConvictionType from API:", response.data5[0].Conviction_Type);
       
@@ -2571,51 +2654,6 @@ removeFIRCopy(index: number): void {
                 hearingDetailsControl.push(this.createHearingDetailGroup());
               });
             }
-          } else if (index === 1) {
-            this.case_id1 = item.case_id || '';
-            // Populate duplicate section 1
-            this.showDuplicateSection = true;
-            this.firForm.patchValue({
-              Court_one: item.court_name || '',
-              courtDistrict_one: item.court_district || '',
-              caseNumber_one: item.trial_case_number || '',
-              publicProsecutor_one: item.public_prosecutor || '',
-              prosecutorPhone_one: item.prosecutor_phone || '',
-              firstHearingDate_one: item.first_hearing_date ? formatDate(item.first_hearing_date, 'yyyy-MM-dd', 'en') : '',
-              judgementAwarded_one: item.judgement_awarded || '',
-            });
-      
-          
-            if (item.hearingDetails_one && Array.isArray(item.hearingDetails_one)) {
-              const hearingDetailsControl = this.firForm.get('hearingDetails_one') as FormArray;
-
-              console.log(hearingDetailsControl,"hearingDetailsControl")
-              hearingDetailsControl.clear();
-              item.hearingDetails_one.forEach((hearing: HearingDetail) => {
-                hearingDetailsControl.push(this.createHearingDetailGroup_one());
-              });
-            }
-          } else if (index === 2) {
-            this.case_id2 = item.case_id || '';
-        
-            this.showDuplicateSection_1 = true;
-            this.firForm.patchValue({
-              Court_three: item.court_name || '',
-              courtDistrict_two: item.court_district || '',
-              caseNumber_two: item.trial_case_number || '',
-              publicProsecutor_two: item.public_prosecutor || '',
-              prosecutorPhone_two: item.prosecutor_phone || '',
-              firstHearingDate_two: item.first_hearing_date ? formatDate(item.first_hearing_date, 'yyyy-MM-dd', 'en') : '',
-              judgementAwarded_two: item.judgement_awarded || '',
-            });
- 
-            if (item.hearingDetails_two && Array.isArray(item.hearingDetails_two)) {
-              const hearingDetailsControl = this.firForm.get('hearingDetails_two') as FormArray;
-              hearingDetailsControl.clear();
-              item.hearingDetails_two.forEach((hearing: HearingDetail) => {
-                hearingDetailsControl.push(this.createHearingDetailGroup_two());
-              });
-            }
           }
         });
       }
@@ -2640,6 +2678,7 @@ removeFIRCopy(index: number): void {
 
     if (response.casedetail_one && response.casedetail_one.length > 0) {
 
+
       response.casedetail_one.forEach((item:any) => {
 
         this.firForm.patchValue({
@@ -2653,7 +2692,34 @@ removeFIRCopy(index: number): void {
           judgementNature_one:item.judgementNature || '',
           Conviction_Type_one:item.Conviction_Type || '',
         });
+
+        if(item.judgementNature){
+          this.uploadJudgement_one = item.judgement_copy;
+          this.firForm.patchValue({
+            judgementDetails_one: {
+              uploadJudgement_one: item.judgement_copy
+            }
+          });
+      }
+
+        // this.firForm.get('judgementDetails_one.uploadJudgement_one')?.setValue(item.judgement_copy);
+        this.firForm.get('judgementDetails_one.judgementNature_one')?.setValue(item.judgementNature);
       });
+      
+
+
+
+      if (response.casedetail_one[0].Judgement_Date){
+      const date = new Date(response.casedetail_one[0].Judgement_Date);
+      const formattedDate = date.toISOString().split('T')[0];
+      this.firForm.get('judgementDetails_one.Judgement_Date_one')?.setValue(formattedDate);
+    }
+
+      if (response.casedetail_one[0].Conviction_Type){
+          this.firForm.get('judgementDetails_one.Conviction_Type_one')?.setValue(response.casedetail_one[0].Conviction_Type);
+        }
+
+
     }
 
     if (response.casedetail_two && response.casedetail_two.length > 0) {
@@ -2674,6 +2740,18 @@ removeFIRCopy(index: number): void {
           this.applyJudgementAwardedValidators(judgementAwardedValue);
           
         });
+
+
+          if (response.casedetail_two[0].Judgement_Date){
+          const date = new Date(response.casedetail_two[0].Judgement_Date);
+          const formattedDate = date.toISOString().split('T')[0];
+          this.firForm.get('judgementDetails_two.Judgement_Date_two')?.setValue(formattedDate);
+        }
+
+          if (response.casedetail_two[0].Conviction_Type){
+          this.firForm.get('judgementDetails_two.Conviction_Type_two')?.setValue(response.casedetail_two[0].Conviction_Type);
+        }
+
       }
 
            
@@ -2723,9 +2801,15 @@ removeFIRCopy(index: number): void {
       }
     });
 
+    const designatedCourtVal = appealDetail.designated_court;
+
+  if (designatedCourtVal && designatedCourtVal.trim() !== '') {
+    this.onDesignatedCourtChange_one_fromapi();
+  }
+
       this.onJudgementNatureChange_one();
       this.onLegalOpinionChange_one();
-      this.onDesignatedCourtChange_one_fromapi();
+      // this.onDesignatedCourtChange_one_fromapi();
     });
     }
 
@@ -3062,6 +3146,9 @@ removeFIRCopy(index: number): void {
         this.firId = response.fir_id;
         if (this.firId) {
           sessionStorage.setItem('firId', this.firId);
+          this.loadVictimsReliefDetails();
+          this.location.replaceState(`/fir-edit-module?fir_id=${this.firId}&step=4`);
+          window.location.reload();
         }
         Swal.fire('Success', 'FIR saved as draft for step 3.', 'success');
       },
@@ -3328,6 +3415,8 @@ removeFIRCopy(index: number): void {
         this.firId = response.fir_id;
         if (this.firId) {
           sessionStorage.setItem('firId', this.firId);
+          this.location.replaceState(`/fir-edit-module?fir_id=${this.firId}&step=4`);
+          window.location.reload();
         }
         Swal.fire('Success', 'FIR saved as draft for step 4.', 'success');
       },
@@ -3340,6 +3429,7 @@ removeFIRCopy(index: number): void {
 
 
   saveStepFiveAsDraft(isSubmit: boolean = false): void {
+    // hellow
     if (!this.firId) {
       Swal.fire('Error', 'FIR ID is missing. Unable to proceed.', 'error');
       return;
@@ -3651,8 +3741,8 @@ onAccusedAgeChange(index: number): void {
       Court_name1: ['', Validators.required],
       trialCourtDistrict: ['', Validators.required],
       trialCaseNumber: ['', Validators.required],
-      publicProsecutor: ['', Validators.required],
-      prosecutorPhone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      publicProsecutor: [''],
+      prosecutorPhone: ['', [ Validators.pattern('^[0-9]{10}$')]],
 
       firstHearingDate: ['', Validators.required],
       judgementAwarded: ['', Validators.required],
@@ -3672,6 +3762,7 @@ onAccusedAgeChange(index: number): void {
       judgementDetails: this.fb.group({
         judgementNature: ['', Validators.required],
         Conviction_Type : [''],
+        Judgement_Date : [''],
         uploadJudgement: [''],
         legalOpinionObtained: [''],
         caseFitForAppeal: [''],
@@ -3703,6 +3794,7 @@ onAccusedAgeChange(index: number): void {
      judgementAwarded_one: ['', Validators.required],
       judgementDetails_one: this.fb.group({
         judgementNature_one: ['', Validators.required],
+        Judgement_Date_one : [''],
         Conviction_Type_one : [''],
         uploadJudgement_one: [''],
         legalOpinionObtained_one: [''],
@@ -3718,6 +3810,7 @@ onAccusedAgeChange(index: number): void {
       judgementAwarded_two: ['', Validators.required],
       judgementDetails_two: this.fb.group({
         judgementNature_two: [''],
+        Judgement_Date_one: [''],
         Conviction_Type_two : [''],
         uploadJudgement_two: [''],
         legalOpinionObtained_two: [''],
@@ -3972,7 +4065,7 @@ uploadedImageSrc: any | ArrayBuffer;
 
   onDesignatedCourtChange_one_fromapi() {
     const selectedValue = this.firForm.get('judgementDetails_one.designatedCourt_one')?.value;
-    this.showDuplicateSection_1 = selectedValue === 'highCourt_one' || selectedValue === 'supremeCourt'; 
+    this.showDuplicateSection_1 = selectedValue === 'highCourt_one' || selectedValue === 'supremeCourt_one'; 
   }
   onDesignatedCourtChange_one(event: Event): void {
     const target = event.target as HTMLSelectElement;
@@ -5123,47 +5216,172 @@ console.log(victimReliefDetail,"cretaieg")
   // }
 
   isStep6Valid(): boolean { 
-    const controls = [
-      'chargeSheetFiled',
-      'courtDivision',
-      'courtName',
-      'caseType',
-      'caseNumber',
-      'chargeSheetDate'              
-    ];
   
-    let caseType = this.firForm.get('caseType')?.value;  // Get the selected case type 
-  
-    // Add conditional validation logic based on caseType
-    if (caseType === 'chargeSheet') {
-      controls.push(
-        'chargeSheetFiled',
-        'courtDivision',
-        'courtName',
-      );
-    } else if (caseType === 'referredChargeSheet') {
-      controls.push('rcsFileNumber', 'rcsFilingDate', 'mfCopy');
+  const baseControls = [
+  'chargeSheetFiled',
+  'courtDivision',
+  'courtName',
+  'caseType',
+  'caseNumber',
+  'chargeSheetDate',
+  'proceedingsFileNo_1',
+  'proceedingsDate_1'
+];
+
+let controls = [...baseControls]; // Copy the base controls array
+
+const caseType = this.firForm.get('caseType')?.value;
+
+// Add conditional fields based on caseType
+if (caseType === 'chargeSheet') {
+  controls.push('chargeSheetFiled', 'courtDivision');
+} else if (caseType === 'referredChargeSheet') {
+  controls.push('rcsFileNumber', 'rcsFilingDate', 'mfCopy');
+}
+
+let allValid = true;
+
+controls.forEach((controlName) => {
+  const control = this.firForm.get(controlName);
+
+  if (control) {
+    control.markAsTouched(); // Trigger UI validation
+
+    const value = control.value;
+    const isValid =
+      value !== null &&
+      value !== undefined &&
+      (typeof value === 'string' ? value.trim() !== '' : true);
+
+    if (!isValid) {
+      // console.warn(`Invalid field: ${controlName}`);
+      allValid = false;
     }
-  
-    let allValid = true;
-  
-    // Validate each field in the controls array
-    controls.forEach((controlName) => {
-      const control = this.firForm.get(controlName);
-      if (control) {
-        control.markAsTouched(); // Mark field as touched to trigger validation
-  
-        if (!control.valid) {
-          // console.log(`Invalid Field: ${controlName}`, control.errors); // Log errors for invalid fields
-          allValid = false;
-        }
-      } else {
-        console.log(`Missing control in form: ${controlName}`); // Log if a control is not found
-        allValid = false;
+  } else {
+    // console.warn(`Missing control: ${controlName}`);
+    allValid = false;
+  }
+});
+
+    
+      const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
+      const invalidVictims: number[] = [];
+
+      const victimrelief_6 = victimsReliefArray.controls.every((victimGroup: any, index: number) => {
+      const reliefAmountScst = victimGroup.get('reliefAmountScst_1');
+      const reliefAmountExGratia = victimGroup.get('reliefAmountExGratia_1');
+      const reliefAmountFirstStage = victimGroup.get('reliefAmountSecondStage');
+
+      const isValidScst = reliefAmountScst?.valid && reliefAmountScst?.value?.toString().trim() !== '';
+      const isValidExGratia = reliefAmountExGratia?.valid && reliefAmountExGratia?.value?.toString().trim() !== '';
+      const isValidFirstStage = reliefAmountFirstStage?.valid && reliefAmountFirstStage?.value?.toString().trim() !== '';
+
+      const isVictimValid = isValidScst && isValidExGratia && isValidFirstStage;
+
+      if (!isVictimValid) {
+        invalidVictims.push(index + 1);
       }
+
+      return isVictimValid;
     });
+
+    const totalcomposistion = this.firForm.get('totalCompensation_1')?.value ? true : false
+
+    var step6_file = false;
+    const hasProceedingsFile = this.proceedingsFile instanceof File;
+
+    if(hasProceedingsFile == true || this.proceedingFileName2 ){
+      step6_file = true;
+    }
+    
+      
+    return allValid && victimrelief_6 && totalcomposistion && step6_file;
+  }
   
-    return allValid;
+
+
+  isStep7Valid(): boolean { 
+  
+  const baseControls = [
+  'courtDistrict',
+  'Court_name1',
+  'trialCaseNumber',
+  'CaseHandledBy',
+  'judgementDetails.judgementNature',
+  'judgementDetails.Judgement_Date',
+  'proceedingsDate_2',
+  'proceedingsFileNo_2',
+
+];
+
+let controls = [...baseControls]; // Copy the base controls array
+
+const CaseHandledBy = this.firForm.get('CaseHandledBy')?.value;
+
+// Add conditional fields based on caseType
+if (CaseHandledBy === 'Special Public Prosecutor') {
+  controls.push('publicProsecutor', 'prosecutorPhone');
+} else {
+  controls.push('NameOfAdvocate', 'advocateMobNumber');
+}
+
+let allValid = true;
+
+controls.forEach((controlName) => {
+  const control = this.firForm.get(controlName);
+
+  if (control) {
+    control.markAsTouched(); // Trigger UI validation
+
+    const value = control.value;
+    const isValid =
+      value !== null &&
+      value !== undefined &&
+      (typeof value === 'string' ? value.trim() !== '' : true);
+
+    if (!isValid) {
+      // console.warn(`Invalid field: ${controlName}`);
+      allValid = false;
+    }
+  } else {
+    // console.warn(`Missing control: ${controlName}`);
+    allValid = false;
+  }
+});
+
+    
+      const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
+      const invalidVictims: number[] = [];
+
+      const victimrelief_7 = victimsReliefArray.controls.every((victimGroup: any, index: number) => {
+      const reliefAmountScst = victimGroup.get('reliefAmountScst_2');
+      const reliefAmountExGratia = victimGroup.get('reliefAmountExGratia_2');
+      const reliefAmountFirstStage = victimGroup.get('reliefAmountThirdStage');
+
+      const isValidScst = reliefAmountScst?.valid && reliefAmountScst?.value?.toString().trim() !== '';
+      const isValidExGratia = reliefAmountExGratia?.valid && reliefAmountExGratia?.value?.toString().trim() !== '';
+      const isValidFirstStage = reliefAmountFirstStage?.valid && reliefAmountFirstStage?.value?.toString().trim() !== '';
+
+      const isVictimValid = isValidScst && isValidExGratia && isValidFirstStage;
+
+      if (!isVictimValid) {
+        invalidVictims.push(index + 1);
+      }
+
+      return isVictimValid;
+    });
+
+    const totalcomposistion = this.firForm.get('totalCompensation_2')?.value ? true : false
+
+    var step7_file = false;
+    const hasProceedingsFile = this.proceedingsFile instanceof File;
+
+    if(hasProceedingsFile == true || this.file95 ){
+      step7_file = true;
+    }
+    
+      
+    return allValid && victimrelief_7 && totalcomposistion && step7_file;
   }
   
 
@@ -5202,9 +5420,14 @@ console.log(victimReliefDetail,"cretaieg")
 
   filePreviews: string[] = []; 
   removeAttachment_2(index: number): void {
+    console.log(this.attachments_2)
     if (this.attachments_2.length > 1) {
       this.attachments_2.removeAt(index);
+      console.log(this.attachments_2)
       this.filePreviews.splice(index, 1); // Remove corresponding preview
+    } else {
+      this.attachments_2.at(0).reset();
+      this.cdr.detectChanges();
     }
   }
   createAttachmentGroup_2(): FormGroup {
@@ -5406,11 +5629,35 @@ console.log(victimReliefDetail,"cretaieg")
       () => {
         Swal.fire({
           title: 'Success',
-          text: 'FIR status updated to 6.',
+          text: 'Chargesheet Stage Updated',
           icon: 'success',
           confirmButtonText: 'OK',
         }).then(() => {
           this.navigateToNextStep(); // Move to the next step in your workflow
+        });
+      },
+      (error) => {
+        console.error('Error updating FIR status:', error);
+        Swal.fire('Error', 'Failed to update FIR status.', 'error');
+      }
+    );
+  }
+
+
+    submitStep7(): void {
+    if (!this.firId) {
+      Swal.fire('Error', 'FIR ID is missing. Unable to proceed.', 'error');
+      return;
+    }
+
+    // Directly update FIR status to 6 without form submission
+    this.firService.updateFirStatus(this.firId, 7).subscribe(
+      () => {
+        Swal.fire({
+          title: 'Success',
+          text: 'Trial Stage Updated',
+          icon: 'success',
+          confirmButtonText: 'OK',
         });
       },
       (error) => {
@@ -6059,8 +6306,8 @@ async UpdateAsDraft_7() {
       courtName: this.firForm.get('Court_name1')?.value,
       courtDistrict: this.firForm.get('courtDistrict')?.value,
       trialCaseNumber: this.firForm.get('caseNumber')?.value,
-      publicProsecutor: this.firForm.get('publicProsecutor')?.value,
-      prosecutorPhone: this.firForm.get('prosecutorPhone')?.value,
+      publicProsecutor: this.firForm.get('publicProsecutor')?.value || null,
+      prosecutorPhone: this.firForm.get('prosecutorPhone')?.value || null,
       firstHearingDate: this.firForm.get('firstHearingDate')?.value,
       CaseHandledBy: this.firForm.get('CaseHandledBy')?.value,
       NameOfAdvocate: this.firForm.get('NameOfAdvocate')?.value,
@@ -6070,6 +6317,7 @@ async UpdateAsDraft_7() {
       judgementNature: this.firForm.get('judgementDetails.judgementNature')?.value,
       uploadJudgement: this.firForm.get('judgementDetails.uploadJudgement')?.value,
       Conviction_Type: this.firForm.get('judgementDetails.Conviction_Type')?.value,
+      Judgement_Date: this.firForm.get('judgementDetails.Judgement_Date')?.value,
     },
 
     trialDetails_one: {
@@ -6079,10 +6327,11 @@ async UpdateAsDraft_7() {
       publicProsecutor: this.firForm.get('publicProsecutor_one')?.value,
       prosecutorPhone: this.firForm.get('prosecutorPhone_one')?.value,
       firstHearingDate: this.firForm.get('firstHearingDate_one')?.value,
-      judgementAwarded: this.firForm.get('judgementAwarded_one')?.value,
+      judgementAwarded: this.firForm.get('judgementAwarded2')?.value,
       judgementNature: this.firForm.get('judgementDetails_one.judgementNature_one')?.value,
       uploadJudgement: this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value,
       Conviction_Type: this.firForm.get('judgementDetails_one.Conviction_Type_one')?.value,
+      Judgement_Date: this.firForm.get('judgementDetails_one.Judgement_Date_one')?.value,
     },
 
     trialDetails_two: {
@@ -6092,10 +6341,11 @@ async UpdateAsDraft_7() {
       publicProsecutor: this.firForm.get('publicProsecutor_two')?.value,
       prosecutorPhone: this.firForm.get('prosecutorPhone_two')?.value,
       firstHearingDate: this.firForm.get('firstHearingDate_two')?.value,
-      judgementAwarded: this.firForm.get('judgementAwarded2')?.value,
+      judgementAwarded: this.firForm.get('judgementAwarded_two')?.value,
       judgementNature: this.firForm.get('judgementDetails_two.judgementNature_two')?.value,
       uploadJudgement: this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value,
       Conviction_Type: this.firForm.get('judgementDetails_two.Conviction_Type_two')?.value,
+      Judgement_Date: this.firForm.get('Judgement_Date_two')?.value,
     },
 
     compensationDetails: {
@@ -6343,7 +6593,6 @@ async UpdateAsDraft_7() {
       })),
       uploadProceedingsPath: this.firForm.get('uploadProceedings_1')?.value || '',
       attachments: this.attachments_1.value ? this.attachments_1.value.map((item: any) => item.file) : [],
-      status: 6, // Update status to 6 for the FIR
     };
   
     console.log(chargesheetData,"chargesheetData")
@@ -6498,16 +6747,40 @@ async UpdateAsDraft_7() {
     return stepNumber <= this.step;
   }
   // Check Step 1 validity
+  // isStep1Valid(): boolean {
+  //   const controls = [
+  //     'policeCity',
+  //     'stationName',
+  //     'policeZone',
+  //     'policeRange',
+  //     'revenueDistrict',
+  //     'officerDesignation',
+  //     'officerPhone'
+  //   ];
+  //   return controls.every((controlName) => this.firForm.get(controlName)?.valid === true);
+  // }
+
   isStep1Valid(): boolean {
-    const controls = [
-      'policeCity',
-      'stationName',
-      'policeZone',
-      'policeRange',
-      'revenueDistrict'
-    ];
-    return controls.every((controlName) => this.firForm.get(controlName)?.valid === true);
+  const controls = [
+    'policeCity',
+    'stationName',
+    'policeZone',
+    'policeRange',
+    'revenueDistrict',
+    'officerDesignation',
+    'officerPhone'
+  ];
+
+  // const invalidControls = controls.filter((controlName) => this.firForm.get(controlName)?.invalid);
+ const invalidControls = controls.filter((controlName) => !this.firForm.get(controlName)?.value);
+
+  if (invalidControls.length > 0) {
+    // console.warn('Invalid Controls by surya:', invalidControls);
+    return false;
   }
+
+  return true;
+}
 
   // Check Step 2 validity
   isStep2Valid(): boolean {
@@ -6596,6 +6869,7 @@ async UpdateAsDraft_7() {
   }
   
   isStep5Valid(): boolean {
+
     const mandatoryFields = ['proceedingsFileNo', 'proceedingsDate'];
   
     const isFormValid = mandatoryFields.every((field) => {
@@ -6603,30 +6877,57 @@ async UpdateAsDraft_7() {
       const value = control?.value;
       const isValid = control?.disabled || (control?.valid && value !== null && value !== '');
   
-      console.log(`Field: ${field}, Value: ${value}, Valid: ${isValid}`);
+      // console.log(`Field: ${field}, Value: ${value}, Valid: ${isValid}`);
+
+      // console.log(isValid && step1 && step2 && step3 && step4)
   
       return isValid;
     });
-  
   
     const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
-    const isCommunityCertificateValid = victimsReliefArray.controls.every((victimGroup: any, index: any) => {
-      const control = victimGroup.get('communityCertificate');
-      const value = control?.value;
-      const isValid = control?.disabled || (control?.valid && value !== null && value !== '');
-  
-      console.log(`Victim ${index + 1} - Community Certificate: ${value}, Valid: ${isValid}`);
-  
-      return isValid;
-    });
-  
-  
-    const hasAttachments = Array.isArray(this.attachments?.value) && this.attachments.value.length > 0;
-  
-   
+    const invalidVictims: number[] = [];
+
+  const isCommunityCertificateValid = victimsReliefArray.controls.every((victimGroup: any, index: number) => {
+  const communityCertificate = victimGroup.get('communityCertificate');
+  const reliefAmountScst = victimGroup.get('reliefAmountScst');
+  const reliefAmountExGratia = victimGroup.get('reliefAmountExGratia');
+  const reliefAmountFirstStage = victimGroup.get('reliefAmountFirstStage');
+
+  const isValidCommunityCertificate = communityCertificate?.disabled || (communityCertificate?.valid && communityCertificate?.value?.toString().trim() !== '');
+  const isValidScst = reliefAmountScst?.valid && reliefAmountScst?.value?.toString().trim() !== '';
+  const isValidExGratia = reliefAmountExGratia?.valid && reliefAmountExGratia?.value?.toString().trim() !== '';
+  const isValidFirstStage = reliefAmountFirstStage?.valid && reliefAmountFirstStage?.value?.toString().trim() !== '';
+
+  const isVictimValid = isValidCommunityCertificate && isValidScst && isValidExGratia && isValidFirstStage;
+
+  if (!isVictimValid) {
+    invalidVictims.push(index + 1);
+  }
+
+  return isVictimValid;
+});
+
+    const totalcomposistion = this.firForm.get('totalCompensation')?.value ? true : false
+
+    var step5_file = false;
     const hasProceedingsFile = this.proceedingsFile instanceof File;
+
+    if(hasProceedingsFile == true || this.proceedingFileName ){
+      step5_file = true;
+    }
   
-    return isFormValid && isCommunityCertificateValid && hasAttachments && hasProceedingsFile;
+    return isFormValid && isCommunityCertificateValid && step5_file && totalcomposistion;
+  }
+
+  firstageValid(): boolean {
+
+    const step1 = this.isStep1Valid();
+    const step2 = this.isStep2Valid();
+    const step3 = this.isStep3Valid();
+    const step4 = this.isStep4Valid();
+    const step5 = this.isStep5Valid();
+  
+    return step1 && step2 && step3 && step4 && step5;
   }
   
 
@@ -7539,4 +7840,11 @@ addAttachment_1_new(): void {
   // Manually trigger the (change) handler
   this.onOffenceCommittedChange(index);
 }
+
+
+lebelName(){
+
+}
+
+
 }

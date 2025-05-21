@@ -40,23 +40,23 @@
     <!-- Filters -->
 
     <div class="d-flex gap-3 mb-3">
-      <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
+      <select  *ngIf="Parsed_UserInfo.access_type != 'District'" class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
         <option value="" selected hidden disabled>Police City</option>
         <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
       </select>
 
-      <select class="form-select" [(ngModel)]="selectedPoliceZone" (change)="applyFilters()">
+      <select  *ngIf="Parsed_UserInfo.access_type != 'District'"  class="form-select" [(ngModel)]="selectedPoliceZone" (change)="applyFilters()">
         <option value="" selected hidden disabled>Police Zone</option>
         <option *ngFor="let item of policeZones" [value]="item">{{ item }}</option>
       </select>
 
 
-      <select class="form-select" [(ngModel)]="selectedPoliceRange" (change)="applyFilters()">
+      <select  *ngIf="Parsed_UserInfo.access_type != 'District'"  class="form-select" [(ngModel)]="selectedPoliceRange" (change)="applyFilters()">
         <option value="" selected hidden disabled>Police Range</option>
         <option *ngFor="let item of policeRanges" [value]="item.police_range">{{ item.police_range }}</option>
       </select>
 
-      <select class="form-select" [(ngModel)]="selectedRevenue_district" (change)="applyFilters()">
+      <select  *ngIf="Parsed_UserInfo.access_type != 'District'"  class="form-select" [(ngModel)]="selectedRevenue_district" (change)="applyFilters()">
         <option value="" selected hidden disabled>Revenue District</option>
         <option *ngFor="let item of revenueDistricts" [value]="item.revenue_district">{{ item.revenue_district }}</option>
       </select>
@@ -160,7 +160,7 @@
               <span *ngSwitchCase="'time_of_occurrence_to'">{{ fir.time_of_occurrence_to }}</span>
               <span *ngSwitchCase="'name_of_complainant'">{{ fir.name_of_complainant }}</span>
 
-              <span *ngSwitchCase="'created_by'">{{ fir.created_by || 'Super User' }}</span>
+              <span *ngSwitchCase="'created_by'">{{ fir.created_by || '' }}</span>
               <span *ngSwitchCase="'created_at'">{{ fir.created_at | date: 'dd-MM-yyyy' }}</span>
               <span *ngSwitchCase="'status'">
                 <span class="badge" [ngClass]="getStatusBadgeClass(fir.status)">
