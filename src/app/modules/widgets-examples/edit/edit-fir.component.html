@@ -126,7 +126,7 @@
             <div class="col-md-6 col-lg-4 mb-3">
               <label for="officerName" class="form-label">6. Name of the Investigating Officer (IO)*</label>
               <input id="officerName" type="text" class="form-control" formControlName="officerName"
-              placeholder="Enter Officer Name" (keypress)="allowOnlyLetters($event)" required/>
+              placeholder="Enter Officer Name" required/>
               <small class="text-danger" *ngIf="firForm.get('officerName')?.invalid && firForm.get('officerName')?.touched">
                 Please enter a valid name.
               </small>
@@ -186,7 +186,7 @@
           </div>
         </div>
         <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
-        <button type="button" class="btn btn-primary" (click)="nextStep()">Next</button>
+        <button type="button" class="btn btn-primary"  [disabled]="!isStep1Valid()" (click)="nextStep()">Next</button>
       </div>
       <div *ngIf="mainStep === 1 && step === 2" class="form-step">
         <h3 class="mb-4">Step 2: Offence Information</h3>
@@ -336,7 +336,7 @@
 
                 <div class="col-md-4 mb-3">
                   <label for="victimName-{{ i }}" class="form-label">20. Name of the Victim *</label>
-                  <input type="text" id="victimName-{{ i }}" class="form-control" formControlName="name" placeholder="Enter victim's name" required (input)="updateVictimNames()" style="text-transform: capitalize;" />
+                  <input type="text" id="victimName-{{ i }}" class="form-control" formControlName="name" placeholder="Enter victim's name" required (change)="updateVictimNames()"  (input)="updateVictimNames()" style="text-transform: capitalize;" />
                   <!-- <div *ngIf="isVictimNameInvalid(i)" class="text-danger mt-1">Please enter a valid name (letters only).</div> -->
                 </div>
                 <div class="col-md-4 mb-3">
@@ -587,6 +587,7 @@
       </div>
       <div *ngIf="mainStep === 1 && step === 4" class="form-step">
         <h3 class="mb-4">Step 4: Accused Information</h3>
+      <div class="col-md-12">
         <div class="col-md-3 mb-3">
           <label for="numberOfAccused" class="form-label">35. Number of Accused *</label>
           <select id="numberOfAccused" class="form-select" formControlName="numberOfAccused" (change)="onNumberOfAccusedChange()" required>
@@ -594,6 +595,36 @@
             <option *ngFor="let num of [1, 2, 3, 4, 5]" [value]="num">{{ num }}</option>
           </select>
         </div>
+        <div class="col-md-12 mb-3">
+          <label for="accused_remarks" class="form-label">35a. Remarks</label>
+          <textarea id="accused_remarks" class="form-control" formControlName="accused_remarks" rows="4" maxlength="3000" placeholder="Remarks"> </textarea>
+          <small class="form-text text-muted">Maximum of 3000 Characters</small>
+        </div>
+      </div>
+      <!-- <div class="row mb-3 align-items-center">
+        <div class="col-md-3">
+          <label for="numberOfAccused" class="form-label">35. Number of Accused *</label>
+          <select id="numberOfAccused"
+                  class="form-select"
+                  formControlName="numberOfAccused"
+                  (change)="onNumberOfAccusedChange()"
+                  required>
+            <option value="" disabled>Select the number of accused</option>
+            <option *ngFor="let num of [1, 2, 3, 4, 5]" [value]="num">{{ num }}</option>
+          </select>
+        </div>
+        <div class="col-md-9">
+          <label for="accused_remarks" class="form-label">35a. Remarks</label>
+          <textarea id="accused_remarks"
+                    class="form-control"
+                    formControlName="accused_remarks"
+                    rows="4"
+                    maxlength="3000"
+                    placeholder="Remarks"></textarea>
+          <small class="form-text text-muted">Maximum of 3000 Characters</small>
+        </div>
+      </div> -->
+
         <div formArrayName="accuseds">
           <div *ngFor="let accused of accuseds.controls; let i = index" [formGroupName]="i" class="accused-entry mb-4 card border-primary">
             <div class="card-header bg-primary text-white">
@@ -710,7 +741,8 @@
                     <option value="false">No</option>
                   </select>
                 </div>
-                <div class="col-md-6 mb-3" *ngIf="accused.get('previousIncident')?.value === 'true'">
+    
+                <div *ngIf="accused.get('previousIncident')?.value === 'true'" class="col-md-6 mb-3">
                   <label for="previousFIRNumber{{ i }}" class="form-label">45. FIR number of previous cases *</label>
                   <div class="input-group">
                     <select [id]="'previousFIRNumber' + i" class="form-select" formControlName="previousFIRNumber">
@@ -725,6 +757,12 @@
                   </div>
                   <small *ngIf="!isFirValid('previousFIRNumber'+ i, 'previousFIRNumberSuffix'+ i)"  class="text-danger d-block mt-1">Please follow the format "12/2024".</small>
                 </div>
+                <div *ngIf="accused.get('previousIncident')?.value === 'true'" class="col-md-12 mb-3">
+                    <label for="previous_incident_remarks{{ i }}" class="form-label">45a. Remarks</label>
+                    <textarea [id]="'previous_incident_remarks' + i" class="form-control" formControlName="previous_incident_remarks" rows="4" maxlength="3000" placeholder="Remarks" ></textarea>
+                    <small class="form-text text-muted">Maximum of 3000 Characters</small>
+                </div>
+                
                 <div class="col-md-6 mb-3">
                   <label for="scstOffence{{ i }}" class="form-label">46. Whether the accused person has committed any offence against members of the SC/ ST community? *</label>
                   <select [id]="'scstOffence' + i" class="form-select" formControlName="scstOffence" (change)="onScstOffencesChange(i)">
@@ -747,6 +785,11 @@
                     </select>
                   </div>
                   <small *ngIf="!isFirValid('scstFIRNumber' + i, 'scstFIRNumberSuffix' + i)" class="text-danger d-block mt-1">Please follow the format "12/2024".</small>
+                </div>
+                <div *ngIf="accused.get('scstOffence')?.value === 'true'" class="col-md-12 mb-3">
+                  <label for="previous_offence_remarks{{ i }}" class="form-label">47a. Remarks</label>
+                  <textarea [id]="'previous_offence_remarks' + i" class="form-control" formControlName="previous_offence_remarks" rows="4" maxlength="3000" placeholder="Remarks" ></textarea>
+                  <small class="form-text text-muted">Maximum of 3000 Characters</small>
                 </div>
                 <!-- <div class="col-md-6 mb-3">
                   <label for="antecedents{{ i }}" class="form-label">48. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *</label>
@@ -781,7 +824,7 @@
                   <label for="landOIssues{{ i }}" class="form-label">49b. L&O Issues (Pickets, Bandobust, etc) *</label>
                   <input type="text" [id]="'landOIssues' + i" class="form-control" formControlName="landOIssues" placeholder="Enter L&O issues" (input)="checkInput(i, 'landOIssues')"/>
                 </div>
-                <div class="col-md-12 mb-3">
+                <!-- <div class="col-md-12 mb-3">
                   <label for="gistOfCurrentCase{{ i }}" class="form-label">50. Gist of the Current Case *</label>
                   <textarea [id]="'gistOfCurrentCase' + i" class="form-control" formControlName="gistOfCurrentCase" rows="4" maxlength="3000" placeholder="Enter gist of the current case" required></textarea>
                   <small class="form-text text-muted">Maximum of 3000 Characters</small>
@@ -802,7 +845,7 @@
                       </button>
                     </div>
                   </div>
-                </div>
+                </div> -->
 
                 
                 <!-- <div *ngIf="uploadedFiles[i]; else existingFile">
@@ -817,14 +860,35 @@
                   </div>
                 </ng-template> -->
                 
-              
-                
-  
-                
               </div>
             </div>
           </div>
         </div>
+
+      <div class="col-md-12 mb-3">
+        <label for="gistOfCurrentCase" class="form-label">50. Gist of the Current Case *</label>
+        <textarea id="gistOfCurrentCase" class="form-control" formControlName="gistOfCurrentCase" rows="4" maxlength="3000" placeholder="Enter gist of the current case" required></textarea>
+        <small class="form-text text-muted">Maximum of 3000 Characters</small>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">51. Upload FIR Copy *</label>
+        <input type="file" id="uploadFIRCopy" class="form-control"
+              required (change)="onFIRFileUpload($event)" multiple *ngIf="!uploadedFIRFileNames" />
+        <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="uploadedFIRFileNames">
+          <div class="d-flex justify-content-start align-items-center">
+            {{ uploadedFIRFileNames }}
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <button class="btn btn-primary btn-sm me-2" (click)="viewFIRCopy()">View</button>
+            <button class="btn btn-danger btn-sm" (click)="removeFIRCopy()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
         <div class="mt-4">
           <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>

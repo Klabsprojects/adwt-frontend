@@ -4445,24 +4445,72 @@ isTabEnabled(stepNumber: number): boolean {
   return stepNumber <= this.step;
 }
 // Check Step 1 validity
+// isStep1Valid(): boolean {
+//   const controls = [
+//     'policeCity',
+//     'policeZone',
+//     'policeRange',
+//     'revenueDistrict',
+
+//     'stationName',
+//     'officerName',
+//     'officerDesignation',
+//     'officerPhone',
+
+
+
+//   ];
+
+//   return controls.every((controlName) => this.firForm.get(controlName)?.valid === true);
+// }
+
+
 isStep1Valid(): boolean {
-  const controls = [
+  // Define the mandatory fields for Step 1
+  const mandatoryFields = [
     'policeCity',
+    'stationName',
     'policeZone',
     'policeRange',
     'revenueDistrict',
-
-    'stationName',
-    'officerName',
     'officerDesignation',
-    'officerPhone',
-
-
-
+    'officerPhone'
+    // Add any other mandatory fields here
   ];
 
-  return controls.every((controlName) => this.firForm.get(controlName)?.valid === true);
+  // Check each mandatory field
+  for (const field of mandatoryFields) {
+    const control = this.firForm.get(field);
+    
+    // Check if the control exists and has a value
+    if (!control || control.value === null || control.value === undefined || control.value === '') {
+      console.log(`Missing mandatory field in Step 1: ${field}`);
+      return false;
+    }
+    
+    // Special case for string fields to check for whitespace-only values
+    if (typeof control.value === 'string' && control.value.trim() === '') {
+      console.log(`Empty mandatory field in Step 1: ${field}`);
+      return false;
+    }
+    
+    // Special case for phone number validation if needed
+    if (field === 'officerPhone') {
+      // Basic phone validation (adjust regex as needed for your format)
+      const phoneRegex = /^[0-9]{10}$/; // Example: 10-digit phone number
+      if (!phoneRegex.test(control.value.toString())) {
+        console.log('Invalid phone number format');
+        return false;
+      }
+    }
+  }
+  
+  // Additional validation for interdependent fields if any
+  
+  // If all checks pass, return true
+  return true;
 }
+
 
 isStep2Valid(): boolean {
   const controls = [

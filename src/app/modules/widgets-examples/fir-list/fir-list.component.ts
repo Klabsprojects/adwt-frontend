@@ -1158,7 +1158,7 @@ getFilterParams() {
   } 
   else {
     if(this.Parsed_UserInfo.access_type == 'District'){
-    params.district = this.Parsed_UserInfo.district;
+    params.revenue_district = this.Parsed_UserInfo.district;
     } 
   }
 

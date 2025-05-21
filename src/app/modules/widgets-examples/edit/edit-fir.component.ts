@@ -211,6 +211,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   isStepThreeModified:boolean = false;
   isStepFourModified:boolean = false;
   isStepFiveModified:boolean = false;
+  uploadedFIRFileNames: string;
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -723,7 +724,7 @@ loadAccusedCommunities(): void {
       }
       else{
 
-        if(stepNumber == 4){
+        if(stepNumber == 5){
         this.firService.GetVictimInformationDetails(this.firId).subscribe(
         (response: any) => {
           console.log(response)
@@ -1993,27 +1994,45 @@ onOffenceCommittedChange(index: number): void {
   
 
 
-  uploadedFIRFileNames: string[] = [];
-  onFIRFileUpload(event: any,index:number): void {
-    // const selectedFile = event.target.files[0];
-    // if (!selectedFile) return;
-  
-    // const formData = new FormData();
-    // formData.append('file', selectedFile);
-  
-    // this.vmcSerive.uploadFile(formData).subscribe({
-    //   next: (response: any) => {
-    //     const uploadedFileReference = response.filePath;
-    //     console.log("uploadedFileReference",uploadedFileReference);
-    //     const accusedsArray = this.firForm.get('accuseds') as FormArray;
-    //     accusedsArray.at(0).get('uploadFIRCopy')?.setValue(uploadedFileReference);
-    //     this.uploadedFIRFileNames = selectedFile.name;
-    //     this.cdr.detectChanges();
-    //   },
-    //   error: (err) => {
-    //     console.error('File upload failed:', err);
-    //   }
-    // });
+//   uploadedFIRFileNames: string[] = [];
+//   onFIRFileUpload(event: any,index:number): void {
+   
+//     const selectedFile = event.target.files[0];
+//     if (!selectedFile) return;
+
+//     const formData = new FormData();
+//     formData.append('file', selectedFile);
+
+//     this.vmcSerive.uploadFile(formData).subscribe({
+//       next: (response: any) => {
+//         const uploadedFileReference = response.filePath;
+//         const accusedsArray = this.firForm.get('accuseds') as FormArray;
+//         accusedsArray.at(index).get('uploadFIRCopy')?.setValue(uploadedFileReference);
+//         this.uploadedFIRFileNames[index] = selectedFile.name;
+//         this.cdr.detectChanges();
+//       },
+//       error: (err) => {
+//         console.error('File upload failed:', err);
+//       }
+//     });
+//   }
+//   viewFIRCopy(index: number): void {
+//   const accusedsArray = this.firForm.get('accuseds') as FormArray;
+//   const path = accusedsArray.at(index).get('uploadFIRCopy')?.value;
+//   if (path) {
+//     const url = `${env.file_access}${path}`;
+//     window.open(url, '_blank');
+//   }
+// }
+
+// removeFIRCopy(index: number): void {
+//   const accusedsArray = this.firForm.get('accuseds') as FormArray;
+//   accusedsArray.at(index).get('uploadFIRCopy')?.setValue('');
+//   this.uploadedFIRFileNames[index] = '';
+// }
+
+  onFIRFileUpload(event: any): void {
+   
     const selectedFile = event.target.files[0];
     if (!selectedFile) return;
 
@@ -2023,9 +2042,8 @@ onOffenceCommittedChange(index: number): void {
     this.vmcSerive.uploadFile(formData).subscribe({
       next: (response: any) => {
         const uploadedFileReference = response.filePath;
-        const accusedsArray = this.firForm.get('accuseds') as FormArray;
-        accusedsArray.at(index).get('uploadFIRCopy')?.setValue(uploadedFileReference);
-        this.uploadedFIRFileNames[index] = selectedFile.name;
+        this.firForm.get('uploadFIRCopy')?.setValue(uploadedFileReference);
+        this.uploadedFIRFileNames = selectedFile.name;
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -2033,19 +2051,17 @@ onOffenceCommittedChange(index: number): void {
       }
     });
   }
-  viewFIRCopy(index: number): void {
-  const accusedsArray = this.firForm.get('accuseds') as FormArray;
-  const path = accusedsArray.at(index).get('uploadFIRCopy')?.value;
+  viewFIRCopy(): void {
+  const path = this.firForm.get('uploadFIRCopy')?.value;
   if (path) {
     const url = `${env.file_access}${path}`;
     window.open(url, '_blank');
   }
 }
 
-removeFIRCopy(index: number): void {
-  const accusedsArray = this.firForm.get('accuseds') as FormArray;
-  accusedsArray.at(index).get('uploadFIRCopy')?.setValue('');
-  this.uploadedFIRFileNames[index] = '';
+removeFIRCopy(): void {
+  this.firForm.get('uploadFIRCopy')?.setValue('');
+  this.uploadedFIRFileNames = '';
 }
 
 
@@ -2261,6 +2277,16 @@ removeFIRCopy(index: number): void {
     if (response.data.number_of_accused) {
       this.firForm.get('numberOfAccused')?.setValue(response.data.number_of_accused);
     }
+    if (response.data.gist_of_current_case) {
+    this.firForm.get('gistOfCurrentCase')?.setValue(response.data.gist_of_current_case);
+    }
+    if (response.data.accused_remarks) {
+    this.firForm.get('accused_remarks')?.setValue(response.data.accused_remarks);
+    }
+    if (response.data.upload_fir_copy) {
+    this.firForm.get('uploadFIRCopy')?.setValue(response.data.upload_fir_copy);
+    this.uploadedFIRFileNames = response.data.upload_fir_copy;
+    }
     // if (response.data.nature_of_judgement) {
     //   this.firForm.get('judgementDetails.judgementNature')?.setValue(response.data.nature_of_judgement);
     // }
@@ -2408,22 +2434,23 @@ removeFIRCopy(index: number): void {
           community: accused.community,
           caste: accused.caste,
           guardianName: accused.guardian_name,
-          previousIncident: accused.previous_incident == 1 ? "true" : "false",
+          previousIncident: (accused.previous_incident == 1 || accused.previous_incident == 'true' ) ? "true" : "false",
           previousFIRNumber: accused.previous_fir_number,
+          previous_incident_remarks : accused.previous_incident_remarks,
           previousFIRNumberSuffix: accused.previous_fir_number_suffix,
-          scstOffence: accused.scst_offence == 1 ? "true" : "false",
+          scstOffence: (accused.scst_offence == 1 || accused.scst_offence == 'true') ? "true" : "false",
           scstFIRNumber: accused.scst_fir_number,
+          previous_offence_remarks : accused.previous_offence_remarks,
           scstFIRNumberSuffix: accused.scst_fir_number_suffix,
           antecedentsOption:accused.antecedentsOption,
           antecedents: accused.antecedents,
           landOIssueOption:accused.landOIssueOption,
           landOIssues: accused.land_o_issues,
-          gistOfCurrentCase: accused.gist_of_current_case,
-          uploadFIRCopy:accused.upload_fir_copy,
+          // gistOfCurrentCase: accused.gist_of_current_case,
+          // uploadFIRCopy:accused.upload_fir_copy,
 
         });
-        this.uploadedFIRFileNames.push(accused.upload_fir_copy.split('/uploads/')[1]);
-        // this.uploadedFIRFileNames = accused.upload_fir_copy.split('uploads/')[1];
+        // this.uploadedFIRFileNames.push(accused.upload_fir_copy.split('/uploads/')[1]);
         accusedFormArray.push(accusedGroup);
         // console.log(accusedFormArray,"accusedFormArrayaccusedFormArrayaccusedFormArray",'accused.upload_fir_copy',accused.upload_fir_copy);
       });
@@ -3147,7 +3174,6 @@ removeFIRCopy(index: number): void {
         if (this.firId) {
           sessionStorage.setItem('firId', this.firId);
           this.loadVictimsReliefDetails();
-          this.location.replaceState(`/fir-edit-module?fir_id=${this.firId}&step=4`);
           window.location.reload();
         }
         Swal.fire('Success', 'FIR saved as draft for step 3.', 'success');
@@ -3366,7 +3392,7 @@ removeFIRCopy(index: number): void {
 
   
   saveStepFourAsDraft(): void {
-  
+  // hi
     // const firData = {
     //   firId: this.firId,
     //   numberOfAccused: this.firForm.get('numberOfAccused')?.value,
@@ -3397,13 +3423,15 @@ removeFIRCopy(index: number): void {
     const firData = {
       firId: this.firId,
       numberOfAccused: this.firForm.get('numberOfAccused')?.value,
+      accused_remarks: this.firForm.get('accused_remarks')?.value,
+      gistOfCurrentCase: this.firForm.get('gistOfCurrentCase')?.value,
+      uploadFIRCopy: this.firForm.get('uploadFIRCopy')?.value,
       accuseds: accusedFormArray.controls.map((accusedControl, index) => {
         const accusedValue = accusedControl.value;
 
         return {
           ...accusedValue,
-          accusedId: accusedValue.accusedId || null,
-          uploadFIRCopy: accusedValue.uploadFIRCopy || null
+          accusedId: accusedValue.accusedId || null
         };
       })
     };
@@ -3415,7 +3443,6 @@ removeFIRCopy(index: number): void {
         this.firId = response.fir_id;
         if (this.firId) {
           sessionStorage.setItem('firId', this.firId);
-          this.location.replaceState(`/fir-edit-module?fir_id=${this.firId}&step=4`);
           window.location.reload();
         }
         Swal.fire('Success', 'FIR saved as draft for step 4.', 'success');
@@ -3716,6 +3743,9 @@ onAccusedAgeChange(index: number): void {
 
       // Step 4 Fields - Accused Details
       numberOfAccused: [1, Validators.required],
+      accused_remarks: [''],
+      gistOfCurrentCase: ['', Validators.required],
+      uploadFIRCopy: ['', Validators.required],
       accuseds: this.fb.array([]),
 
       // Step 5 Fields - Victim Relief and Compensation Details
@@ -5091,6 +5121,8 @@ console.log(victimReliefDetail,"cretaieg")
       guardianName: ['', Validators.required],
       previousIncident: [],
       previousFIRNumber: [''],
+      previous_incident_remarks: [''],
+      previous_offence_remarks: [''],
       previousFIRNumberSuffix: [''],
       scstOffence: [],
       scstFIRNumber: [''],
@@ -5099,8 +5131,6 @@ console.log(victimReliefDetail,"cretaieg")
       antecedents: [''],
       landOIssueOption: ['', Validators.required],
       landOIssues: [''],
-      gistOfCurrentCase: ['', Validators.required],
-      uploadFIRCopy: ['', Validators.required],
       availableCastes: [[]],
     });
   }
@@ -5737,9 +5767,11 @@ controls.forEach((controlName) => {
       this.saveStepTwoAsDraft();
       this.updateFirStatus(1);
     } else if (this.step === 3) {
+       this.location.replaceState(`/fir-edit-module?fir_id=${this.firId}&step=3`);
       this.saveStepThreeAsDraft();
       this.updateFirStatus(2);
     } else if (this.step === 4) {
+      this.location.replaceState(`/fir-edit-module?fir_id=${this.firId}&step=4`);
       this.saveStepFourAsDraft();
       this.updateFirStatus(3);
     } else if (this.step === 5) {
@@ -6760,8 +6792,32 @@ async UpdateAsDraft_7() {
   //   return controls.every((controlName) => this.firForm.get(controlName)?.valid === true);
   // }
 
-  isStep1Valid(): boolean {
-  const controls = [
+//   isStep1Valid(): boolean {
+//   const controls = [
+//     'policeCity',
+//     'stationName',
+//     'policeZone',
+//     'policeRange',
+//     'revenueDistrict',
+//     'officerDesignation',
+//     'officerPhone'
+//   ];
+
+//   // const invalidControls = controls.filter((controlName) => this.firForm.get(controlName)?.invalid);
+//  const invalidControls = controls.filter((controlName) => !this.firForm.get(controlName)?.value);
+
+//   if (invalidControls.length > 0) {
+//     // console.warn('Invalid Controls by surya:', invalidControls);
+//     return false;
+//   }
+
+//   return true;
+// }
+
+
+isStep1Valid(): boolean {
+  // Define the mandatory fields for Step 1
+  const mandatoryFields = [
     'policeCity',
     'stationName',
     'policeZone',
@@ -6769,104 +6825,363 @@ async UpdateAsDraft_7() {
     'revenueDistrict',
     'officerDesignation',
     'officerPhone'
+    // Add any other mandatory fields here
   ];
 
-  // const invalidControls = controls.filter((controlName) => this.firForm.get(controlName)?.invalid);
- const invalidControls = controls.filter((controlName) => !this.firForm.get(controlName)?.value);
+  // Check each mandatory field
+  for (const field of mandatoryFields) {
+    const control = this.firForm.get(field);
+    
+    // Check if the control exists and has a value
+    if (!control || control.value === null || control.value === undefined || control.value === '') {
+      console.log(`Missing mandatory field in Step 1: ${field}`);
+      return false;
+    }
+    
+    // Special case for string fields to check for whitespace-only values
+    if (typeof control.value === 'string' && control.value.trim() === '') {
+      console.log(`Empty mandatory field in Step 1: ${field}`);
+      return false;
+    }
+    
+    // Special case for phone number validation if needed
+    if (field === 'officerPhone') {
+      // Basic phone validation (adjust regex as needed for your format)
+      const phoneRegex = /^[0-9]{10}$/; // Example: 10-digit phone number
+      if (!phoneRegex.test(control.value.toString())) {
+        console.log('Invalid phone number format');
+        return false;
+      }
+    }
+  }
+  
+  // Additional validation for interdependent fields if any
+  
+  // If all checks pass, return true
+  return true;
+}
 
-  if (invalidControls.length > 0) {
-    // console.warn('Invalid Controls by surya:', invalidControls);
+  // // Check Step 2 validity
+  // isStep2Valid(): boolean {
+  //   const controls = [
+  //     'firNumber',
+  //     'firNumberSuffix',
+  //     'placeOfOccurrence',
+  //     'dateOfRegistration',
+  //     'timeOfRegistration',
+  //     // 'natureOfOffence',
+  //     // 'sectionsIPC',
+  //   ];
+
+  //   return controls.every((controlName) => this.firForm.get(controlName)?.valid === true);
+  // }
+
+  isStep2Valid(): boolean {
+  // Define the mandatory fields for Step 2
+  const mandatoryFields = [
+    'firNumber',
+    'firNumberSuffix',
+    'placeOfOccurrence',
+    'dateOfRegistration',
+    'timeOfRegistration'
+    // Add any other mandatory fields here
+  ];
+
+  // Check each mandatory field
+  for (const field of mandatoryFields) {
+    const control = this.firForm.get(field);
+    
+    // Check if the control exists and has a value
+    if (!control || control.value === null || control.value === undefined || control.value === '') {
+      console.log(`Missing mandatory field in Step 2: ${field}`);
+      return false;
+    }
+    
+    // Special case for string fields to check for whitespace-only values
+    if (typeof control.value === 'string' && control.value.trim() === '') {
+      console.log(`Empty mandatory field in Step 2: ${field}`);
+      return false;
+    }  
+  }
+  
+  return true;
+}
+
+
+  // Check Step 3 validity
+  // isStep3Valid(): boolean {
+  //   // Check if the complainant details section is valid
+  //   const complainantDetails = this.firForm.get('complainantDetails');
+  //   const isComplainantValid = complainantDetails ? complainantDetails.valid === true : false;
+
+  //   // Check if the victims form array is valid
+  //   const victimsValid = this.victims.controls.every(victim => victim.valid === true);
+
+  //   // Check if the 'isDeceased' and 'deceasedPersonNames' fields are valid
+  //   const isDeceased = this.firForm.get('isDeceased')?.value;
+  //   const isDeceasedValid = isDeceased !== '' &&
+  //     (isDeceased == 'no' || (this.firForm.get('deceasedPersonNames')?.valid === true));
+  //   const isValuePresent = this.firForm.get('deceasedPersonNames')?.value?.length !== 0;
+
+  //   // Ensure all conditions return a boolean
+  //   return Boolean(isComplainantValid && victimsValid && isDeceasedValid);
+  // }
+
+
+  
+  isStep3Valid(): boolean {
+  // Check complainant details mandatory fields
+  const complainantDetails = this.firForm.get('complainantDetails') as FormGroup;
+  if (!complainantDetails) {
+    console.log('Missing complainantDetails section');
     return false;
+  }
+
+  const mobileNumberOfComplainantlength = this.firForm.get('complainantDetails.mobileNumberOfComplainant')?.value;
+  // Define mandatory fields for complainant
+  const complainantMandatoryFields = [
+    'nameOfComplainant',
+    'mobileNumberOfComplainant',
+    'isVictimSameAsComplainant',
+  ];
+
+  if(mobileNumberOfComplainantlength.length != 10){
+    return false;
+  }
+
+  // Check each mandatory field in complainant details
+  for (const field of complainantMandatoryFields) {
+    const control = complainantDetails.get(field);
+    if (!control || control.value === null || control.value === undefined || control.value === '') {
+      console.log(`Missing mandatory field for complainant: ${field}`);
+      return false;
+    }
+    
+    // Special case for string fields
+    if (typeof control.value === 'string' && control.value.trim() === '') {
+      console.log(`Empty mandatory field for complainant: ${field}`);
+      return false;
+    }
+  }
+
+  // Check victims section
+  const victimsArray = this.firForm.get('victims') as FormArray;
+  const numberOfVictims = this.firForm.get('complainantDetails.numberOfVictims')?.value;
+  
+  // Check if numberOfVictims is specified
+  if (!numberOfVictims) {
+    console.log('Missing number of victims');
+    return false;
+  }
+
+
+  // Define mandatory fields for each victim
+  for (let i = 0; i < victimsArray.length; i++) {
+    const victimGroup = victimsArray.at(i) as FormGroup;
+    
+    
+    // Define mandatory fields for victims
+    const victimMandatoryFields = [
+      'age',
+      'gender',
+      'mobileNumber',
+      'community',
+      'caste',
+      'guardianName',
+      'isNativeDistrictSame',
+      'offenceCommitted',
+      'scstSections'
+      // Add other mandatory victim fields
+    ];
+    
+    
+    // If isNativeDistrictSame is 'No', nativeDistrict is mandatory
+    if (victimGroup.get('isNativeDistrictSame')?.value == 'no') {
+      victimMandatoryFields.push('nativeDistrict');
+    }
+
+    if (victimGroup.get('age')?.value > 17 ) {
+    victimMandatoryFields.push('name');
+    }
+
+    if(victimGroup.get('mobileNumber')?.value.length != 10){
+      return false;
+    }
+    
+    // Check each mandatory field for this victim
+    for (const field of victimMandatoryFields) {
+      const control = victimGroup.get(field);
+      
+      if (!control || control.value === null || control.value === undefined || control.value === '') {
+        console.log(`Missing mandatory field for victim[${i}]: ${field}`);
+        return false;
+      }
+      
+      // Special case for string fields
+      if (typeof control.value === 'string' && control.value.trim() === '') {
+        console.log(`Empty mandatory field for victim[${i}]: ${field}`);
+        return false;
+      }
+      
+      // Special case for array fields
+      if (Array.isArray(control.value) && control.value.length === 0) {
+        console.log(`Empty array field for victim[${i}]: ${field}`);
+        return false;
+      }
+    }
+    
+    // Special case for gender "Other" requiring customGender
+    if (victimGroup.get('gender')?.value === 'Other') {
+      const customGender = victimGroup.get('customGender');
+      if (!customGender || !customGender.value || 
+          (typeof customGender.value === 'string' && customGender.value.trim() === '')) {
+        console.log(`Missing customGender for victim[${i}] with gender 'Other'`);
+        return false;
+      }
+    }
+  }
+
+  // Check deceased section
+  const isDeceased = this.firForm.get('isDeceased')?.value;
+  
+  // Check if isDeceased field is filled
+  if (!isDeceased) {
+    console.log('Missing isDeceased field');
+    return false;
+  }
+  
+  // If isDeceased is 'yes', check if deceasedPersonNames is provided
+  if (isDeceased == 'yes') {
+    const deceasedPersonNames = this.firForm.get('deceasedPersonNames')?.value;
+    if (!deceasedPersonNames || 
+        (Array.isArray(deceasedPersonNames) && deceasedPersonNames.length === 0)) {
+      console.log('Missing deceased person names');
+      return false;
+    }
   }
 
   return true;
 }
 
-  // Check Step 2 validity
-  isStep2Valid(): boolean {
-    const controls = [
-      'firNumber',
-      'firNumberSuffix',
-      'placeOfOccurrence',
-      'dateOfRegistration',
-      'timeOfRegistration',
-      // 'natureOfOffence',
-      // 'sectionsIPC',
+  
+  // isStep4Valid(): boolean {
+  //   const numberOfAccusedControl = this.firForm.get('numberOfAccused');
+  //   const accusedsArray = this.firForm.get('accuseds') as FormArray;
+  
+  //   let isValid = true;
+
+  //   // Check if 'numberOfAccused' control exists and is valid
+  //   if (!numberOfAccusedControl || !numberOfAccusedControl.valid) {
+  //     console.log('Invalid Field: numberOfAccused', numberOfAccusedControl?.errors);
+  //     isValid = false;
+  //   }
+  
+  //     accusedsArray.controls.forEach((accusedControl, index) => {
+  //       const accusedGroup = accusedControl as FormGroup; // Explicitly cast to FormGroup
+  //       if (!accusedGroup.valid) {
+  //         // console.log(`Invalid Field in accuseds[${index}]:`, accusedGroup.errors);
+          
+  //         Object.keys(accusedGroup.controls).forEach((field) => {
+  //           const fieldControl = accusedGroup.get(field);
+  //           if (fieldControl && !fieldControl.valid) {
+  //             // console.log(`Invalid accuseds[${index}].${field}:`, fieldControl.errors);
+  //           }
+  //         });
+  
+  //         isValid = false;
+  //       }
+  //     });
+  
+  //   return isValid;
+  // }
+
+  isStep4Valid(): boolean {
+  const accusedsArray = this.firForm.get('accuseds') as FormArray;
+
+  const numberOfAccusedControl = this.firForm.get('numberOfAccused');
+  // Check if 'numberOfAccused' control has a value (mandatory field)
+  if (!numberOfAccusedControl || !numberOfAccusedControl.value) {
+    console.log('Missing mandatory field: numberOfAccused');
+    return false;
+  }
+
+  const gistOfCurrentCaseControl = this.firForm.get('gistOfCurrentCase');
+  // Check if 'numberOfAccused' control has a value (mandatory field)
+  if (!gistOfCurrentCaseControl || !gistOfCurrentCaseControl.value) {
+    console.log('Missing mandatory field: gistOfCurrentCase');
+    return false;
+  }
+
+  const uploadFIRCopyControl = this.firForm.get('uploadFIRCopy');
+  // Check if 'numberOfAccused' control has a value (mandatory field)
+  if (!uploadFIRCopyControl || !uploadFIRCopyControl.value) {
+    console.log('Missing mandatory field: uploadFIRCopy');
+    return false;
+  }
+
+  // Verify all mandatory fields in each accused entry are filled
+  for (let i = 0; i < accusedsArray.length; i++) {
+    const accusedGroup = accusedsArray.at(i) as FormGroup;
+
+    const age = accusedGroup.get('age')?.value;
+    const previousIncident = accusedGroup.get('previousIncident')?.value;
+    const scstOffence = accusedGroup.get('scstOffence')?.value;
+    const landOIssueOption = accusedGroup.get('landOIssueOption')?.value;
+    const antecedentsOption = accusedGroup.get('antecedentsOption')?.value;
+    
+    // Define the list of mandatory fields for accused
+    var mandatoryFields = [
+      'age', 
+      'gender',
+      'community',
+      'caste',
+      'guardianName',
+      'previousIncident',
+      'scstOffence',
+      'antecedentsOption',
+      'landOIssueOption'
     ];
 
-    return controls.every((controlName) => this.firForm.get(controlName)?.valid === true);
-  }
-
-  // Check Step 3 validity
-  isStep3Valid(): boolean {
-    // Check if the complainant details section is valid
-    const complainantDetails = this.firForm.get('complainantDetails');
-    const isComplainantValid = complainantDetails ? complainantDetails.valid === true : false;
-
-    // Check if the victims form array is valid
-    const victimsValid = this.victims.controls.every(victim => victim.valid === true);
-
-    // Check if the 'isDeceased' and 'deceasedPersonNames' fields are valid
-    const isDeceased = this.firForm.get('isDeceased')?.value;
-    const isDeceasedValid = isDeceased !== '' &&
-      (isDeceased == 'no' || (this.firForm.get('deceasedPersonNames')?.valid === true));
-    const isValuePresent = this.firForm.get('deceasedPersonNames')?.value?.length !== 0;
-
-    // Ensure all conditions return a boolean
-    return Boolean(isComplainantValid && victimsValid && isDeceasedValid);
-  }
-
-  
-  isStep4Valid(): boolean {
-    const numberOfAccusedControl = this.firForm.get('numberOfAccused');
-    const accusedsArray = this.firForm.get('accuseds') as FormArray;
-  
-    let isValid = true;
-    let isUploadFIRCopyFilled: boolean | null = null;
-    // Check if 'numberOfAccused' control exists and is valid
-    if (!numberOfAccusedControl || !numberOfAccusedControl.valid) {
-      console.log('Invalid Field: numberOfAccused', numberOfAccusedControl?.errors);
-      isValid = false;
+    if(age > 17){
+      mandatoryFields.push('name');
     }
-  
-    // Ensure 'accuseds' is a FormArray before proceeding
-    if (accusedsArray instanceof FormArray) {
-      accusedsArray.controls.forEach((accusedControl, index) => {
-        const accusedGroup = accusedControl as FormGroup; // Explicitly cast to FormGroup
-        if (!accusedGroup.valid) {
-          // console.log(`Invalid Field in accuseds[${index}]:`, accusedGroup.errors);
-          
-          Object.keys(accusedGroup.controls).forEach((field) => {
-            const fieldControl = accusedGroup.get(field);
-            if (fieldControl && !fieldControl.valid) {
-              // console.log(`Invalid accuseds[${index}].${field}:`, fieldControl.errors);
-            }
-          });
-  
-          isValid = false;
-        }
-// mahiis check
-        const uploadFIRCopyControl = accusedGroup.get('uploadFIRCopy');
-        if (uploadFIRCopyControl) {
-          const isFilled = uploadFIRCopyControl.value ? true : false;
-  
-          if (isUploadFIRCopyFilled === null) {
-     
-            isUploadFIRCopyFilled = isFilled;
-          } else if (isUploadFIRCopyFilled !== isFilled) {
-           
-            console.log(`Error: Inconsistent 'uploadFIRCopy' values in accuseds[${index}]`);
-            isValid = false;
-          }
-        }
-      });
-    } else {
-      console.log('accuseds is not a FormArray');
-      isValid = false;
+
+    if(previousIncident == 'true'){
+      mandatoryFields.push('previousFIRNumber', 'previousFIRNumberSuffix');
     }
-  
-    return isValid;
+
+    if(scstOffence == 'true'){
+      mandatoryFields.push('scstFIRNumber', 'scstFIRNumberSuffix');
+    }
+
+    if(landOIssueOption == 'Yes'){
+       mandatoryFields.push('landOIssues');
+    }
+
+    if(antecedentsOption == 'Yes'){
+       mandatoryFields.push('antecedents');
+    }
+    
+    
+    // Check each mandatory field
+    for (const field of mandatoryFields) {
+      const control = accusedGroup.get(field);
+      if (!control || !control.value) {
+        console.log(`Missing mandatory field for accused[${i}]: ${field}`);
+        return false;
+      }
+      
+      // Special case for fields that require trimming (string fields)
+      if (typeof control.value === 'string' && control.value.trim() === '') {
+        console.log(`Empty mandatory field for accused[${i}]: ${field}`);
+        return false;
+      }
+    }
+    
   }
+
+  return true;
+}
   
   isStep5Valid(): boolean {
 
@@ -6996,6 +7311,21 @@ trackStepFourChanges() {
     console.log('Step 4 field changed: numberOfAccused');
   });
 
+    this.firForm.get('gistOfCurrentCase')?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
+    this.isStepFourModified = true;
+    console.log('Step 4 field changed: gistOfCurrentCase');
+  });
+
+    this.firForm.get('uploadFIRCopy')?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
+    this.isStepFourModified = true;
+    console.log('Step 4 field changed: uploadFIRCopy');
+  });
+
+    this.firForm.get('accused_remarks')?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
+    this.isStepFourModified = true;
+    console.log('Step 4 field changed: accused_remarks');
+  });
+
   this.firForm.get('accuseds')?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
     this.isStepFourModified = true;
     console.log('Step 4 accuseds array modified');
@@ -7074,6 +7404,7 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
       this.step++;
     } else if (this.step === 3 && this.isStep3Valid()) {
       if (this.isStepThreeModified == true) {
+      this.location.replaceState(`/fir-edit-module?fir_id=${this.firId}&step=4`);
       this.saveStepThreeAsDraft();
       this.updateFirStatus(3); 
       this.isStepThreeModified = false;
@@ -7081,6 +7412,7 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
       this.step++;
     } else if (this.step === 4 && this.isStep4Valid()) {
       if(this.isStepFourModified == true){
+        this.location.replaceState(`/fir-edit-module?fir_id=${this.firId}&step=5`);
         this.saveStepFourAsDraft();
         this.updateFirStatus(4); 
         this.isStepFourModified = false;

@@ -141,7 +141,7 @@ saveStepThreeAsDraft(firData: any): Observable<any> {
 // }
 
 saveStepFourAsDraft(firData: any): Observable<any> {
-  let body = {firId :  firData.firId, numberOfAccused : firData.numberOfAccused.toString(), accuseds : JSON.stringify(firData.accuseds || [])}
+  let body = {firId :  firData.firId, numberOfAccused : firData.numberOfAccused.toString(), accuseds : JSON.stringify(firData.accuseds || []), gistOfCurrentCase : firData.gistOfCurrentCase, uploadFIRCopy : firData.uploadFIRCopy, accused_remarks : firData.accused_remarks}
   return this.http.post(`${this.baseUrl}/handle-step-four`, body);
 }
 

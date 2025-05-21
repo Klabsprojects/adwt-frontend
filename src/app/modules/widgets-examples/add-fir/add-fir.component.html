@@ -108,7 +108,7 @@
                       <div class="col-md-6 col-lg-4 mb-3">
                         <label for="officerName" class="form-label">6. Name of the Investigating Officer (IO)*</label>
                         <input id="officerName" type="text" class="form-control" formControlName="officerName"
-                        placeholder="Enter Officer Name" (keypress)="allowOnlyLetters($event)" required/>
+                        placeholder="Enter Officer Name" required/>
                         <small class="text-danger" *ngIf="firForm.get('officerName')?.invalid && firForm.get('officerName')?.touched">
                           Please enter a valid name.
                         </small>
@@ -176,7 +176,7 @@
                     </div>
                 </div>
                 <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
-                <button type="button" class="btn btn-primary" (click)="nextStep()">Next</button>
+                <button type="button" class="btn btn-primary" [disabled]="!isStep1Valid()" (click)="nextStep()">Next</button>
               </div>
 
             <div *ngIf="mainStep === 1 && step === 2" class="form-step">
