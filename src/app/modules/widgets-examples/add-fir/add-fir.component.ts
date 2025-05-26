@@ -168,6 +168,7 @@ isStepTwoModified = false;
 isStepThreeModified = false;
 sectionFields: string[] = [''];
 Parsed_UserInfo : any;
+SubmitButton = true;
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -176,7 +177,9 @@ Parsed_UserInfo : any;
     private modalService: NgbModal,
     private policeDivisionService :PoliceDivisionService,
     private vmcSerive:VmcMeetingService
-  ) {}
+  ) {
+    this.SubmitButton = true;
+  }
   private wasVictimSame: boolean = false; // Track the previous state of on Victim same as Complainant
 
 
@@ -735,6 +738,7 @@ onCaseTypeChange() {
 
   // Save Step 1 and track officer IDs after the first save
   saveStepOneAsDraft() {
+    this.SubmitButton = false;
     this.firForm.enable();
     const firData = {
       ...this.firForm.value,
@@ -742,6 +746,7 @@ onCaseTypeChange() {
     };
     this.firService.handleStepOne(this.firId, firData).subscribe(
       (response: any) => {
+        this.SubmitButton = true;
         this.firId = response.fir_id;
         if (this.firId) {
           sessionStorage.setItem('firId', this.firId);
@@ -750,6 +755,8 @@ onCaseTypeChange() {
         Swal.fire('Success', 'FIR saved as draft for step 1.', 'success');
       },
       (error) => {
+        this.SubmitButton = true;
+        this.cdr.detectChanges();
         Swal.fire('Error', 'Failed to save FIR as draft for step 1.', 'error');
       }
     );

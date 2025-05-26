@@ -163,6 +163,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
     { value: 'Provisions', label: 'Provisions' },
     { value: 'House site Patta', label: 'House site Patta' }
   ];
+   victim_relif_section_values = ['Rape, etc., or unnatural Offences', 'Gang rape', 'Murder or Death','100 percent incapacitation','Where incapacitation is less than 100 percent, but more than 50 percent','Where incapacitation is less than 50 percent'];
 
   // Tabs for step navigation
   tabs = [
@@ -212,6 +213,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   isStepFourModified:boolean = false;
   isStepFiveModified:boolean = false;
   uploadedFIRFileNames: string;
+  SubmitButton = true;
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -223,7 +225,9 @@ export class EditFirComponent implements OnInit, OnDestroy {
     private policeDivisionService :PoliceDivisionService,
     private vmcSerive : VmcMeetingService,
     private location: Location
-   ) {}
+   ) {
+    this.SubmitButton = true;
+   }
    private wasVictimSame: boolean = false; // Track the previous state of on Victim same as Complainant
 
   onDrop1(event: DragEvent): void {
@@ -2627,6 +2631,10 @@ removeFIRCopy(): void {
       this.firForm.get('judgementDetails.Judgement_Date')?.setValue(formattedDate);
     }
 
+      if (response.data5[0].judgement_nature_remarks){
+      this.firForm.get('judgementDetails.judgement_nature_remarks')?.setValue(response.data5[0].judgement_nature_remarks);
+    }
+
       if (this.firForm && response.data5 && response.data5.length > 0) {
         console.log("ConvictionType from API:", response.data5[0].Conviction_Type);
       
@@ -2655,6 +2663,7 @@ removeFIRCopy(): void {
             // Populate main section
             this.firForm.patchValue({
               trialCaseNumber: item.trial_case_number || '',
+              CRL_number: item.CRL_number || '',
               courtDistrict: item.court_district || '',
               Court_name1: item.court_name || '',
               publicProsecutor: item.public_prosecutor || '',
@@ -2712,6 +2721,7 @@ removeFIRCopy(): void {
           Court_one: item.court_name || '',
           courtDistrict_one: item.court_district || '',
           caseNumber_one: item.case_number || '',
+          CRL_number_one: item.CRL_number || '',
           publicProsecutor_one: item.public_prosecutor || '',
           prosecutorPhone_one: item.prosecutor_phone || '',
           firstHearingDate_one: item.second_hearing_date ? formatDate(item.second_hearing_date, 'yyyy-MM-dd', 'en') : '',
@@ -2740,7 +2750,12 @@ removeFIRCopy(): void {
       const date = new Date(response.casedetail_one[0].Judgement_Date);
       const formattedDate = date.toISOString().split('T')[0];
       this.firForm.get('judgementDetails_one.Judgement_Date_one')?.setValue(formattedDate);
-    }
+      }
+
+      
+      if (response.casedetail_one[0].judgement_nature_remarks){
+      this.firForm.get('judgementDetails_one.judgement_nature_remarks_one')?.setValue(response.casedetail_one[0].judgement_nature_remarks);
+      }
 
       if (response.casedetail_one[0].Conviction_Type){
           this.firForm.get('judgementDetails_one.Conviction_Type_one')?.setValue(response.casedetail_one[0].Conviction_Type);
@@ -2756,9 +2771,10 @@ removeFIRCopy(): void {
           const judgementAwardedValue = item.judgement_awarded || '';
           this.firForm.patchValue({
             judgementAwarded3: judgementAwardedValue,
-
+            judgementAwarded_two : judgementAwardedValue ,
             courtDistrict_two : item.court_district,
             caseNumber_two:item.case_number,
+            CRL_number_two: item.CRL_number || '',
             publicProsecutor_two:item.public_prosecutor,
             prosecutorPhone_two:item.prosecutor_phone,
 
@@ -2766,6 +2782,16 @@ removeFIRCopy(): void {
           });
           this.applyJudgementAwardedValidators(judgementAwardedValue);
           
+          if(item.judgementNature){
+          this.uploadJudgement_two = item.judgement_copy;
+          this.firForm.patchValue({
+            judgementDetails_one: {
+              uploadJudgement_two: item.judgement_copy
+            }
+          });
+      }
+
+        this.firForm.get('judgementDetails_two.judgementNature_two')?.setValue(item.judgementNature);
         });
 
 
@@ -2773,6 +2799,10 @@ removeFIRCopy(): void {
           const date = new Date(response.casedetail_two[0].Judgement_Date);
           const formattedDate = date.toISOString().split('T')[0];
           this.firForm.get('judgementDetails_two.Judgement_Date_two')?.setValue(formattedDate);
+        }
+
+        if (response.casedetail_two[0].judgement_nature_remarks){
+          this.firForm.get('judgementDetails_two.judgement_nature_remarks_two')?.setValue(response.casedetail_two[0].judgement_nature_remarks);
         }
 
           if (response.casedetail_two[0].Conviction_Type){
@@ -3048,6 +3078,7 @@ removeFIRCopy(): void {
 
   // Save Step 1 and track officer IDs after the first save
   saveStepOneAsDraft() {
+    this.SubmitButton = false;
     this.firForm.enable();
     const firData = {
       ...this.firForm.value,
@@ -3057,6 +3088,8 @@ removeFIRCopy(): void {
 
     this.firService.handleStepOne(this.firId, firData).subscribe(
       (response: any) => { 
+        this.SubmitButton = true;
+         this.cdr.detectChanges();
         this.firId = response.fir_id;
         if (this.firId) {
           sessionStorage.setItem('firId', this.firId); 
@@ -3068,6 +3101,8 @@ removeFIRCopy(): void {
         Swal.fire('Success', 'FIR saved as draft for step 1.', 'success');
       },
       (error) => {
+        this.SubmitButton = true;
+        this.cdr.detectChanges();
         console.error('Error saving FIR for step 1:', error);
         Swal.fire('Error', 'Failed to save FIR as draft for step 1.', 'error');
       }
@@ -3089,6 +3124,7 @@ removeFIRCopy(): void {
   
   // Method to save step 2 as draft
   saveStepTwoAsDraft() {
+    this.SubmitButton = false;
     const firData = {
       firNumber: this.firForm.value.firNumber,
       firNumberSuffix: this.firForm.value.firNumberSuffix,
@@ -3107,6 +3143,8 @@ removeFIRCopy(): void {
 
     this.firService.handleStepTwo(this.firId, firData).subscribe(
       (response: any) => {
+        this.SubmitButton = true;
+        this.cdr.detectChanges();
         this.firId = response.fir_id; // Update FIR ID from backend response
         if (this.firId) {
           sessionStorage.setItem('firId', this.firId); // Save FIR ID in session
@@ -3114,6 +3152,8 @@ removeFIRCopy(): void {
         Swal.fire('Success', 'FIR saved as draft for step 2.', 'success');
       },
       (error) => {
+        this.SubmitButton = true;
+        this.cdr.detectChanges();
         console.error('Error saving FIR for step 2:', error);
         Swal.fire('Error', 'Failed to save FIR as draft for step 2.', 'error');
       }
@@ -3121,6 +3161,8 @@ removeFIRCopy(): void {
   }
 
   saveStepThreeAsDraft() {
+    // current stp 3
+     this.SubmitButton = false;
 
         const victimsArray = this.firForm.get('victims') as FormArray;
         const firFormValues = this.firForm.value;
@@ -3157,6 +3199,7 @@ removeFIRCopy(): void {
           chargesheet_stage_ex_gratia: victim.chargesheet_stage_ex_gratia || null,
           final_stage_as_per_act: victim.final_stage_as_per_act || null,
           final_stage_ex_gratia: victim.final_stage_ex_gratia || null,
+          relief_applicable: (victim.offenceCommitted || []).some((offence : any) => this.victim_relif_section_values.includes(offence)) ? 1 : 0
         });
       }
 
@@ -3170,15 +3213,21 @@ removeFIRCopy(): void {
 
     this.firService.saveStepThreeAsDraft(firData).subscribe(
       (response: any) => {
+         this.SubmitButton = true;
+         this.cdr.detectChanges();
         this.firId = response.fir_id;
         if (this.firId) {
           sessionStorage.setItem('firId', this.firId);
           this.loadVictimsReliefDetails();
-          window.location.reload();
+          Swal.fire('Success', 'FIR saved Victim Information Successfully.', 'success')
+          .then(() => {
+            window.location.reload();
+          });
         }
-        Swal.fire('Success', 'FIR saved as draft for step 3.', 'success');
       },
       (error) => {
+         this.SubmitButton = true;
+         this.cdr.detectChanges();
         console.error('Error saving FIR for step 3:', error);
         Swal.fire('Error', 'Failed to save FIR as draft for step 3.', 'error');
       }
@@ -3392,32 +3441,8 @@ removeFIRCopy(): void {
 
   
   saveStepFourAsDraft(): void {
-  // hi
-    // const firData = {
-    //   firId: this.firId,
-    //   numberOfAccused: this.firForm.get('numberOfAccused')?.value,
-    //   accuseds: this.firForm.get('accuseds')?.value.map((accused: any, index: number) => ({
-    //     ...accused,
-    //     accusedId: accused.accusedId || null,
-    //     // uploadFIRCopy: this.multipleFiles[index] || null
-    //     uploadFIRCopy: this.firForm.value.accuseds[0].uploadFIRCopy || null
-    //   })),
-    // };
-    // console.log(firData,"firDatafirDatafirData")
-    // console.log(this.multipleFiles ,"multipleFilesmultipleFiles")
-    // this.firService.saveStepFourAsDraft(firData).subscribe(
-    //   (response: any) => {
-    //     this.firId = response.fir_id;
-    //     if (this.firId) {
-    //       sessionStorage.setItem('firId', this.firId);
-    //     }
-    //     Swal.fire('Success', 'FIR saved as draft for step 4.', 'success');
-    //   },
-    //   (error) => {
-    //     console.error('Error saving FIR for step 4:', error);
-    //     Swal.fire('Error', 'Failed to save FIR as draft for step 4.', 'error');
-    //   }
-    // );
+    this.SubmitButton = false;
+    // current stp 4
     const accusedFormArray = this.firForm.get('accuseds') as FormArray;
 
     const firData = {
@@ -3440,14 +3465,20 @@ removeFIRCopy(): void {
 
     this.firService.saveStepFourAsDraft(firData).subscribe(
       (response: any) => {
+        this.SubmitButton = true;
+        this.cdr.detectChanges();
         this.firId = response.fir_id;
         if (this.firId) {
           sessionStorage.setItem('firId', this.firId);
-          window.location.reload();
+          Swal.fire('Success', 'FIR saved Accused Information Successfully.', 'success')
+          .then(() => {
+            window.location.reload();
+          });
         }
-        Swal.fire('Success', 'FIR saved as draft for step 4.', 'success');
       },
       (error) => {
+        this.SubmitButton = true;
+        this.cdr.detectChanges();
         console.error('Error saving FIR for step 4:', error);
         Swal.fire('Error', 'Failed to save FIR as draft for step 4.', 'error');
       }
@@ -3456,6 +3487,7 @@ removeFIRCopy(): void {
 
 
   saveStepFiveAsDraft(isSubmit: boolean = false): void {
+    this.SubmitButton = false;
     // hellow
     if (!this.firId) {
       Swal.fire('Error', 'FIR ID is missing. Unable to proceed.', 'error');
@@ -3488,6 +3520,8 @@ removeFIRCopy(): void {
 
     this.firService.updatestep5(firData).subscribe(
       (response) => {
+        this.SubmitButton = true;
+        this.cdr.detectChanges();
         if (isSubmit) {
           Swal.fire({
             title: 'Success',
@@ -3502,6 +3536,8 @@ removeFIRCopy(): void {
         }
       },
       (error) => {
+        this.SubmitButton = true;
+        this.cdr.detectChanges();
         console.error('Error saving Step 5 data:', error);
         Swal.fire('Error', 'Failed to save Step 5 data', 'error');
       }
@@ -3771,6 +3807,7 @@ onAccusedAgeChange(index: number): void {
       Court_name1: ['', Validators.required],
       trialCourtDistrict: ['', Validators.required],
       trialCaseNumber: ['', Validators.required],
+      CRL_number: ['', Validators.required],
       publicProsecutor: [''],
       prosecutorPhone: ['', [ Validators.pattern('^[0-9]{10}$')]],
 
@@ -3793,6 +3830,7 @@ onAccusedAgeChange(index: number): void {
         judgementNature: ['', Validators.required],
         Conviction_Type : [''],
         Judgement_Date : [''],
+        judgement_nature_remarks : [''],
         uploadJudgement: [''],
         legalOpinionObtained: [''],
         caseFitForAppeal: [''],
@@ -3807,6 +3845,7 @@ onAccusedAgeChange(index: number): void {
       Court_one: ['', Validators.required],
       courtDistrict_one: ['', Validators.required],
       caseNumber_one: ['', Validators.required],
+      CRL_number_one: ['', Validators.required],
       publicProsecutor_one: ['', Validators.required],
       prosecutorPhone_one: ['', Validators.required],
       firstHearingDate_one: ['', Validators.required],
@@ -3814,6 +3853,7 @@ onAccusedAgeChange(index: number): void {
 
       courtDistrict_two: ['', Validators.required],
       caseNumber_two: ['', Validators.required],
+      CRL_number_two: ['', Validators.required],
       publicProsecutor_two: ['', Validators.required],
       prosecutorPhone_two: ['', Validators.required],
       firstHearingDate_two: ['', Validators.required],
@@ -3825,6 +3865,7 @@ onAccusedAgeChange(index: number): void {
       judgementDetails_one: this.fb.group({
         judgementNature_one: ['', Validators.required],
         Judgement_Date_one : [''],
+        judgement_nature_remarks_one : [''],
         Conviction_Type_one : [''],
         uploadJudgement_one: [''],
         legalOpinionObtained_one: [''],
@@ -3840,7 +3881,8 @@ onAccusedAgeChange(index: number): void {
       judgementAwarded_two: ['', Validators.required],
       judgementDetails_two: this.fb.group({
         judgementNature_two: [''],
-        Judgement_Date_one: [''],
+        Judgement_Date_two: [''],
+        judgement_nature_remarks_two: [''],
         Conviction_Type_two : [''],
         uploadJudgement_two: [''],
         legalOpinionObtained_two: [''],
@@ -4551,9 +4593,64 @@ uploadedImageSrc: any | ArrayBuffer;
         reliefAmountScst_2: [victimReliefDetail.relief_amount_act],
         reliefAmountExGratia_2: [victimReliefDetail.relief_amount_government],
         reliefAmountThirdStage: [victimReliefDetail.relief_amount_final_stage || 0], // 3 total
+        relief_applicable: [victimReliefDetail.relief_applicable || 0], // 3 total
+        // relief_applicable2 : ((JSON.parse(victimReliefDetail.offence_committed )|| []).some((offence : any) => this.victim_relif_section_values.includes(offence)) ? 1 : 0),
+        relief_applicable2: (() => {
+            const offenceStr = victimReliefDetail.offence_committed;
+            
+            // Return 0 if null, undefined, or empty string
+            if (!offenceStr || offenceStr === '') {
+              return 0;
+            }
+            
+            // Check if it's a JSON string (starts with [ and ends with ])
+            const isJsonString = typeof offenceStr === 'string' && 
+                                offenceStr.trim().startsWith('[') && 
+                                offenceStr.trim().endsWith(']');
+            
+            // If it's not a JSON string (regular string like 'Non GCR', 'gcr', etc.), return 0
+            if (!isJsonString) {
+              return 0;
+            }
+            
+            // Check minimum length - should be at least as long as ["Gang rape"] which is 13 characters
+            if (offenceStr.length < 13) {
+              return 0;
+            }
+            
+            try {
+              // Try to parse JSON
+              const parsedOffences = JSON.parse(offenceStr);
+              
+              // Check if it's an array and has meaningful length
+              if (!Array.isArray(parsedOffences)) {
+                return 0;
+              }
+              
+              // Check if array has valid content (not just empty strings or minimal values like "[0]")
+              const validOffences = parsedOffences.filter(offence => 
+                offence && 
+                typeof offence === 'string' && 
+                offence.trim().length > 0 &&
+                offence.trim() !== '0' // Filter out "[0]" type values
+              );
+              
+              if (validOffences.length === 0) {
+                return 0;
+              }
+              
+              // Check if any valid offence matches relief values
+              return validOffences.some((offence: string) => 
+                this.victim_relif_section_values.includes(offence.trim())
+              ) ? 1 : 0;
+              
+            } catch (error) {
+              // If JSON parse fails, return 0
+              return 0;
+            }
+          })(),
         additionalRelief: [additionalRelief]
       });
-      
   
       victimsReliefArray.push(victimGroup);
       this.updateTotalCompensation();
@@ -5253,7 +5350,7 @@ console.log(victimReliefDetail,"cretaieg")
   'courtName',
   'caseType',
   'caseNumber',
-  'chargeSheetDate',
+  // 'chargeSheetDate',
   'proceedingsFileNo_1',
   'proceedingsDate_1'
 ];
@@ -5336,12 +5433,11 @@ controls.forEach((controlName) => {
   'courtDistrict',
   'Court_name1',
   'trialCaseNumber',
+  'CRL_number',
   'CaseHandledBy',
   'judgementDetails.judgementNature',
   'judgementDetails.Judgement_Date',
-  'proceedingsDate_2',
-  'proceedingsFileNo_2',
-
+  
 ];
 
 let controls = [...baseControls]; // Copy the base controls array
@@ -5354,6 +5450,19 @@ if (CaseHandledBy === 'Special Public Prosecutor') {
 } else {
   controls.push('NameOfAdvocate', 'advocateMobNumber');
 }
+
+if(this.firForm.get('judgementDetails.judgementNature')?.value == 'Convicted' || this.firForm.get('judgementDetails.filedBy')?.value != 'No appeal yet'){
+  controls.push('proceedingsDate_2','proceedingsFileNo_2');
+}
+
+var file95 = true;
+
+if(this.firForm.get('judgementDetails.judgementNature')?.value == 'Convicted' || this.firForm.get('judgementDetails.filedBy')?.value != 'No appeal yet'){
+  if (this.file95 == ''){
+    file95 = false;
+  }
+}
+
 
 let allValid = true;
 
@@ -5382,8 +5491,10 @@ controls.forEach((controlName) => {
     
       const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
       const invalidVictims: number[] = [];
-
-      const victimrelief_7 = victimsReliefArray.controls.every((victimGroup: any, index: number) => {
+      var victimrelief_7 = true;
+      var totalcomposistion = true;
+      if(this.firForm.get('judgementDetails.judgementNature')?.value == 'Convicted' || this.firForm.get('judgementDetails.filedBy')?.value != 'No appeal yet'){
+      victimrelief_7 = victimsReliefArray.controls.every((victimGroup: any, index: number) => {
       const reliefAmountScst = victimGroup.get('reliefAmountScst_2');
       const reliefAmountExGratia = victimGroup.get('reliefAmountExGratia_2');
       const reliefAmountFirstStage = victimGroup.get('reliefAmountThirdStage');
@@ -5400,18 +5511,18 @@ controls.forEach((controlName) => {
 
       return isVictimValid;
     });
-
-    const totalcomposistion = this.firForm.get('totalCompensation_2')?.value ? true : false
-
-    var step7_file = false;
-    const hasProceedingsFile = this.proceedingsFile instanceof File;
-
-    if(hasProceedingsFile == true || this.file95 ){
-      step7_file = true;
+    totalcomposistion = this.firForm.get('totalCompensation_2')?.value ? true : false
     }
+
+    // var step7_file = false;
+    // const hasProceedingsFile = this.proceedingsFile instanceof File;
+
+    // if(hasProceedingsFile == true || this.file95 ){
+    //   step7_file = true;
+    // }
     
       
-    return allValid && victimrelief_7 && totalcomposistion && step7_file;
+    return allValid && victimrelief_7 && totalcomposistion && file95;
   }
   
 
@@ -6323,6 +6434,7 @@ console.log(formFields,"formFieldsformFields")
 //   });
 // }
 async UpdateAsDraft_7() {
+  this.SubmitButton = false;
   if (!this.firId) {
     Swal.fire('Error', 'FIR ID is missing. Unable to save draft.', 'error');
     return;
@@ -6337,7 +6449,8 @@ async UpdateAsDraft_7() {
     trialDetails: {
       courtName: this.firForm.get('Court_name1')?.value,
       courtDistrict: this.firForm.get('courtDistrict')?.value,
-      trialCaseNumber: this.firForm.get('caseNumber')?.value,
+      trialCaseNumber: this.firForm.get('trialCaseNumber')?.value,
+      CRL_number: this.firForm.get('CRL_number')?.value,
       publicProsecutor: this.firForm.get('publicProsecutor')?.value || null,
       prosecutorPhone: this.firForm.get('prosecutorPhone')?.value || null,
       firstHearingDate: this.firForm.get('firstHearingDate')?.value,
@@ -6350,26 +6463,30 @@ async UpdateAsDraft_7() {
       uploadJudgement: this.firForm.get('judgementDetails.uploadJudgement')?.value,
       Conviction_Type: this.firForm.get('judgementDetails.Conviction_Type')?.value,
       Judgement_Date: this.firForm.get('judgementDetails.Judgement_Date')?.value,
+      judgement_nature_remarks: this.firForm.get('judgementDetails.judgement_nature_remarks')?.value,
     },
 
     trialDetails_one: {
       courtName: this.firForm.get('Court_name1')?.value,
       courtDistrict: this.firForm.get('courtDistrict_one')?.value,
       trialCaseNumber: this.firForm.get('caseNumber_one')?.value,
+      CRL_number: this.firForm.get('CRL_number_one')?.value,
       publicProsecutor: this.firForm.get('publicProsecutor_one')?.value,
       prosecutorPhone: this.firForm.get('prosecutorPhone_one')?.value,
       firstHearingDate: this.firForm.get('firstHearingDate_one')?.value,
-      judgementAwarded: this.firForm.get('judgementAwarded2')?.value,
+      judgementAwarded: this.firForm.get('judgementAwarded_one')?.value,
       judgementNature: this.firForm.get('judgementDetails_one.judgementNature_one')?.value,
       uploadJudgement: this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value,
       Conviction_Type: this.firForm.get('judgementDetails_one.Conviction_Type_one')?.value,
       Judgement_Date: this.firForm.get('judgementDetails_one.Judgement_Date_one')?.value,
+      judgement_nature_remarks: this.firForm.get('judgementDetails_one.judgement_nature_remarks_one')?.value,
     },
 
     trialDetails_two: {
       courtName: this.firForm.get('Court_name1')?.value,
       courtDistrict: this.firForm.get('courtDistrict_two')?.value,
       trialCaseNumber: this.firForm.get('caseNumber_two')?.value,
+      CRL_number: this.firForm.get('CRL_number_two')?.value,
       publicProsecutor: this.firForm.get('publicProsecutor_two')?.value,
       prosecutorPhone: this.firForm.get('prosecutorPhone_two')?.value,
       firstHearingDate: this.firForm.get('firstHearingDate_two')?.value,
@@ -6377,7 +6494,8 @@ async UpdateAsDraft_7() {
       judgementNature: this.firForm.get('judgementDetails_two.judgementNature_two')?.value,
       uploadJudgement: this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value,
       Conviction_Type: this.firForm.get('judgementDetails_two.Conviction_Type_two')?.value,
-      Judgement_Date: this.firForm.get('Judgement_Date_two')?.value,
+      Judgement_Date: this.firForm.get('judgementDetails_two.Judgement_Date_two')?.value,
+      judgement_nature_remarks: this.firForm.get('judgementDetails_two.judgement_nature_remarks_two')?.value,
     },
 
     compensationDetails: {
@@ -6446,9 +6564,11 @@ async UpdateAsDraft_7() {
   };
 
   this.firService.UpdateStepSevenAsDraft(formFields).subscribe({
-    next: () => Swal.fire('Success', 'Draft data saved successfully.', 'success'),
+    next: () => Swal.fire('Success', 'Draft data saved successfully.', 'success'), 
     error: () => Swal.fire('Error', 'Failed to save draft data.', 'error')
   });
+  this.SubmitButton = true;
+  this.cdr.detectChanges();
 }
 
 
@@ -6579,6 +6699,7 @@ async UpdateAsDraft_7() {
 
   proceedingsFile_1: File | null = null;
   saveAsDraft_6(isSubmit: boolean = false): void {
+    this.SubmitButton = false;
     // if (!this.firId) {
     //   Swal.fire('Error', 'FIR ID is missing. Unable to save as draft.', 'error');
     //   return;
@@ -6633,7 +6754,8 @@ async UpdateAsDraft_7() {
     // Call the service to send data to the backend
     this.firService.updateStep6(chargesheetData).subscribe(
       (response: any) => {
-
+        this.SubmitButton = true;
+        this.cdr.detectChanges();
         this.submitStepSix();
         Swal.fire({
           title: 'Success',
@@ -6642,6 +6764,8 @@ async UpdateAsDraft_7() {
         });
       },
       (error) => {
+        this.SubmitButton = true;
+        this.cdr.detectChanges();
         console.error('Error saving Step 6 data:', error);
         Swal.fire('Error', 'Failed to save Step 6 data.', 'error');
       }

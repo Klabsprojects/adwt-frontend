@@ -175,8 +175,8 @@
                       </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
-                <button type="button" class="btn btn-primary" [disabled]="!isStep1Valid()" (click)="nextStep()">Next</button>
+                <button type="button" class="btn btn-warning me-2" [disabled]="!SubmitButton" (click)="saveAsDraft()">Save as Draft</button>
+                <button type="button" class="btn btn-primary" [disabled]="!isStep1Valid() || !SubmitButton" (click)="nextStep()">Next</button>
               </div>
 
             <div *ngIf="mainStep === 1 && step === 2" class="form-step">

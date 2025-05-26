@@ -185,8 +185,8 @@
             </div>
           </div>
         </div>
-        <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
-        <button type="button" class="btn btn-primary"  [disabled]="!isStep1Valid()" (click)="nextStep()">Next</button>
+        <button type="button" class="btn btn-warning me-2" [disabled]="!SubmitButton" (click)="saveAsDraft()">Save as Draft</button>
+        <button type="button" class="btn btn-primary"  [disabled]="!isStep1Valid() || !SubmitButton" (click)="nextStep()">Next</button>
       </div>
       <div *ngIf="mainStep === 1 && step === 2" class="form-step">
         <h3 class="mb-4">Step 2: Offence Information</h3>
@@ -280,9 +280,9 @@
           </div>
         </div>
         <div class="mt-4">
-          <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
+          <button type="button" class="btn btn-warning me-2" [disabled]="!SubmitButton" (click)="saveAsDraft()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-          <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid()">Next</button>
+          <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid() || !SubmitButton">Next</button>
         </div>
       </div>
       <div *ngIf="mainStep === 1 && step === 3" class="form-step">
@@ -580,9 +580,9 @@
           </div>
         </div>
         <div class="mt-4">
-          <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
+          <button type="button" class="btn btn-warning me-2" [disabled]="!SubmitButton" (click)="saveAsDraft()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-          <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid()">Next</button>
+          <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid() || !SubmitButton">Next</button>
         </div>
       </div>
       <div *ngIf="mainStep === 1 && step === 4" class="form-step">
@@ -890,10 +890,10 @@
 
 
         <div class="mt-4">
-          <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
+          <button type="button" class="btn btn-warning me-2" [disabled]="!SubmitButton" (click)="saveAsDraft()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
           <!-- <button type="button" class="btn btn-primary" (click)="saveStepFourAsDraft()" [disabled]="!isStepValid()">Next</button> -->
-          <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid()">Submit</button>
+          <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="!isStepValid() || !SubmitButton">Submit</button>
         </div>
       </div>
       <div *ngIf="mainStep === 1 && step === 5" class="form-step">
@@ -946,7 +946,7 @@
                 <input type="text" class="form-control text-end" formControlName="reliefAmountFirstStage" placeholder="0" (keypress)="allowOnlyNumbers($event)"  />
               </div>
             </div>
-            <div class="mb-4" *ngIf="showRelief">
+            <div class="mb-4" *ngIf="victimRelief.get('relief_applicable')?.value == 1 || victimRelief.get('relief_applicable2')?.value == 1">
               <label class="form-label d-block mb-2">
                 57. Eligible additional relief for the legal heir of the person died (Victim {{ i + 1 }}) *
               </label>
@@ -1119,9 +1119,9 @@
           </div>
         </div> -->
         <div class="mt-4">
-          <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft()">Save as Draft</button>
+          <button type="button" class="btn btn-warning me-2" [disabled]="!SubmitButton" (click)="saveAsDraft()">Save as Draft</button>
           <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button>
-          <button *ngIf="step === 5" type="submit" class="btn btn-primary" [disabled]="!firstageValid()" (click)="submitStepFive()">Submit</button>
+          <button *ngIf="step === 5" type="submit" class="btn btn-primary" [disabled]="!firstageValid() || !SubmitButton" (click)="submitStepFive()">Submit</button>
         </div>
       </div>
 
@@ -1425,10 +1425,10 @@
           </div>
         </div>
         <div class="mt-4">
-          <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft_6()">Save as Draft</button>
+          <button type="button" class="btn btn-warning me-2" [disabled]="!SubmitButton" (click)="saveAsDraft_6()">Save as Draft</button>
           <!-- <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button> -->
           <button type="button" class="btn btn-secondary me-2" (click)="previousMainStep()">Previous</button>
-          <button type="button" class="btn btn-primary" (click)="submitStepSix();saveAsDraft_6()" [disabled]="!isStep6Valid()">Submit</button>
+          <button type="button" class="btn btn-primary" (click)="submitStepSix();saveAsDraft_6()" [disabled]="!isStep6Valid() || !SubmitButton">Submit</button>
         </div>
       </div>
      
@@ -1486,14 +1486,19 @@
 
                     <!-- Item 76 -->
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">82. Case Number Report (CNR) / Special SC number *</label>
-                        <input type="text" class="form-control" formControlName="trialCaseNumber" placeholder="Enter Case Number" required />
+                        <label class="form-label">82. CNR Numbers *</label>
+                        <input type="text" class="form-control" formControlName="trialCaseNumber" placeholder="Enter CNR Numbers" required />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">82.A SC/Special SC Number *</label>
+                        <input type="text" class="form-control" formControlName="CRL_number" placeholder="Enter SC/Special SC Number" required />
                     </div>
 
 <!-- newly addaed item -->
 
 <div class="col-md-6 mb-3">
-<label class="form-label">82. A. Case is handled by *</label>
+<label class="form-label">82. B. Case is handled by *</label>
 <select class="form-select" formControlName="CaseHandledBy"(change)="onCaseHandledByChange($event)" required>
 <option value="" disabled selected>Select </option>
 <option *ngFor="let data of CaseHandledBy" [value]="data">{{ data }}</option>
@@ -1502,7 +1507,7 @@
 
 
 <div *ngIf="show94BAnd94C" class="col-md-6 mb-3">
-<label class="form-label">82. B. Name of the advocate *</label>
+<label class="form-label">82. C. Name of the advocate *</label>
 <input type="text" class="form-control" formControlName="NameOfAdvocate" placeholder="Enter advocate name" required />
 </div>
 
@@ -1511,7 +1516,7 @@
 
 
 <div *ngIf="show94BAnd94C" class="col-md-6 mb-3">
-<label class="form-label">82. C. Phone Number of the advocate *</label>
+<label class="form-label">82. D. Phone Number of the advocate *</label>
 <input
 type="text"
 class="form-control"
@@ -1709,6 +1714,13 @@ maxlength="10"
                         </select>
                       </div>
 
+ 
+                        <div *ngIf="firForm.get('judgementDetails.judgementNature')?.value" class="col-md-12 mb-3">
+                          <label for="judgement_nature_remarks" class="form-label">Remarks</label>
+                          <textarea id="judgement_nature_remarks" class="form-control" formControlName="judgement_nature_remarks" rows="4" maxlength="3000" placeholder="Remarks"> </textarea>
+                          <small class="form-text text-muted">Maximum of 3000 Characters</small>
+                        </div>
+
                       <!-- Upload Judgement Copy -->
                       <!-- <div class="col-md-6">
                         <label class="form-label">88. Upload Judgement Copy *</label>
@@ -1723,7 +1735,7 @@ maxlength="10"
                       </div> -->
 
                       <div class="col-md-6">
-                        <label class="form-label">88. Upload Judgement Copy *</label>
+                        <label class="form-label">88. Upload Judgement Copy</label>
                         <input
                           type="file"
                           class="form-control"
@@ -1801,6 +1813,7 @@ maxlength="10"
                           <option value="" disabled selected>Select Option</option>
                           <option value="victim">Victim</option>
                           <option value="government">Government</option>
+                          <option value="No appeal yet">No appeal yet</option>
                         </select>
                       </div>
 
@@ -1849,8 +1862,12 @@ maxlength="10"
                             </div>
                             <!-- Item 76 -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">2. Case Number Report (CNR) / Special SC number *</label>
-                                <input type="text" class="form-control" formControlName="caseNumber_one" placeholder="Enter Case Number" required />
+                                <label class="form-label">2. CNR Numbers *</label>
+                                <input type="text" class="form-control" formControlName="caseNumber_one" placeholder="Enter CNR Number" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">2a. CRL. A Number *</label>
+                                <input type="text" class="form-control" formControlName="CRL_number_one" placeholder="Enter CRL Number" required />
                             </div>
                             <!-- Item 77 -->
                             <div class="col-md-6 mb-3">
@@ -1904,7 +1921,7 @@ maxlength="10"
 
 
                 <div >
-                  <div class="border border-primary rounded p-3 mb-4">
+                  <div *ngIf="this.firForm.get('judgementDetails.judgementAwarded_one')?.value == 'no'" class="border border-primary rounded p-3 mb-4">
                     <!-- Wrap the entire section with formArrayName -->
                     <div formArrayName="hearingDetails_one">
                       <div
@@ -2021,6 +2038,12 @@ maxlength="10"
                                   <option value="Above 5 Years imprisonment">Above 5 Years imprisonment</option>
                                 </select>
                               </div>
+
+                        <div *ngIf="firForm.get('judgementDetails_one.judgementNature_one')?.value" class="col-md-12 mb-3">
+                          <label for="judgement_nature_remarks_one" class="form-label">Remarks</label>
+                          <textarea id="judgement_nature_remarks_one" class="form-control" formControlName="judgement_nature_remarks_one" rows="4" maxlength="3000" placeholder="Remarks"> </textarea>
+                          <small class="form-text text-muted">Maximum of 3000 Characters</small>
+                        </div>
 
                               <!-- Upload Judgement Copy -->
                         
@@ -2145,9 +2168,15 @@ maxlength="10"
                           </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">3. Case Number Report (CNR) / Special SC number *</label>
-                                <input type="text" class="form-control" formControlName="caseNumber_two" placeholder="Enter Case Number" required />
+                                <label class="form-label">3. CNR Number *</label>
+                                <input type="text" class="form-control" formControlName="caseNumber_two" placeholder="Enter CRM Number" required />
                             </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">3a. CRL. A Number *</label>
+                                <input type="text" class="form-control" formControlName="CRL_number_two" placeholder="Enter CLR Number" required />
+                            </div>
+
                             <!-- Item 77 -->
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">4. Special Public Prosecutor's Name *</label>
@@ -2318,6 +2347,12 @@ maxlength="10"
                                 </select>
                               </div>
 
+                        <div *ngIf="firForm.get('judgementDetails_two.judgementNature_two')?.value" class="col-md-12 mb-3">
+                          <label for="judgement_nature_remarks_two" class="form-label">Remarks</label>
+                          <textarea id="judgement_nature_remarks_two" class="form-control" formControlName="judgement_nature_remarks_two" rows="4" maxlength="3000" placeholder="Remarks"> </textarea>
+                          <small class="form-text text-muted">Maximum of 3000 Characters</small>
+                        </div>
+
                               <!-- Upload Judgement Copy -->
                               <!-- <div class="col-md-6">
                                 <label class="form-label">13. Upload Judgement Copy *</label>
@@ -2429,7 +2464,7 @@ maxlength="10"
 
 
 
-              <div  *ngIf="!hideCompensationSection">
+              <div  *ngIf="!hideCompensationSection && (firForm.get('judgementDetails.judgementNature')?.value == 'Convicted' || firForm.get('judgementDetails.filedBy')?.value != 'No appeal yet')">
                     <div formArrayName="victimsRelief">
                       <div *ngFor="let victimRelief of victimsRelief.controls; let i = index" [formGroupName]="i"  class="card border-primary mb-4">
                          <div class="card-body">
@@ -2627,14 +2662,14 @@ maxlength="10"
 </div>
         <!-- Navigation Buttons -->
         <div class="mt-4">
-            <button type="button" class="btn btn-warning me-2" (click)="saveAsDraft_7()">
+            <button type="button" class="btn btn-warning me-2"  [disabled]="!SubmitButton" (click)="saveAsDraft_7()">
                 Save as Draft
             </button>
             <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">
                 Previous
             </button>
             <!-- (click)="submitStepSeven()" -->
-            <button type="submit" class="btn btn-primary"  [disabled]="!isStep7Valid()" (click)="saveAsDraft_7();submitStep7()">Submit</button>
+            <button type="submit" class="btn btn-primary"  [disabled]="!isStep7Valid() || !SubmitButton" (click)="saveAsDraft_7();submitStep7()">Submit</button>
         </div>
 </div>
     </form>
