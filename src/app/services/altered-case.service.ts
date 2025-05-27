@@ -12,11 +12,11 @@ export class AlteredCaseService {
   constructor(private http: HttpClient) {}
 
   getNatureOfOffenceOptions(): Observable<{ offence_name: string }[]> {
-    return this.http.get<{ offence_name: string }[]>(`${this.baseUrl}/natureOfOffenceOptions`);
+    return this.http.get<{ offence_name: string }[]>(`${this.baseUrl}natureOfOffenceOptions`);
   }
 
   getSCSTSectionsOptions(): Observable<{ offence_act_name: string }[]> {
-    return this.http.get<{ offence_act_name: string }[]>(`${this.baseUrl}/scstSectionsOptions`);
+    return this.http.get<{ offence_act_name: string }[]>(`${this.baseUrl}scstSectionsOptions`);
   }
 
 
@@ -46,7 +46,7 @@ export class AlteredCaseService {
   }
 
   getVictimsByFirId(firId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/victims_new`, { params: { fir_id: firId } });
+    return this.http.get<any[]>(`${this.baseUrl}victims_new`, { params: { fir_id: firId } });
   }
 
   updateVictims(payload: any): Observable<any> {
@@ -57,7 +57,7 @@ export class AlteredCaseService {
   }
 
   getVictimNamesByFirId(firId: string): Observable<{ name: string; isSelected: number }[]> {
-    return this.http.get<{ name: string; isSelected: number }[]>(`${this.baseUrl}/get-victim-names/${firId}`);
+    return this.http.get<{ name: string; isSelected: number }[]>(`${this.baseUrl}get-victim-names/${firId}`);
   }
 
 

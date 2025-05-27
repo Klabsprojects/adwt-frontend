@@ -893,4 +893,61 @@ export class VmcmeetingComponent implements OnInit {
         }
       );
     }
+
+
+
+     deleteMeeting(meetingID: string): void {
+        console.log("Deleting Meeting with ID:", meetingID); // Debugging log
+        if (!meetingID) {
+          console.error("Meeting ID is missing!");
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Meeting ID is missing. Deletion cannot proceed.',
+            confirmButtonColor: '#d33',
+          });
+          return;
+        }
+    
+        Swal.fire({
+          title: 'Are you sure?',
+          text: 'You will not be able to recover this Meeting!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'No, cancel!',
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.vmcMeeting.deleteMeeting(meetingID).subscribe(
+              () => {
+                this.showSuccessAlert('Meeting deleted successfully!');
+                this.loadMeeting();
+              },
+              (error: any) => {
+                console.error("Error deleting Meeting:", error);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Failed to delete the Meeting. Please try again later.',
+                  confirmButtonColor: '#d33',
+                });
+              }
+            );
+          }
+        });
+      }
+
+
+  showSuccessAlert(message: string) {
+  Swal.fire({
+  icon: 'success',
+  title: 'Success!',
+  text: message,
+  confirmButtonText: 'OK',
+  confirmButtonColor: '#3085d6',
+  });
+  }
+
 }

@@ -80,6 +80,7 @@
               <div ngbDropdownMenu>
                 <button ngbDropdownItem (click)="Edit(meeting,'Edit')">Edit</button>
                 <button ngbDropdownItem (click)="Edit(meeting,'View')">View</button>
+                <button *ngIf="Parsed_UserInfo.role == '1'" ngbDropdownItem (click)="deleteMeeting(meeting.id)">Delete</button>
               </div>
             </div>
           </td>

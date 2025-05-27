@@ -338,7 +338,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   removeAttachmentFromBackend1(id: number): void {
     this.firServiceAPI.removeAttachmentFromBackend1(id).subscribe(
       response => {
-        console.log('Attachment removed successfully:', response);
+        // console.log('Attachment removed successfully:', response);
       },
       error => {
         console.error('Error removing attachment:', error);
@@ -348,7 +348,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   removeAttachmentFromBackend(id: number): void {
     this.firServiceAPI.removeAttachmentFromBackend(id).subscribe(
       response => {
-        console.log('Attachment removed successfully:', response);
+        // console.log('Attachment removed successfully:', response);
       },
       error => {
         console.error('Error removing attachment:', error);
@@ -390,7 +390,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   
   this.selectedFiles =selectedFiles
    
-      console.log(selectedFiles,"selectedFiles")
+      // console.log(selectedFiles,"selectedFiles")
        // Convert FileList to File[]
       this.processFiles2(selectedFiles);  // Process the selected files
     } else {
@@ -731,7 +731,7 @@ loadAccusedCommunities(): void {
         if(stepNumber == 5){
         this.firService.GetVictimInformationDetails(this.firId).subscribe(
         (response: any) => {
-          console.log(response)
+          // console.log(response)
           if(response.datacount.id == 0){
             this.navigateToStep(3);
           } else {
@@ -881,11 +881,11 @@ loadAccusedCommunities(): void {
   }
 
   navigateToMainStep(stepNumber: number): void {
-    console.log(stepNumber, 'main step')
+    // console.log(stepNumber, 'main step')
     if(stepNumber == 2){
       this.firService.Getstep5Detail(this.firId).subscribe(
         (response: any) => {
-          console.log(response)
+          // console.log(response)
           if(response.datacount.id > 0 && response.datacount.status >= 5){
              this.mainStep = stepNumber;
             this.step = 1; 
@@ -900,7 +900,7 @@ loadAccusedCommunities(): void {
     } else if (stepNumber == 3){
          this.firService.GetChargesheetDetail(this.firId).subscribe(
         (response: any) => {
-          console.log(response)
+          // console.log(response)
           if(response.datacount.id == 0){
             Swal.fire('Warning', "Kindly Complete Chargesheet Stage First!", 'warning');
           } else {
@@ -1083,7 +1083,7 @@ onOffenceCommittedChange(index: number): void {
       getId:any) {
       const victimGroup = victims.at(index) as FormGroup; // Access the victim's FormGroup
       const victimsReliefGroup = victimsRelief.at(index) as FormGroup;
-      console.log(victimsReliefGroup);
+      // console.log(victimsReliefGroup);
       // Filter to find matching poa_act_section values
       const matchingSections = offenceReliefDetails
         .filter(offence => selectedOffences.includes(offence.name_of_offence))
@@ -1092,12 +1092,12 @@ onOffenceCommittedChange(index: number): void {
         this.loader = true;
         this.firService.getOffenceActsWithId(getId).subscribe(
           (response: any[]) => {
-            console.log(response);
+            // console.log(response);
             this.loader = false;
             let responseArray = Array.isArray(response) ? response : [response];
             const matchedActs = responseArray.filter((act) => {
               const actNamesArray = act.offence_act_names.split(',');
-              console.log(actNamesArray, matchingSections);
+              // console.log(actNamesArray, matchingSections);
               return actNamesArray.some((name: any) => matchingSections.includes(name)); 
             });
             if (matchedActs.length > 0) {
@@ -2332,7 +2332,7 @@ removeFIRCopy(): void {
       // Resetting the victims array in case of a previous value
       const victimsFormArray = this.firForm.get('victims') as FormArray;
       victimsFormArray.clear(); // Clear any existing victims data
-      console.log('arryresp',response.data1);
+      // console.log('arryresp',response.data1);
 
       response.data1.forEach((victim: any, index: number) => {
 
@@ -2409,7 +2409,7 @@ removeFIRCopy(): void {
       accusedFormArray.clear(); 
       this.firCopyValue = [];
       response.data2.forEach((accused: any,index:number) => {
-        console.log(accused.upload_fir_copy,"uploadFIRCopy")
+        // console.log(accused.upload_fir_copy,"uploadFIRCopy")
         const selectedCommunity = accused.community;
    
         if (selectedCommunity) {
@@ -2461,7 +2461,7 @@ removeFIRCopy(): void {
     }
 
     if(response && response.data3){
-      console.log('response.data3-response.data3',response.data3);
+      // console.log('response.data3-response.data3',response.data3);
 
       if (response.data3.proceedings_date) {
         const dateObj = new Date(response.data3.proceedings_date);
@@ -2483,7 +2483,7 @@ removeFIRCopy(): void {
   
         const data = response.data3.proceedings_file
         this.proceedingFileName = data;
-        console.log('data-data-data',data);
+        // console.log('data-data-data',data);
         this.firForm.get('proceedingsFile')?.setValue(data);
         this.filePath_attachment = response.data3.file_paths?.length ? response.data3.file_paths.map((file:any) => `${file}`): [];
         
@@ -2506,7 +2506,7 @@ removeFIRCopy(): void {
       
           this.allFiles = allFilesArray;
 
-          console.log(response,"this.allFiles")
+          // console.log(response,"this.allFiles")
         } catch (error) {
           console.error('Error parsing all_attachments:', error);
           this.allFiles = [];
@@ -2515,7 +2515,7 @@ removeFIRCopy(): void {
     }
 
     if(response && response.data4){
-      console.log("response.data4",response.data4);
+      // console.log("response.data4",response.data4);
 
     const chargesheetDetails = response.data4;
 
@@ -2570,6 +2570,9 @@ removeFIRCopy(): void {
     if (chargesheetDetails.case_number) {
       this.firForm.get('caseNumber')?.setValue(chargesheetDetails.case_number);
     }
+    if (chargesheetDetails.ChargeSheet_CRL_number) {
+      this.firForm.get('ChargeSheet_CRL_number')?.setValue(chargesheetDetails.ChargeSheet_CRL_number);
+    }
     if (chargesheetDetails.chargesheetDate){
       const date = new Date(chargesheetDetails.chargesheetDate);
       const formattedDate = date.toISOString().split('T')[0];
@@ -2623,7 +2626,7 @@ removeFIRCopy(): void {
     
     if(response.data5 && response.data5.length){
 
-      console.log('response.data5',response.data5);
+      // console.log('response.data5',response.data5);
 
       if (response.data5[0].Judgement_Date){
       const date = new Date(response.data5[0].Judgement_Date);
@@ -2636,14 +2639,14 @@ removeFIRCopy(): void {
     }
 
       if (this.firForm && response.data5 && response.data5.length > 0) {
-        console.log("ConvictionType from API:", response.data5[0].Conviction_Type);
+        // console.log("ConvictionType from API:", response.data5[0].Conviction_Type);
       
         const convictionType = response.data5[0].Conviction_Type || '';
       
         // Check if the form group exists before setting the value
         if (this.firForm.get('judgementDetails.Conviction_Type')) {
           this.firForm.get('judgementDetails.Conviction_Type')?.setValue(convictionType);
-          console.log("Form Control after setting:", this.firForm.get('judgementDetails.Conviction_Type')?.value);
+          // console.log("Form Control after setting:", this.firForm.get('judgementDetails.Conviction_Type')?.value);
         } else {
           console.error("Conviction_Type is missing inside judgementDetails!");
         }
@@ -2830,7 +2833,7 @@ removeFIRCopy(): void {
            
           });
 
-          console.log(this.firForm.get('judgementDetails')?.value,"sasasasasasa");
+          // console.log(this.firForm.get('judgementDetails')?.value,"sasasasasasa");
 
           this.onLegalOpinionChange();
           this.onDesignatedCourtChange_demo();
@@ -2840,7 +2843,7 @@ removeFIRCopy(): void {
 
 
     if (response.appeal_details_one && response.appeal_details_one.length > 0) {
-      console.log(response.appeal_details_one,"appeal_details_one")
+      // console.log(response.appeal_details_one,"appeal_details_one")
         response.appeal_details_one.forEach((appealDetail:any) => {
 
         this.firForm.patchValue({
@@ -2888,11 +2891,11 @@ removeFIRCopy(): void {
     }
 
     if (response.hearingDetails_one && response.hearingDetails_one.length > 0) {
-      console.log(response.hearingDetails_one, "response.hearingDetails_one");
+      // console.log(response.hearingDetails_one, "response.hearingDetails_one");
     
       const hearingDetailsControl = this.firForm.get('hearingDetails_one') as FormArray;
     
-      console.log(hearingDetailsControl, "hearingDetailsControl");
+      // console.log(hearingDetailsControl, "hearingDetailsControl");
     
       hearingDetailsControl.clear(); 
     
@@ -2909,7 +2912,7 @@ removeFIRCopy(): void {
     }
 
     if (response.compensation_details_2 && response.compensation_details_2.length > 0) {
-        console.log(response.compensation_details_2,"compensation_details_2")
+        // console.log(response.compensation_details_2,"compensation_details_2")
         response.compensation_details_2.forEach((item:any) => {
         this.firForm.patchValue({
           totalCompensation_2: item.total_compensation,
@@ -2919,11 +2922,11 @@ removeFIRCopy(): void {
 
         });
         this.file95 = item.upload_proceedings;
-        console.log('file95',this.file95);
+        // console.log('file95',this.file95);
         if (item.upload_proceedings) {
           this.uploadProceedings_2_preview = `${this.image_access2}${item.upload_proceedings}`;
 
-          console.log( this.uploadProceedings_2_preview," this.uploadProceedings_2_preview",'item.upload_proceedings',item.upload_proceedings);
+          // console.log( this.uploadProceedings_2_preview," this.uploadProceedings_2_preview",'item.upload_proceedings',item.upload_proceedings);
         }
       });
     }
@@ -3084,7 +3087,7 @@ removeFIRCopy(): void {
       ...this.firForm.value,
     };
 
-    console.log("Submit data",firData);
+    // console.log("Submit data",firData);
 
     this.firService.handleStepOne(this.firId, firData).subscribe(
       (response: any) => { 
@@ -3178,11 +3181,11 @@ removeFIRCopy(): void {
         
         victims.push({
           victim_id: victim.victim_id || null,
-          name: isVictimSameAsComplainant ? complainantDetails.nameOfComplainant : victim?.name?.trim() || '', 
+          name: victim?.name?.trim() || '', 
           age: victim.age || '',
           gender: victim.gender || '',
           customGender: victim.gender === 'Other' ? victim.customGender || null : null,
-          mobileNumber: isVictimSameAsComplainant ? complainantDetails.mobileNumberOfComplainant : victim?.mobileNumber?.trim() || '', 
+          mobileNumber: victim?.mobileNumber?.trim() || '', 
           address: victim.address || null,
           victimPincode: victim.victimPincode || null,
           community: victim.community || '',
@@ -3461,7 +3464,7 @@ removeFIRCopy(): void {
       })
     };
 
-    console.log(firData, "firDatafirDatafirData");
+    // console.log(firData, "firDatafirDatafirData");
 
     this.firService.saveStepFourAsDraft(firData).subscribe(
       (response: any) => {
@@ -3516,7 +3519,7 @@ removeFIRCopy(): void {
       attachments: this.attachmentss_1 ? this.attachmentss_1.map((item: any) => item.path) : [],
       status: isSubmit ? 5 : undefined,
     };
-  console.log(firData,"firDatafirDatafirData")
+  // console.log(firData,"firDatafirDatafirData")
 
     this.firService.updatestep5(firData).subscribe(
       (response) => {
@@ -3674,7 +3677,7 @@ removeFIRCopy(): void {
               if(stations){
                 this.policeStations = stations.map(station =>
                   station.replace(/\s+/g, '-'));
-                  console.log("before station",station_name);
+                  // console.log("before station",station_name);
                 if(station_name) {
                   const station = this.policeStations.find(ele => console.log(ele === station_name));
                   this.firForm.get('stationName')?.setValue(station_name);
@@ -3801,6 +3804,7 @@ onAccusedAgeChange(index: number): void {
       courtDivision: ['', Validators.required],
       courtName: ['', Validators.required],
       caseNumber: ['', Validators.required],
+      ChargeSheet_CRL_number: ['', Validators.required],
       chargeSheetDate:[{ value: '', disabled: true }],
 
       // Step 6 Fields - Case Trial and Court Details
@@ -3932,12 +3936,14 @@ onAccusedAgeChange(index: number): void {
   
     if (caseType === 'chargeSheet') {
       this.firForm.get('caseNumber')?.enable();
+      this.firForm.get('ChargeSheet_CRL_number')?.enable();
       this.firForm.get('chargeSheetDate')?.enable();
       this.firForm.get('rcsFileNumber')?.disable();
       this.firForm.get('rcsFilingDate')?.disable();
       this.firForm.get('mfCopy')?.disable();
     } else if (caseType === 'referredChargeSheet') {
       this.firForm.get('caseNumber')?.disable();
+      this.firForm.get('ChargeSheet_CRL_number')?.disable();
       this.firForm.get('chargeSheetDate')?.disable();
       this.firForm.get('rcsFileNumber')?.enable();
       this.firForm.get('rcsFilingDate')?.enable();
@@ -4052,12 +4058,12 @@ uploadedImageSrc: any | ArrayBuffer;
     const control = this.accuseds.at(index).get(field); // Access form control correctly
     if (control) {
       const value = control.value?.trim() || '';
-      console.log(`[INFO] Input detected - Field: ${field}, Index: ${index}, Value: "${value}"`);
+      // console.log(`[INFO] Input detected - Field: ${field}, Index: ${index}, Value: "${value}"`);
       if (value !== '') {  
-        console.log(`[SUCCESS] ${field} input filled for index ${index}: "${value}" - No error shown.`);
+        // console.log(`[SUCCESS] ${field} input filled for index ${index}: "${value}" - No error shown.`);
         control.setErrors(null); // Clear errors if input is valid
       } else {  
-        console.log(`[ERROR] ${field} input is empty for index ${index} - Showing error.`);
+        // console.log(`[ERROR] ${field} input is empty for index ${index} - Showing error.`);
         control.setErrors({ required: true }); // Set error if input is empty
       }  
       // Ensure UI updates properly
@@ -4203,7 +4209,7 @@ uploadedImageSrc: any | ArrayBuffer;
   }
   onJudgementSelectionChangehearing(event: any): void {
     const value = event.target.value; 
-    console.log(value);
+    // console.log(value);
 
     if (value === 'yes') {
       this.firForm.get('judgementDetails.judgementNature')?.setValidators([Validators.required]);
@@ -4426,7 +4432,7 @@ uploadedImageSrc: any | ArrayBuffer;
 
     this.multipleFilesForproceeding1 = selectedFile
 
-    console.log( this.multipleFilesForproceeding1)
+    // console.log( this.multipleFilesForproceeding1)
 
    
     this.uploadedFiles_procedin1g[i] = true;
@@ -4878,7 +4884,7 @@ uploadedImageSrc: any | ArrayBuffer;
 
   createVictimReliefGroup(victimReliefDetail: any): FormGroup {
 
-console.log(victimReliefDetail,"cretaieg")
+// console.log(victimReliefDetail,"cretaieg")
 
     return this.fb.group({
       victimId: [victimReliefDetail.victim_id || ''],
@@ -4942,7 +4948,7 @@ console.log(victimReliefDetail,"cretaieg")
     const startYear = 1900;
 
     for (let year = currentYear; year >= startYear; year--) {
-      console.log("year-year", typeof year);
+      // console.log("year-year", typeof year);
       this.yearOptions.push(year); // Populate yearOptions array with years
     }
   }
@@ -4964,7 +4970,7 @@ console.log(victimReliefDetail,"cretaieg")
     loadOptions() {
       this.firService.getOffences().subscribe(
         (offences: any) => {
-          console.log(offences);
+          // console.log(offences);
           this.offenceOptions = offences
             .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
             this.offenceOptions.push(
@@ -5034,7 +5040,7 @@ console.log(victimReliefDetail,"cretaieg")
   showSubCasteText = false;
   onAccusedCommunityChange(event: any, index: number): void {
     const selectedCommunity = event;
-      console.log(selectedCommunity);
+      // console.log(selectedCommunity);
       if(selectedCommunity == "General" || selectedCommunity == "Others"){
         this.showSubCaste = false;
         this.showSubCasteText = true;
@@ -5094,7 +5100,7 @@ console.log(victimReliefDetail,"cretaieg")
           (data: any) => {
             this.policeCities = [district];
     
-            console.log(data,"this.policeCities")
+            // console.log(data,"this.policeCities")
             this.policeZones = data.map((item: any) => item.police_zone_name);
             // this.policeRanges = data.map((item: any) => item.police_range_name);
             // this.revenueDistricts = data.map((item: any) => item.revenue_district_name);
@@ -5350,6 +5356,7 @@ console.log(victimReliefDetail,"cretaieg")
   'courtName',
   'caseType',
   'caseNumber',
+  'ChargeSheet_CRL_number',
   // 'chargeSheetDate',
   'proceedingsFileNo_1',
   'proceedingsDate_1'
@@ -5561,10 +5568,10 @@ controls.forEach((controlName) => {
 
   filePreviews: string[] = []; 
   removeAttachment_2(index: number): void {
-    console.log(this.attachments_2)
+    // console.log(this.attachments_2)
     if (this.attachments_2.length > 1) {
       this.attachments_2.removeAt(index);
-      console.log(this.attachments_2)
+      // console.log(this.attachments_2)
       this.filePreviews.splice(index, 1); // Remove corresponding preview
     } else {
       this.attachments_2.at(0).reset();
@@ -5921,7 +5928,7 @@ controls.forEach((controlName) => {
       }
     }
 
-console.log(formFields,"formFieldsformFields")
+// console.log(formFields,"formFieldsformFields")
 
   //   const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement | null;
   
@@ -6264,7 +6271,7 @@ console.log(formFields,"formFieldsformFields")
         });
       }
 
-      console.log(`File uploaded and path saved for index ${index}:`, uploadedFilePath);
+      // console.log(`File uploaded and path saved for index ${index}:`, uploadedFilePath);
     },
     error: (err) => {
       console.error('File upload failed:', err);
@@ -6717,15 +6724,10 @@ async UpdateAsDraft_7() {
         courtDistrict: this.firForm.get('courtDivision')?.value || '',
         courtName: this.firForm.get('courtName')?.value || '',
         caseType: this.firForm.get('caseType')?.value || '',
-        caseNumber: this.firForm.get('caseType')?.value === 'chargeSheet'
-          ? this.firForm.get('caseNumber')?.value || ''
-          : null,
-        chargeSheetDate: this.firForm.get('caseType')?.value === 'chargeSheet'
-          ? this.firForm.get('chargeSheetDate')?.value || null
-          : null,
-        rcsFileNumber: this.firForm.get('caseType')?.value === 'referredChargeSheet'
-          ? this.firForm.get('rcsFileNumber')?.value || ''
-          : null,
+        caseNumber: this.firForm.get('caseType')?.value === 'chargeSheet' ? this.firForm.get('caseNumber')?.value || '' : null,
+        chargeSheetDate: this.firForm.get('caseType')?.value === 'chargeSheet' ? this.firForm.get('chargeSheetDate')?.value || null : null,
+        ChargeSheet_CRL_number: this.firForm.get('caseType')?.value === 'chargeSheet' ? this.firForm.get('ChargeSheet_CRL_number')?.value || null : null,
+        rcsFileNumber: this.firForm.get('caseType')?.value === 'referredChargeSheet' ? this.firForm.get('rcsFileNumber')?.value || '' : null,
         rcsFilingDate: this.firForm.get('caseType')?.value === 'referredChargeSheet'
           ? this.firForm.get('rcsFilingDate')?.value || null
           : null,
@@ -6748,8 +6750,8 @@ async UpdateAsDraft_7() {
       attachments: this.attachments_1.value ? this.attachments_1.value.map((item: any) => item.file) : [],
     };
   
-    console.log(chargesheetData,"chargesheetData")
-        console.log(this.victimsRelief.value,"this.victimsRelief.value")
+    // console.log(chargesheetData,"chargesheetData")
+    //     console.log(this.victimsRelief.value,"this.victimsRelief.value")
   
     // Call the service to send data to the backend
     this.firService.updateStep6(chargesheetData).subscribe(
@@ -6958,13 +6960,13 @@ isStep1Valid(): boolean {
     
     // Check if the control exists and has a value
     if (!control || control.value === null || control.value === undefined || control.value === '') {
-      console.log(`Missing mandatory field in Step 1: ${field}`);
+      // console.log(`Missing mandatory field in Step 1: ${field}`);
       return false;
     }
     
     // Special case for string fields to check for whitespace-only values
     if (typeof control.value === 'string' && control.value.trim() === '') {
-      console.log(`Empty mandatory field in Step 1: ${field}`);
+      // console.log(`Empty mandatory field in Step 1: ${field}`);
       return false;
     }
     
@@ -6973,7 +6975,7 @@ isStep1Valid(): boolean {
       // Basic phone validation (adjust regex as needed for your format)
       const phoneRegex = /^[0-9]{10}$/; // Example: 10-digit phone number
       if (!phoneRegex.test(control.value.toString())) {
-        console.log('Invalid phone number format');
+        // console.log('Invalid phone number format');
         return false;
       }
     }
@@ -7017,13 +7019,13 @@ isStep1Valid(): boolean {
     
     // Check if the control exists and has a value
     if (!control || control.value === null || control.value === undefined || control.value === '') {
-      console.log(`Missing mandatory field in Step 2: ${field}`);
+      // console.log(`Missing mandatory field in Step 2: ${field}`);
       return false;
     }
     
     // Special case for string fields to check for whitespace-only values
     if (typeof control.value === 'string' && control.value.trim() === '') {
-      console.log(`Empty mandatory field in Step 2: ${field}`);
+      // console.log(`Empty mandatory field in Step 2: ${field}`);
       return false;
     }  
   }
@@ -7057,7 +7059,7 @@ isStep1Valid(): boolean {
   // Check complainant details mandatory fields
   const complainantDetails = this.firForm.get('complainantDetails') as FormGroup;
   if (!complainantDetails) {
-    console.log('Missing complainantDetails section');
+    // console.log('Missing complainantDetails section');
     return false;
   }
 
@@ -7077,13 +7079,13 @@ isStep1Valid(): boolean {
   for (const field of complainantMandatoryFields) {
     const control = complainantDetails.get(field);
     if (!control || control.value === null || control.value === undefined || control.value === '') {
-      console.log(`Missing mandatory field for complainant: ${field}`);
+      // console.log(`Missing mandatory field for complainant: ${field}`);
       return false;
     }
     
     // Special case for string fields
     if (typeof control.value === 'string' && control.value.trim() === '') {
-      console.log(`Empty mandatory field for complainant: ${field}`);
+      // console.log(`Empty mandatory field for complainant: ${field}`);
       return false;
     }
   }
@@ -7094,7 +7096,7 @@ isStep1Valid(): boolean {
   
   // Check if numberOfVictims is specified
   if (!numberOfVictims) {
-    console.log('Missing number of victims');
+    // console.log('Missing number of victims');
     return false;
   }
 
@@ -7137,19 +7139,19 @@ isStep1Valid(): boolean {
       const control = victimGroup.get(field);
       
       if (!control || control.value === null || control.value === undefined || control.value === '') {
-        console.log(`Missing mandatory field for victim[${i}]: ${field}`);
+        // console.log(`Missing mandatory field for victim[${i}]: ${field}`);
         return false;
       }
       
       // Special case for string fields
       if (typeof control.value === 'string' && control.value.trim() === '') {
-        console.log(`Empty mandatory field for victim[${i}]: ${field}`);
+        // console.log(`Empty mandatory field for victim[${i}]: ${field}`);
         return false;
       }
       
       // Special case for array fields
       if (Array.isArray(control.value) && control.value.length === 0) {
-        console.log(`Empty array field for victim[${i}]: ${field}`);
+        // console.log(`Empty array field for victim[${i}]: ${field}`);
         return false;
       }
     }
@@ -7159,7 +7161,7 @@ isStep1Valid(): boolean {
       const customGender = victimGroup.get('customGender');
       if (!customGender || !customGender.value || 
           (typeof customGender.value === 'string' && customGender.value.trim() === '')) {
-        console.log(`Missing customGender for victim[${i}] with gender 'Other'`);
+        // console.log(`Missing customGender for victim[${i}] with gender 'Other'`);
         return false;
       }
     }
@@ -7170,7 +7172,7 @@ isStep1Valid(): boolean {
   
   // Check if isDeceased field is filled
   if (!isDeceased) {
-    console.log('Missing isDeceased field');
+    // console.log('Missing isDeceased field');
     return false;
   }
   
@@ -7179,7 +7181,7 @@ isStep1Valid(): boolean {
     const deceasedPersonNames = this.firForm.get('deceasedPersonNames')?.value;
     if (!deceasedPersonNames || 
         (Array.isArray(deceasedPersonNames) && deceasedPersonNames.length === 0)) {
-      console.log('Missing deceased person names');
+      // console.log('Missing deceased person names');
       return false;
     }
   }
@@ -7225,21 +7227,21 @@ isStep1Valid(): boolean {
   const numberOfAccusedControl = this.firForm.get('numberOfAccused');
   // Check if 'numberOfAccused' control has a value (mandatory field)
   if (!numberOfAccusedControl || !numberOfAccusedControl.value) {
-    console.log('Missing mandatory field: numberOfAccused');
+    // console.log('Missing mandatory field: numberOfAccused');
     return false;
   }
 
   const gistOfCurrentCaseControl = this.firForm.get('gistOfCurrentCase');
   // Check if 'numberOfAccused' control has a value (mandatory field)
   if (!gistOfCurrentCaseControl || !gistOfCurrentCaseControl.value) {
-    console.log('Missing mandatory field: gistOfCurrentCase');
+    // console.log('Missing mandatory field: gistOfCurrentCase');
     return false;
   }
 
   const uploadFIRCopyControl = this.firForm.get('uploadFIRCopy');
   // Check if 'numberOfAccused' control has a value (mandatory field)
   if (!uploadFIRCopyControl || !uploadFIRCopyControl.value) {
-    console.log('Missing mandatory field: uploadFIRCopy');
+    // console.log('Missing mandatory field: uploadFIRCopy');
     return false;
   }
 
@@ -7291,13 +7293,13 @@ isStep1Valid(): boolean {
     for (const field of mandatoryFields) {
       const control = accusedGroup.get(field);
       if (!control || !control.value) {
-        console.log(`Missing mandatory field for accused[${i}]: ${field}`);
+        // console.log(`Missing mandatory field for accused[${i}]: ${field}`);
         return false;
       }
       
       // Special case for fields that require trimming (string fields)
       if (typeof control.value === 'string' && control.value.trim() === '') {
-        console.log(`Empty mandatory field for accused[${i}]: ${field}`);
+        // console.log(`Empty mandatory field for accused[${i}]: ${field}`);
         return false;
       }
     }
@@ -7381,7 +7383,7 @@ isStep1Valid(): boolean {
     stepOneFields.forEach(field => {
       this.firForm.get(field)?.valueChanges.pipe(skip(1),distinctUntilChanged()).subscribe(() => {
         this.isStepOneModified = true;
-        console.log(`Step 1 field changed: ${field}`);
+        // console.log(`Step 1 field changed: ${field}`);
       });
     });
   }
@@ -7391,7 +7393,7 @@ isStep1Valid(): boolean {
     stepOneFields.forEach(field => {
       this.firForm.get(field)?.valueChanges.pipe(skip(1),distinctUntilChanged()).subscribe(() => {
         this.isStepTwoModified = true;
-        console.log(`Step 2 field changed: ${field}`);
+        // console.log(`Step 2 field changed: ${field}`);
       });
     });
   }
@@ -7403,7 +7405,7 @@ isStep1Valid(): boolean {
     complainantFields.forEach(field => {
       this.firForm.get(`complainantDetails.${field}`)?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
         this.isStepThreeModified = true;
-        console.log(`Step 3 field changed: ${field}`);
+        // console.log(`Step 3 field changed: ${field}`);
       });
     });
   
@@ -7411,7 +7413,7 @@ isStep1Valid(): boolean {
     otherFields.forEach(field => {
       this.firForm.get(field)?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
         this.isStepThreeModified = true;
-        console.log(`Step 3 field changed: ${field}`);
+        // console.log(`Step 3 field changed: ${field}`);
       });
     });
   
@@ -7423,7 +7425,7 @@ isStep1Valid(): boolean {
         distinctUntilChanged()
       ).subscribe(() => {
         this.isStepThreeModified = true;
-        console.log('Victims array modified');
+        // console.log('Victims array modified');
       });
     }, 500); // Wait for the form to stabilize before tracking
   }
@@ -7432,27 +7434,27 @@ isStep1Valid(): boolean {
 trackStepFourChanges() {
   this.firForm.get('numberOfAccused')?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
     this.isStepFourModified = true;
-    console.log('Step 4 field changed: numberOfAccused');
+    // console.log('Step 4 field changed: numberOfAccused');
   });
 
     this.firForm.get('gistOfCurrentCase')?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
     this.isStepFourModified = true;
-    console.log('Step 4 field changed: gistOfCurrentCase');
+    // console.log('Step 4 field changed: gistOfCurrentCase');
   });
 
     this.firForm.get('uploadFIRCopy')?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
     this.isStepFourModified = true;
-    console.log('Step 4 field changed: uploadFIRCopy');
+    // console.log('Step 4 field changed: uploadFIRCopy');
   });
 
     this.firForm.get('accused_remarks')?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
     this.isStepFourModified = true;
-    console.log('Step 4 field changed: accused_remarks');
+    // console.log('Step 4 field changed: accused_remarks');
   });
 
   this.firForm.get('accuseds')?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
     this.isStepFourModified = true;
-    console.log('Step 4 accuseds array modified');
+    // console.log('Step 4 accuseds array modified');
   });
 }
 
@@ -7469,7 +7471,7 @@ trackStepFiveChanges() {
   reliefFields.forEach(field => {
     this.firForm.get(field)?.valueChanges.pipe(skip(1), distinctUntilChanged()).subscribe(() => {
       this.isStepFiveModified = true;
-      console.log(`Step 5 field changed: ${field}`);
+      // console.log(`Step 5 field changed: ${field}`);
     });
   });
 
@@ -7481,7 +7483,7 @@ trackStepFiveChanges() {
       distinctUntilChanged()
     ).subscribe(() => {
       this.isStepFiveModified = true;
-      console.log('VictimsRelief array modified');
+      // console.log('VictimsRelief array modified');
     });
   }, 500); // Wait to prevent initialization trigger
 }
@@ -7543,7 +7545,7 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
       }
       this.firService.GetVictimInformationDetails(this.firId).subscribe(
         (response: any) => {
-          console.log(response)
+          // console.log(response)
           if(response.datacount.id == 0){
             this.step = 3;
             this.cdr.detectChanges();
@@ -7591,12 +7593,12 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
 
 
   navigateToStep(stepNumber: number): void {
-    console.log(stepNumber,'step_number')
+    // console.log(stepNumber,'step_number')
     // if(this.firId){
     if(stepNumber == 5){
       this.firService.GetVictimInformationDetails(this.firId).subscribe(
         (response: any) => {
-          console.log(response)
+          // console.log(response)
           if(response.datacount.id == 0){
             Swal.fire('Warning', "Kindly Fill In The Victim's Information First!", 'warning');
           } else {
@@ -7805,9 +7807,9 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
       });
   
       // Optionally, display the file name
-      console.log('File selected:', file.name);
+      // console.log('File selected:', file.name);
     } else {
-      console.log('No file selected');
+      // console.log('No file selected');
     }
   }
 
@@ -7949,7 +7951,7 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
       });
   }
   viewuploadJudgementone(){
-    console.log(this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value);
+    // console.log(this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value);
      if (this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value) {
         const url = `${env.file_access}${this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value}`;
         window.open(url, '_blank');
@@ -8014,7 +8016,7 @@ removeuploadJudgementone(){
       });
   }
   viewuploadJudgementtwo(){
-    console.log(this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value);
+    // console.log(this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value);
      if (this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value) {
         const url = `${env.file_access}${this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value}`;
         window.open(url, '_blank');
@@ -8029,7 +8031,7 @@ removeuploadJudgementtwo(){
   const file = event.target.files?.[0];
 
   if (file) {
-    console.log('File selected:', file.name, file);
+    // console.log('File selected:', file.name, file);
 
     const reader = new FileReader();
     reader.onload = (e: any) => {
@@ -8039,7 +8041,7 @@ removeuploadJudgementtwo(){
 
     this.uploadMultipleFiles(file)
       .then(paths => {
-        console.log('Uploaded file path:', paths[0]);
+        // console.log('Uploaded file path:', paths[0]);
 
         // Update form control and preview with uploaded file path
         this.firForm.patchValue({
@@ -8052,7 +8054,7 @@ removeuploadJudgementtwo(){
         console.error('Error uploading file:', error);
       });
   } else {
-    console.log('No file selected');
+    // console.log('No file selected');
     this.uploadProceedings_2_preview = '';
   }
 }
@@ -8068,7 +8070,7 @@ onCityChange(event: any) {
   //   this.resetPoliceFields();
   // }
   const selectedCity = event.target.value;
-    console.log('selectedCity',selectedCity);
+    // console.log('selectedCity',selectedCity);
     if(selectedCity == "Chennai City"){
       this.firForm.get('policeRange')?.enable();
     }
@@ -8095,7 +8097,7 @@ onCityChange(event: any) {
 //   this.firForm.get('stationName')?.setValue(data);
 // }
 getStationName(value: any) {
-  console.log("Selected Station:", value);
+  // console.log("Selected Station:", value);
 }
 
 
@@ -8137,7 +8139,7 @@ getPoliceStation(district: string): void {
         // Format station names
         this.policeStations = stations.map(station => station.replace(/\s+/g, '-'));
 
-        console.log("Police Stations:", this.policeStations);
+        // console.log("Police Stations:", this.policeStations);
 
         // Get the first station or a specific one
         const firstStation = this.policeStations.length > 0 ? this.policeStations[0] : '';
@@ -8148,7 +8150,7 @@ getPoliceStation(district: string): void {
         // Call getStationName with the selected value
         this.getStationName(firstStation);
 
-        console.log("Selected Station:", this.firForm.get('stationName')?.value);
+        // console.log("Selected Station:", this.firForm.get('stationName')?.value);
 
         // Detect changes to update the view
         this.cdr.detectChanges();
@@ -8190,7 +8192,7 @@ getPoliceStation(district: string): void {
   }
 
   getDesignation(event:any){
-    console.log(event.target.value);
+    // console.log(event.target.value);
     const designationValue = event.target.value;
     if(designationValue  == "Others"){
       this.showOtherDesignation = true;

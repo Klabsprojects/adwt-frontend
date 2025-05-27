@@ -353,7 +353,7 @@
                 name="policeCity" id="policeCity"
                 type="text"
                 class="form-control"
-                placeholder="Enter Police City / District"
+               
                 [value]="policeCity"
                 />
               </div>
@@ -363,7 +363,7 @@
                 name="policeZone" id="policeZone"
                 type="text"
                 class="form-control"
-                placeholder="Enter Police Zone"
+            
                 [value]="policeZone"
                 />
               </div>
@@ -373,7 +373,7 @@
                   name="policeRange" id="policeRange"
                   type="text"
                   class="form-control"
-                  placeholder="Enter Police Range"
+                 
                   [value]="policeRange"
                 />
               </div>
@@ -383,7 +383,7 @@
                   name="revenueDistrict" id="revenueDistrict"
                   type="text"
                   class="form-control"
-                  placeholder="Enter Revenue District"
+                  
                   [value]="revenueDistrict"
                 />
               </div>
@@ -393,7 +393,7 @@
                   name="stationName" id="stationName"
                   type="text"
                   class="form-control"
-                  placeholder="Enter Police Station Name"
+                  
                   [value]="stationName"
                 />
               </div>
@@ -410,7 +410,7 @@
                   id="officerName"
                   type="text"
                   class="form-control"
-                  placeholder="Enter Officer Name"
+                  
                   [value]="officerName"
                 />
               </div>
@@ -440,7 +440,7 @@
                   id="officerDesignation"
                   type="text"
                   class="form-control"
-                  placeholder="Enter Designation"
+                  
                   [value]="officerDesignation"
                 />
               </div>
@@ -458,7 +458,7 @@
                   id="officerPhone"
                   type="text"
                   class="form-control"
-                  placeholder="Enter Phone Number"
+                  
                   [value]="officerPhone"
                 />
               </div>
@@ -486,7 +486,7 @@
                   name="firNumber"
                   id="firNumber"
                   class="form-control"
-                  placeholder="Enter FIR Number"
+                  
                   [value]="firNumber"
                 />
               </div>
@@ -500,7 +500,7 @@
                   name="dateOfOccurrence"
                   id="dateOfOccurrence"
                   class="form-control"
-                  placeholder="Enter Date"
+                  
                   [value]="dateOfOccurrence"
                 />
               </div>
@@ -526,7 +526,7 @@
                   name="timeOfOccurrence"
                   id="timeOfOccurrence"
                   class="form-control"
-                  placeholder="Enter Time"
+                  
                   [value]="timeOfOccurrence"
                 />
               </div>
@@ -553,22 +553,47 @@
                   name="placeOfOccurrence"
                   id="placeOfOccurrence"
                   class="form-control"
-                  placeholder="Enter Place"
                   [value]="placeOfOccurrence"
+                />
+              </div>
+
+                <div class="col-md-4 mb-3">
+                <label for="is_case_altered" class="form-label">13. Is Case altered?</label>
+                <input
+                  readonly
+                  type="text"
+                  name="is_case_altered"
+                  id="is_case_altered"
+                  class="form-control"
+                  
+                  [value]="is_case_altered"
                 />
               </div>
 
               <!-- Date of Case Registration -->
               <div class="col-md-4 mb-3">
-                <label for="dateOfRegistration" class="form-label">13. Date of Case Registration</label>
+                <label for="dateOfRegistration" class="form-label">13a. Date of Case Registration</label>
                 <input
                   readonly
                   type="text"
                   name="dateOfRegistration"
                   id="dateOfRegistration"
                   class="form-control"
-                  placeholder="Enter Date"
+                  
                   [value]="dateOfRegistration"
+                />
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label for="is_case_altered" class="form-label">13b. Date of Case Alteration</label>
+                <input
+                  readonly
+                  type="text"
+                  name="is_case_altered"
+                  id="is_case_altered"
+                  class="form-control"
+                  
+                  [value]="is_case_altered"
                 />
               </div>
 
@@ -581,7 +606,7 @@
                   name="timeOfRegistration"
                   id="timeOfRegistration"
                   class="form-control"
-                  placeholder="Enter Time"
+                  
                   [value]="timeOfRegistration"
                 />
               </div>
@@ -610,7 +635,7 @@
                 name="nameOfComplainant"
                 id="nameOfComplainant"
                 class="form-control"
-                placeholder="Enter Name of Complainant"
+                
                 [value]="nameOfComplainant"
               />
             </div>
@@ -623,7 +648,7 @@
                 name="mobileNumberOfComplainant"
                 id="mobileNumberOfComplainant"
                 class="form-control"
-                placeholder="Enter Mobile Number"
+                
                 [value]="mobileNumberOfComplainant"
               />
             </div>
@@ -636,7 +661,7 @@
                 name="isVictimSameAsComplainant"
                 id="isVictimSameAsComplainant"
                 class="form-control"
-                placeholder="Enter Yes or No"
+                
                 [value]="isVictimSameAsComplainant"
               />
             </div>
@@ -649,7 +674,7 @@
                 name="numberOfVictims"
                 id="numberOfVictims"
                 class="form-control"
-                placeholder="Enter Number of Victims"
+                
                 [value]="numberOfVictims"
               />
             </div>
@@ -670,7 +695,7 @@
                     name="victimAge{{ i }}"
                     id="victimAge{{ i }}"
                     class="form-control"
-                    placeholder="Enter Victim's Age"
+                    
                     [value]="victim.victim_age"
                   />
                 </div>
@@ -683,7 +708,7 @@
                     name="victimName{{ i }}"
                     id="victimName{{ i }}"
                     class="form-control"
-                    placeholder="Enter Victim's Name"
+                    
                     [value]="victim.victim_name"
                   />
                 </div>
@@ -696,7 +721,7 @@
                     name="victimGender{{ i }}"
                     id="victimGender{{ i }}"
                     class="form-control"
-                    placeholder="Enter Gender"
+                    
                     [value]="victim.victim_gender"
                   />
                 </div>
@@ -709,7 +734,7 @@
                     name="victimMobile{{ i }}"
                     id="victimMobile{{ i }}"
                     class="form-control"
-                    placeholder="Enter Mobile Number"
+                    
                     [value]="victim.mobile_number"
                   />
                 </div>
@@ -722,7 +747,7 @@
                     name="victimAddress{{ i }}"
                     id="victimAddress{{ i }}"
                     class="form-control"
-                    placeholder="Enter Address"
+                    
                     [value]="victim.address"
                   />
                 </div>
@@ -735,7 +760,7 @@
                     name="victimPincode{{ i }}"
                     id="victimPincode{{ i }}"
                     class="form-control"
-                    placeholder="Enter Pincode"
+                    
                     [value]="victim.victim_pincode"
                   />
                 </div>
@@ -748,7 +773,7 @@
                     name="victimCommunity{{ i }}"
                     id="victimCommunity{{ i }}"
                     class="form-control"
-                    placeholder="Enter Community"
+                    
                     [value]="victim.community"
                   />
                 </div>
@@ -761,7 +786,7 @@
                     name="victimCaste{{ i }}"
                     id="victimCaste{{ i }}"
                     class="form-control"
-                    placeholder="Enter Caste"
+                    
                     [value]="victim.caste"
                   />
                 </div>
@@ -774,7 +799,7 @@
                     name="victimGuardian{{ i }}"
                     id="victimGuardian{{ i }}"
                     class="form-control"
-                    placeholder="Enter Guardian's Name"
+                    
                     [value]="victim.guardian_name"
                   />
                 </div>
@@ -787,7 +812,7 @@
                     name="isNativeDistrictSame{{ i }}"
                     id="isNativeDistrictSame{{ i }}"
                     class="form-control"
-                    placeholder="Enter Yes or No"
+                    
                     [value]="victim.is_native_district_same"
                   />
                 </div>
@@ -800,7 +825,7 @@
                     name="nativeDistrict{{ i }}"
                     id="nativeDistrict{{ i }}"
                     class="form-control"
-                    placeholder="Native District"
+                    
                     [value]="victim.native_district"
                   />
                 </div>
@@ -812,7 +837,7 @@
                     name="victimOffence{{ i }}"
                     id="victimOffence{{ i }}"
                     class="form-control"
-                    placeholder="Describe the Offence"
+                    
                   >{{ victim.offence_committed }}</textarea>
                 </div>
 
@@ -823,7 +848,7 @@
                     name="invokedAct{{ i }}"
                     id="invokedAct{{ i }}"
                     class="form-control"
-                    placeholder="Describe the Offence"
+                    
                   >{{ victim.scst_sections }}</textarea>
                 </div>
 
@@ -834,7 +859,7 @@
                     name="sectionsIPC{{ i }}"
                     id="sectionsIPC{{ i }}"
                     class="form-control"
-                    placeholder="Enter Sections, separated by commas"
+                    
                   >{{ victim.sectionsIPC }}</textarea> -->
                   <div *ngFor="let section of sectionsIPC; let i = index">
                     <div class="form-group col-md-6" style="float: left; margin-right:10px;">
@@ -864,7 +889,7 @@
                   name="isDeceased"
                   id="isDeceased"
                   class="form-control"
-                  placeholder=""
+                  
                   [value]="isDeceased"
                 />
               </div>
@@ -877,7 +902,7 @@
                   name="isDeceasedName"
                   id="isDeceasedName"
                   class="form-control"
-                  placeholder=""
+                  
                   [value]="deceasedPersonNames"
                 />
               </div>
@@ -903,7 +928,7 @@
                 name="numberOfAccused"
                 id="numberOfAccused"
                 class="form-control"
-                placeholder="Enter Number of Accused"
+                
                 [value]="numberOfAccused"
               />
             </div>
@@ -922,7 +947,7 @@
                       name="accusedAge{{ i }}"
                       id="accusedAge{{ i }}"
                       class="form-control"
-                      placeholder="Enter Accused Age"
+                      
                       [value]="accused.age"
                     />
                   </div>
@@ -935,7 +960,7 @@
                       name="accusedName{{ i }}"
                       id="accusedName{{ i }}"
                       class="form-control"
-                      placeholder="Enter Accused Name"
+                      
                       [value]="accused.name"
                     />
                   </div>
@@ -948,7 +973,7 @@
                       name="accusedGender{{ i }}"
                       id="accusedGender{{ i }}"
                       class="form-control"
-                      placeholder="Enter Gender"
+                      
                       [value]="accused.gender"
                     />
                   </div>
@@ -962,7 +987,7 @@
                       name="specifyGender{{ i }}"
                       id="specifyGender{{ i }}"
                       class="form-control"
-                      placeholder="Enter Gender"
+                      
                       [value]="accused.custom_gender"
                     />
                   </div> -->
@@ -976,7 +1001,7 @@
                       name="accusedAddress{{ i }}"
                       id="accusedAddress{{ i }}"
                       class="form-control"
-                      placeholder="Enter Address"
+                      
                       [value]="accused.address"
                     />
                   </div>
@@ -989,7 +1014,7 @@
                       name="accusedPincode{{i}}"
                       id="accusedPincode{{i}}"
                       class="form-control"
-                      placeholder="Enter Pincode"
+                      
                       [value]="accused.pincode"
                     />
                   </div>
@@ -1003,7 +1028,7 @@
                       name="accusedCommunity{{i}}"
                       id="accusedCommunity{{i}}"
                       class="form-control"
-                      placeholder="Enter Community"
+                      
                       [value]="accused.community"
                     />
                   </div>
@@ -1016,7 +1041,7 @@
                       name="accusedCaste{{i}}"
                       id="accusedCaste{{i}}"
                       class="form-control"
-                      placeholder="Enter Caste"
+                      
                       [value]="accused.caste"
                     />
                   </div>
@@ -1032,7 +1057,7 @@
                       name="accusedGuardian{{ i }}"
                       id="accusedGuardian{{ i }}"
                       class="form-control"
-                      placeholder="Enter Guardian's Name"
+                      
                       [value]="accused.guardian_name"
                     />
                   </div>
@@ -1048,7 +1073,7 @@
                       name="previousIncident{{i}}"
                       id="previousIncident{{i}}"
                       class="form-control"
-                      placeholder="Enter Yes or No"
+                      
                       [value]="accused.previous_incident"
                     />
                   </div>
@@ -1062,7 +1087,7 @@
                       name="previousFIRNumber{{i}}"
                       id="previousFIRNumber{{i}}"
                       class="form-control"
-                      placeholder="Enter Previous FIR Number"
+                      
                       [value]="accused.previous_fir_number + accused.previous_fir_number_suffix"
                     />
                   </div>
@@ -1078,7 +1103,7 @@
                       name="scstOffence{{ i }}"
                       id="scstOffence{{ i }}"
                       class="form-control"
-                      placeholder="Enter Yes or No"
+                      
                       [value]="accused.scst_offence"
                     />
                   </div>
@@ -1091,7 +1116,7 @@
                       name="scstFIRNumber{{ i }}"
                       id="scstFIRNumber{{ i }}"
                       class="form-control"
-                      placeholder="Enter SC/ST FIR Number"
+                      
                       [value]="accused.scst_fir_number + accused.scst_fir_number_suffix"
                     />
                   </div>
@@ -1118,7 +1143,7 @@
                       name="antecedents{{ i }}"
                       id="antecedents{{ i }}"
                       class="form-control"
-                      placeholder="Enter Antecedents"
+                      
                       [value]="accused.antecedents"
                     />
                   </div>
@@ -1145,7 +1170,7 @@
                       name="landOIssues{{ i }}"
                       id="landOIssues{{ i }}"
                       class="form-control"
-                      placeholder="Enter L&O Issues"
+                      
                       [value]="accused.land_o_issues"
                     />
                   </div>
@@ -1159,7 +1184,7 @@
                     id="gist_of_current_case{{i}}"
                     class="form-control"
                     rows="4"
-                    placeholder="Enter Gist of the Current Case"
+                    
                     [value]="accused.gist_of_current_case"
                   ></textarea>
                 </div>
@@ -1216,7 +1241,7 @@
         name="communityCertificate{{ i }}"
         id="communityCertificate{{ i }}"
         [value]="relief.community_certificate"
-        placeholder="Enter Yes or No"
+        
       />
       </div>
 
@@ -1236,7 +1261,7 @@
           name="victimName{{ i }}"
           id="victimName{{ i }}"
           [value]="relief.victim_name"
-          placeholder="Enter Victim Name"
+          
         />
       </div>
     </div>
@@ -1254,7 +1279,7 @@
           name="reliefAmountScst{{ i }}"
           id="reliefAmountScst{{ i }}"
           [value]="relief.relief_amount_scst"
-          placeholder="Enter Relief Amount"
+          
         />
       </div>
     </div>
@@ -1272,7 +1297,7 @@
           name="reliefAmountExGratia{{ i }}"
           id="reliefAmountExGratia{{ i }}"
           [value]="relief.relief_amount_exgratia"
-          placeholder="Enter Relief Amount"
+          
         />
       </div>
     </div>
@@ -1290,7 +1315,7 @@
         name="reliefAmountFirstStage{{ i }}"
         id="reliefAmountFirstStage{{ i }}"
         [value]="relief.relief_amount_first_stage"
-        placeholder="Enter Relief Amount"
+        
       />
       </div>
     </div>
@@ -1308,7 +1333,7 @@
           name="additionalRelief{{ i }}"
           id="additionalRelief{{ i }}"
           [value]="relief.additional_relief"
-          placeholder="additionalRelief"
+          
         />
       </div>
     </div>
@@ -1331,7 +1356,7 @@
                   name="totalCompensation"
                   id="totalCompensation"
                   [value]="totalCompensation"
-                  placeholder="Enter Total Amount"
+                  
                 />
               </div>
             </div>
@@ -1347,7 +1372,7 @@
                   name="proceedingsFileNo"
                   id="proceedingsFileNo"
                   [value]="proceedingsFileNo"
-                  placeholder="Enter File No."
+                  
                 />
               </div>
 
@@ -1374,7 +1399,7 @@
                 id="proceedingsFile"
                 [value]="proceedingsFile"
                 rows="2"
-                placeholder="Enter details for Commissionerate / S.P. Office Proceedings"
+                
               ></textarea>
             </div>
 
@@ -1388,7 +1413,7 @@
                 id="attachments"
                
                 rows="2"
-                placeholder="Enter details or references for key attachments"
+                
               ></textarea>
 
               <div *ngIf="attachments.length > 0">
@@ -1420,7 +1445,7 @@
         id="chargeSheetFiled"
         class="form-control"
         [value]="chargeSheetFiled"
-        placeholder="Yes/No"
+        
       />
     </div>
     <!-- Court Division -->
@@ -1433,7 +1458,7 @@
         id="courtDistrict"
         class="form-control"
         [value]="courtDistrict"
-        placeholder="Enter Court Division"
+        
       />
     </div>
     <!-- Court Range -->
@@ -1446,7 +1471,7 @@
         id="courtName"
         class="form-control"
         [value]="courtName"
-        placeholder="Enter Court Range"
+        
       />
     </div>
   </div>
@@ -1462,7 +1487,7 @@
         id="caseType"
         class="form-control"
         [value]="caseType"
-        placeholder="Enter Case Type"
+        
       />
     </div>
     <!-- Case Number -->
@@ -1475,7 +1500,7 @@
         id="caseNumber"
         class="form-control"
         [value]="caseNumber"
-        placeholder="Enter Case Number"
+        
       />
     </div>
 
@@ -1500,7 +1525,7 @@
         id="rcsFileNumber"
         class="form-control"
         [value]="rcsFileNumber"
-        placeholder="Enter RCS File Number"
+        
       />
     </div>
     <!-- RCS Filing Date -->
@@ -1547,7 +1572,7 @@
                   id="victimName2"
                   class="form-control"
                   [value]="victimName2"
-                  placeholder="Enter Victim Name"
+                  
                 />
               </div>
               <!-- Relief Amount (SC/ST Act) -->
@@ -1560,7 +1585,7 @@
                   id="reliefAmountScst1"
                   class="form-control"
                   [value]="reliefAmountScst1"
-                  placeholder="Enter Relief Amount"
+                  
                 />
               </div>
               <!-- Relief Amount (Ex-Gratia) -->
@@ -1573,7 +1598,7 @@
                   id="reliefAmountExGratia1"
                   class="form-control"
                   [value]="reliefAmountExGratia1"
-                  placeholder="Enter Relief Amount"
+                  
                 />
               </div>
               <!-- Total Eligible Amount for the Second Stage of Relief -->
@@ -1620,7 +1645,7 @@
                   id="proceedingsFileNo1"
                   class="form-control"
                   [value]="proceedingsFileNo1"
-                  placeholder="Enter File No."
+                  
                 />
               </div>
               <!-- Proceedings Date -->
@@ -1665,7 +1690,7 @@
                 class="form-control"
                 rows="2"
                 [value]="attachments1"
-                placeholder="Enter details or descriptions for other attachments"
+                
               ></textarea>
             </div>
           </div>
@@ -1690,7 +1715,7 @@
                   type="text"
                   class="form-control"
                   [value]="casedetails.court_name"
-                  placeholder="Enter Name"
+                  
                 />
               </div>
 
@@ -1704,7 +1729,7 @@
                   type="text"
                   class="form-control"
                   [value]="casedetails.court_district"
-                  placeholder="Enter District"
+                  
                 />
               </div>
 
@@ -1718,7 +1743,7 @@
                   type="text"
                   class="form-control"
                   [value]="casedetails.trial_case_number"
-                  placeholder="Enter Case Number"
+                  
                 />
               </div>
 
@@ -1732,7 +1757,7 @@
                   type="text"
                   class="form-control"
                   [value]="casedetails.public_prosecutor"
-                  placeholder="Enter Name"
+                  
                 />
               </div>
 
@@ -1746,7 +1771,7 @@
                   type="text"
                   class="form-control"
                   [value]="casedetails.prosecutor_phone"
-                  placeholder="Enter Phone Number"
+                  
                   maxlength="10"
                 />
               </div>
@@ -1770,7 +1795,7 @@
                   type="text"
                   class="form-control"
                   [value]="hearingdetail.first_hearing_date  | date:'dd/MM/yyyy'"
-                  placeholder="Select Hearing Date"
+                  
                 />
               </div>
               <!-- Item 86: Has a Judgement been awarded in the case? -->
@@ -1783,7 +1808,7 @@
                   type="text"
                   class="form-control"
                   [value]="hearingdetail.judgement_awarded"
-                  placeholder="Enter Yes or No"
+                  
                 />
               </div>
             </div>
@@ -1814,7 +1839,7 @@
                         type="text"
                         class="form-control"
                         [value]="hearingdetail1.next_hearing_date | date:'dd/MM/yyyy'"
-                        placeholder="Next Hearing Date"
+                        
                       />
                     </div>
 
@@ -1828,7 +1853,7 @@
                         type="text"
                         class="form-control"
                         [value]="hearingdetail1.reason_next_hearing"
-                        placeholder="Reason for Next Hearing"
+                        
                       />
                     </div>
                   </div>
@@ -1845,7 +1870,7 @@
                     type="text"
                     class="form-control"
                     [value]="judgementBeenAwardednxt "
-                    placeholder="Has a Judgement been awarded in the case"
+                    
                   />
                 </div>
               </div>
@@ -1870,7 +1895,7 @@
                     type="text"
                     class="form-control"
                     [value]="Judgement.nature_of_judgement"
-                    placeholder="Enter Nature of Judgement"
+                    
                   />
                 </div>
 
@@ -1920,7 +1945,7 @@
                     type="text"
                     class="form-control"
                     [value]="appeal.legal_opinion_obtained"
-                    placeholder="Enter Yes or No"
+                    
                   />
                 </div>
 
@@ -1934,7 +1959,7 @@
                     type="text"
                     class="form-control"
                     [value]="appeal.case_fit_for_appeal"
-                    placeholder="Enter Yes or No"
+                    
                   />
                 </div>
 
@@ -1948,7 +1973,7 @@
                     type="text"
                     class="form-control"
                     [value]="appeal.government_approval_for_appeal"
-                    placeholder="Enter Yes or No"
+                    
                   />
                 </div>
 
@@ -1962,7 +1987,7 @@
                     type="text"
                     class="form-control"
                     [value]="appeal.filed_by"
-                    placeholder="Enter Victim or Government"
+                    
                   />
                 </div>
 
@@ -1976,7 +2001,7 @@
                     type="text"
                     class="form-control"
                     [value]="appeal.designated_court"
-                    placeholder="Enter Court Name"
+                    
                   />
                 </div>
               </div>
@@ -1996,7 +2021,7 @@
                     type="text"
                     class="form-control"
                     [value]="casedetailsone.court_district"
-                    placeholder="Enter District Name"
+                    
                   />
                 </div>
                 <div class="col-md-6 mb-3">
@@ -2008,7 +2033,7 @@
                     type="text"
                     class="form-control"
                     [value]="casedetailsone.case_number"
-                    placeholder="Enter Case Number"
+                    
                   />
                 </div>
                 <div class="col-md-6 mb-3">
@@ -2020,7 +2045,7 @@
                     type="text"
                     class="form-control"
                     [value]="casedetailsone.public_prosecutor	"
-                    placeholder="Enter Name"
+                    
                   />
                 </div>
                 <div class="col-md-6 mb-3">
@@ -2032,7 +2057,7 @@
                     type="text"
                     class="form-control"
                     [value]="casedetailsone.prosecutor_phone"
-                    placeholder="Enter Phone Number"
+                    
                     maxlength="10"
                   />
                 </div>
@@ -2053,7 +2078,7 @@
                     type="text"
                     class="form-control"
                     [value]="hearingdetailone.first_hearing_date | date:'dd/MM/yyyy'"
-                    placeholder="Enter Date"
+                    
                   />
                 </div>
                 <div class="col-md-6">
@@ -2065,7 +2090,7 @@
                     type="text"
                     class="form-control"
                     [value]="hearingdetailone.judgement_awarded  "
-                    placeholder="Enter Yes or No"
+                    
                   />
                 </div>
               </div>
@@ -2089,7 +2114,7 @@
                     type="text"
                     class="form-control"
                     [value]="courtDetails?.second_hearing_date| date:'dd/MM/yyyy'"
-                    placeholder="Enter Date"
+                    
                   />
                 </div>
           
@@ -2105,7 +2130,7 @@
                     type="text"
                     class="form-control"
                     [value]="courtDetails?.judgement_awarded"
-                    placeholder="Enter Yes or No"
+                    
                   />
                 </div>
           
@@ -2134,7 +2159,7 @@
                           type="text"
                           class="form-control"
                           [value]="hearingdetailstwo.next_hearing_date | date:'dd/MM/yyyy'"
-                          placeholder="Next Hearing Date"
+                          
                         />
                       </div>
 
@@ -2148,7 +2173,7 @@
                           type="text"
                           class="form-control"
                           [value]="hearingdetailstwo.reason_next_hearing"
-                          placeholder="Reason for Next Hearing"
+                          
                         />
                       </div>
                     </div>
@@ -2165,7 +2190,7 @@
                       type="text"
                       class="form-control"
                       [value]="judgementBeenAwardednxt1"
-                      placeholder="Has a Judgement been awarded in the case"
+                      
                     />
                   </div>
                 </div>
@@ -2189,7 +2214,7 @@
                       type="text"
                       class="form-control"
                       [value]="hearingdetailone.nature_of_judgement"
-                      placeholder="Enter Nature of Judgement"
+                      
                     />
                   </div>
 >
@@ -2202,7 +2227,7 @@
                       type="text"
                       class="form-control"
                       [value]="hearingdetailone.judgement_copy"
-                      placeholder="Enter Judgement Copy Details"
+                      
                     />
                   </div>
                 </div>
@@ -2230,7 +2255,7 @@
                 class="form-control"
                 [value]="courtDetails?.judgementNature === 'Convicted_one' ? 'Accused person(s) has been Convicted' : 
                           courtDetails?.judgementNature === 'Acquitted_one' ? 'Accused person(s) have been Acquitted' : ''"
-                placeholder="Enter Nature of Judgement"
+                
               />
             </div>
             
@@ -2244,7 +2269,7 @@
                  type="text"
                  class="form-control"
                  [value]=""
-                 placeholder="Enter Judgement Copy Details"
+                 
                />
              </div>
            </div>
@@ -2272,7 +2297,7 @@
                     type="text"
                     class="form-control"
                     [value]="natureOfJudgemen_2ndConvicted"
-                    placeholder="Enter Nature of Judgement"
+                    
                   />
                 </div>
 
@@ -2286,7 +2311,7 @@
                     type="text"
                     class="form-control"
                     [value]="judgementCopy_2ndConvicted"
-                    placeholder="Enter Judgement Copy Details"
+                    
                   />
                 </div>
               </div>
@@ -2307,7 +2332,7 @@
                     type="text"
                     class="form-control mb-3"
                     [value]="victimName4_2ndConvicted"
-                    placeholder="Enter Name of the Victim"
+                    
                   />
                 </div>
 
@@ -2325,7 +2350,7 @@
                       type="text"
                       class="form-control text-end"
                       [value]="reliefAmount_2ndConvicted"
-                      placeholder="Enter Amount"
+                      
                     />
                   </div>
                 </div>
@@ -2344,7 +2369,7 @@
                       type="text"
                       class="form-control text-end"
                       [value]="reliefAmount2_2ndConvicted"
-                      placeholder="Enter Amount"
+                      
                     />
                   </div>
                 </div>
@@ -2361,7 +2386,7 @@
                       type="text"
                       class="form-control text-end"
                       [value]="eligibleAmount_2ndConvicted"
-                      placeholder="Enter Total Amount"
+                      
                     />
                   </div>
                 </div>
@@ -2384,7 +2409,7 @@
                       type="text"
                       class="form-control text-end"
                       [value]="totalAmount_2ndConvicted"
-                      placeholder="Enter Total Amount"
+                      
                     />
                   </div>
                 </div>
@@ -2399,7 +2424,7 @@
                       type="text"
                       class="form-control"
                       [value]="proceedingsNo_2ndConvicted"
-                      placeholder="Enter File No."
+                      
                     />
                   </div>
                   <div class="col-md-6 mb-3">
@@ -2422,7 +2447,7 @@
                       type="text"
                       class="form-control"
                       [value]="officeProceedings_2ndConvicted"
-                      placeholder="Enter Proceedings Details"
+                      
                     />
                   </div>
                 </div>
@@ -2437,7 +2462,7 @@
                       type="text"
                       class="form-control"
                       [value]="otherAttachments_2ndConvicted"
-                      placeholder="Enter Attachment Details"
+                      
                     />
                   </div>
                 </div>
@@ -2465,7 +2490,7 @@
                     type="text"
                     class="form-control"
                     [value]="appealone.legal_opinion_obtained"
-                    placeholder="Enter Yes or No"
+                    
                   />
                 </div>
 
@@ -2479,7 +2504,7 @@
                     type="text"
                     class="form-control"
                     [value]="appealone.case_fit_for_appeal"
-                    placeholder="Enter Yes or No"
+                    
                   />
                 </div>
 
@@ -2493,7 +2518,7 @@
                     type="text"
                     class="form-control"
                     [value]="appealone.government_approval_for_appeal"
-                    placeholder="Enter Yes or No"
+                    
                   />
                 </div>
 
@@ -2507,7 +2532,7 @@
                     type="text"
                     class="form-control"
                     [value]="appealone.filed_by"
-                    placeholder="Enter Victim or Government"
+                    
                   />
                 </div>
 
@@ -2521,7 +2546,7 @@
                     type="text"
                     class="form-control"
                     [value]="appealone.designated_court"
-                    placeholder="Enter Court Name"
+                    
                   />
                 </div>
               </div>
@@ -2541,7 +2566,7 @@
                     type="text"
                     class="form-control"
                     [value]="casedetailstwo.case_number"
-                    placeholder="Enter Case Number"
+                    
                   />
                 </div>
                 <div class="col-md-6 mb-3">
@@ -2553,7 +2578,7 @@
                     type="text"
                     class="form-control"
                     [value]="casedetailstwo.public_prosecutor	"
-                    placeholder="Enter Name"
+                    
                   />
                 </div>
                 <div class="col-md-6 mb-3">
@@ -2565,7 +2590,7 @@
                     type="text"
                     class="form-control"
                     [value]="casedetailstwo.prosecutor_phone"
-                    placeholder="Enter Phone Number"
+                    
                     maxlength="10"
                   />
                 </div>
@@ -2587,7 +2612,7 @@
                     class="form-control"
                     [value]="courtdetailstwo.first_hearing_date | date:'dd/MM/yyyy'
                     "
-                    placeholder="Enter Date"
+                    
                   />
                 </div>
                 <div class="col-md-6">
@@ -2599,7 +2624,7 @@
                     type="text"
                     class="form-control"
                     [value]="courtdetailstwo.judgement_awarded"
-                    placeholder="Enter Yes or No"
+                    
                   />
                 </div>
               </div>
@@ -2625,7 +2650,7 @@
                           type="text"
                           class="form-control"
                           [value]="hearingdetailsthree.next_hearing_date | date:'dd/MM/yyyy'"
-                          placeholder="Next Hearing Date"
+                          
                         />
                       </div>
 
@@ -2639,7 +2664,7 @@
                           type="text"
                           class="form-control"
                           [value]="hearingdetailsthree.reason_next_hearing"
-                          placeholder="Reason for Next Hearing"
+                          
                         />
                       </div>
                     </div>
@@ -2656,7 +2681,7 @@
                       type="text"
                       class="form-control"
                       [value]="judgementBeenAwardednxt2"
-                      placeholder="Has a Judgement been awarded in the case"
+                      
                     />
                   </div>
                 </div>
@@ -2678,7 +2703,7 @@
                     type="text"
                     class="form-control"
                     [value]="hearingdetailtwo.nature_of_judgement"
-                    placeholder="Enter Nature of Judgement"
+                    
                   />
                 </div>
                 <div class="col-md-6">
@@ -2714,7 +2739,7 @@
                     type="text"
                     class="form-control"
                     [value]="natureOfJudgemen_3rdConvicted"
-                    placeholder="Enter Nature of Judgement"
+                    
                   />
                 </div>
 
@@ -2727,7 +2752,7 @@
                     type="text"
                     class="form-control"
                     [value]="judgementCopy_3rdConvicted"
-                    placeholder="Enter Judgement Copy Details"
+                    
                   />
                 </div>
               </div>
@@ -2748,7 +2773,7 @@
                     type="text"
                     class="form-control mb-3"
                     [value]="victimName4_3rdConvicted"
-                    placeholder="Enter Name of the Victim"
+                    
                   />
                 </div>
 
@@ -2766,7 +2791,7 @@
                       type="text"
                       class="form-control text-end"
                       [value]="reliefAmount_3rdConvicted"
-                      placeholder="Enter Amount"
+                      
                     />
                   </div>
                 </div>
@@ -2785,7 +2810,7 @@
                       type="text"
                       class="form-control text-end"
                       [value]="reliefAmount2_3rdConvicted"
-                      placeholder="Enter Amount"
+                      
                     />
                   </div>
                 </div>
@@ -2802,7 +2827,7 @@
                       type="text"
                       class="form-control text-end"
                       [value]="eligibleAmount_3rdConvicted"
-                      placeholder="Enter Total Amount"
+                      
                     />
                   </div>
                 </div>
@@ -2825,7 +2850,7 @@
                       type="text"
                       class="form-control text-end"
                       [value]="totalAmount_3rdConvicted"
-                      placeholder="Enter Total Amount"
+                      
                     />
                   </div>
                 </div>
@@ -2840,7 +2865,7 @@
                       type="text"
                       class="form-control"
                       [value]="proceedingsNo_3rdConvicted"
-                      placeholder="Enter File No."
+                      
                     />
                   </div>
                   <div class="col-md-6 mb-3">
@@ -2863,7 +2888,7 @@
                       type="text"
                       class="form-control"
                       [value]="officeProceedings_3rdConvicted"
-                      placeholder="Enter Proceedings Details"
+                      
                     />
                   </div>
                 </div>
@@ -2878,7 +2903,7 @@
                       type="text"
                       class="form-control"
                       [value]="otherAttachments_3rdConvicted"
-                      placeholder="Enter Attachment Details"
+                      
                     />
                   </div>
                 </div>
@@ -2913,7 +2938,7 @@
                    type="text"
                    class="form-control mb-3"
                    [value]="trialrelief.victim_name"
-                   placeholder="Enter Name of the Victim"
+                   
                  />
                </div>
 
@@ -2932,7 +2957,7 @@
                      type="text"
                      class="form-control text-end"
                      [value]="trialrelief.relief_amount_act"
-                     placeholder="Enter Amount"
+                     
                    />
                  </div>
                </div>
@@ -2952,7 +2977,7 @@
                      type="text"
                      class="form-control text-end"
                      [value]="trialrelief.relief_amount_government"
-                     placeholder="Enter Amount"
+                     
                    />
                  </div>
                </div>
@@ -2972,7 +2997,7 @@
                      type="text"
                      class="form-control text-end"
                      [value]="trialrelief.relief_amount_final_stage"
-                     placeholder="Enter Total Amount"
+                     
                    />
                  </div>
                </div>
@@ -2998,7 +3023,7 @@
                        type="text"
                        class="form-control text-end"
                        [value]="firtrail.total_amount_third_stage"
-                       placeholder="Enter Total Amount"
+                       
                      />
                    </div>
                  </div>
@@ -3011,7 +3036,7 @@
                      type="text"
                      class="form-control"
                      [value]="firtrail.proceedings_file_no"
-                     placeholder="Enter File No."
+                     
                    />
                  </div>
                  <div class="col-md-6 mb-3">
@@ -3038,7 +3063,7 @@
                     type="text"
                     class="form-control me-2"
                     [value]="uploadProceedingsUrl"
-                    placeholder="Enter Proceedings Details"
+                    
                   />
                   <button *ngIf="uploadProceedingsUrl" class="btn btn-primary ms-2" (click)="showPreview()">
                     View
@@ -3067,7 +3092,7 @@
                      type="text"
                      class="form-control"
                      [value]="otherAttachments_1stConvicted"
-                     placeholder="Enter Attachment Details"
+                     
                    />
                  </div>
                </div>
@@ -3095,7 +3120,7 @@
                   type="text"
                   class="form-control"
                   [value]="caseappealdetailstwo.legal_opinion_obtained"
-                  placeholder="Enter Yes or No"
+                  
                 />
               </div>
 
@@ -3109,7 +3134,7 @@
                   type="text"
                   class="form-control"
                   [value]="caseappealdetailstwo.case_fit_for_appeal"
-                  placeholder="Enter Yes or No"
+                  
                 />
               </div>
 
@@ -3123,7 +3148,7 @@
                   type="text"
                   class="form-control"
                   [value]="caseappealdetailstwo.government_approval_for_appeal"
-                  placeholder="Enter Yes or No"
+                  
                 />
               </div>
 
@@ -3137,7 +3162,7 @@
                   type="text"
                   class="form-control"
                   [value]="caseappealdetailstwo.filed_by"
-                  placeholder="Enter Victim or Government"
+                  
                 />
               </div>
             </div>

@@ -1195,7 +1195,7 @@
                 <input type="text" id="caseNumber" class="form-control" formControlName="caseNumber" placeholder="Enter Case Number" required/>
               </div> -->
               <div class="col-lg-6" *ngIf="firForm.get('caseType')?.value === 'chargeSheet'">
-                <label for="caseNumber" class="form-label">67a. Case Number Report (CNR) / Special SC Number *</label>
+                <label for="caseNumber" class="form-label">67a. CNR Number *</label>
                 <input
                   type="text"
                   id="caseNumber"
@@ -1205,8 +1205,19 @@
                   required
                 />
                 </div>
+                <div class="col-lg-6" *ngIf="firForm.get('caseType')?.value === 'chargeSheet'">
+                <label for="ChargeSheet_CRL_number" class="form-label">67b. SC/ Special SC Number *</label>
+                <input
+                  type="text"
+                  id="ChargeSheet_CRL_number"
+                  class="form-control"
+                  formControlName="ChargeSheet_CRL_number"
+                  placeholder="SC/ Special SC Number"
+                  required
+                />
+                </div>
                 <div class="col-lg-4" *ngIf="firForm.get('caseType')?.value === 'chargeSheet'">
-                  <label for="chargeSheetDate" class="form-label">67b. Date of Chargesheet</label>
+                  <label for="chargeSheetDate" class="form-label">67c. Date of Chargesheet</label>
                   <input
                     type="date"
                     id="chargeSheetDate"

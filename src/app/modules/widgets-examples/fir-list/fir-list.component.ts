@@ -41,6 +41,7 @@ export class FirListComponent implements OnInit {
   timeOfOccurrence: string = '';
   time_of_occurrence_to:string='';
   placeOfOccurrence: string = '';
+  is_case_altered : string = '';
   dateOfRegistration: string = '';
   timeOfRegistration: string = '';
 
@@ -671,6 +672,7 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
           this.placeOfOccurrence=data.queryResults[0].place_of_occurrence;
           this.dateOfRegistration= data.queryResults[0].date_of_registration ? this.convertToNormalDate(data.queryResults[0].date_of_registration) : data.queryResults[0].date_of_registration;
           this.timeOfRegistration=data.queryResults[0].time_of_registration;
+          this.timeOfRegistration=data.queryResults[0].is_case_altered;
 
           this.nameOfComplainant=data.queryResults[0].name_of_complainant;
           this.mobileNumberOfComplainant=data.queryResults[0].mobile_number_of_complainant;

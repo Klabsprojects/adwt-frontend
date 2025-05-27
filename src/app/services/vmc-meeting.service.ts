@@ -113,4 +113,7 @@ export class VmcMeetingService {
     return this.http.post(`${environment.apiUrl}FileUpload`, formData);
   }
   
+  deleteMeeting(meeting_Id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/Delete_Meeting${meeting_Id}`);
+  }
 }
