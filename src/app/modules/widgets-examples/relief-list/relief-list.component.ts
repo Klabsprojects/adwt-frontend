@@ -287,7 +287,7 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
 
   displayedColumns: { label: string; field: string; sortable: boolean; visible: boolean }[] = [
     { label: 'Sl.No', field: 'sl_no', sortable: false, visible: true },
-    { label: 'FIR No.', field: 'fir_id', sortable: true, visible: true },
+    { label: 'FIR No.', field: 'fir_number', sortable: true, visible: true },
     { label: 'Police City', field: 'police_city', sortable: true, visible: true },
     { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
     { label: 'Created By', field: 'created_by', sortable: true, visible: true },
@@ -337,6 +337,7 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
       const matchesSearch =
         fir.fir_id.toString().toLowerCase().includes(searchLower) ||
         (fir.police_city || '').toLowerCase().includes(searchLower) ||
+        (fir.fir_number || '').toLowerCase().includes(searchLower) ||
         (fir.police_station || '').toLowerCase().includes(searchLower);
 
       // Apply dropdown filters

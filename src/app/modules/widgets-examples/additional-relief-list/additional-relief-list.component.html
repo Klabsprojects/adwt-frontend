@@ -41,18 +41,18 @@
 <div class="p-10">
    <!-- Filters -->
    <div class="d-flex gap-3 mb-3">
-    <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
+    <!-- <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
       <option value="" selected disabled>Select One</option>
       <option *ngFor="let item of firList" [value]="item.fir_id">{{ item.fir_id }}</option>
-    </select>
+    </select> -->
 
     <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
-      <option value="" selected disabled>Select One</option>
+      <option value="" selected disabled>Victim ID</option>
       <option *ngFor="let item of firList" [value]="item.victim_id">{{ item.victim_id }}</option>
     </select>
 
     <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
-      <option value="" selected disabled>Select One</option>
+      <option value="" selected disabled>Victim Name</option>
       <option *ngFor="let item of firList" [value]="item.victim_name">{{ item.victim_name }}</option>
     </select>
 
@@ -83,7 +83,7 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>FIR ID</th>
+          <th>FIR No</th>
           <th>Victim ID</th>
           <th>Victim Name</th>
           <th>Actions</th>
@@ -92,7 +92,7 @@
       <tbody>
         <tr *ngFor="let fir of displayedFirList; let i = index">
           <td>{{ (page - 1) * itemsPerPage + i + 1 }}</td>
-          <td>{{ fir.fir_id }}</td>
+          <td>{{ fir.fir_number }}</td>
           <td>{{ fir.victim_id }}</td>
           <td>{{ fir.victim_name }}</td>
           <td>

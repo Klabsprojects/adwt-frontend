@@ -1188,6 +1188,8 @@
                   <option value="" disabled>Select Case Type</option>
                   <option value="chargeSheet">Charge Sheet</option>
                   <option value="referredChargeSheet">Referred Charge Sheet (RCS)</option>
+                  <option value="sectionDeleted">Section Deleted</option>
+                  <option value="firQuashed">FIR Quashed</option>
                 </select>
               </div>
               <!-- <div *ngIf="firForm.get('caseType')?.value === 'chargeSheet'" class="col-lg-6">
@@ -1225,26 +1227,118 @@
                     formControlName="chargeSheetDate"
                   />
                 </div>
+
+
+              <div *ngIf="firForm.get('caseType')?.value === 'firQuashed'" class="col-md-12">
+              <div class="row">
+                 
+              <div class="row mb-4">
+              <div class="mb-4 col-6">
+                <label class="form-label">Quash Petition No. *</label>
+                <input type="text" class="form-control" formControlName="quash_petition_no" placeholder="Quash Petition No." required />
+              </div>
+              <div class="mb-4 col-6">
+                <label class="form-label">Petition Date *</label>
+                <input type="date" class="form-control" formControlName="petition_date" [max]="today" required/>
+              </div>
+            </div>
+
+              <div class="mb-4">
+              <label class="form-label">Upload Court Order</label>
+         
+            <input type="file" id="upload_court_order" class="form-control" required 
+            (change)="upload_court_order_FileUpload($event)" multiple *ngIf="!upload_court_order_path"/>
+            <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="upload_court_order_path">
+            <div class="d-flex justify-content-start align-items-center">
+              {{upload_court_order_path}}
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <button class="btn btn-primary btn-sm me-2" (click)="view_upload_court_order()">View</button>
+              <button class="btn btn-danger btn-sm" (click)="remove_upload_court_order()"><i class="fas fa-times"></i></button>
+            </div>
+          </div>
+          </div>
+
+        </div>
+        </div>
+
+
+
+        <div *ngIf="firForm.get('caseType')?.value === 'sectionDeleted'" class="col-md-12">
+            <div class="row">
+                 
+              <div class="row mb-4">
+              <div class="mb-4 col-6">
+                <label class="form-label">Proceedings File No. *</label>
+                <input type="text" class="form-control" formControlName="proceedingsFileNo_1" placeholder="Enter File No." required />
+              </div>
+              <div class="mb-4 col-6">
+                <label class="form-label">Proceedings Date *</label>
+                <input type="date" class="form-control" formControlName="proceedingsDate_1" [max]="today" required/>
+              </div>
+            </div>
+
+              <div class="mb-4">
+              <label class="form-label">Upload Commissionerate / S.P. Office Proceedings *</label>
+         
+            <input type="file" [id]="'uploadProceedings_1' + i" class="form-control" required 
+            (change)="onProceedingsFileUpload2($event)" multiple *ngIf="!proceedingFileName2"/>
+            <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingFileName2">
+            <div class="d-flex justify-content-start align-items-center">
+              {{proceedingFileName2}}
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <button class="btn btn-primary btn-sm me-2" (click)="viewProceedingsCopy2()">View</button>
+              <button class="btn btn-danger btn-sm" (click)="removeProceedingsCopy2()"><i class="fas fa-times"></i></button>
+            </div>
+          </div>
+          </div>
+
+        </div>
+        </div>
+
+
               <div *ngIf="firForm.get('caseType')?.value === 'referredChargeSheet'" class="col-md-12">
                 <div class="row">
                   <div class="col-lg-6">
-                    <label for="rcsFileNumber" class="form-label">68. Referred Charge Sheet (RCS) file number</label>
+                    <label for="rcsFileNumber" class="form-label">68. Referred Charge Sheet (RCS) file number *</label>
                     <input type="text" id="rcsFileNumber" class="form-control" formControlName="rcsFileNumber" required placeholder="Enter RCS File Number"/>
                   </div>
                   <div class="col-lg-6">
-                    <label for="rcsFilingDate" class="form-label">69. Referred Charge Sheet (RCS) filing date</label>
+                    <label for="rcsFilingDate" class="form-label">69. Referred Charge Sheet (RCS) filing date *</label>
                     <input type="date" id="rcsFilingDate" class="form-control" formControlName="rcsFilingDate" required placeholder="Enter Case Number"/>
                   </div>
-                  <div class="col-lg-6">
+
+                  <!-- <div class="col-lg-6">
                     <label for="mfCopy" class="form-label">70. Upload MF copy</label>
                     <input type="file" id="mfCopy" class="form-control" formControlName="mfCopy" required/>
-                  </div>
+                  </div> -->
+
+
+                    <div class="mb-4">
+                        <label class="form-label">70. Upload MF copy *</label>
+   
+                      <input type="file" id = "mfCopy" class="form-control" required 
+                      (change)="MFcopyFileUpload($event)" *ngIf="!mfCopyPath"/>
+                      <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="mfCopyPath">
+                      <div class="d-flex justify-content-start align-items-center">
+                        {{mfCopyPath}}
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-primary btn-sm me-2" (click)="viewMFcopyFile()">View</button>
+                        <button class="btn btn-danger btn-sm" (click)="removeMFcopyFile()"><i class="fas fa-times"></i></button>
+                      </div>
+                    </div>
+                    </div>
+                    
+
                 </div>
               </div>
+
             </div>
           </div>
         </div>
-        <div class="" *ngIf="firForm.get('caseType')?.value !== 'referredChargeSheet'">
+        <div class="" *ngIf="firForm.get('caseType')?.value == 'chargeSheet'">
           <div formArrayName="victimsRelief">
             <div *ngFor="let victimRelief of victimsRelief.controls; let i = index" [formGroupName]="i" class="card border-primary mb-4">
               <div class="card-body">
@@ -1280,7 +1374,7 @@
             </div>
           </div>
         </div>
-        <div class="card border-primary mb-4" *ngIf="firForm.get('caseType')?.value !== 'referredChargeSheet'">
+        <div class="card border-primary mb-4" *ngIf="firForm.get('caseType')?.value == 'chargeSheet'">
           <div class="card-body">
             <div class="row mb-4">
               <div class="col-8">

@@ -247,6 +247,7 @@ export class AdditionalReliefListComponent implements OnInit {
       const matchesSearch =
         fir.fir_id.toString().toLowerCase().includes(searchLower) ||
         (fir.victim_id || '').toLowerCase().includes(searchLower) ||
+        (fir.fir_number || '').toLowerCase().includes(searchLower) ||
         (fir.victim_name || '').toLowerCase().includes(searchLower);
 
       // Apply dropdown filters
