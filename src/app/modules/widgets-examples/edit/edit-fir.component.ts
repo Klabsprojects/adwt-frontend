@@ -689,8 +689,8 @@ loadAccusedCommunities(): void {
     this.loadAllOffenceReliefDetails();
     this.loadAccusedCommunities();
     if (this.firId) {
-      this.loadFirDetails(this.firId);
-      this.loadVictimsReliefDetails();
+      // this.loadFirDetails(this.firId);
+      // this.loadVictimsReliefDetails();
       //console.log(`Using existing FIR ID: ${this.firId}`);
     } else {
       //console.log('Creating a new FIR entry');
@@ -2061,7 +2061,7 @@ onOffenceCommittedChange(index: number): void {
   viewFIRCopy(): void {
   const path = this.firForm.get('uploadFIRCopy')?.value;
   if (path) {
-    const url = `${env.file_access}${path}`;
+    const url = `${env.file_access}${path.startsWith('/') ? '' : '/'}${path}`;
     window.open(url, '_blank');
   }
 }
@@ -2094,10 +2094,21 @@ removeFIRCopy(): void {
       });
     }  
     viewProceedingsCopy(): void {
-      if (this.firForm.get('proceedingsFile')?.value) {
-        const url = `${env.file_access}${this.firForm.get('proceedingsFile')?.value}`;
+     let url = this.firForm.get('proceedingsFile')?.value;
+      if (url) {
+        url = `${env.file_access}${url.startsWith('/') ? '' : '/'}${url}`;
         window.open(url, '_blank');
       }
+
+      // if (this.firForm.get('proceedingsFile')?.value) {
+      //   let fakeurl =
+      //   const url = `${env.file_access}${this.firForm.get('proceedingsFile')?.value}`;
+      //   if (!path.startsWith('/')) {
+      //     path = '/' + path;
+      //   }
+
+      //   window.open(url, '_blank');
+      // }
     }
     
     
@@ -2108,6 +2119,9 @@ removeFIRCopy(): void {
 
     view62(path: any): void {
         if (path) {
+          if (!path.startsWith('/')) {
+            path = '/' + path;
+          }
           const url = `${env.file_access}${path}`;
           window.open(url, '_blank');
         }
@@ -2134,7 +2148,8 @@ removeFIRCopy(): void {
 
     viewProceedingsCopy2(): void {
       if (this.firForm.get('uploadProceedings_1')?.value) {
-        const url = `${env.file_access}${this.firForm.get('uploadProceedings_1')?.value}`;
+        // const url = `${env.file_access}${this.firForm.get('uploadProceedings_1')?.value}`;
+        const url = `${env.file_access}${this.firForm.get('uploadProceedings_1')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('uploadProceedings_1')?.value}`;
         window.open(url, '_blank');
       }
     }
@@ -2167,7 +2182,8 @@ removeFIRCopy(): void {
     }
     view95(){
       if (this.firForm.get('uploadProceedings_2')?.value) {
-        const url = `${env.file_access}${this.firForm.get('uploadProceedings_2')?.value}`;
+        // const url = `${env.file_access}${this.firForm.get('uploadProceedings_2')?.value}`;
+        const url = `${env.file_access}${this.firForm.get('uploadProceedings_2')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('uploadProceedings_2')?.value}`;
         window.open(url, '_blank');
       }
     }
@@ -2496,7 +2512,7 @@ removeFIRCopy(): void {
         this.filePath_attachment.forEach((filePath: any) => {
           this.attachmentss_1.push({ id: "", path: filePath, file: filePath });
         });
-        // console.log("Updated attachmentss_1:", this.attachmentss_1);  
+        // console.log("Updated attachmentss_1:", this.attachmentss_1);
       }
 
       if (response.data3.all_attachments) {
@@ -2549,7 +2565,8 @@ removeFIRCopy(): void {
       this.proceedingFileName2 = response.data4.upload_proceedings_path;
     }  
     if (response.data4.attachments) { 
-      this.attachmentss_1 =  response.data4.attachments
+      // console.log('response.data4.attachments',response.data4.attachments);
+      // this.attachmentss_1 =  response.data4.attachments
     }
     if (response && response.data4 && response.data4.proceedings_date) {
       const dateObj = new Date(response.data4.proceedings_date);
@@ -3362,30 +3379,28 @@ removeFIRCopy(): void {
 
       this.attachmentss_1[index].path = uploadedFilePath;
       this.attachmentss_1[index].file = null;
-
+      this.cdr.detectChanges();
       // Update FormArray
-      const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
-      while (attachmentsControl.length <= index) {
-        attachmentsControl.push(this.fb.group({
-          file: [null],
-          filePath: [''],
-          fileName: ['']
-        }));
-      }
+      // const attachmentsControl = this.firForm.get('attachmentss_1') as FormArray;
+      // while (attachmentsControl.length <= index) {
+      //   attachmentsControl.push(this.fb.group({
+      //     file: [null],
+      //     filePath: [''],
+      //     fileName: ['']
+      //   }));
+      // }
 
-      const attachmentControl = attachmentsControl.at(index);
-      if (!attachmentControl) {
-        console.error(`Form control at index ${index} is undefined`);
-        return;
-      }
+      // const attachmentControl = attachmentsControl.at(index);
+      // if (!attachmentControl) {
+      //   console.error(`Form control at index ${index} is undefined`);
+      //   return;
+      // }
 
-      attachmentControl.patchValue({
-        file: file,
-        filePath: uploadedFilePath,
-        fileName: file.name
-      });
-
-      this.cdr.detectChanges(); // Optional, for UI refresh
+      // attachmentControl.patchValue({
+      //   file: file,
+      //   filePath: uploadedFilePath,
+      //   fileName: file.name
+      // });
     },
     error: (err) => {
       console.error('File upload failed:', err);
@@ -3411,50 +3426,53 @@ removeFIRCopy(): void {
   
   
   removeAttachment_1(index: number) {
-    const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
+    if (this.attachmentss_1.length > 0) {
+      this.attachmentss_1.splice(index,1);
+    } 
+    // const attachmentsControl = this.firForm.get('attachmentss_1') as FormArray;
   
-    if (!attachmentsControl || attachmentsControl.length <= index) {
-      console.error("Attempted to remove an undefined attachment at index", index);
-      return;
-    }
+    // if (!attachmentsControl || attachmentsControl.length <= index) {
+    //   console.error("Attempted to remove an undefined attachment at index", index);
+    //   return;
+    // }
   
 
-    attachmentsControl.removeAt(index);
+    // attachmentsControl.removeAt(index);
   
  
-    if (this.attachmentss_1 && index < this.attachmentss_1.length) {
-      this.attachmentss_1.splice(index, 1);
-    }
+    // if (this.attachmentss_1 && index < this.attachmentss_1.length) {
+    //   this.attachmentss_1.splice(index, 1);
+    // }
   
    
-    if (this.filePath_attachment && index < this.filePath_attachment.length) {
-      this.filePath_attachment.splice(index, 1);
-    }
+    // if (this.filePath_attachment && index < this.filePath_attachment.length) {
+    //   this.filePath_attachment.splice(index, 1);
+    // }
   
    
-    if (this.attachmentss_1.length > 0) {
-      this.attachmentss_1 = this.attachmentss_1.map((item:any, i:any) => ({
-        id: item.id,
-        path: item.path,
-        file: item.file,
-      }));
+    // if (this.attachmentss_1.length > 0) {
+    //   this.attachmentss_1 = this.attachmentss_1.map((item:any, i:any) => ({
+    //     id: item.id,
+    //     path: item.path,
+    //     file: item.file,
+    //   }));
   
     
-      while (attachmentsControl.length > 0) {
-        attachmentsControl.removeAt(0);
-      }
+    //   while (attachmentsControl.length > 0) {
+    //     attachmentsControl.removeAt(0);
+    //   }
   
-      this.attachmentss_1.forEach((attachment:any, i:any) => {
-        attachmentsControl.push(this.fb.group({
-          filePath: [attachment.path]
-        }));
-      });
-    }
+    //   this.attachmentss_1.forEach((attachment:any, i:any) => {
+    //     attachmentsControl.push(this.fb.group({
+    //       filePath: [attachment.path]
+    //     }));
+    //   });
+    // }
   
-    // Refresh UI
-    setTimeout(() => {
-      this.cdr.detectChanges();
-    }, 0);
+    // // Refresh UI
+    // setTimeout(() => {
+    //   this.cdr.detectChanges();
+    // }, 0);
   }
   
   
@@ -5291,15 +5309,15 @@ uploadedImageSrc: any | ArrayBuffer;
 
       
     addAttachment_1() {
-      const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
+      const attachmentsControl = this.firForm.get('attachmentss_1') as FormArray;
     
-      if (!attachmentsControl) {
-        console.error("attachments_1 FormArray is undefined.");
-        return;
-      }
+      // if (!attachmentsControl) {
+      //   console.error("attachmentss_1 FormArray is undefined.");
+      //   return;
+      // }
     
       
-      attachmentsControl.push(this.fb.group({
+       attachmentsControl && attachmentsControl.push(this.fb.group({
         file: [null],       
         filePath: [''],     
         fileName: ['']      
@@ -6280,7 +6298,7 @@ controls.forEach((controlName) => {
   // }
   viewAttachment_2(path: string): void {
   if (path) {
-    const url = `${env.file_access}${path}`;
+    const url = `${env.file_access}${path.startsWith('/') ? '' : '/'}${path}`;
     window.open(url, '_blank');
   }
 }
@@ -7933,7 +7951,7 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
 
   viewuploadJudgement(){
     if (this.firForm.get('judgementDetails.uploadJudgement')?.value) {
-        const url = `${env.file_access}${this.firForm.get('judgementDetails.uploadJudgement')?.value}`;
+        const url = `${env.file_access}${this.firForm.get('judgementDetails.uploadJudgement')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('judgementDetails.uploadJudgement')?.value}`;
         window.open(url, '_blank');
       }
   }
@@ -7998,7 +8016,7 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
   viewuploadJudgementone(){
     // console.log(this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value);
      if (this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value) {
-        const url = `${env.file_access}${this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value}`;
+        const url = `${env.file_access}${this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value}`;
         window.open(url, '_blank');
       }
   }
@@ -8063,7 +8081,7 @@ removeuploadJudgementone(){
   viewuploadJudgementtwo(){
     // console.log(this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value);
      if (this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value) {
-        const url = `${env.file_access}${this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value}`;
+        const url = `${env.file_access}${this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value}`;
         window.open(url, '_blank');
       }
   }
@@ -8322,7 +8340,7 @@ onFileSelect_1New(event: any, index: number, fileControl: string, fileNameContro
 viewAttachment_1(index: number): void {
   const filePath = this.attachments_1.at(index).get('file')?.value;
   if (filePath) {
-    const url = `${env.file_access}${filePath}`;
+    const url = `${env.file_access}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
     window.open(url, '_blank');
   }
 }
@@ -8372,7 +8390,7 @@ lebelName(){
 
     viewMFcopyFile(): void {
       if (this.firForm.get('mfCopy')?.value) {
-        const url = `${env.file_access}${this.firForm.get('mfCopy')?.value}`;
+        const url = `${env.file_access}${this.firForm.get('mfCopy')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('mfCopy')?.value}`;
         window.open(url, '_blank');
       }
     }
@@ -8408,7 +8426,8 @@ lebelName(){
 
     view_upload_court_order(): void {
       if (this.firForm.get('upload_court_order')?.value) {
-        const url = `${env.file_access}${this.firForm.get('upload_court_order')?.value}`;
+        // const url = `${env.file_access}${this.firForm.get('upload_court_order')?.value}`;
+        const url = `${env.file_access}${this.firForm.get('upload_court_order')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('upload_court_order')?.value}`;
         window.open(url, '_blank');
       }
     }
