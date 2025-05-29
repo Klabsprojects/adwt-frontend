@@ -26,6 +26,8 @@ export class ReliefListComponent implements OnInit {
   totalPages = 1; // Total number of pages
   isLoading = true; // Loading indicator
   searchText: string = '';
+  dorf:any;
+  dort:any;
 
   constructor(
     private reliefService: ReliefService,
@@ -291,9 +293,11 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
     { label: 'Police City', field: 'police_city', sortable: true, visible: true },
     { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
     { label: 'Created By', field: 'created_by', sortable: true, visible: true },
+    { label: 'Date Of Reporting', field : 'date_of_repost', sortable: true, visible: true},
     { label: 'Created At', field: 'created_at', sortable: true, visible: true },
     { label: 'Status', field: 'status', sortable: false, visible: true },
     { label: 'Actions', field: 'actions', sortable: false, visible: true },
+
   ];
 
   selectedColumns: any[] = [...this.displayedColumns];

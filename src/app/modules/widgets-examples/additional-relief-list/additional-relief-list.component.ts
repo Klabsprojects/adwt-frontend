@@ -8,6 +8,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { PoliceDivisionService } from 'src/app/services/police-division.service';
 
 @Component({
   selector: 'app-additional-relief-list',
@@ -28,16 +29,20 @@ export class AdditionalReliefListComponent implements OnInit {
   constructor(
     private additionalreliefService: AdditionalReliefService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private policeDivisionService :PoliceDivisionService
   ) {}
 
   ngOnInit(): void {
     this.fetchFIRList();
     this.updateSelectedColumns();
+    this.loadPoliceDivision();
   }
 
   // Filters
   selectedDistrict: string = '';
+  selectedPoliceCity:string = '';
+  selectedPoliceStation:string = '';
   selectedNatureOfOffence: string = '';
   selectedStatusOfCase: string = '';
   selectedStatusOfRelief: string = '';
@@ -84,6 +89,9 @@ export class AdditionalReliefListComponent implements OnInit {
     'Virudhunagar'
   ];
 
+  policeCities:any[]=[];
+  policestations:any[]=[];
+
   naturesOfOffence: string[] = [
     'Theft',
     'Assault',
@@ -117,6 +125,10 @@ export class AdditionalReliefListComponent implements OnInit {
     { label: 'FIR ID', field: 'fir_id', sortable: true, visible: true },
     { label: 'Victim ID', field: 'victim_id', sortable: true, visible: true },
     { label: 'Victim Name', field: 'victim_name', sortable: true, visible: true },
+    { label: 'Disctrict', field: 'disctrict', sortable: true, visible: true },
+    { label: 'Police City', field: 'police_city', sortable: true, visible: true },
+    { label: 'Police Station Name', field: 'station_name', sortable: true, visible: true },
+     { label: 'Actions', field: 'actions', sortable: false, visible: true },
     // { label: 'Actions', field: 'created_by', sortable: true, visible: true },
     // { label: 'Created At', field: 'created_at', sortable: true, visible: true },
     // { label: 'Status', field: 'status', sortable: false, visible: true },
@@ -270,6 +282,8 @@ export class AdditionalReliefListComponent implements OnInit {
     this.selectedDistrict = '';
     this.selectedNatureOfOffence = '';
     this.selectedStatusOfCase = '';
+    this.selectedDistrict = '';
+    this.selectedPoliceStation = '';
     this.applyFilters();
   }
   
@@ -306,5 +320,15 @@ export class AdditionalReliefListComponent implements OnInit {
     return this.filteredFirList().slice(startIndex, startIndex + this.itemsPerPage);
   }
 
+  loadPoliceDivision() {
+    this.policeDivisionService.getAllPoliceDivisions().subscribe(
+      (data: any) => {
+        this.policeCities = data.map((item: any) => item.district_division_name);
+      },
+      (error: any) => {
+        console.error(error)
+      }
+    );
+  }
 
 }
