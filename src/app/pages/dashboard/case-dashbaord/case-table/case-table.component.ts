@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
   styleUrl: './case-table.component.scss'
 })
 export class CaseTableComponent implements OnInit,OnDestroy {
+  loading:boolean=true;
   private subscription = new Subscription();
   constructor(private cdr:ChangeDetectorRef, private hcs:homeCaseService){}
   ngOnDestroy(): void {
@@ -16,7 +17,8 @@ export class CaseTableComponent implements OnInit,OnDestroy {
     this.subscription.add(
       this.hcs.table$.subscribe((res:any)=>{
         if(res){
-          this.zonewise = res;
+          this.zonewise = res.filter((item: any) => {return item.sz !== 0 || item.cz !== 0 || item.nz !== 0 || item.wz !== 0;});
+          this.loading = false;
         }
         this.cdr.detectChanges();
       })

@@ -13,10 +13,12 @@ export class MeetingSblmdComponent implements OnInit,OnDestroy {
   }
   private subscription = new Subscription();
   public tableData:any[]=[];
+  loading:boolean = true;
   ngOnInit(): void {
     this.subscription.add(
       this.hms.sblmd$.subscribe((res: any) => {
         if (res) {
+          this.loading = Object.keys(res).length === 0 ? true:false;
           this.tableData = Object.entries(res).map(([location, data]) => {
             if (typeof data === 'object' && data !== null) {
               return { location, ...data };

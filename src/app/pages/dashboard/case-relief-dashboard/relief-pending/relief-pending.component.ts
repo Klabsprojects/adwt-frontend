@@ -42,6 +42,7 @@ export type ChartOptions = {
   styleUrls: ['./relief-pending.component.scss']
 })
 export class ReliefPendingComponent implements OnInit, OnDestroy {
+  loading:boolean=false;
   private subscription: Subscription = new Subscription();
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: ChartOptions;
@@ -109,6 +110,7 @@ export class ReliefPendingComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscription.add(
       this.csr.pending$.subscribe((res: any[]) => {
+        this.loading = res.length === 0 ? true : false;
         if (!res) return;
 
         const districts = res.map(item => item.revenue_district);

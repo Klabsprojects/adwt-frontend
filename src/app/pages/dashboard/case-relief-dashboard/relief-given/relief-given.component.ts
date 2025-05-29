@@ -43,6 +43,7 @@ export type ChartOptions = {
 })
 export class ReliefGivenComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
+  loading:boolean = false;
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: ChartOptions;
 
@@ -109,8 +110,8 @@ export class ReliefGivenComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscription.add(
       this.csr.given$.subscribe((res: any[]) => {
+        this.loading = res.length === 0 ? true : false;
         if (!res) return;
-
         const districts = res.map(item => item.revenue_district);
         const job = res.map(item => item.job_Given);
         const pension = res.map(item => item.Pension_Given);

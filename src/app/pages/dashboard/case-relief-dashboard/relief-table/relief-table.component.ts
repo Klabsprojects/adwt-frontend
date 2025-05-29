@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 })
 export class ReliefTableComponent implements OnInit,OnDestroy {
   public tableData:any[]=[]
+  loading:boolean = false;
   private subscription: Subscription = new Subscription();
   constructor(private crs:caseReliefService, private cdr:ChangeDetectorRef){}
 
@@ -15,6 +16,7 @@ export class ReliefTableComponent implements OnInit,OnDestroy {
     this.subscription.add(
       this.crs.tabledata$.subscribe((res: any) => {
         if (res) {
+          this.loading = res.length === 0 ? true : false;
           this.tableData = res;
           this.cdr.detectChanges();
         }

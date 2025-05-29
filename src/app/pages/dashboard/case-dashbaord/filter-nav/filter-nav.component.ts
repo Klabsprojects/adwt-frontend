@@ -69,12 +69,14 @@ export class FilterNavComponent implements OnInit, OnDestroy {
     this.callAllfunction();
     this.subscription.add(
       this.hcs.distrct$.subscribe((res:any)=>{
-        if(res){
+        // if(res){
+          // console.log("res1",res)
           if(Object.keys(body).length === 0){
+            // console.log("res2",res)
             this.selectedDistricts = res;
             this.callAllfunction();
           }
-        }
+        // }
       })
     )
   }

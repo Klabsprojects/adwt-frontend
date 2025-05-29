@@ -43,6 +43,7 @@ import { ReliefPensionStatusComponent } from 'src/app/pages/dashboard/case-relie
 import { ReliefReliefStatusComponent } from 'src/app/pages/dashboard/case-relief-dashboard/relief-relief-status/relief-relief-status.component';
 import { ReliefTableComponent } from 'src/app/pages/dashboard/case-relief-dashboard/relief-table/relief-table.component';
 import { BaseChartDirective } from 'ng2-charts';
+import { LoadingDashComponent } from 'src/app/pages/dashboard/loading-dash/loading-dash.component';
 @NgModule({
   declarations: [
     MeetingCardsComponent,
@@ -56,6 +57,7 @@ import { BaseChartDirective } from 'ng2-charts';
     DashboardComponent,
     DadtwoDashboardComponent,
     CaseDashbaordComponent,
+    LoadingDashComponent,
     CardsComponent,
     FilterNavComponent,
     CaseDwcdmPTComponent,

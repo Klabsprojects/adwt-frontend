@@ -14,6 +14,7 @@ Chart.register(...registerables, ChartDataLabels);
 })
 export class ReliefPensionStatusComponent {
   private subscription: Subscription = new Subscription();
+  loading:boolean = false;
 
   constructor(private dbService: DashboardService, private cdr: ChangeDetectorRef, private csr: caseReliefService) {}
   ngOnDestroy(): void {
@@ -24,6 +25,7 @@ export class ReliefPensionStatusComponent {
     this.subscription.add(
       this.csr.pensionStatus$.subscribe((res: any) => {
         if(res){
+          this.loading = Object.keys(res).length === 0 ? true : false;
           this.pieChartDatasets = [{
             data: [res.Given, res.Pending],
             backgroundColor: ['#d64550', '#48327a']

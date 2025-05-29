@@ -3,6 +3,12 @@
         <h5 class="card-title" style="font-size: 18px;font-weight: 500;">Pendency PT Casess</h5>
     </div>
 </div>
-<div class="card-body">
+<!-- <div class="card-body">
     <canvas id="barChart1" style="max-height: 300px; width: 100%;"></canvas>
+</div> -->
+<div id="chart">
+    <apx-chart [series]="chartOptions.series!" [chart]="chartOptions.chart!" [dataLabels]="chartOptions.dataLabels!"
+        [plotOptions]="chartOptions.plotOptions!" [responsive]="chartOptions.responsive!" [xaxis]="chartOptions.xaxis!"
+        [legend]="chartOptions.legend!" [fill]="chartOptions.fill!" *ngIf="chartOptions?.series"></apx-chart>
 </div>
+<app-loading-dash *ngIf="loading"/>

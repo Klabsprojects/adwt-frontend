@@ -28,18 +28,21 @@ export class homeMeetingService {
     }
 
     setCardDetails(data: any) {
+        this.cardsdetails.next({});
         this.ds.userPostMethod('GetVmcDashboardCardsValues', data).subscribe((res: any) => {
             this.cardsdetails.next(res.data[0]);
         })
     }
 
     setDlmdDetails(data: any) {
+        this.dlmdDetails.next([]);
         this.ds.userPostMethod('GetVmcQuarterlyMeetingStats',data).subscribe((res:any)=>{
             this.dlmdDetails.next(res.data);
           })
     }
 
     setSblmdDetails(data: any) {
+        this.sblmd.next({});
         this.ds.userPostMethod('GetVmcSubdivisionMeetingStats',data).subscribe((res:any)=>{
             this.sblmd.next(res.data);
           })

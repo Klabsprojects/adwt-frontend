@@ -11,6 +11,7 @@ Chart.register(...registerables);
 })
 export class CasePiechartComponent implements OnInit,OnDestroy {
   private subscription = new Subscription();
+  loading:boolean=false;
   constructor(private dbService:DashboardService, private hcs:homeCaseService, private cdr:ChangeDetectorRef) {
     Chart.register(...registerables);
   }
@@ -28,6 +29,12 @@ export class CasePiechartComponent implements OnInit,OnDestroy {
         }
         this.cdr.detectChanges();
        })
+    )
+    this.subscription.add(
+      this.hcs.isPieChartLoading$.subscribe((res:any)=>{
+        this.loading = res;
+        this.cdr.detectChanges();
+      })
     )
   }
   public pieChartOptions: ChartOptions<'doughnut'> = {

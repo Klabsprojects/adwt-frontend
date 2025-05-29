@@ -97,6 +97,7 @@ export class CaseDwcdmPTComponent implements OnInit,OnDestroy {
     { min: 61, max: 90, color: '#ffdd55' },
     { min: 90, max: Infinity, color: '#dc3545' },
   ];
+  loading:boolean=false;
 
   constructor(private hcs:homeCaseService,private cdr:ChangeDetectorRef){}
   ngOnDestroy(): void {
@@ -108,6 +109,12 @@ export class CaseDwcdmPTComponent implements OnInit,OnDestroy {
         if(res){
           this.updateCount(res);
         }
+        this.cdr.detectChanges();
+      })
+    )
+    this.subscription.add(
+      this.hcs.isDwcdmPtLoading$.subscribe((res: any) => {
+        this.loading = res;
         this.cdr.detectChanges();
       })
     )

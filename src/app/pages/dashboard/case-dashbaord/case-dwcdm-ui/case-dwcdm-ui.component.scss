@@ -24,9 +24,7 @@
     align-items: center;
   }
   
-  .legend {
-    display: flex;
-    flex-direction: column;
+  .legend-bg{
     padding: 10px 15px;
     background-color: #f0f0f0;
     border-radius: 8px;
@@ -34,11 +32,22 @@
     margin-bottom: 20px;
   }
   
+  .legend {
+    display: flex;
+    gap: 1rem;
+    // flex-direction: column;
+    // padding: 10px 15px;
+    // background-color: #f0f0f0;
+    // border-radius: 8px;
+    // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    // margin-bottom: 20px;
+  }
+  
   .legenditem {
     display: flex;
     align-items: center;
     margin-bottom: 8px;
-    font-size: 14px;
+    font-size: 10px;
     font-family: 'Lato', sans-serif;
   }
   

@@ -1,5 +1,6 @@
-<div id="chart">
+<div id="chart" style="position: relative;">
     <apx-chart [series]="chartOptions.series!" [chart]="chartOptions.chart!" [dataLabels]="chartOptions.dataLabels!"
         [plotOptions]="chartOptions.plotOptions!" [responsive]="chartOptions.responsive!" [xaxis]="chartOptions.xaxis!"
         [legend]="chartOptions.legend!" [fill]="chartOptions.fill!" *ngIf="chartOptions?.series"></apx-chart>
+        <app-loading-dash *ngIf="loading" />
 </div>

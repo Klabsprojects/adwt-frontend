@@ -13,6 +13,7 @@ Chart.register(...registerables, ChartDataLabels);
   styleUrl: './relief-education-status.component.scss'
 })
 export class ReliefEducationStatusComponent {
+  loading:boolean=false;
   private subscription: Subscription = new Subscription();
 
   constructor(private dbService: DashboardService, private cdr: ChangeDetectorRef, private csr: caseReliefService) {}
@@ -24,6 +25,7 @@ export class ReliefEducationStatusComponent {
     this.subscription.add(
       this.csr.educationStatus$.subscribe((res: any) => {
         if(res){
+          this.loading = Object.keys(res).length === 0 ? true:false;
           this.pieChartDatasets = [{
             data: [res.Given, res.Pending],
             backgroundColor: ['#d64550', '#48327a']

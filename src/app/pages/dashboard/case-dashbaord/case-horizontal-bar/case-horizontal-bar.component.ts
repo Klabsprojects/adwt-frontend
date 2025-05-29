@@ -27,6 +27,7 @@ export type ChartOptions = {
 export class CaseHorizontalBarComponent implements OnInit,OnDestroy {
   private subscription = new Subscription();
   constructor(private hcs:homeCaseService, private cdr:ChangeDetectorRef){}
+  loading:boolean=false;
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
@@ -36,6 +37,12 @@ export class CaseHorizontalBarComponent implements OnInit,OnDestroy {
         if(res){
           this.createBar(res);
         }
+        this.cdr.detectChanges();
+      })
+    )
+    this.subscription.add(
+      this.hcs.isHorizontalLoading$.subscribe((res:any)=>{
+        this.loading = res;
         this.cdr.detectChanges();
       })
     )

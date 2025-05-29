@@ -21,6 +21,7 @@ export type ChartOptions = {
 })
 export class MeetingQwsmsComponent implements OnInit,OnDestroy {
   private subscription =  new Subscription();
+  loading:boolean = false;
   @ViewChild("chart") chart: ChartComponent;
   public chartOptions: ChartOptions;
   ngOnInit(): void {
@@ -28,6 +29,7 @@ export class MeetingQwsmsComponent implements OnInit,OnDestroy {
       this.hms.qwsms$.subscribe((res: any) => {
         if (res) {
           const categories = Object.keys(res); // ["Q1", "Q2", "Q3", "Q4"]
+          this.loading = categories.length === 0 ? true:false;
           const completed = categories.map(q => res[q].completed);
           const pending = categories.map(q => res[q].pending);
   

@@ -1012,7 +1012,7 @@ export class DashboardComponent implements AfterViewInit  {
   }
 
   // new dashboard switch code
-  currentDashboard: 'case' | 'meeting' | 'relief' = 'case';
+  currentDashboard: 'case' | 'meeting' | 'relief' = 'relief';
 
   switchDashboard(dashboard: 'case' | 'meeting' | 'relief') {
     this.currentDashboard = dashboard;

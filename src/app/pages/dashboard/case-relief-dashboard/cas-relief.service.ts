@@ -53,6 +53,7 @@ export class caseReliefService{
 
     setStaticValues(data:any){
         // const district = data.district? {district:data.district} : {};
+        this.staticCards.next({});
         const district = {}
         this.ds.userPostMethod('ReliefDashboardStaticValues',district).subscribe((res:any)=>{
             this.staticCards.next(res.data[0]);
@@ -60,54 +61,63 @@ export class caseReliefService{
     }
 
     setDynamicValues(data:any){
+        this.dynamicCards.next({});
         this.ds.userPostMethod('ReliefDashboardDynamicValues',data).subscribe((res:any)=>{
             this.dynamicCards.next(res.data[0]);
         })
     }
 
     setTableValues(data:any){
+        this.tabledata.next([]);
         this.ds.userPostMethod('ReliefDashboarTableData',data).subscribe((res:any)=>{
             this.tabledata.next(res.data);
         })
     }
     
     setJobStatus(data:any){
+        this.jobstatus.next({});
         this.ds.userPostMethod('JobStatus',data).subscribe((res:any)=>{
             this.jobstatus.next(res.data[0]);
         })
     }
     
     setPensionStatus(data:any){
+        this.pensionStatus.next({});
         this.ds.userPostMethod('PensionStatus',data).subscribe((res:any)=>{
             this.pensionStatus.next(res.data[0]);
         })
     }
 
     setPattaStatus(data:any){
+        this.pattaStatus.next({});
         this.ds.userPostMethod('PattaStatus',data).subscribe((res:any)=>{
             this.pattaStatus.next(res.data[0]);
         })
     }
 
     setEducationStatus(data:any){
+        this.educationStatus.next({});
         this.ds.userPostMethod('EducationConsissionStatus',data).subscribe((res:any)=>{
             this.educationStatus.next(res.data[0]);
         })
     }
 
     setReliefStatus(data:any){
+        this.reliefStatus.next({});
         this.ds.userPostMethod('ReliefStatus_donut_chart',data).subscribe((res:any)=>{
             this.reliefStatus.next(res.data[0]);
         })
     }
 
     setPending(data:any){
+        this.pending.next([]);
         this.ds.userPostMethod('DistrictWisePedingStatus',data).subscribe((res:any)=>{
             this.pending.next(res.data);
         })
     }
 
     setGiven(data:any){
+        this.given.next([]);
         this.ds.userPostMethod('DistrictWiseGivenStatus',data).subscribe((res:any)=>{
             this.given.next(res.data);
         })

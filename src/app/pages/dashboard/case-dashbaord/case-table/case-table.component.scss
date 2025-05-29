@@ -26,7 +26,7 @@ h2{
 th, .total > td{
     background-color: #00008B;
     color: #fff !important;
-    border: 1px solid #fff;
+    // border: 1px solid #fff;
     text-align: center;
     padding: 10px;
 }
@@ -45,7 +45,7 @@ td{
 }
 table thead th {
     position: sticky;
-    top: 0;
+    top: -5px;
     background-color: #00008B; /* Ensure it's the same as your header background */
     color: #fff;
     z-index: 2; /* Ensure it stays above tbody content */

@@ -10,6 +10,7 @@ export class CaseDwcdmUiComponent implements OnInit,OnDestroy {
   private subscription = new Subscription();
   selectedDistrict: string | null = null;
   map:string[];
+  loading:boolean=false;
   districtData = [
     { id: 'path2921', name: 'Ariyalur', data: { count: 0 } },
     { id: 'path2923', name: 'Perambalur', data: { count: 0 } },
@@ -108,6 +109,12 @@ export class CaseDwcdmUiComponent implements OnInit,OnDestroy {
         if(res){
           this.updateCount(res);
         }
+        this.cdr.detectChanges();
+      })
+    )
+    this.subscription.add(
+      this.hcs.isDwcdmUiLoading$.subscribe((res: any) => {
+        this.loading = res;
         this.cdr.detectChanges();
       })
     )

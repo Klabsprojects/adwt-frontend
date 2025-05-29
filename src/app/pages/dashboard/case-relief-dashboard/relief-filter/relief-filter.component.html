@@ -40,7 +40,7 @@
             </select>
         </div>
         <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4">
-            <p>Relief Status</p>
+            <p>Type of Relief</p>
             <select name="" id="" [(ngModel)]="selectedReliefStatus" (change)="get_other_details()">
                 <option value="" selected>Select</option>
                 <option [value]="rs" *ngFor="let rs of relief_status">{{rs}}</option>

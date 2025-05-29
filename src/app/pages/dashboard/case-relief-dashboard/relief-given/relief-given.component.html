@@ -1,4 +1,4 @@
-<div id="chart">
+<div id="chart" style="position: relative;">
   <apx-chart
     [series]="chartOptions!.series"
     [chart]="chartOptions!.chart"
@@ -12,4 +12,5 @@
     [tooltip]="chartOptions!.tooltip"
     [legend]="chartOptions!.legend"
   ></apx-chart>
+  <app-loading-dash *ngIf="loading"/>
 </div>

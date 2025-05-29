@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 })
 export class CaseStatusComponent implements OnInit,OnDestroy {
   private subscription = new Subscription();
+  loading:boolean=false;
   @ViewChild('pieChartstatus') pieChartstatus!: ElementRef;
   chartInstance: any;
   status_of_case = {
@@ -27,6 +28,12 @@ export class CaseStatusComponent implements OnInit,OnDestroy {
           this.status_of_case = res;
           this.createPieChart();
         }
+        this.cdr.detectChanges();
+      })
+    )
+    this.subscription.add(
+      this.hcs.isStatusLoading$.subscribe((res:any)=>{
+        this.loading = res;
         this.cdr.detectChanges();
       })
     )

@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 })
 export class MeetingDlmdComponent implements OnInit, OnDestroy {
   private subscription = new Subscription();
+  loading:boolean = false;
   quarters = ['q1', 'q2', 'q3', 'q4', 'total'];
   tableData: any[] = [];
   constructor(private hms: homeMeetingService, private cdr: ChangeDetectorRef) { }
@@ -18,6 +19,7 @@ export class MeetingDlmdComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.hms.dlmdDetails$.subscribe((res: any) => {
         if (res) {
+          this.loading = Object.keys(res).length === 0 ? true:false;
           this.tableData = Object.keys(res).map(district => {
             const districtData = res[district];
 

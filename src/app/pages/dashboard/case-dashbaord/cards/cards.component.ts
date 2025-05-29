@@ -11,6 +11,7 @@ export class CardsComponent implements OnInit,OnDestroy {
   dynamicCardsData:any={};
   private subscription = new Subscription(); 
   constructor(private hsc:homeCaseService, private cdr:ChangeDetectorRef){}
+  loading:boolean=false;
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
@@ -28,6 +29,12 @@ export class CardsComponent implements OnInit,OnDestroy {
         if(res){
           this.dynamicCardsData = res;
         }
+        this.cdr.detectChanges();
+      })
+    )
+    this.subscription.add(
+      this.hsc.isStaticCardsLoading$.subscribe((res:any)=>{
+        this.loading = res;
         this.cdr.detectChanges();
       })
     )
