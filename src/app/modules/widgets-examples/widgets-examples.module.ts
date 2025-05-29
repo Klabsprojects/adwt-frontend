@@ -37,6 +37,8 @@ import { MatOptionModule } from '@angular/material/core';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { VmcComponent  } from './vmc/vmc.component';
+import { LayoutModule } from 'src/app/_metronic/layout/layout.module';
+
 
 @NgModule({
   declarations: [
@@ -75,6 +77,7 @@ import { VmcComponent  } from './vmc/vmc.component';
     MatCheckboxModule,
     MatOptionModule,
     SweetAlert2Module,
+    LayoutModule
   ],
 })
 export class WidgetsExamplesModule {}

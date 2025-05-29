@@ -8,7 +8,9 @@ import { Router , ActivatedRoute } from '@angular/router';
 import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
+import { environment as env } from 'src/environments/environment.prod';
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
+import { FirService } from 'src/app/services/fir.service';
 @Component({
   selector: 'app-fir-list',
   templateUrl: './fir-list.component.html',
@@ -16,7 +18,7 @@ import { PoliceDivisionService } from 'src/app/services/police-division.service'
 
 export class FirListComponent implements OnInit {
 
-  firId: number;
+  firId: any;
   image_access = environment.image_access;
   image_access2 = environment.image_access2;
 
@@ -42,6 +44,7 @@ export class FirListComponent implements OnInit {
   time_of_occurrence_to:string='';
   placeOfOccurrence: string = '';
   is_case_altered : string = '';
+  altered_date : string = '';
   dateOfRegistration: string = '';
   timeOfRegistration: string = '';
 
@@ -49,7 +52,8 @@ export class FirListComponent implements OnInit {
   mobileNumberOfComplainant: string = '';
   isVictimSameAsComplainant: string = '';
   numberOfVictims: string = '';
-
+  victimNames: string[] = [];
+  victimsReliefDetails: any[] = [];
   judgementBeenAwardednxt: string = '';
 
 
@@ -76,7 +80,7 @@ export class FirListComponent implements OnInit {
 
 
   numberOfAccused: string = ''; // Default: 1 accused
-
+  accused_remarks:string='';
 
 
   accusedsdata: any[] = [];
@@ -96,6 +100,8 @@ export class FirListComponent implements OnInit {
   landOIssues: string = ''; // Default: No L&O issues
   gistOfCurrentCase: string = ''; // Default: Brief case description
   uploadFIRCopy: string = ''; // Default: No file uploaded
+  previous_incident_remarks : string='';
+  uploadedFIRFileNames: string;
 
   reliefsdata: any[] = [];
   communityCertificate: string = ''; // Default: Yes
@@ -109,7 +115,7 @@ export class FirListComponent implements OnInit {
   proceedingsFileNo: string = ''; // Default: Proceedings file number
   proceedingsDate: string = ''; // Default: YYYY-MM-DD
   proceedingsFile: string = ''; // Default: Text
-  attachments: string = ''; // Default: Text
+  attachments: any; // Default: Text
 
   chargeSheetFiled: string = ''; // Default: Yes
   courtDistrict: string = ''; // Default: Court District
@@ -518,10 +524,14 @@ export class FirListComponent implements OnInit {
   currentPage: number = 1; // Current page
   totalPages: number = 0;
   Parsed_UserInfo : any;
+  showDuplicateSection = false;
+  showDuplicateSection_1: boolean = false;
 
 
   constructor(
     private firService: FirListTestService,
+    // private firService : FirService,
+    private firGetService: FirService,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private route: ActivatedRoute,
@@ -565,12 +575,130 @@ export class FirListComponent implements OnInit {
     this.years.push(year);
   }
 }
+
+
+loadFirDetails(firId: any){
+    this.firGetService.getFirDetails(firId).subscribe(
+      (response) => {
+          this.policeCity = response.data.police_city;
+          this.policeZone = response.data.police_zone;
+          this.policeRange = response.data.police_range;
+          this.revenueDistrict = response.data.revenue_district;
+          this.stationName = response.data.police_station;
+          this.officerName = response.data.officer_name;
+          this.complaintReceivedType = response.data.complaintReceivedType;
+          this.complaintRegisteredBy = response.data.complaintRegisteredBy;
+          this.complaintReceiverName = response.data.complaintReceiverName;
+          this.officerDesignation=response.data.officer_designation;
+          this.officerPhone=response.data.officer_phone;
+          this.firNumber=response.data.fir_number+'/'+response.data.fir_number_suffix;
+          this.dateOfOccurrence= response.data.date_of_occurrence ? this.convertToNormalDate(response.data.date_of_occurrence) : response.data.date_of_occurrence;
+          this.date_of_occurrence_to= response.data.date_of_occurrence_to ? this.convertToNormalDate(response.data.date_of_occurrence_to) : response.data.date_of_occurrence_to;
+          this.timeOfOccurrence=response.data.time_of_occurrence;
+          this.time_of_occurrence_to=response.data.time_of_occurrence_to;
+          this.placeOfOccurrence=response.data.place_of_occurrence;
+          this.dateOfRegistration= response.data.date_of_registration ? this.convertToNormalDate(response.data.date_of_registration) : response.data.date_of_registration;
+          this.timeOfRegistration=response.data.time_of_registration;
+          this.is_case_altered=response.data.is_case_altered;
+          this.altered_date=response.data.altered_date ? this.convertToNormalDate(response.data.altered_date) : response.data.altered_date;
+
+          this.nameOfComplainant=response.data.name_of_complainant;
+          this.mobileNumberOfComplainant=response.data.mobile_number_of_complainant;
+          if(response.data && response.data.is_victim_same_as_complainant){
+            if(response.data.is_victim_same_as_complainant == 'true'){
+              this.isVictimSameAsComplainant= 'Yes';
+            } else {
+              this.isVictimSameAsComplainant= 'No';
+            }
+          }
+          this.numberOfVictims=response.data.number_of_victim;
+          this.victimsdata =response.data1;
+          this.victimsdata = this.victimsdata.map((victim) => {
+          const age = Number(victim.victim_age);
+          const name = !isNaN(age) && age < 18 ? 'Minor' : victim.victim_name;
+
+        return {
+          ...victim,
+          victim_name: name,
+          scst_sections: victim.scst_sections ? this.formatedata(victim.scst_sections) : victim.scst_sections,
+          offence_committed: victim.offence_committed ? this.formatedata(victim.offence_committed) : victim.offence_committed,
+          sectionsIPC: victim.sectionsIPC_JSON ? JSON.parse(victim.sectionsIPC_JSON) : []
+        };
+
+        
+      });
+       this.isDeceased = response.data.is_deceased == 1 ? 'Yes' : 'No';
+       this.deceasedPersonNames= response.data.deceased_person_names ? this.formatedata(response.data.deceased_person_names) : response.data.deceased_person_names;
+       this.numberOfAccused=response.data.number_of_accused;
+       this.accused_remarks=response.data.accused_remarks;
+       this.accusedsdata =response.data2;
+       this.reliefsdata = response.data;
+       this.gistOfCurrentCase =response.data.gist_of_current_case;
+       this.uploadFIRCopy=response.data.upload_fir_copy;
+       this.uploadedFIRFileNames = response.data.upload_fir_copy;
+       this.totalCompensation=response.data3.total_compensation;
+       console.log(this.totalCompensation, response.data3.total_amount_third_stage);
+       this.proceedingsFileNo=response.data3.proceedings_file_no;
+       this.proceedingsDate= response.data3.proceedings_date ? this.convertToNormalDate(response.data3.proceedings_date) : response.data3.proceedings_date;
+       this.proceedingsFile=response.data3.proceedings_file;
+       this.loadVictimsDetails();
+        this.attachments = response.data3.file_paths || [];
+
+      });
+}
+
+getFileName(path: string): string {
+  return path.split('/').pop() || path;
+}
+
+
+parseAdditionalRelief(data: string): any[] {
+  try {
+    const parsed = JSON.parse(data);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+loadVictimsDetails(): void {
+    if (!this.firId || this.firId !== sessionStorage.getItem('firId')) { 
+      return;
+    }
+
+    this.firGetService.getVictimsReliefDetails(this.firId).subscribe(
+      (response: any) => {
+        this.numberOfVictims = response.numberOfVictims;
+        this.victimNames = response.victimNames;
+          this.victimsReliefDetails = response.victimsReliefDetails;
+          this.reliefsdata = this.victimsReliefDetails;
+          console.log("vidtim",this.victimsReliefDetails);
+      },
+      (error) => {
+        console.error('Error fetching victim details:', error);
+        Swal.fire('Error', 'Failed to load victim details', 'error');
+      }
+    );
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
   // funtions
   fetchFirDetails(firId:any): void {
 
 
     console.log(firId)
-    this.firService.getFirView(firId).subscribe(
+    this.firGetService.getFirDetails(firId).subscribe(
       (data) => {
         console.log(data);
         if (!data || data.length === 0) {
@@ -672,7 +800,8 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
           this.placeOfOccurrence=data.queryResults[0].place_of_occurrence;
           this.dateOfRegistration= data.queryResults[0].date_of_registration ? this.convertToNormalDate(data.queryResults[0].date_of_registration) : data.queryResults[0].date_of_registration;
           this.timeOfRegistration=data.queryResults[0].time_of_registration;
-          this.timeOfRegistration=data.queryResults[0].is_case_altered;
+          this.is_case_altered=data.queryResults[0].is_case_altered;
+          this.altered_date=data.queryResults[0].altered_date ? this.convertToNormalDate(data.queryResults[0].altered_date) : data.queryResults[0].altered_date;
 
           this.nameOfComplainant=data.queryResults[0].name_of_complainant;
           this.mobileNumberOfComplainant=data.queryResults[0].mobile_number_of_complainant;
@@ -713,12 +842,12 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
           }
           console.log("section",data.queryResults1[0].sectionsIPC_JSON);
           
-          this.isDeceased=data.queryResults[0].is_deceased;
+          // this.isDeceased=data.queryResults[0].is_deceased;
+          this.isDeceased = data.queryResults[0].is_deceased == 1 ? 'Yes' : 'No';
           this.deceasedPersonNames= data.queryResults[0].deceased_person_names ? this.formatedata(data.queryResults[0].deceased_person_names) : data.queryResults[0].deceased_person_names;
 
           this.numberOfAccused=data.queryResults[0].number_of_accused;
-console.log( this.numberOfAccused,"number")
-console.log( data.queryResults[0],"vire ")
+          this.accused_remarks=data.queryResults[0].accused_remarks;
           // this.accusedAge=data.queryResults2[0].age;
           // this.accusedName=data.queryResults2[0].name;
           // this.accusedGender=data.queryResults2[0].gender;
@@ -740,7 +869,10 @@ console.log( data.queryResults[0],"vire ")
           // this.gistOfCurrentCase=data.queryResults2[0].gist_of_current_case;
 
           // need to check
+          console.log(data.queryResults[0], "case",data.firDetails);
+          this.gistOfCurrentCase = data.queryResults[0].gist_of_current_case;
           this.uploadFIRCopy=data.queryResults[0].upload_fir_copy;
+          this.uploadedFIRFileNames = data.queryResults[0].upload_fir_copy;
 
 
           // this.communityCertificate=data.queryResults3[0].community_certificate;
@@ -870,6 +1002,21 @@ console.log( data.queryResults[0],"vire ")
   }
 
 
+viewFIRCopy(): void {
+  const path = this.uploadFIRCopy;
+  if (path) {
+    const url = `${env.file_access}${path}`;
+    window.open(url, '_blank');
+  }
+}
+
+viewProceedingFileName(): void {
+  const path = this.proceedingsFile;
+  if (path) {
+    const url = `${env.file_access}${path}`;
+    window.open(url, '_blank');
+  }
+}
 
   updateSelectedColumns() {
     this.selectedColumns = this.displayedColumns.filter((col) => col.visible);
@@ -909,14 +1056,13 @@ console.log( data.queryResults[0],"vire ")
   openModal(data: any): void {
 
 
-    this.firId = data.fir_id; // Save the FIR ID
-
-    console.log(this.firId)
+    this.firId = data.fir_id; 
 
     // alert(this.firId)
     this.currentStep = 0; // Reset to the first step
     this.modalService.open(this.firDetailsModal, { size: 'xl', backdrop: 'static' });
-    this.fetchFirDetails(this.firId); // Fetch details after opening the modal
+    // this.fetchFirDetails(this.firId); // Fetch details after opening the modal
+    this.loadFirDetails(this.firId);
   }
 
 

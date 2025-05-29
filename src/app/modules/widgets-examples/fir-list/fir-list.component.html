@@ -584,16 +584,16 @@
                 />
               </div>
 
-              <div class="col-md-4 mb-3">
-                <label for="is_case_altered" class="form-label">13b. Date of Case Alteration</label>
+              <div class="col-md-4 mb-3" *ngIf="is_case_altered === 'Yes'">
+                <label for="altered_date" class="form-label">13b. Date of Case Alteration</label>
                 <input
                   readonly
                   type="text"
-                  name="is_case_altered"
-                  id="is_case_altered"
+                  name="altered_date"
+                  id="altered_date"
                   class="form-control"
                   
-                  [value]="is_case_altered"
+                  [value]="altered_date"
                 />
               </div>
 
@@ -817,7 +817,7 @@
                   />
                 </div>
 
-                <div class="col-md-6 mb-3">
+                <div class="col-md-6 mb-3" *ngIf="victim.is_native_district_same !== 'yes'">
                   <label for="nativeDistrict{{ i }}" class="form-label">29. Victim's Native District *</label>
                   <input
                     readonly
@@ -861,16 +861,21 @@
                     class="form-control"
                     
                   >{{ victim.sectionsIPC }}</textarea> -->
-                  <div *ngFor="let section of sectionsIPC; let i = index">
-                    <div class="form-group col-md-6" style="float: left; margin-right:10px;">
-                      <label>Section Type</label>
-                      <input type="text" class="form-control" [value]="section.SectionType" readonly />
-                    </div>
-                    <div class="form-group col-md-5" style="float: left;">
-                      <label>Section</label>
-                      <input type="text" class="form-control" [value]="section.Section" readonly />
+                 
+
+                  <div *ngIf="victim.sectionsIPC">
+                    <div *ngFor="let section of victim.sectionsIPC; let i = index">
+                      <div class="form-group col-md-6" style="float: left; margin-right:10px;">
+                        <label>Section Type</label>
+                        <input type="text" class="form-control" [value]="section.SectionType" readonly />
+                      </div>
+                      <div class="form-group col-md-5" style="float: left;">
+                        <label>Section</label>
+                        <input type="text" class="form-control" [value]="section.Section" readonly />
+                      </div>
                     </div>
                   </div>
+
                   
                   
                 </div>
@@ -889,12 +894,11 @@
                   name="isDeceased"
                   id="isDeceased"
                   class="form-control"
-                  
                   [value]="isDeceased"
                 />
               </div>
 
-              <div class="col-md-6 mb-3">
+              <div class="col-md-6 mb-3" *ngIf="isDeceased !== 'No'">
                 <label for="deceasedPersonNames" class="form-label">34. Name(s) of the deceased person *</label>
                 <input
                   readonly
@@ -931,6 +935,13 @@
                 
                 [value]="numberOfAccused"
               />
+            </div>
+
+            <div class="col-md-12 mb-3">
+              <label for="accused_remarks" class="form-label">35a. Remarks</label>
+              <textarea id="accused_remarks" class="form-control" name="accused_remarks" [value]="accused_remarks"
+              rows="4" maxlength="3000" placeholder="Remarks"> </textarea>
+
             </div>
 
             <!-- Accused Details Section -->
@@ -1073,25 +1084,36 @@
                       name="previousIncident{{i}}"
                       id="previousIncident{{i}}"
                       class="form-control"
-                      
-                      [value]="accused.previous_incident"
+                      [value]="accused.previous_incident === true ? 'Yes' : 'No'"
+
                     />
                   </div>
 
                   <!-- Previous FIR Number -->
-                  <div class="col-md-6 mb-3">
-                    <label for="previousFIRNumber{{i}}" class="form-label">45. FIR number of previous cases *</label>
-                    <input
-                      readonly
-                      type="text"
-                      name="previousFIRNumber{{i}}"
-                      id="previousFIRNumber{{i}}"
-                      class="form-control"
-                      
-                      [value]="accused.previous_fir_number + accused.previous_fir_number_suffix"
-                    />
-                  </div>
+                 <div class="col-md-6 mb-3" *ngIf="accused.previous_incident === true">
+                  <label for="previousFIRNumber{{i}}" class="form-label">45. FIR number of previous cases *</label>
+                  <input
+                    readonly
+                    type="text"
+                    name="previousFIRNumber{{i}}"
+                    id="previousFIRNumber{{i}}"
+                    class="form-control"
+                    [value]="accused.previous_fir_number + accused.previous_fir_number_suffix"
+                  />
+                </div>
 
+                <!-- Question 45a: Remarks - Show only if previous_incident is true -->
+                <div *ngIf="accused.previous_incident === true" class="col-md-12 mb-3">
+                  <label for="previous_incident_remarks{{ i }}" class="form-label">45a. Remarks</label>
+                  <textarea 
+                    [id]="'previous_incident_remarks' + i" 
+                    class="form-control" 
+                    [value]="accused.previous_incident_remarks"
+                    rows="4"
+                    readonly
+                    placeholder="Remarks">
+                  </textarea>
+                </div>
                   <!-- SC/ST Offences -->
                   <div class="col-md-6 mb-3">
                     <label for="scstOffence" class="form-label">
@@ -1103,12 +1125,11 @@
                       name="scstOffence{{ i }}"
                       id="scstOffence{{ i }}"
                       class="form-control"
-                      
-                      [value]="accused.scst_offence"
+                      [value]="accused.scst_offence === true  ? 'Yes' : 'No'"
                     />
                   </div>
 
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-6 mb-3" *ngIf="accused.previous_incident === true ">
                     <label for="scstFIRNumber" class="form-label">47. FIR number of previous cases *</label>
                     <input
                       readonly
@@ -1120,6 +1141,20 @@
                       [value]="accused.scst_fir_number + accused.scst_fir_number_suffix"
                     />
                   </div>
+
+
+                  <div class="col-md-12 mb-3" *ngIf="accused.previous_incident === true">
+                  <label for="previous_offence_remarks{{ i }}" class="form-label">47a. Remarks</label>
+                  <textarea
+                    readonly
+                    name="previous_offence_remarks{{ i }}"
+                    id="previous_offence_remarks{{ i }}"
+                    class="form-control"
+                    rows="4"
+                    
+                    [value]="accused.previous_offence_remarks"
+                  ></textarea>
+                </div>
 
                   <!-- Antecedents of the Accused -->
                   <div class="col-md-6">
@@ -1133,7 +1168,7 @@
                     [value]="accused.antecedentsOption"
                   />
                    </div>
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-6 mb-3" *ngIf="accused.antecedentsOption === 'Yes'">
                     <label for="antecedents{{i}}" class="form-label">
                       48b. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *
                     </label>
@@ -1160,7 +1195,7 @@
                       [value]="accused.landOIssueOption"
                     />
                    </div>
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-6 mb-3" *ngIf="accused.landOIssueOption === 'Yes'">
                     <label for="landOIssues{{i}}" class="form-label">
                       49b. L&O Issues (Pickets, Bandoust, etc.) *
                     </label>
@@ -1176,38 +1211,46 @@
                   </div>
 
                   <!-- Gist of the Current Case -->
-                <div class="col-md-12 mb-3">
-                  <label for="gist_of_current_case{{i}}" class="form-label">50. Gist of the Current Case *</label>
-                  <textarea
-                    readonly
-                    name="gist_of_current_case{{i}}"
-                    id="gist_of_current_case{{i}}"
-                    class="form-control"
-                    rows="4"
-                    
-                    [value]="accused.gist_of_current_case"
-                  ></textarea>
-                </div>
+                
                 </div>
               </div>
               <div>
 
+                <div class="col-md-12 mb-3">
+                  <label for="gist_of_current_case" class="form-label">50. Gist of the Current Case *</label>
+                  <textarea
+                    readonly
+                    name="gistOfCurrentCase"
+                    id="gistOfCurrentCase"
+                    class="form-control"
+                    rows="4"
+                    [value]="gistOfCurrentCase"
+                  ></textarea>
+                </div>
 
                 <!-- FIR Copy Upload -->
                 <div class="col-md-6 mb-3">
                   <label for="uploadFIRCopy" class="form-label">51. Upload FIR Copy *</label>
-                  <input
+                  <!-- <input
                     readonly
                     type="text"
                     name="uploadFIRCopy"
                     id="uploadFIRCopy"
                     class="form-control"
                     [value]="uploadFIRCopy"
-                  />
-
-                  <div *ngIf="uploadFIRCopy">
-                    <img [src]="image_access + uploadFIRCopy" alt="FIR Copy" style="max-width: 100px;" class=" mt-2" />
+                  /> -->
+                  <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="uploadedFIRFileNames">
+                  <div class="d-flex justify-content-start align-items-center">
+                    {{ uploadedFIRFileNames }}
                   </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <button class="btn btn-primary btn-sm me-2" (click)="viewFIRCopy()">View</button>
+                  </div>
+                </div>
+
+                  <!-- <div *ngIf="uploadFIRCopy">
+                    <img [src]="image_access + uploadFIRCopy" alt="FIR Copy" style="max-width: 100px;" class=" mt-2" />
+                  </div> -->
                 </div>
               </div>
             </div>
@@ -1321,22 +1364,24 @@
     </div>
 
     <!-- Eligible Additional Relief -->
-    <div class="d-flex align-items-center">
-      <div class="col-md-7 mb-3">
-        <label for="additionalRelief{{ i }}" class="form-label">57. Eligible additional relief for the legal heir of the person died *</label>
-      </div>
-      <div class="col-md-5 mb-3">
-        <input
-          readonly
-          type="text"
-          class="form-control text-start"
-          name="additionalRelief{{ i }}"
-          id="additionalRelief{{ i }}"
-          [value]="relief.additional_relief"
-          
-        />
-      </div>
-    </div>
+    <div class="d-flex align-items-center" *ngIf="relief.additional_relief && (parseAdditionalRelief(relief.additional_relief).length > 0)">
+  <div class="col-md-7 mb-3">
+    <label for="additionalRelief{{ i }}" class="form-label">
+      57. Eligible additional relief for the legal heir of the person died *
+    </label>
+  </div>
+  <div class="col-md-5 mb-3">
+    <input
+      readonly
+      type="text"
+      class="form-control text-start"
+      name="additionalRelief{{ i }}"
+      id="additionalRelief{{ i }}"
+      [value]="relief.additional_relief"
+    />
+  </div>
+</div>
+
 
   </div>
             </div>
@@ -1344,7 +1389,7 @@
 
 
             <!-- Total Compensation Amount -->
-            <div class="row mb-4">
+            <div class="row mb-4" *ngIf="totalCompensation !== null && totalCompensation !== undefined">
               <div class="col-6" >
                 <label class="form-label">58. Total Amount for 1st Stage of Compensation (Total across all victims) *</label>
               </div>
@@ -1392,7 +1437,7 @@
             <!-- Upload Commissionerate / S.P. Office Proceedings -->
             <div class="mb-4">
               <label class="form-label">61. Upload Commissionerate / S.P. Office Proceedings *</label>
-              <textarea
+              <!-- <textarea
                 readonly
                 class="form-control"
                 name="proceedingsFile"
@@ -1400,29 +1445,33 @@
                 [value]="proceedingsFile"
                 rows="2"
                 
-              ></textarea>
+              ></textarea> -->
+              <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingsFile">
+                  <div class="d-flex justify-content-start align-items-center">
+                    {{ proceedingsFile }}
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <button class="btn btn-primary btn-sm me-2" (click)="viewProceedingFileName()">View</button>
+                  </div>
+                </div>
             </div>
 
             <!-- Attachment Fields -->
             <div class="mb-4">
               <label class="form-label">62. Upload key Attachments *</label>
-              <textarea
-                readonly
-                class="form-control"
-                name="attachments"
-                id="attachments"
-               
-                rows="2"
-                
-              ></textarea>
 
-              <div *ngIf="attachments.length > 0">
-                <div *ngFor="let attachment of attachments">
-                  <img [src]="image_access + attachment" alt="Attachment" style="max-width: 100px;" class="mt-2" />
+              <div
+                class="d-flex justify-content-between align-items-center uploaded mb-2"
+                *ngFor="let file of attachments; let i = index">
+                <div class="d-flex justify-content-start align-items-center">
+                  {{ getFileName(file) }}
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <a class="btn btn-primary btn-sm me-2" [href]="file" target="_blank">View</a>
                 </div>
               </div>
-              
             </div>
+
           </div>
         </div>
       </div>
