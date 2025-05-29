@@ -214,6 +214,9 @@ export class EditFirComponent implements OnInit, OnDestroy {
   isStepFiveModified:boolean = false;
   uploadedFIRFileNames: string;
   SubmitButton = true;
+  mfCopyPath : string = '';
+  upload_court_order_path : string = '';
+  
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -686,8 +689,8 @@ loadAccusedCommunities(): void {
     this.loadAllOffenceReliefDetails();
     this.loadAccusedCommunities();
     if (this.firId) {
-      this.loadFirDetails(this.firId);
-      this.loadVictimsReliefDetails();
+      // this.loadFirDetails(this.firId);
+      // this.loadVictimsReliefDetails();
       //console.log(`Using existing FIR ID: ${this.firId}`);
     } else {
       //console.log('Creating a new FIR entry');
@@ -2058,7 +2061,7 @@ onOffenceCommittedChange(index: number): void {
   viewFIRCopy(): void {
   const path = this.firForm.get('uploadFIRCopy')?.value;
   if (path) {
-    const url = `${env.file_access}${path}`;
+    const url = `${env.file_access}${path.startsWith('/') ? '' : '/'}${path}`;
     window.open(url, '_blank');
   }
 }
@@ -2091,10 +2094,21 @@ removeFIRCopy(): void {
       });
     }  
     viewProceedingsCopy(): void {
-      if (this.firForm.get('proceedingsFile')?.value) {
-        const url = `${env.file_access}${this.firForm.get('proceedingsFile')?.value}`;
+     let url = this.firForm.get('proceedingsFile')?.value;
+      if (url) {
+        url = `${env.file_access}${url.startsWith('/') ? '' : '/'}${url}`;
         window.open(url, '_blank');
       }
+
+      // if (this.firForm.get('proceedingsFile')?.value) {
+      //   let fakeurl =
+      //   const url = `${env.file_access}${this.firForm.get('proceedingsFile')?.value}`;
+      //   if (!path.startsWith('/')) {
+      //     path = '/' + path;
+      //   }
+
+      //   window.open(url, '_blank');
+      // }
     }
     
     
@@ -2105,6 +2119,9 @@ removeFIRCopy(): void {
 
     view62(path: any): void {
         if (path) {
+          if (!path.startsWith('/')) {
+            path = '/' + path;
+          }
           const url = `${env.file_access}${path}`;
           window.open(url, '_blank');
         }
@@ -2131,7 +2148,8 @@ removeFIRCopy(): void {
 
     viewProceedingsCopy2(): void {
       if (this.firForm.get('uploadProceedings_1')?.value) {
-        const url = `${env.file_access}${this.firForm.get('uploadProceedings_1')?.value}`;
+        // const url = `${env.file_access}${this.firForm.get('uploadProceedings_1')?.value}`;
+        const url = `${env.file_access}${this.firForm.get('uploadProceedings_1')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('uploadProceedings_1')?.value}`;
         window.open(url, '_blank');
       }
     }
@@ -2164,7 +2182,8 @@ removeFIRCopy(): void {
     }
     view95(){
       if (this.firForm.get('uploadProceedings_2')?.value) {
-        const url = `${env.file_access}${this.firForm.get('uploadProceedings_2')?.value}`;
+        // const url = `${env.file_access}${this.firForm.get('uploadProceedings_2')?.value}`;
+        const url = `${env.file_access}${this.firForm.get('uploadProceedings_2')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('uploadProceedings_2')?.value}`;
         window.open(url, '_blank');
       }
     }
@@ -2493,7 +2512,7 @@ removeFIRCopy(): void {
         this.filePath_attachment.forEach((filePath: any) => {
           this.attachmentss_1.push({ id: "", path: filePath, file: filePath });
         });
-        // console.log("Updated attachmentss_1:", this.attachmentss_1);  
+        // console.log("Updated attachmentss_1:", this.attachmentss_1);
       }
 
       if (response.data3.all_attachments) {
@@ -2525,12 +2544,29 @@ removeFIRCopy(): void {
     if (response.data4.proceedings_file_no) {
       this.firForm.get('proceedingsFileNo_1')?.setValue(response.data4.proceedings_file_no);
     }
+    if (response.data4.mf_copy_path) {
+      this.firForm.get('mfCopy')?.setValue(response.data4.mf_copy_path);
+      this.mfCopyPath = response.data4.mf_copy_path;
+    }
+    if (response.data4.upload_court_order_path) {
+      this.firForm.get('upload_court_order')?.setValue(response.data4.upload_court_order_path);
+      this.upload_court_order_path = response.data4.upload_court_order_path;
+    }
+       if (response.data4.quash_petition_no) {
+      this.firForm.get('quash_petition_no')?.setValue(response.data4.quash_petition_no);
+    }
+       if (response.data4.petition_date) {
+      const dateObj = new Date(response.data4.petition_date);
+      const formattedDate = dateObj.toISOString().split('T')[0]; // Format to 'yyyy-mm-dd'
+      this.firForm.get('petition_date')?.setValue(formattedDate);
+    }
     if (response.data4.upload_proceedings_path) { 
       this.firForm.get('uploadProceedings_1')?.setValue(response.data4.upload_proceedings_path);
       this.proceedingFileName2 = response.data4.upload_proceedings_path;
     }  
     if (response.data4.attachments) { 
-      this.attachmentss_1 =  response.data4.attachments
+      // console.log('response.data4.attachments',response.data4.attachments);
+      // this.attachmentss_1 =  response.data4.attachments
     }
     if (response && response.data4 && response.data4.proceedings_date) {
       const dateObj = new Date(response.data4.proceedings_date);
@@ -3343,30 +3379,28 @@ removeFIRCopy(): void {
 
       this.attachmentss_1[index].path = uploadedFilePath;
       this.attachmentss_1[index].file = null;
-
+      this.cdr.detectChanges();
       // Update FormArray
-      const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
-      while (attachmentsControl.length <= index) {
-        attachmentsControl.push(this.fb.group({
-          file: [null],
-          filePath: [''],
-          fileName: ['']
-        }));
-      }
+      // const attachmentsControl = this.firForm.get('attachmentss_1') as FormArray;
+      // while (attachmentsControl.length <= index) {
+      //   attachmentsControl.push(this.fb.group({
+      //     file: [null],
+      //     filePath: [''],
+      //     fileName: ['']
+      //   }));
+      // }
 
-      const attachmentControl = attachmentsControl.at(index);
-      if (!attachmentControl) {
-        console.error(`Form control at index ${index} is undefined`);
-        return;
-      }
+      // const attachmentControl = attachmentsControl.at(index);
+      // if (!attachmentControl) {
+      //   console.error(`Form control at index ${index} is undefined`);
+      //   return;
+      // }
 
-      attachmentControl.patchValue({
-        file: file,
-        filePath: uploadedFilePath,
-        fileName: file.name
-      });
-
-      this.cdr.detectChanges(); // Optional, for UI refresh
+      // attachmentControl.patchValue({
+      //   file: file,
+      //   filePath: uploadedFilePath,
+      //   fileName: file.name
+      // });
     },
     error: (err) => {
       console.error('File upload failed:', err);
@@ -3392,50 +3426,53 @@ removeFIRCopy(): void {
   
   
   removeAttachment_1(index: number) {
-    const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
+    if (this.attachmentss_1.length > 0) {
+      this.attachmentss_1.splice(index,1);
+    } 
+    // const attachmentsControl = this.firForm.get('attachmentss_1') as FormArray;
   
-    if (!attachmentsControl || attachmentsControl.length <= index) {
-      console.error("Attempted to remove an undefined attachment at index", index);
-      return;
-    }
+    // if (!attachmentsControl || attachmentsControl.length <= index) {
+    //   console.error("Attempted to remove an undefined attachment at index", index);
+    //   return;
+    // }
   
 
-    attachmentsControl.removeAt(index);
+    // attachmentsControl.removeAt(index);
   
  
-    if (this.attachmentss_1 && index < this.attachmentss_1.length) {
-      this.attachmentss_1.splice(index, 1);
-    }
+    // if (this.attachmentss_1 && index < this.attachmentss_1.length) {
+    //   this.attachmentss_1.splice(index, 1);
+    // }
   
    
-    if (this.filePath_attachment && index < this.filePath_attachment.length) {
-      this.filePath_attachment.splice(index, 1);
-    }
+    // if (this.filePath_attachment && index < this.filePath_attachment.length) {
+    //   this.filePath_attachment.splice(index, 1);
+    // }
   
    
-    if (this.attachmentss_1.length > 0) {
-      this.attachmentss_1 = this.attachmentss_1.map((item:any, i:any) => ({
-        id: item.id,
-        path: item.path,
-        file: item.file,
-      }));
+    // if (this.attachmentss_1.length > 0) {
+    //   this.attachmentss_1 = this.attachmentss_1.map((item:any, i:any) => ({
+    //     id: item.id,
+    //     path: item.path,
+    //     file: item.file,
+    //   }));
   
     
-      while (attachmentsControl.length > 0) {
-        attachmentsControl.removeAt(0);
-      }
+    //   while (attachmentsControl.length > 0) {
+    //     attachmentsControl.removeAt(0);
+    //   }
   
-      this.attachmentss_1.forEach((attachment:any, i:any) => {
-        attachmentsControl.push(this.fb.group({
-          filePath: [attachment.path]
-        }));
-      });
-    }
+    //   this.attachmentss_1.forEach((attachment:any, i:any) => {
+    //     attachmentsControl.push(this.fb.group({
+    //       filePath: [attachment.path]
+    //     }));
+    //   });
+    // }
   
-    // Refresh UI
-    setTimeout(() => {
-      this.cdr.detectChanges();
-    }, 0);
+    // // Refresh UI
+    // setTimeout(() => {
+    //   this.cdr.detectChanges();
+    // }, 0);
   }
   
   
@@ -3805,6 +3842,12 @@ onAccusedAgeChange(index: number): void {
       courtName: ['', Validators.required],
       caseNumber: ['', Validators.required],
       ChargeSheet_CRL_number: ['', Validators.required],
+      rcsFileNumber: [''],
+      rcsFilingDate: [''],
+      mfCopy: [''],
+      quash_petition_no: [''],
+      petition_date: [''],
+      upload_court_order: [''],
       chargeSheetDate:[{ value: '', disabled: true }],
 
       // Step 6 Fields - Case Trial and Court Details
@@ -5266,15 +5309,15 @@ uploadedImageSrc: any | ArrayBuffer;
 
       
     addAttachment_1() {
-      const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
+      const attachmentsControl = this.firForm.get('attachmentss_1') as FormArray;
     
-      if (!attachmentsControl) {
-        console.error("attachments_1 FormArray is undefined.");
-        return;
-      }
+      // if (!attachmentsControl) {
+      //   console.error("attachmentss_1 FormArray is undefined.");
+      //   return;
+      // }
     
       
-      attachmentsControl.push(this.fb.group({
+       attachmentsControl && attachmentsControl.push(this.fb.group({
         file: [null],       
         filePath: [''],     
         fileName: ['']      
@@ -5355,11 +5398,7 @@ uploadedImageSrc: any | ArrayBuffer;
   'courtDivision',
   'courtName',
   'caseType',
-  'caseNumber',
-  'ChargeSheet_CRL_number',
   // 'chargeSheetDate',
-  'proceedingsFileNo_1',
-  'proceedingsDate_1'
 ];
 
 let controls = [...baseControls]; // Copy the base controls array
@@ -5368,9 +5407,16 @@ const caseType = this.firForm.get('caseType')?.value;
 
 // Add conditional fields based on caseType
 if (caseType === 'chargeSheet') {
-  controls.push('chargeSheetFiled', 'courtDivision');
-} else if (caseType === 'referredChargeSheet') {
-  controls.push('rcsFileNumber', 'rcsFilingDate', 'mfCopy');
+  controls.push('caseNumber', 'ChargeSheet_CRL_number', 'proceedingsFileNo_1', 'proceedingsDate_1');
+} 
+else if (caseType === 'referredChargeSheet') {
+  controls.push('rcsFileNumber', 'rcsFilingDate');
+}
+else if (caseType === 'firQuashed') {
+  controls.push('quash_petition_no', 'petition_date');
+}
+else if (caseType === 'sectionDeleted') {
+  controls.push('proceedingsFileNo_1', 'proceedingsDate_1');
 }
 
 let allValid = true;
@@ -5401,7 +5447,15 @@ controls.forEach((controlName) => {
       const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
       const invalidVictims: number[] = [];
 
-      const victimrelief_6 = victimsReliefArray.controls.every((victimGroup: any, index: number) => {
+
+
+    var totalcomposistion = true;
+    var victimrelief_6 = true;
+
+    if(caseType == 'chargeSheet'){
+      totalcomposistion = this.firForm.get('totalCompensation_1')?.value ? true : false
+
+      victimrelief_6 = victimsReliefArray.controls.every((victimGroup: any, index: number) => {
       const reliefAmountScst = victimGroup.get('reliefAmountScst_1');
       const reliefAmountExGratia = victimGroup.get('reliefAmountExGratia_1');
       const reliefAmountFirstStage = victimGroup.get('reliefAmountSecondStage');
@@ -5418,8 +5472,7 @@ controls.forEach((controlName) => {
 
       return isVictimValid;
     });
-
-    const totalcomposistion = this.firForm.get('totalCompensation_1')?.value ? true : false
+    }
 
     var step6_file = false;
     const hasProceedingsFile = this.proceedingsFile instanceof File;
@@ -5428,8 +5481,17 @@ controls.forEach((controlName) => {
       step6_file = true;
     }
     
+    var mf_file = true 
+    if(caseType === 'referredChargeSheet' && !this.mfCopyPath){
+      mf_file = false
+    }
+
+    var step6_file = true 
+    if((caseType == 'sectionDeleted' || caseType == 'chargeSheet') && !this.proceedingFileName2){
+      step6_file = false
+    }
       
-    return allValid && victimrelief_6 && totalcomposistion && step6_file;
+    return allValid && victimrelief_6 && totalcomposistion && step6_file && mf_file;
   }
   
 
@@ -6236,7 +6298,7 @@ controls.forEach((controlName) => {
   // }
   viewAttachment_2(path: string): void {
   if (path) {
-    const url = `${env.file_access}${path}`;
+    const url = `${env.file_access}${path.startsWith('/') ? '' : '/'}${path}`;
     window.open(url, '_blank');
   }
 }
@@ -6601,7 +6663,7 @@ async UpdateAsDraft_7() {
       this.firService.getCourtRangesByDivision(selectedDivision).subscribe(
         (ranges: string[]) => {
           this.courtRanges5 = ranges; 
-          this.firForm.patchValue({ courtName: '' }); 
+          // this.firForm.patchValue({ courtName: '' }); 
         },
         (error) => {
           console.error('Error fetching court ranges:', error);
@@ -6728,13 +6790,14 @@ async UpdateAsDraft_7() {
         chargeSheetDate: this.firForm.get('caseType')?.value === 'chargeSheet' ? this.firForm.get('chargeSheetDate')?.value || null : null,
         ChargeSheet_CRL_number: this.firForm.get('caseType')?.value === 'chargeSheet' ? this.firForm.get('ChargeSheet_CRL_number')?.value || null : null,
         rcsFileNumber: this.firForm.get('caseType')?.value === 'referredChargeSheet' ? this.firForm.get('rcsFileNumber')?.value || '' : null,
-        rcsFilingDate: this.firForm.get('caseType')?.value === 'referredChargeSheet'
-          ? this.firForm.get('rcsFilingDate')?.value || null
-          : null,
+        rcsFilingDate: this.firForm.get('caseType')?.value === 'referredChargeSheet' ? this.firForm.get('rcsFilingDate')?.value || null : null,
         mfCopyPath: this.firForm.get('mfCopy')?.value || '',
         totalCompensation: parseFloat(this.firForm.get('totalCompensation_1')?.value || '0.00').toFixed(2),
         proceedingsFileNo: this.firForm.get('proceedingsFileNo_1')?.value || '',
         proceedingsDate: this.firForm.get('proceedingsDate_1')?.value || null,
+        quash_petition_no: this.firForm.get('quash_petition_no')?.value || null,
+        petition_date: this.firForm.get('petition_date')?.value || null,
+        upload_court_order_path: this.firForm.get('upload_court_order')?.value || null,
         // uploadProceedingsPath: this.proceedingsFile_1 || '',
       },
 
@@ -7888,7 +7951,7 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
 
   viewuploadJudgement(){
     if (this.firForm.get('judgementDetails.uploadJudgement')?.value) {
-        const url = `${env.file_access}${this.firForm.get('judgementDetails.uploadJudgement')?.value}`;
+        const url = `${env.file_access}${this.firForm.get('judgementDetails.uploadJudgement')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('judgementDetails.uploadJudgement')?.value}`;
         window.open(url, '_blank');
       }
   }
@@ -7953,7 +8016,7 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
   viewuploadJudgementone(){
     // console.log(this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value);
      if (this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value) {
-        const url = `${env.file_access}${this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value}`;
+        const url = `${env.file_access}${this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('judgementDetails_one.uploadJudgement_one')?.value}`;
         window.open(url, '_blank');
       }
   }
@@ -8018,7 +8081,7 @@ removeuploadJudgementone(){
   viewuploadJudgementtwo(){
     // console.log(this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value);
      if (this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value) {
-        const url = `${env.file_access}${this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value}`;
+        const url = `${env.file_access}${this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('judgementDetails_two.uploadJudgement_two')?.value}`;
         window.open(url, '_blank');
       }
   }
@@ -8277,7 +8340,7 @@ onFileSelect_1New(event: any, index: number, fileControl: string, fileNameContro
 viewAttachment_1(index: number): void {
   const filePath = this.attachments_1.at(index).get('file')?.value;
   if (filePath) {
-    const url = `${env.file_access}${filePath}`;
+    const url = `${env.file_access}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
     window.open(url, '_blank');
   }
 }
@@ -8305,4 +8368,73 @@ lebelName(){
 }
 
 
+  MFcopyFileUpload(event: any): void {
+      const selectedFile = event.target.files[0];
+      if (!selectedFile) return;
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+    
+      this.vmcSerive.uploadFile(formData).subscribe({
+        next: (response: any) => {
+          const uploadedFileReference = response.filePath;
+          this.mfCopyPath = selectedFile.name;
+          this.firForm.get('mfCopy')?.setValue(uploadedFileReference);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('File upload failed:', err);
+        }
+      });
+    }  
+
+    viewMFcopyFile(): void {
+      if (this.firForm.get('mfCopy')?.value) {
+        const url = `${env.file_access}${this.firForm.get('mfCopy')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('mfCopy')?.value}`;
+        window.open(url, '_blank');
+      }
+    }
+    
+    
+    removeMFcopyFile(): void {
+      this.firForm.get('mfCopy')?.setValue(null);
+      this.mfCopyPath = '';
+    }
+
+
+
+    
+  upload_court_order_FileUpload(event: any): void {
+      const selectedFile = event.target.files[0];
+      if (!selectedFile) return;
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+    
+      this.vmcSerive.uploadFile(formData).subscribe({
+        next: (response: any) => {
+          const uploadedFileReference = response.filePath;
+          this.upload_court_order_path = selectedFile.name;
+          this.firForm.get('upload_court_order')?.setValue(uploadedFileReference);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('File upload failed:', err);
+        }
+      });
+    }  
+
+    view_upload_court_order(): void {
+      if (this.firForm.get('upload_court_order')?.value) {
+        // const url = `${env.file_access}${this.firForm.get('upload_court_order')?.value}`;
+        const url = `${env.file_access}${this.firForm.get('upload_court_order')?.value.startsWith('/') ? '' : '/'}${this.firForm.get('upload_court_order')?.value}`;
+        window.open(url, '_blank');
+      }
+    }
+    
+    
+    remove_upload_court_order(): void {
+      this.firForm.get('upload_court_order')?.setValue(null);
+      this.upload_court_order_path = '';
+    }
 }

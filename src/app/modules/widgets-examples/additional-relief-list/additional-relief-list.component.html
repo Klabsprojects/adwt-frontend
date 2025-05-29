@@ -12,11 +12,11 @@
           [(ngModel)]="searchText"
           (input)="applyFilters()"
           class="form-control form-control-solid w-250px ps-12"
-          placeholder="Search"
+          placeholder="Search FIR"
         />
       </div>
 
-    <!-- <div class="card-toolbar d-flex align-items-center gap-3">
+    <div class="card-toolbar d-flex align-items-center gap-3">
       <mat-form-field appearance="outline" class="w-250px">
         <mat-label>Selected Columns</mat-label>
         <mat-select>
@@ -35,25 +35,39 @@
           </div>
         </mat-select>
       </mat-form-field>
-    </div> -->
+    </div>
 
   </div>
 <div class="p-10">
    <!-- Filters -->
    <div class="d-flex gap-3 mb-3">
-    <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
+    <!-- <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
       <option value="" selected disabled>Select One</option>
       <option *ngFor="let item of firList" [value]="item.fir_id">{{ item.fir_id }}</option>
-    </select>
+    </select> -->
 
-    <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
-      <option value="" selected disabled>Select One</option>
+    <!-- <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
+      <option value="" selected disabled>Victim ID</option>
       <option *ngFor="let item of firList" [value]="item.victim_id">{{ item.victim_id }}</option>
     </select>
 
     <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
-      <option value="" selected disabled>Select One</option>
+      <option value="" selected disabled>Victim Name</option>
       <option *ngFor="let item of firList" [value]="item.victim_name">{{ item.victim_name }}</option>
+    </select> -->
+    <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
+        <option value="" selected disabled>District</option>
+        <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
+    </select>
+
+    <select class="form-select" [(ngModel)]="selectedPoliceCity" (change)="applyFilters()">
+        <option value="" selected hidden disabled>Police City</option>
+        <option *ngFor="let city of policeCities" [value]="city">{{ city }}</option>
+    </select>
+
+    <select class="form-select" [(ngModel)]="selectedPoliceStation" (change)="applyFilters()">
+        <option value="" selected hidden disabled>Police Station Name</option>
+        <option *ngFor="let policestation of policestations" [value]="policestation">{{ policestation }}</option>
     </select>
 
     <button style="width: 40% !important;" (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
@@ -82,23 +96,39 @@
     <table *ngIf="!isLoading && displayedFirList.length > 0" class="table table-striped table-bordered table-hover">
       <thead>
         <tr>
-          <th>#</th>
-          <th>FIR ID</th>
+          <!-- <th>#</th>
+          <th>FIR No</th>
           <th>Victim ID</th>
           <th>Victim Name</th>
-          <th>Actions</th>
+          <th>Actions</th> -->
+          <th *ngFor="let column of displayedColumns" [hidden]="!column.visible">
+            {{ column.label }}
+            <i
+              *ngIf="column.sortable"
+              class="fas"
+              [ngClass]="getSortIcon(column.field)"
+              (click)="sortTable(column.field)"
+            ></i>
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let fir of displayedFirList; let i = index">
-          <td>{{ (page - 1) * itemsPerPage + i + 1 }}</td>
-          <td>{{ fir.fir_id }}</td>
-          <td>{{ fir.victim_id }}</td>
-          <td>{{ fir.victim_name }}</td>
-          <td>
-            <button class="btn btn-primary btn-sm" (click)="navigateToRelief(fir.fir_id,fir.victim_id)">
-              View
-            </button>
+          <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
+            <ng-container [ngSwitch]="column.field">
+              <td *ngSwitchCase="'sl_no'">{{ (page - 1) * itemsPerPage + i + 1 }}</td>
+              <td *ngSwitchCase="'fir_id'">{{ fir.fir_number }}</td>
+              <td *ngSwitchCase="'victim_id'">{{ fir.victim_id }}</td>
+              <td *ngSwitchCase="'victim_name'">{{ fir.victim_name }}</td>
+              <td *ngSwitchCase="'disctrict'">{{ fir.disctrict }}</td>
+              <td *ngSwitchCase="'police_city'">{{ fir.police_city }}</td>
+              <td *ngSwitchCase="'station_name'">{{ fir.station_name }}</td>
+              <td *ngSwitchCase="'actions'">
+                <button class="btn btn-primary btn-sm" (click)="navigateToRelief(fir.fir_id,fir.victim_id)">
+                  View
+                </button>
+              </td>
+            </ng-container>
           </td>
         </tr>
       </tbody>

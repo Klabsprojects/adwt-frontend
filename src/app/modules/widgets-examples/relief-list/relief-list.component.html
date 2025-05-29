@@ -8,7 +8,7 @@
         [(ngModel)]="searchText"
         (input)="applyFilters()"
         class="form-control form-control-solid w-250px ps-12"
-        placeholder="Search"
+        placeholder="Search FIR"
       />
     </div>
   </div>
@@ -44,31 +44,38 @@
 
   <div class="card-body">
 
-    <div class="d-flex gap-3 mb-3">
-      <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
-        <option value="" selected disabled>Select One</option>
-        <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
-      </select>
+    <div class="d-flex gap-3 mb-3 flex-wrap">
+  <div>
+    <label>District</label>
+    <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
+      <option value="" selected disabled>District</option>
+      <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
+    </select>
+  </div>
 
-      <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
-        <option value="" selected disabled>Select One</option>
-        <option *ngFor="let nature of firList" [value]="nature.police_station">{{ nature.police_station }}</option>
-      </select>
+  <div>
+    <label>Police Station</label>
+    <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
+      <option value="" selected disabled>Police Station</option>
+      <option *ngFor="let nature of firList" [value]="nature.police_station">{{ nature.police_station }}</option>
+    </select>
+  </div>
 
-      <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
-        <option value="" selected disabled>Select One</option>
-        <option *ngFor="let status of statusesOfCase" [value]="status">{{ status }}</option>
-      </select>
+  <div>
+    <label>DO Reporting From</label>
+    <input type="date" class="form-control" [(ngModel)]="dorf" (change)="applyFilters()">
+  </div>
 
-      <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
-        <option value="" selected disabled>Select One</option>
-        <option *ngFor="let reliefStatus of statusesOfRelief" [value]="reliefStatus">
-          {{ reliefStatus }}
-        </option>
-      </select>
+  <div>
+    <label>DO Reporting To</label>
+    <input type="date" class="form-control" [(ngModel)]="dort" (change)="applyFilters()">
+  </div>
 
-      <button style="width: 40% !important;" (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
-    </div>
+  <div class="align-self-end">
+    <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
+  </div>
+</div>
+
     <!-- Show message if FIR list is empty -->
     <div *ngIf="filteredFirList().length === 0" class="alert alert-warning">
       No Relif data available.
@@ -124,10 +131,11 @@
           <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
             <ng-container [ngSwitch]="column.field">
               <span *ngSwitchCase="'sl_no'">{{ (page - 1) * itemsPerPage + i + 1 }}</span>
-              <span *ngSwitchCase="'fir_id'">{{ fir.fir_id }}</span>
+              <span *ngSwitchCase="'fir_number'">{{ fir.fir_number }}</span>
               <span *ngSwitchCase="'police_city'">{{ fir.police_city }}</span>
               <span *ngSwitchCase="'police_station'">{{ fir.police_station }}</span>
-              <span *ngSwitchCase="'created_by'">{{ fir.created_by || 'Super User' }}</span>
+              <span *ngSwitchCase="'date_of_repost'">{{fir.date_of_repost}}</span>
+              <span *ngSwitchCase="'created_by'">{{ fir.created_by || '' }}</span>
               <span *ngSwitchCase="'created_at'">{{ fir.created_at | date: 'dd-MM-yyyy' }}</span>
               <span *ngSwitchCase="'status'">
                 <span class="badge" [ngClass]="getStatusBadgeClass(fir.status)">

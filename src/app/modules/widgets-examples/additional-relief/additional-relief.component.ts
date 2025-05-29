@@ -4,6 +4,7 @@ import { FormControl, AbstractControl } from '@angular/forms';
 
 import { ActivatedRoute } from '@angular/router';
 import { AdditionalReliefService } from 'src/app/services/additional-relief.service';
+import { environment } from 'src/environments/environment.prod';
 
 
 import {
@@ -67,7 +68,9 @@ export class AdditionalReliefComponent {
   uploadProceedingsExisitingPath : string | null;
   uploadcompensationProceedingsExisitingPath : string | null;
   uploadDocumentExisitingPath : string | null;
-
+  showFileInput = true;
+  showFileInput1 = true;
+  file_access = environment.file_access;
 
   
   constructor(
@@ -221,8 +224,8 @@ export class AdditionalReliefComponent {
   
 
     calculateTotal(): number {
-      const pensionAmount = this.additionalReliefForm.get('pensionAmount')?.value || 0;
-      const dearnessAllowance = this.additionalReliefForm.get('dearnessAllowance')?.value || 0;
+      const pensionAmount = parseFloat(this.additionalReliefForm.get('pensionAmount')?.value) || 0;
+      const dearnessAllowance = parseFloat(this.additionalReliefForm.get('dearnessAllowance')?.value) || 0;
       return pensionAmount + dearnessAllowance;
     }
 
@@ -238,8 +241,8 @@ export class AdditionalReliefComponent {
     }
 
     updateTotalPensionAmount() {
-      const pensionAmount = this.additionalReliefForm.get('pensionAmount')?.value || 0;
-      const dearnessAllowance = this.additionalReliefForm.get('dearnessAllowance')?.value || 0;
+      const pensionAmount = parseFloat(this.additionalReliefForm.get('pensionAmount')?.value) || 0;
+      const dearnessAllowance = parseFloat(this.additionalReliefForm.get('dearnessAllowance')?.value) || 0;
       const totalPensionAmount = pensionAmount + dearnessAllowance;
       this.additionalReliefForm.get('totalPensionAmount')?.setValue(totalPensionAmount, { emitEvent: false });
     }
@@ -522,10 +525,12 @@ export class AdditionalReliefComponent {
 
     if(formData.upload_proceedings_document){
       this.uploadDocumentExisitingPath = formData.upload_proceedings_document;
+       this.showFileInput1 = false;
     }
 
     if(formData.upload_proceedings){
       this.uploadProceedingsExisitingPath = formData.upload_proceedings;
+      this.showFileInput = false;
     }
 
 
@@ -641,5 +646,56 @@ export class AdditionalReliefComponent {
   }
 
 
+
+
+  getFileName(): string {
+    return this.uploadProceedingsExisitingPath ? this.uploadProceedingsExisitingPath.split('/').pop() || '' : '';
+  }
+
+
+
+  viewFile(): void {
+    if (this.uploadProceedingsExisitingPath) {
+      window.open(this.file_access+this.uploadProceedingsExisitingPath, '_blank');
+    }
+  }
+
+  clearFile(): void {
+    this.uploadProceedingsExisitingPath = null;
+    this.showFileInput = true;
+    const fileInput = document.getElementById('uploadProceedings') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';  // Correct way to reset a file input
+    } 
+    // if(this.selectedFile){
+    //   this.selectedFile = null;
+    // }
+  }
+
+
+
+  getFileName1(): string {
+    return this.uploadDocumentExisitingPath ? this.uploadDocumentExisitingPath.split('/').pop() || '' : '';
+  }
+
+
+
+  viewFile1(): void {
+    if (this.uploadDocumentExisitingPath) {
+      window.open(this.file_access+this.uploadDocumentExisitingPath, '_blank');
+    }
+  }
+
+  clearFile1(): void {
+    this.uploadDocumentExisitingPath = null;
+    this.showFileInput1 = true;
+    const fileInput = document.getElementById('uploadFile') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';  // Correct way to reset a file input
+    } 
+    // if(this.selectedFile){
+    //   this.selectedFile = null;
+    // }
+  }
 }
 

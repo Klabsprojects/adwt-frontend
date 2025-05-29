@@ -84,10 +84,38 @@
             <input id="proceedingsDate" type="date" class="form-control" formControlName="proceedingsDate" required>
           </div>
           <!-- Upload Proceedings Document -->
-          <div class="col-md-4 mb-3">
+          <!-- <div class="col-md-4 mb-3">
             <label for="uploadProceedings">Upload Proceedings Document *</label>
             <input id="uploadProceedings" type="file" class="form-control" formControlName="uploadProceedings" (change)="uploadProceedingsDocument($event)" required>
+          </div> -->
+
+          <div class="col-md-4 mb-3">                
+            <div *ngIf="uploadProceedingsExisitingPath && !showFileInput">
+            <div class="col-12 mb-3">
+              <div style="padding: 7px;" class="card">
+                <div style="padding: 7px;" class="card-body d-flex justify-content-between align-items-center">
+                  <span class="text-truncate me-2">{{ getFileName() }}</span>
+                  <div>
+                    <button type="button" class="btn btn-primary btn-sm me-2" (click)="viewFile()">
+                      View
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="clearFile()">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+          <label *ngIf="showFileInput" for="uploadProceedings" class="form-label">Upload Proceedings Document *</label><span *ngIf="showFileInput" style="color: red;font-size: 9px;margin-left: 10px;" >(Only PDF file less than 5 MB will be allowed)</span>
+              <input *ngIf="showFileInput"
+                type="file" 
+                class="form-control" 
+                id="uploadProceedings"
+                (change)="uploadProceedingsDocument($event)" 
+                accept="application/pdf"
+              />
+          </div> 
         </div>
 
         <div *ngIf="victim.additional_relief && victim.additional_relief.includes('Employment / Job')" class="row m-4">
@@ -331,6 +359,7 @@
               type="text"
               class="form-control"
               formControlName="pinCode"
+              maxlength="6"
               placeholder="Enter Pin Code"
             />
           </div>
@@ -594,7 +623,7 @@
             />
           </div>
           <!-- Upload proceedings document -->
-          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('provisionsGivenStatus')?.value === 'Yes'">
+          <!-- <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('provisionsGivenStatus')?.value === 'Yes'">
             <label for="uploadFile">Upload Proceedings Document *</label>
             <input
               type="file"
@@ -604,7 +633,38 @@
               (change)="uploadDocument($event)"
               required
             />
+          </div> -->
+
+
+           <div  *ngIf="additionalReliefForm.get('provisionsGivenStatus')?.value === 'Yes'" class="col-md-4 mb-3">                
+            <div *ngIf="uploadDocumentExisitingPath && !showFileInput1">
+            <div class="col-12 mb-3">
+              <div style="padding: 7px;" class="card">
+                <div style="padding: 7px;" class="card-body d-flex justify-content-between align-items-center">
+                  <span class="text-truncate me-2">{{ getFileName1() }}</span>
+                  <div>
+                    <button type="button" class="btn btn-primary btn-sm me-2" (click)="viewFile1()">
+                      View
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="clearFile1()">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+          <label *ngIf="showFileInput1" for="uploadFile" class="form-label">Upload Proceedings Document *</label><span *ngIf="showFileInput1" style="color: red;font-size: 9px;margin-left: 10px;" >(Only PDF file less than 5 MB will be allowed)</span>
+              <input *ngIf="showFileInput1"
+                type="file" 
+                class="form-control" 
+                id="uploadFile"
+                (change)="uploadDocument($event)" 
+                accept="application/pdf"
+              />
+          </div> 
+
+
         </div>
 
         <div *ngIf="victim.additional_relief && victim.additional_relief.includes('Burnt House')" class="row m-4">
@@ -683,10 +743,10 @@
             />
           </div> -->
 
-          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('compensationGivenStatus')?.value === 'Yes'">
+          <!-- <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('compensationGivenStatus')?.value === 'Yes'">
             <label for="compensationuploadProceedings">Upload Proceedings Document *</label>
             <input id="compensationuploadProceedings" type="file" class="form-control" formControlName="compensationuploadProceedings" (change)="uploadProceedingsDocumentcompensation($event)" required>
-          </div>
+          </div> -->
         </div>
       </div>
 

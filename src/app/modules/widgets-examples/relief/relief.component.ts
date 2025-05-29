@@ -272,9 +272,9 @@ export class ReliefComponent implements OnInit {
         victimId: victim.victim_id, // Map victim_id
         chargesheetId: victim.chargesheet_id, // Map chargesheet_id
         secondInstallmentVictimName: victim.secondInstallmentVictimName || '',
-        secondInstallmentReliefScst: parseFloat(victim.secondInstallmentReliefScst) || 0,
-        secondInstallmentReliefExGratia: parseFloat(victim.secondInstallmentReliefExGratia) || 0,
-        secondInstallmentTotalRelief: parseFloat(victim.secondInstallmentTotalRelief) || 0,
+        secondInstallmentReliefScst: parseFloat(victim.q1 || victim.secondInstallmentReliefScst) || 0,
+        secondInstallmentReliefExGratia: parseFloat(victim.q2 || victim.secondInstallmentReliefExGratia) || 0,
+        secondInstallmentTotalRelief: parseFloat(victim.q3 || victim.secondInstallmentTotalRelief) || 0,
       });
       victimControls.push(group);
     });
@@ -296,9 +296,9 @@ export class ReliefComponent implements OnInit {
           victimId: victim.victimId,
           trialId: victim.trialId,
           thirdInstallmentVictimName: victim.victimName,
-          thirdInstallmentReliefAct: parseFloat(victim.reliefAmountAct) || 0,
-          thirdInstallmentReliefGovernment: parseFloat(victim.reliefAmountGovernment) || 0,
-          thirdInstallmentReliefTotal: parseFloat(victim.reliefAmountFinalStage) || 0,
+          thirdInstallmentReliefAct: parseFloat(victim.r1 || victim.reliefAmountAct) || 0,
+          thirdInstallmentReliefGovernment: parseFloat(victim.r2 || victim.reliefAmountGovernment) || 0,
+          thirdInstallmentReliefTotal: parseFloat(victim.r3 || victim.reliefAmountFinalStage) || 0,
         })
       );
     });
@@ -322,12 +322,12 @@ export class ReliefComponent implements OnInit {
 
 
   private createVictimFormGroup(victim: any = {}): FormGroup {
-    const scstValue = parseFloat(victim.firstInstallmentReliefScst || '0'); // First Installment Relief
-    const exGratiaValue = parseFloat(victim.firstInstallmentReliefExGratia || '0');
+    const scstValue = parseFloat(victim.p1 || victim.firstInstallmentReliefScst || '0'); // First Installment Relief
+    const exGratiaValue = parseFloat(victim.p2 || victim.firstInstallmentReliefExGratia || '0');
     const totalRelief = this.calculateTotal(scstValue, exGratiaValue);
 
-    const secondReliefScst = parseFloat(victim.secondInstallmentReliefScst || '0'); // Second Installment Relief
-    const secondReliefExGratia = parseFloat(victim.secondInstallmentReliefExGratia || '0');
+    const secondReliefScst = parseFloat(victim.q2 || victim.secondInstallmentReliefScst || '0'); // Second Installment Relief
+    const secondReliefExGratia = parseFloat(victim.q2 || victim.secondInstallmentReliefExGratia || '0');
     const secondTotalRelief = this.calculateTotal(secondReliefScst, secondReliefExGratia);
 
     const thirdReliefAct = parseFloat(victim.thirdInstallmentReliefAct || '0'); // Third Installment Relief
