@@ -113,10 +113,17 @@ export class FirListComponent implements OnInit {
 
   totalCompensation: string = ''; // Default: ₹100,000
   proceedingsFileNo: string = ''; // Default: Proceedings file number
+  proceedingsFileNo_1: string = '';
   proceedingsDate: string = ''; // Default: YYYY-MM-DD
+  proceedingsDate_1:string='';
   proceedingsFile: string = ''; // Default: Text
+  proceedingFileName2: string = ''; // Default: Text
   attachments: any; // Default: Text
-
+  chargeSheetattachments: any; // Default: Text
+  quash_petition_no:string='';
+  petition_date:string='';
+  upload_court_order_path : string = '';
+  totalCompensation_1:string='';
   chargeSheetFiled: string = ''; // Default: Yes
   courtDistrict: string = ''; // Default: Court District
   courtName: string = ''; // Default: Court Range
@@ -126,6 +133,7 @@ export class FirListComponent implements OnInit {
   rcsFileNumber: string = ''; // Default: RCS File Number
   rcsFilingDate: string = ''; // Default: YYYY-MM-DD
   mfCopy: string = ''; // Default: Upload MF Copy
+  ChargeSheet_CRL_number:string='';
 
   victimName2: string = ''; // Default: Victim Name
   reliefAmountScst1: string = ''; // Default: Relief Amount (SC/ST Act)
@@ -642,8 +650,26 @@ loadFirDetails(firId: any){
        this.proceedingsDate= response.data3.proceedings_date ? this.convertToNormalDate(response.data3.proceedings_date) : response.data3.proceedings_date;
        this.proceedingsFile=response.data3.proceedings_file;
        this.loadVictimsDetails();
-        this.attachments = response.data3.file_paths || [];
-
+       this.attachments = response.data3.file_paths || [];
+       this.chargeSheetFiled=response.data4.charge_sheet_filed;
+       this.courtDistrict=response.data4.court_district;
+       this.courtName=response.data4.court_name;
+       this.caseType=response.data4.case_type;
+      // this.caseType = 'referredChargeSheet';
+       this.caseNumber=response.data4.case_number;
+       this.chargeSheetDate= response.data4.chargesheetDate ? this.convertToNormalDate(response.data4.chargesheetDate) : response.data4.chargesheetDate;
+       this.ChargeSheet_CRL_number = response.data4.ChargeSheet_CRL_number;
+       this.rcsFileNumber=response.data4.rcs_file_number;
+       this.rcsFilingDate=response.data4.rcs_filing_date  ? this.convertToNormalDate(response.data4.rcs_filing_date) : response.data4.rcs_filing_date;
+       this.mfCopy=response.data4.mf_copy_path;
+       this.proceedingsFileNo_1=response.data4.proceedings_file_no;
+       this.proceedingsDate_1 = response.data4.proceedings_date ? this.convertToNormalDate(response.data4.proceedings_date) : response.data4.proceedings_date;
+       this.proceedingFileName2 = response.data4.upload_proceedings_path;
+       this.quash_petition_no = response.data4.quash_petition_no;
+       this.petition_date = response.data4.petition_date ? this.convertToNormalDate(response.data4.petition_date) : response.data4.petition_date;
+       this.upload_court_order_path = response.data4.upload_court_order_path;
+       this.totalCompensation_1=response.data4.total_compensation_1;
+       this.chargeSheetattachments = response.data4.attachments || [];
       });
 }
 
@@ -651,6 +677,9 @@ getFileName(path: string): string {
   return path.split('/').pop() || path;
 }
 
+getChargeFileName(path: string): string {
+  return path.split('/').pop() || path;
+}
 
 parseAdditionalRelief(data: string): any[] {
   try {
@@ -662,9 +691,9 @@ parseAdditionalRelief(data: string): any[] {
 }
 
 loadVictimsDetails(): void {
-    if (!this.firId || this.firId !== sessionStorage.getItem('firId')) { 
-      return;
-    }
+    // if (!this.firId || this.firId !== sessionStorage.getItem('firId')) { 
+    //   return;
+    // }
 
     this.firGetService.getVictimsReliefDetails(this.firId).subscribe(
       (response: any) => {
@@ -673,6 +702,12 @@ loadVictimsDetails(): void {
           this.victimsReliefDetails = response.victimsReliefDetails;
           this.reliefsdata = this.victimsReliefDetails;
           console.log("vidtim",this.victimsReliefDetails);
+          const data = response.victimsReliefDetails[0];  // get the first object from the array
+
+          this.victimName2 = data.victim_name;
+          this.reliefAmountScst1 = data.relief_amount_scst_1;
+          this.reliefAmountExGratia1 = data.relief_amount_ex_gratia_1;
+          this.totalCompensation1 = data.relief_amount_second_stage;
       },
       (error) => {
         console.error('Error fetching victim details:', error);
@@ -1010,8 +1045,32 @@ viewFIRCopy(): void {
   }
 }
 
+viewmfCopy(){
+  const path = this.mfCopy;
+  if (path) {
+    const url = `${env.file_access}${path}`;
+    window.open(url, '_blank');
+  }
+}
+
+viewProceedingsCopy2(){
+  const path = this.proceedingFileName2;
+  if (path) {
+    const url = `${env.file_access}${path}`;
+    window.open(url, '_blank');
+  }
+}
+
 viewProceedingFileName(): void {
   const path = this.proceedingsFile;
+  if (path) {
+    const url = `${env.file_access}${path}`;
+    window.open(url, '_blank');
+  }
+}
+
+view_upload_court_order() : void {
+  const path = this.upload_court_order_path;
   if (path) {
     const url = `${env.file_access}${path}`;
     window.open(url, '_blank');

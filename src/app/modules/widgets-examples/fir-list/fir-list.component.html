@@ -1446,7 +1446,7 @@
                 rows="2"
                 
               ></textarea> -->
-              <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingsFile">
+                <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingsFile">
                   <div class="d-flex justify-content-start align-items-center">
                     {{ proceedingsFile }}
                   </div>
@@ -1540,7 +1540,7 @@
       />
     </div>
     <!-- Case Number -->
-    <div class="col-md-6">
+    <div class="col-md-6" *ngIf="caseType === 'chargeSheet'">
       <label for="caseNumber" class="form-label">67a. Case Number Report (CNR) / Special SC Number</label>
       <input
         readonly
@@ -1553,19 +1553,101 @@
       />
     </div>
 
-    <div class="col-md-6">
-      <label for="chargeSheetDate" class="form-label">67b. Date of Chargesheet</label>
+    <div class="col-md-6" *ngIf="caseType === 'chargeSheet'">
+      <label for="ChargeSheet_CRL_number" class="form-label">67b. SC/ Special SC Number </label>
+      <input
+        type="text"
+        id="ChargeSheet_CRL_number"
+        class="form-control"
+        name="ChargeSheet_CRL_number"
+        [value]="ChargeSheet_CRL_number"
+        placeholder="SC/ Special SC Number"
+        readonly
+      />
+    </div> 
+
+
+    <div class="col-md-6" *ngIf="caseType === 'chargeSheet'">
+      <label for="chargeSheetDate" class="form-label">67c. Date of Chargesheet</label>
       <input
         type="text"
         id="chargeSheetDate"
         class="form-control"
         name="chargeSheetDate"
         [value]="chargeSheetDate"
+        readonly
       />
     </div> 
 
+    <div *ngIf="caseType === 'firQuashed'" class="col-md-12">
+              <div class="row">
+                 
+              <div class="row mb-4">
+              <div class="mb-4 col-6">
+                <label class="form-label">Quash Petition No. *</label>
+                <input type="text" class="form-control" name="quash_petition_no"
+                 readonly placeholder="Quash Petition No." [value]="quash_petition_no" id="quash_petition_no" />
+              </div>
+              <div class="mb-4 col-6">
+                <label class="form-label">Petition Date *</label>
+                <input type="date" class="form-control" name="petition_date" [value]="petition_date"
+                id="petition_date" readonly />
+              </div>
+            </div>
+
+              <div class="mb-4">
+              <label class="form-label">Upload Court Order</label>
+         <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="upload_court_order_path">
+            <div class="d-flex justify-content-start align-items-center">
+              {{upload_court_order_path}}
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <button class="btn btn-primary btn-sm me-2" (click)="view_upload_court_order()">View</button>
+            </div>
+          </div>
+          </div>
+
+        </div>
+        </div>
+
+    <div *ngIf="caseType === 'sectionDeleted'" class="col-md-12">
+            <div class="row">
+                 
+              <div class="row mb-4">
+              <div class="mb-4 col-6">
+                <label class="form-label">Proceedings File No. *</label>
+                <input type="text" class="form-control" id="proceedingsFileNo_1" name="proceedingsFileNo_1" 
+                [value]="proceedingsFileNo_1"
+                placeholder="Enter File No." readonly  />
+              </div>
+              <div class="mb-4 col-6">
+                <label class="form-label">Proceedings Date *</label>
+                <input type="date" class="form-control" name="proceedingsDate_1" id="proceedingsDate_1"
+                [value]="proceedingsDate_1" readonly
+                  />
+              </div>
+            </div>
+
+              <div class="mb-4">
+              <label class="form-label">Upload Commissionerate / S.P. Office Proceedings *</label>
+         
+            
+            <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingFileName2">
+            <div class="d-flex justify-content-start align-items-center">
+              {{proceedingFileName2}}
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <button class="btn btn-primary btn-sm me-2" (click)="viewProceedingsCopy2()">View</button>
+            </div>
+          </div>
+          </div>
+
+        </div>
+        </div>
+
+
     <!-- RCS File Number -->
-    <div class="col-md-6">
+    <div class="col-md-6"  *ngIf="caseType === 'referredChargeSheet'">
       <label for="rcsFileNumber" class="form-label">68. RCS File Number</label>
       <input
         readonly
@@ -1578,7 +1660,7 @@
       />
     </div>
     <!-- RCS Filing Date -->
-    <div class="col-md-6">
+    <div class="col-md-6" *ngIf="caseType === 'referredChargeSheet'">
       <label for="rcsFilingDate" class="form-label">69. RCS Filing Date</label>
       <input
         readonly
@@ -1590,16 +1672,24 @@
       />
     </div>
     <!-- Upload MF Copy -->
-    <div class="col-md-6">
+    <div class="col-md-6" *ngIf="caseType === 'referredChargeSheet'">
       <label for="mfCopy" class="form-label">70. Upload MF Copy</label>
-      <input
+      <!-- <input
         readonly
         type="text"
         name="mfCopy"
         id="mfCopy"
         class="form-control"
         [value]="mfCopy"
-      />
+      /> -->
+      <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="mfCopy">
+                  <div class="d-flex justify-content-start align-items-center">
+                    {{ mfCopy }}
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <button class="btn btn-primary btn-sm me-2" (click)="viewmfCopy()">View</button>
+                  </div>
+                </div>
     </div>
   </div>
 </div>
@@ -1678,10 +1768,10 @@
                 <input
                   readonly
                   type="text"
-                  name="totalCompensation2"
-                  id="totalCompensation2"
+                  name="totalCompensation_1"
+                  id="totalCompensation_1"
                   class="form-control"
-                  [value]="totalCompensation2"
+                  [value]="totalCompensation_1"
                 />
               </div>
               <!-- Proceedings File No -->
@@ -1690,10 +1780,10 @@
                 <input
                   readonly
                   type="text"
-                  name="proceedingsFileNo1"
+                  name="proceedingsFileNo_1"
                   id="proceedingsFileNo1"
                   class="form-control"
-                  [value]="proceedingsFileNo1"
+                  [value]="proceedingsFileNo_1"
                   
                 />
               </div>
@@ -1703,10 +1793,10 @@
                 <input
                   readonly
                   type="text"
-                  name="proceedingsDate1"
+                  name="proceedingsDate_1"
                   id="proceedingsDate1"
                   class="form-control"
-                  [value]="proceedingsDate1"
+                  [value]="proceedingsDate_1"
                 />
               </div>
             </div>
@@ -1714,25 +1804,33 @@
             <!-- Upload Commissionerate/SP Office Proceedings -->
             <div class="mb-3">
               <label for="uploadProceedings" class="form-label">78. Upload Commissionerate/SP Office Proceedings</label>
-              <input
+              <!-- <input
                 readonly
                 type="text"
                 name="uploadProceedings"
                 id="uploadProceedings"
                 class="form-control"
                 [value]="uploadProceedings"
-              />
+              /> -->
 
               
-              <div *ngIf="uploadProceedings">
+              <!-- <div *ngIf="uploadProceedings">
                 <img [src]="image_access + uploadProceedings" alt="uploadProceedings" style="max-width: 100px;" class=" mt-2" />
-              </div>
+              </div> -->
+              <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingFileName2">
+            <div class="d-flex justify-content-start align-items-center">
+              {{proceedingFileName2}}
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <button class="btn btn-primary btn-sm me-2" (click)="viewProceedingsCopy2()">View</button>
+            </div>
+          </div>
             </div>
 
             <!-- Other Attachments -->
             <div class="mb-3">
               <label for="attachments1" class="form-label">79. Upload Other Attachments</label>
-              <textarea
+              <!-- <textarea
                 readonly
                 name="attachments1"
                 id="attachments1"
@@ -1740,7 +1838,17 @@
                 rows="2"
                 [value]="attachments1"
                 
-              ></textarea>
+              ></textarea> -->
+              <div
+                class="d-flex justify-content-between align-items-center uploaded mb-2"
+                *ngFor="let files of chargeSheetattachments; let i = index">
+                <div class="d-flex justify-content-start align-items-center">
+                  {{ getChargeFileName(files) }}
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <a class="btn btn-primary btn-sm me-2" [href]="files" target="_blank">View</a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
