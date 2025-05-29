@@ -525,4 +525,11 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     }
   }
 
+
+
+  deleteAccused(accusedId: any, UserId : any, number_of_accused : any, fir_id : any): Observable<any> {
+    let body = {accusedId , UserId , number_of_accused, fir_id}
+    return this.http.post(`${this.baseUrl}/deleteAccused`, body);
+  }
+  
 }

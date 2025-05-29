@@ -592,7 +592,7 @@
           <label for="numberOfAccused" class="form-label">35. Number of Accused *</label>
           <select id="numberOfAccused" class="form-select" formControlName="numberOfAccused" (change)="onNumberOfAccusedChange()" required>
             <option value="" disabled>Select the number of accused</option>
-            <option *ngFor="let num of [1, 2, 3, 4, 5]" [value]="num">{{ num }}</option>
+            <option *ngFor="let num of getAvailableNumbers()" [value]="num">{{ num }}</option>
           </select>
         </div>
         <div class="col-md-12 mb-3">
@@ -627,8 +627,16 @@
 
         <div formArrayName="accuseds">
           <div *ngFor="let accused of accuseds.controls; let i = index" [formGroupName]="i" class="accused-entry mb-4 card border-primary">
-            <div class="card-header bg-primary text-white">
+            <div style="align-items: center;" class="card-header bg-primary text-white">
               <h5 class="text-white mt-4">#{{ i + 1 }} Accused Details</h5>
+                  <button  
+                    style="height: 40px;"
+                    type="button" 
+                    class="btn btn-danger btn-sm" 
+                    (click)="deleteAccused(i, accused.get('accusedId')?.value)"
+                    [title]="'Delete Accused #' + (i + 1)">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
             </div>
             <div class="card-body">
               <div class="row">
