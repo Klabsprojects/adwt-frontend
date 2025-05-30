@@ -3677,10 +3677,10 @@ removeFIRCopy(): void {
       }
       // If age is below 18, disable the name field
       if (ageValue < 18) {
-        nameControl?.disable({ emitEvent: false });
+        // nameControl?.disable({ emitEvent: false });
         nameControl?.setValue('Minor', { emitEvent: false });
       } else {
-        nameControl?.enable({ emitEvent: false });
+        // nameControl?.enable({ emitEvent: false });
         if (nameControl?.value === 'Minor') {
           nameControl.setValue('', { emitEvent: false });
         }
@@ -5217,24 +5217,105 @@ uploadedImageSrc: any | ArrayBuffer;
     return this.firForm.get('victims') as FormArray;
   }
 
-  onNumberOfVictimsChange() {
-    const currentVictimCount = this.victims.length; // Current number of victim entries
-    const numberOfVictims = this.firForm.get('complainantDetails.numberOfVictims')?.value || 1;
+  // onNumberOfVictimsChange() {
+  //   const currentVictimCount = this.victims.length; // Current number of victim entries
+  //   const numberOfVictims = this.firForm.get('complainantDetails.numberOfVictims')?.value || 1;
 
-    if (numberOfVictims > currentVictimCount) {
-      // Add new victim fields
-      for (let i = currentVictimCount; i < numberOfVictims; i++) {
-        this.victims.push(this.createVictimGroup());
-      }
-    } else if (numberOfVictims < currentVictimCount) {
-      // Remove excess victim fields
-      for (let i = currentVictimCount - 1; i >= numberOfVictims; i--) {
-        this.victims.removeAt(i);
-      }
+  //   if (numberOfVictims > currentVictimCount) {
+  //     // Add new victim fields
+  //     for (let i = currentVictimCount; i < numberOfVictims; i++) {
+  //       this.victims.push(this.createVictimGroup());
+  //     }
+  //   } else if (numberOfVictims < currentVictimCount) {
+  //     // Remove excess victim fields
+  //     for (let i = currentVictimCount - 1; i >= numberOfVictims; i--) {
+  //       this.victims.removeAt(i);
+  //     }
+  //   }
+
+  //   this.cdr.detectChanges(); // Ensure UI is updated
+  // }
+
+
+  onNumberOfVictimsChange(): void {
+    const numberOfVictims = this.firForm.get('complainantDetails.numberOfVictims')?.value || 1;
+    const victimsArray = this.firForm.get('victims') as FormArray;
+    const currentLength = victimsArray.length;
+
+    // **PREVENT MANUAL DECREASE** - Only allow increase
+    if (numberOfVictims < currentLength) {
+      // Reset to current length - user cannot manually decrease
+      this.firForm.get('complainantDetails.numberOfVictims')?.setValue(currentLength, { emitEvent: false });
+      console.log('Manual decrease prevented. Use delete button instead.');
+      return;
     }
 
-    this.cdr.detectChanges(); // Ensure UI is updated
+    // Only allow increase
+    if (currentLength < numberOfVictims) {
+      // Add new accused fields to reach the target number
+      for (let i = currentLength; i < numberOfVictims; i++) {
+        victimsArray.push(this.createVictimGroup());
+      }
+      console.log(`Added ${numberOfVictims - currentLength} new accused entries`);
+    }
+
+    this.cdr.detectChanges();
   }
+
+
+   deleteVictim(index: number, victim_id?: number): void {
+    const victimArray = this.firForm.get('victims') as FormArray;
+    
+    // Prevent deletion if only one accused remains
+    if (victimArray.length <= 1) {
+      alert('At least one victim must remain.');
+      return;
+    }
+
+    if (victim_id) {
+      // Call backend service to delete the record
+      this.deleteVictimFromBackend(victim_id, index , victimArray.length -1);
+    } else {
+      // No accusedId means it's a new entry, just remove from array
+      this.removeVictimFromArray(index);
+    }
+  }
+
+  private deleteVictimFromBackend(victim_id: number, index: number, number_of_victim : any): void {
+    // Call your backend service here
+    this.firService.deleteVictim(victim_id,this.Parsed_UserInfo.id, number_of_victim, this.firId).subscribe({
+      next: (response : any) => {
+        Swal.fire('success', response.message, 'success');
+        // console.log('Accused deleted successfully from backend:', accusedId);
+        this.removeVictimFromArray(index);
+      },
+      error: (error : any) => {
+        console.error('Error deleting victim from backend:', error);
+        // Handle error - maybe show a toast message
+        alert('Failed to delete victim. Please try again.');
+      }
+    });
+  }
+
+  private removeVictimFromArray(index: number): void {
+    const victimArray = this.firForm.get('victims') as FormArray;
+    
+    // Remove from FormArray
+    victimArray.removeAt(index);
+
+    // Update the numberOfAccused control to reflect the new count
+    const newCount = victimArray.length;
+    this.firForm.get('complainantDetails.numberOfVictims')?.setValue(newCount, { emitEvent: false });
+    
+    // Update the maximum reached tracking if needed
+    this.maxAccusedReached = Math.max(this.maxAccusedReached, newCount);
+
+    this.cdr.detectChanges();
+  }
+
+
+
+
 
     onNumberOfAccusedChange(): void {
     const numberOfAccused = this.firForm.get('numberOfAccused')?.value || 1;
@@ -5267,20 +5348,6 @@ uploadedImageSrc: any | ArrayBuffer;
     return this.firForm.get('accuseds') as FormArray;
   }
 
-  // onNumberOfAccusedChange(): void {
-  //   const numberOfAccused = this.firForm.get('numberOfAccused')?.value || 1;
-  //   const accusedsArray = this.firForm.get('accuseds') as FormArray;
-
-  //   // Clear existing accused fields
-  //   accusedsArray.clear();
-
-  //   // Add new accused fields based on the selected number
-  //   for (let i = 0; i < numberOfAccused; i++) {
-  //     accusedsArray.push(this.createAccusedGroup());
-  //   }
-
-  //   this.cdr.detectChanges(); // Trigger change detection to update the UI
-  // }
 
     getAvailableNumbers(): number[] {
     const currentValue = this.firForm.get('numberOfAccused')?.value || 1;
@@ -5294,60 +5361,6 @@ uploadedImageSrc: any | ArrayBuffer;
     return numbers;
   }
 
-//   onNumberOfAccusedChange(): void {
-//   const numberOfAccused = this.firForm.get('numberOfAccused')?.value || 1;
-//   const accusedsArray = this.firForm.get('accuseds') as FormArray;
-//   const currentLength = accusedsArray.length;
-
-//   if (currentLength < numberOfAccused) {
-//     // Add new accused fields to reach the target number
-//     for (let i = currentLength; i < numberOfAccused; i++) {
-//       accusedsArray.push(this.createAccusedGroup());
-//     }
-//   } else if (currentLength > numberOfAccused) {
-//     // Remove excess accused fields from the end
-//     while (accusedsArray.length > numberOfAccused) {
-//       accusedsArray.removeAt(accusedsArray.length - 1);
-//     }
-//   }
-
-//   this.cdr.detectChanges(); // Trigger change detection to update the UI
-// }
-
-
-//  onNumberOfAccusedChange(): void {
-//     const numberOfAccused = this.firForm.get('numberOfAccused')?.value || 1;
-//     const accusedsArray = this.firForm.get('accuseds') as FormArray;
-//     const currentLength = accusedsArray.length;
-
-//     // Update the maximum reached if current selection is higher
-//     if (numberOfAccused > this.maxAccusedReached) {
-//       this.maxAccusedReached = numberOfAccused;
-//     }
-
-//     // Prevent decreasing below the maximum ever reached (security restriction)
-//     if (numberOfAccused < this.maxAccusedReached && currentLength > 0) {
-//       // Reset to the maximum reached value
-//       this.firForm.get('numberOfAccused')?.setValue(this.maxAccusedReached, { emitEvent: false });
-//       return;
-//     }
-
-//     if (currentLength < numberOfAccused) {
-//       // Add new accused fields to reach the target number
-//       for (let i = currentLength; i < numberOfAccused; i++) {
-//         accusedsArray.push(this.createAccusedGroup());
-//       }
-//     } else if (currentLength > numberOfAccused) {
-//       // Remove excess accused fields from the end
-//       while (accusedsArray.length > numberOfAccused) {
-//         accusedsArray.removeAt(accusedsArray.length - 1);
-//       }
-//     }
-
-//     this.cdr.detectChanges();
-//   }
-
-  // Optional: Method to reset the restriction (if needed for admin/special cases)
   resetAccusedRestriction(): void {
     this.maxAccusedReached = this.firForm.get('numberOfAccused')?.value || 1;
   }
@@ -5674,11 +5687,11 @@ if(this.firForm.get('judgementDetails.judgementNature')?.value == 'Convicted' ||
 
 var file95 = true;
 
-if(this.firForm.get('judgementDetails.judgementNature')?.value == 'Convicted' || this.firForm.get('judgementDetails.filedBy')?.value != 'No appeal yet'){
-  if (this.file95 == ''){
-    file95 = false;
-  }
-}
+// if(this.firForm.get('judgementDetails.judgementNature')?.value == 'Convicted' || this.firForm.get('judgementDetails.filedBy')?.value != 'No appeal yet'){
+//   if (this.file95 == ''){
+//     file95 = false;
+//   }
+// }
 
 
 let allValid = true;
@@ -5710,6 +5723,7 @@ controls.forEach((controlName) => {
       const invalidVictims: number[] = [];
       var victimrelief_7 = true;
       var totalcomposistion = true;
+
       if(this.firForm.get('judgementDetails.judgementNature')?.value == 'Convicted' || this.firForm.get('judgementDetails.filedBy')?.value != 'No appeal yet'){
       victimrelief_7 = victimsReliefArray.controls.every((victimGroup: any, index: number) => {
       const reliefAmountScst = victimGroup.get('reliefAmountScst_2');

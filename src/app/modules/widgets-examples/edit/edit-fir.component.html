@@ -316,8 +316,16 @@
         </div>
         <div formArrayName="victims">
           <div *ngFor="let victim of victims.controls; let i = index" [formGroupName]="i" class="victim-entry mb-4 card border-primary">
-            <div class="card-header bg-primary">
+            <div style="align-items: center;" class="card-header bg-primary">
               <h5 class="text-white mt-3">#{{ i + 1 }} Victim Details</h5>
+                <button  
+                    style="height: 40px;"
+                    type="button" 
+                    class="btn btn-danger btn-sm" 
+                    (click)="deleteVictim(i, victim.get('victim_id')?.value)"
+                    [title]="'Delete victim #' + (i + 1)">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
             </div>
             <div class="card-body">
 
@@ -336,7 +344,17 @@
 
                 <div class="col-md-4 mb-3">
                   <label for="victimName-{{ i }}" class="form-label">20. Name of the Victim *</label>
-                  <input type="text" id="victimName-{{ i }}" class="form-control" formControlName="name" placeholder="Enter victim's name" required (change)="updateVictimNames()"  (input)="updateVictimNames()" style="text-transform: capitalize;" />
+                  <input type="text" 
+                      id="victimName-{{ i }}" 
+                      class="form-control" 
+                      formControlName="name" 
+                      placeholder="Enter victim's name" 
+                      required 
+                      (change)="updateVictimNames()"  
+                      (input)="updateVictimNames()" 
+                      style="text-transform: capitalize;"
+                      [readonly]="victims.at(i)?.get('age')?.value < 18" />
+                  <!-- <input type="text" id="victimName-{{ i }}" class="form-control" formControlName="name" placeholder="Enter victim's name" required (change)="updateVictimNames()"  (input)="updateVictimNames()" style="text-transform: capitalize;" /> -->
                   <!-- <div *ngIf="isVictimNameInvalid(i)" class="text-danger mt-1">Please enter a valid name (letters only).</div> -->
                 </div>
                 <div class="col-md-4 mb-3">
@@ -1921,7 +1939,7 @@ maxlength="10"
 
                       <!-- Who has filed the appeal -->
                       <div class="col-md-6 mt-3" *ngIf="showFiledBy">
-                        <label class="form-label">100. Who has filed the appeal?</label>
+                        <label class="form-label">100. Who has filed the appeal? *</label>
                         <select class="form-select" formControlName="filedBy">
                           <option value="" disabled selected>Select Option</option>
                           <option value="victim">Victim</option>

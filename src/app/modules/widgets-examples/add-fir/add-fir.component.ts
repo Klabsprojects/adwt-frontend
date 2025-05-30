@@ -990,7 +990,7 @@ onFileSelect_3(event: Event, controlName: string): void {
       //alphabetSelection: ['', Validators.required],
       //stationNumber: ['', Validators.required],
       stationName: ['', Validators.required],
-      officerName: ['', [Validators.required, Validators.pattern('^[A-Za-z\\s]*$')]], // Name validation
+      officerName: ['', [Validators.required]], // Name validation
       complaintReceivedType:[''],
       complaintRegisteredBy:[''],
       complaintReceiverName:[''],

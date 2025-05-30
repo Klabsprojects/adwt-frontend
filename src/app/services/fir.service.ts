@@ -531,5 +531,10 @@ saveStepFourAsDraft(firData: any): Observable<any> {
     let body = {accusedId , UserId , number_of_accused, fir_id}
     return this.http.post(`${this.baseUrl}/deleteAccused`, body);
   }
+
+  deleteVictim(victim_id: any, UserId : any, number_of_victim : any, fir_id : any): Observable<any> {
+  let body = {victim_id , UserId , number_of_victim, fir_id}
+  return this.http.post(`${this.baseUrl}/deleteVictim`, body);
+}
   
 }
