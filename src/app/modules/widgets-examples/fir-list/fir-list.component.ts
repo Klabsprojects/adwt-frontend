@@ -11,6 +11,7 @@ import { environment } from '../../../../environments/environment';
 import { environment as env } from 'src/environments/environment.prod';
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
 import { FirService } from 'src/app/services/fir.service';
+import { formatDate } from '@angular/common';
 @Component({
   selector: 'app-fir-list',
   templateUrl: './fir-list.component.html',
@@ -588,6 +589,7 @@ export class FirListComponent implements OnInit {
 loadFirDetails(firId: any){
     this.firGetService.getFirDetails(firId).subscribe(
       (response) => {
+          console.log("response view",response);
           this.policeCity = response.data.police_city;
           this.policeZone = response.data.police_zone;
           this.policeRange = response.data.police_range;
@@ -670,8 +672,223 @@ loadFirDetails(firId: any){
        this.upload_court_order_path = response.data4.upload_court_order_path;
        this.totalCompensation_1=response.data4.total_compensation_1;
        this.chargeSheetattachments = response.data4.attachments || [];
+       
+
+       this.showDuplicateSection = false;
+        this.showDuplicateSection_1 = false;
+
+        // Assign data from response
+        if (response && response.data5 && response.data5.length > 0) {
+          const item = response.data5[0];
+          this.courtDistrict = item.court_district || '';
+          this.Court_name1 = item.court_name || '';
+          this.trialCaseNumber = item.trial_case_number || '';
+          this.CRL_number = item.CRL_number || '';
+          this.CaseHandledBy = item.CaseHandledBy || '';
+          this.NameOfAdvocate = item.NameOfAdvocate || '';
+          this.advocateMobNumber = item.advocateMobNumber || '';
+          this.publicProsecutor = item.public_prosecutor || '';
+          this.prosecutorPhone = item.prosecutor_phone || '';
+          this.firstHearingDate = item.first_hearing_date ? formatDate(item.first_hearing_date, 'yyyy-MM-dd', 'en') : '';
+          this.judgementAwarded = item.judgement_awarded || '';
+          this.judgementNature = item.judgementNature || '';
+          this.Judgement_Date = item.Judgement_Date ? formatDate(item.Judgement_Date, 'yyyy-MM-dd', 'en') : '';
+          this.Conviction_Type = item.Conviction_Type || '';
+          this.judgement_nature_remarks = item.judgement_nature_remarks || '';
+
+          // Hearing Details
+          if (item.hearingDetails && Array.isArray(item.hearingDetails)) {
+            this.hearingDetails = item.hearingDetails.map((hearing: any) => ({
+              nextHearingDate: hearing.next_hearing_date ? formatDate(hearing.next_hearing_date, 'yyyy-MM-dd', 'en') : '',
+              reasonNextHearing: hearing.reason_next_hearing || ''
+            }));
+          }
+        }
+
+        // Appeal Details
+        if (response.appeal_details && response.appeal_details.length > 0) {
+          const appealDetail = response.appeal_details[0];
+          this.legalOpinionObtained = appealDetail.legal_opinion_obtained || '';
+          this.caseFitForAppeal = appealDetail.case_fit_for_appeal || '';
+          this.governmentApprovalForAppeal = appealDetail.government_approval_for_appeal || '';
+          this.filedBy = appealDetail.filed_by || '';
+          this.designatedCourt = appealDetail.designated_court || '';
+        }
+
+        // Duplicate Section (High Court)
+        if (response.casedetail_one && response.casedetail_one.length > 0) {
+          this.showDuplicateSection = true;
+          this.selectedCourtType = 'highCourt';
+          const item = response.casedetail_one[0];
+          this.courtDistrict_one = item.court_district || '';
+          this.caseNumber_one = item.case_number || '';
+          this.CRL_number_one = item.CRL_number || '';
+          this.publicProsecutor_one = item.public_prosecutor || '';
+          this.prosecutorPhone_one = item.prosecutor_phone || '';
+          this.firstHearingDate_one = item.second_hearing_date ? formatDate(item.second_hearing_date, 'yyyy-MM-dd', 'en') : '';
+          this.judgementAwarded_one = item.judgement_awarded || '';
+          this.judgementNature_one = item.judgementNature || '';
+          this.Judgement_Date_one = item.Judgement_Date ? formatDate(item.Judgement_Date, 'yyyy-MM-dd', 'en') : '';
+          this.Conviction_Type_one = item.Conviction_Type || '';
+          this.judgement_nature_remarks_one = item.judgement_nature_remarks || '';
+          this.uploadJudgement_one = item.judgement_copy || '';
+
+          if (response.hearingDetails_one && response.hearingDetails_one.length > 0) {
+            this.hearingDetails_one = response.hearingDetails_one.map((hearing: any) => ({
+              nextHearingDate_one: hearing.next_hearing_date ? formatDate(hearing.next_hearing_date, 'yyyy-MM-dd', 'en') : '',
+              reasonNextHearing_one: hearing.reason_next_hearing || ''
+            }));
+          }
+
+          if (response.appeal_details_one && response.appeal_details_one.length > 0) {
+            const appealDetail = response.appeal_details_one[0];
+            this.legalOpinionObtained_one = appealDetail.legal_opinion_obtained || '';
+            this.caseFitForAppeal_one = appealDetail.case_fit_for_appeal || '';
+            this.governmentApprovalForAppeal_one = appealDetail.government_approval_for_appeal || '';
+            this.filedBy_one = appealDetail.filed_by || '';
+            this.designatedCourt_one = appealDetail.designated_court || '';
+          }
+        }
+
+        // Duplicate Section 1 (Supreme Court)
+        if (response.casedetail_two && response.casedetail_two.length > 0) {
+          this.showDuplicateSection_1 = true;
+          const item = response.casedetail_two[0];
+          this.courtDistrict_two = item.court_district || '';
+          this.caseNumber_two = item.case_number || '';
+          this.CRL_number_two = item.CRL_number || '';
+          this.publicProsecutor_two = item.public_prosecutor || '';
+          this.prosecutorPhone_two = item.prosecutor_phone || '';
+          this.firstHearingDate_two = item.second_hearing_date ? formatDate(item.second_hearing_date, 'yyyy-MM-dd', 'en') : '';
+          this.judgementAwarded_two = item.judgement_awarded || '';
+          this.judgementAwarded3 = item.judgement_awarded || '';
+          this.judgementNature_two = item.judgementNature || '';
+          this.Judgement_Date_two = item.Judgement_Date ? formatDate(item.Judgement_Date, 'yyyy-MM-dd', 'en') : '';
+          this.Conviction_Type_two = item.Conviction_Type || '';
+          this.judgement_nature_remarks_two = item.judgement_nature_remarks || '';
+          this.uploadJudgement_two = item.judgement_copy || '';
+          this.legalOpinionObtained_two = item.legal_opinion_obtained || '';
+          this.caseFitForAppeal_two = item.case_fit_for_appeal || '';
+          this.governmentApprovalForAppeal_two = item.government_approval_for_appeal || '';
+          this.filedBy_two = item.filed_by || '';
+
+          if (response.hearingDetails_two && response.hearingDetails_two.length > 0) {
+            this.hearingDetails_two = response.hearingDetails_two.map((hearing: any) => ({
+              nextHearingDate_two: hearing.next_hearing_date ? formatDate(hearing.next_hearing_date, 'yyyy-MM-dd', 'en') : '',
+              reasonNextHearing_two: hearing.reason_next_hearing || ''
+            }));
+          }
+        }
+
+        // Victim Relief and Compensation
+        if (response.data1 && response.data1.length > 0) {
+          this.victimNames = response.data1.map((victim: any) => victim.victim_name || '');
+        }
+
+        if (response.compensation_details_2 && response.compensation_details_2.length > 0) {
+          this.victimsRelief = response.compensation_details_2.map((item: any) => ({
+            reliefAmountScst_2: item.relief_amount_scst || '',
+            reliefAmountExGratia_2: item.relief_amount_ex_gratia || '',
+            reliefAmountThirdStage: item.total_compensation || ''
+          }));
+          this.totalCompensation_2 = response.compensation_details_2[0].total_compensation || '';
+          this.proceedingsFileNo_2 = response.compensation_details_2[0].proceedings_file_no || '';
+          this.proceedingsDate_2 = response.compensation_details_2[0].proceedings_date ? formatDate(response.compensation_details_2[0].proceedings_date, 'yyyy-MM-dd', 'en') : '';
+          this.file95 = response.compensation_details_2[0].upload_proceedings || '';
+        }
+
+        // Attachments
+        if (response.trialAttachments && response.trialAttachments.length > 0) {
+          this.attachments_2 = response.trialAttachments.map((item: any) => ({
+            fileName_2: item.file_name || '',
+            file_2: item.file_name || ''
+          }));
+        }
+
+        this.hideCompensationSection = !(this.judgementNature === 'Convicted' || this.filedBy !== 'No appeal yet');
+
+        this.cdr.detectChanges();
+
       });
 }
+
+  Court_name1: string = '';
+  trialCaseNumber: string = '';
+  CRL_number: string = '';
+  CaseHandledBy: string = '';
+  NameOfAdvocate: string = '';
+  advocateMobNumber: string = '';
+  publicProsecutor: string = '';
+  prosecutorPhone: string = '';
+  firstHearingDate: string = '';
+  judgementAwarded1: string = '';
+  judgementNature: string = '';
+  Judgement_Date: string = '';
+  Conviction_Type: string = '';
+  judgement_nature_remarks: string = '';
+  uploadJudgement: string = '';
+  legalOpinionObtained: string = '';
+  caseFitForAppeal: string = '';
+  governmentApprovalForAppeal: string = '';
+  filedBy: string = '';
+  designatedCourt: string = '';
+  selectedCourtType: string = '';
+  courtDistrict_one: string = '';
+  caseNumber_one: string = '';
+  CRL_number_one: string = '';
+  publicProsecutor_one: string = '';
+  prosecutorPhone_one: string = '';
+  firstHearingDate_one: string = '';
+  judgementAwarded_one: string = '';
+  judgementAwarded2: string = '';
+  judgementNature_one: string = '';
+  Judgement_Date_one: string = '';
+  Conviction_Type_one: string = '';
+  judgement_nature_remarks_one: string = '';
+  uploadJudgement_one: string = '';
+  legalOpinionObtained_one: string = '';
+  caseFitForAppeal_one: string = '';
+  governmentApprovalForAppeal_one: string = '';
+  filedBy_one: string = '';
+  designatedCourt_one: string = '';
+  courtDistrict_two: string = '';
+  caseNumber_two: string = '';
+  CRL_number_two: string = '';
+  publicProsecutor_two: string = '';
+  prosecutorPhone_two: string = '';
+  firstHearingDate_two: string = '';
+  judgementAwarded_two: string = '';
+  judgementAwarded3: string = '';
+  judgementNature_two: string = '';
+  Judgement_Date_two: string = '';
+  Conviction_Type_two: string = '';
+  judgement_nature_remarks_two: string = '';
+  uploadJudgement_two: string = '';
+  legalOpinionObtained_two: string = '';
+  caseFitForAppeal_two: string = '';
+  governmentApprovalForAppeal_two: string = '';
+  filedBy_two: string = '';
+  victimsRelief: any[] = [];
+  totalCompensation_2: string = '';
+  proceedingsFileNo_2: string = '';
+  proceedingsDate_2: string = '';
+  file95: string = '';
+  attachments_2: any[] = [];
+  hideCompensationSection: boolean = false;
+  hearingDetails: any[] = [];
+  hearingDetails_one: any[] = [];
+  hearingDetails_two: any[] = [];
+
+
+ viewuploadJudgement(path:any){
+
+  }
+  view_pdf(path:any){
+     if (path) {
+        const url = `${env.file_access}${path.startsWith('/') ? '' : '/'}${path}`;
+        window.open(url, '_blank');
+      }
+  }
 
 getFileName(path: string): string {
   return path.split('/').pop() || path;
