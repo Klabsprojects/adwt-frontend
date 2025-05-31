@@ -46,18 +46,18 @@
 
     <div class="d-flex gap-3 mb-3 flex-wrap">
   <div>
-    <label>District</label>
-    <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
-      <option value="" selected disabled>District</option>
+    <label>Police City</label>
+    <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters();loadPoliceStations(selectedDistrict)">
+      <option value="" selected disabled>Police City</option>
       <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
     </select>
   </div>
 
   <div>
     <label>Police Station</label>
-    <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
+    <select class="form-select" [(ngModel)]="policeStationName" (change)="applyFilters()">
       <option value="" selected disabled>Police Station</option>
-      <option *ngFor="let nature of firList" [value]="nature.police_station">{{ nature.police_station }}</option>
+      <option *ngFor="let station of policeStationlist"  [value]="station">{{ station }}</option>
     </select>
   </div>
 
@@ -77,12 +77,12 @@
 </div>
 
     <!-- Show message if FIR list is empty -->
-    <div *ngIf="filteredFirList().length === 0" class="alert alert-warning">
+    <div *ngIf="firList.length === 0" class="alert alert-warning">
       No Relif data available.
     </div>
 
     <!-- Table displaying FIRs -->
-    <table *ngIf="filteredFirList().length > 0" class="table table-striped table-bordered table-hover">
+    <table *ngIf="this.firList.length > 0" class="table table-striped table-bordered table-hover">
       <thead>
         <!-- <tr>
           <th>Sl.No</th>

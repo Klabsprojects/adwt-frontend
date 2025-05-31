@@ -9,6 +9,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
+import { VmcMeetingService } from 'src/app/services/vmc-meeting.service';
+import { FirService } from 'src/app/services/fir.service';
 
 @Component({
   selector: 'app-additional-relief-list',
@@ -25,18 +27,29 @@ export class AdditionalReliefListComponent implements OnInit {
   itemsPerPage = 10; // Items per page
   totalPages = 1; // Total number of pages
   isLoading = true; // Loading indicator
+  Parsed_UserInfo : any;
 
   constructor(
     private additionalreliefService: AdditionalReliefService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private policeDivisionService :PoliceDivisionService
-  ) {}
+    private policeDivisionService :PoliceDivisionService,
+    private vmcMeeting: VmcMeetingService,
+    private firService: FirService,
+  ) {
+    const UserInfo : any = sessionStorage.getItem('user_data');
+    this.Parsed_UserInfo = JSON.parse(UserInfo)
+    this.vmcMeeting.getDistricts().subscribe((data) => {
+    this.districts = Object.keys(data);
+    this.cdr.detectChanges();
+  });
+  }
 
   ngOnInit(): void {
     this.fetchFIRList();
     this.updateSelectedColumns();
-    this.loadPoliceDivision();
+    // this.loadPoliceDivision();
+    this.loadPolicecity();
   }
 
   // Filters
@@ -48,49 +61,9 @@ export class AdditionalReliefListComponent implements OnInit {
   selectedStatusOfRelief: string = '';
 
   // Filter options
-  districts: string[] = [
-    'Ariyalur',
-    'Chengalpattu',
-    'Chennai',
-    'Coimbatore',
-    'Cuddalore',
-    'Dharmapuri',
-    'Dindigul',
-    'Erode',
-    'Kallakurichi',
-    'Kanchipuram',
-    'Kanniyakumari',
-    'Karur',
-    'Krishnagiri',
-    'Madurai',
-    'Mayiladuthurai',
-    'Nagapattinam',
-    'Namakkal',
-    'Nilgiris',
-    'Perambalur',
-    'Pudukkottai',
-    'Ramanathapuram',
-    'Ranipet',
-    'Salem',
-    'Sivagangai',
-    'Tenkasi',
-    'Thanjavur',
-    'Theni',
-    'Thoothukudi (Tuticorin)',
-    'Tiruchirappalli (Trichy)',
-    'Tirunelveli',
-    'Tirupathur',
-    'Tiruppur',
-    'Tiruvallur',
-    'Tiruvannamalai',
-    'Tiruvarur',
-    'Vellore',
-    'Viluppuram',
-    'Virudhunagar'
-  ];
-
-  policeCities:any[]=[];
-  policestations:any[]=[];
+  districts: any;
+  policeCities:any;
+  policestations:any;
 
   naturesOfOffence: string[] = [
     'Theft',
@@ -125,9 +98,9 @@ export class AdditionalReliefListComponent implements OnInit {
     { label: 'FIR ID', field: 'fir_id', sortable: true, visible: true },
     { label: 'Victim ID', field: 'victim_id', sortable: true, visible: true },
     { label: 'Victim Name', field: 'victim_name', sortable: true, visible: true },
-    { label: 'Disctrict', field: 'disctrict', sortable: true, visible: true },
+    { label: 'Disctrict', field: 'revenue_district', sortable: true, visible: true },
     { label: 'Police City', field: 'police_city', sortable: true, visible: true },
-    { label: 'Police Station Name', field: 'station_name', sortable: true, visible: true },
+    { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
      { label: 'Actions', field: 'actions', sortable: false, visible: true },
     // { label: 'Actions', field: 'created_by', sortable: true, visible: true },
     // { label: 'Created At', field: 'created_at', sortable: true, visible: true },
@@ -143,7 +116,7 @@ export class AdditionalReliefListComponent implements OnInit {
   // Fetch FIR data from the service
   fetchFIRList(): void {
     this.isLoading = true;
-    this.additionalreliefService.getFIRAdditionalReliefList_By_Victim().subscribe(
+    this.additionalreliefService.getFIRAdditionalReliefList_By_Victim(this.getFilterParams()).subscribe(
       (data) => {
         console.log('Raw API Response:', data);
         // Filter FIRs with at least one victim with relief
@@ -250,43 +223,94 @@ export class AdditionalReliefListComponent implements OnInit {
     this.filteredFirList();
   }
 
-  // Filtered FIR list based on search and filter criteria
+  // // Filtered FIR list based on search and filter criteria
+  // filteredFirList() {
+  //   const searchLower = this.searchText.toLowerCase();
+
+  //   return this.displayedFirList = this.firList.filter((fir) => {
+  //     // Apply search filter
+  //     const matchesSearch =
+  //       fir.fir_id.toString().toLowerCase().includes(searchLower) ||
+  //       (fir.victim_id || '').toLowerCase().includes(searchLower) ||
+  //       (fir.fir_number || '').toLowerCase().includes(searchLower) ||
+  //       (fir.victim_name || '').toLowerCase().includes(searchLower);
+
+  //     // Apply dropdown filters
+  //     const matchesDistrict = this.selectedDistrict ? fir.fir_id === this.selectedDistrict : true;
+  //     const matchesNatureOfOffence = this.selectedNatureOfOffence ? fir.victim_id === this.selectedNatureOfOffence : true;
+  //     const matchesStatusOfCase = this.selectedStatusOfCase ? fir.victim_name === this.selectedStatusOfCase : true;
+  //     // const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status_of_relief === this.selectedStatusOfRelief : true;
+
+  //     return (
+  //       matchesSearch &&
+  //       matchesDistrict &&
+  //       matchesNatureOfOffence &&
+  //       matchesStatusOfCase 
+  //     );
+  //   });
+  // }
+
+    // Filtered FIR list based on search and filter criteria
   filteredFirList() {
-    const searchLower = this.searchText.toLowerCase();
-
-    return this.displayedFirList = this.firList.filter((fir) => {
-      // Apply search filter
-      const matchesSearch =
-        fir.fir_id.toString().toLowerCase().includes(searchLower) ||
-        (fir.victim_id || '').toLowerCase().includes(searchLower) ||
-        (fir.fir_number || '').toLowerCase().includes(searchLower) ||
-        (fir.victim_name || '').toLowerCase().includes(searchLower);
-
-      // Apply dropdown filters
-      const matchesDistrict = this.selectedDistrict ? fir.fir_id === this.selectedDistrict : true;
-      const matchesNatureOfOffence = this.selectedNatureOfOffence ? fir.victim_id === this.selectedNatureOfOffence : true;
-      const matchesStatusOfCase = this.selectedStatusOfCase ? fir.victim_name === this.selectedStatusOfCase : true;
-      // const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status_of_relief === this.selectedStatusOfRelief : true;
-
-      return (
-        matchesSearch &&
-        matchesDistrict &&
-        matchesNatureOfOffence &&
-        matchesStatusOfCase 
-      );
-    });
+    this.isLoading = true;
+    this.additionalreliefService.getFIRAdditionalReliefList_By_Victim(this.getFilterParams()).subscribe(
+      (data) => {
+        console.log('Raw API Response:', data);
+        // Filter FIRs with at least one victim with relief
+        // this.firList = (data || []).filter((fir) => fir.victims_with_relief > 0);
+        this.firList = data;
+        console.log('Filtered FIR List:', this.firList);
+        this.updatePagination();
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      (error) => {
+        console.error('Error fetching FIR data:', error);
+        this.isLoading = false;
+      }
+    );
   }
 
   clearfilter(){
     this.searchText = '';
-    this.selectedDistrict = '';
-    this.selectedNatureOfOffence = '';
-    this.selectedStatusOfCase = '';
+    this.selectedPoliceCity = '';
     this.selectedDistrict = '';
     this.selectedPoliceStation = '';
     this.applyFilters();
   }
   
+
+getFilterParams() {
+  const params: any = {};
+  
+  if (this.searchText) {
+    params.search = this.searchText;
+  }
+  
+  if (this.selectedPoliceCity) {
+    params.district = this.selectedPoliceCity;
+  }
+
+  if (this.selectedPoliceStation) {
+    params.policeStationName = this.selectedPoliceStation;
+  }
+
+  if (this.selectedDistrict) {
+    params.revenue_district = this.selectedDistrict;
+  }
+  
+  if(this.Parsed_UserInfo.role == '3'){
+    params.district = this.Parsed_UserInfo.police_city
+  } 
+  else {
+    if(this.Parsed_UserInfo.access_type == 'District'){
+    params.revenue_district = this.Parsed_UserInfo.district;
+    } 
+  }
+
+  
+  return params;
+}
 
 
   // Sorting logic
@@ -317,7 +341,7 @@ export class AdditionalReliefListComponent implements OnInit {
   // Paginated FIR list
   paginatedFirList() {
     const startIndex = (this.page - 1) * this.itemsPerPage;
-    return this.filteredFirList().slice(startIndex, startIndex + this.itemsPerPage);
+    return this.firList.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
   loadPoliceDivision() {
@@ -329,6 +353,33 @@ export class AdditionalReliefListComponent implements OnInit {
         console.error(error)
       }
     );
+  }
+
+  loadPolicecity() {
+  this.policeDivisionService.getpoliceCity().subscribe(
+    (data: any) => {
+      this.policeCities = data.map((item: any) => item.district_division_name);
+    },
+    (error: any) => {
+      // Swal.fire('Error', 'Failed to load division details.', 'error');
+    }
+  );
+}
+
+  loadPoliceStations(district: string): void {
+    if (district) {
+      this.firService.getPoliceStations(district).subscribe(
+        (stations: string[]) => {
+          this.policestations = stations.map(station =>
+            station.replace(/\s+/g, '-')); // Replace spaces with "-"
+          // this.firForm.get('stationName')?.setValue(''); // Reset selected station if district changes
+          this.cdr.detectChanges(); // Trigger UI update
+        },
+        (error) => {
+          console.error('Error fetching police stations:', error);
+        }
+      );
+    }
   }
 
 }

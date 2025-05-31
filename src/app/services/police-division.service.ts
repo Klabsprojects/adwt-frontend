@@ -15,6 +15,10 @@ export class PoliceDivisionService {
     return this.http.get(`${this.baseUrl}`);
   }
 
+  getpoliceCity(): Observable<any> {
+    return this.http.get(`${environment.apiUrl}getpoliceCity`);
+  }
+
   // Get all districts for dropdown selection
   getAllDistricts(): Observable<any> {
     return this.http.get(`${this.baseUrl}/districts`);

@@ -169,6 +169,7 @@ isStepThreeModified = false;
 sectionFields: string[] = [''];
 Parsed_UserInfo : any;
 SubmitButton = true;
+police_Cities_data:any
   constructor(
     private fb: FormBuilder,
     private firService: FirService,
@@ -179,6 +180,7 @@ SubmitButton = true;
     private vmcSerive:VmcMeetingService
   ) {
     this.SubmitButton = true;
+    this.loadPolicecity();
   }
   private wasVictimSame: boolean = false; // Track the previous state of on Victim same as Complainant
 
@@ -2332,14 +2334,14 @@ handleCaseTypeChange() {
   }
 
   loadnativedistrict() {
-    this.firService.getPoliceRevenue().subscribe(
-      (Native: any) => {
-        this.policeStations = Native.map((Native: any) => Native.revenue_district_name);
-      },
-      (error: any) => {
-        Swal.fire('Error', 'Failed to load offence options.', 'error');
-      }
-    );
+    // this.firService.getPoliceRevenue().subscribe(
+    //   (Native: any) => {
+    //     this.policeStations = Native.map((Native: any) => Native.revenue_district_name);
+    //   },
+    //   (error: any) => {
+    //     Swal.fire('Error', 'Failed to load offence options.', 'error');
+    //   }
+    // );
   }
 
 
@@ -2433,20 +2435,19 @@ handleCaseTypeChange() {
     );
   }
 
-  police_Cities_data:any
-
   loadPoliceDivision() {
     this.policeDivisionService.getAllPoliceDivisions().subscribe(
       (data: any) => {
         // this.police_Cities_data =data;
 
         // this.police_Cities_data = data.map((item: any) => item.district_division_name);
-        this.police_Cities_data = Array.from(
-          new Set(data.map((item: any) => item.district_division_name as string))
-        ).sort((a: any, b: any) => a.localeCompare(b));
+        // this.police_Cities_data = Array.from(
+        //   new Set(data.map((item: any) => item.district_division_name as string))
+        // ).sort((a: any, b: any) => a.localeCompare(b));
+        
 
         console.log( data)
-        this.policeZones = data.map((item: any) => item.police_zone_name);
+        // this.policeZones = data.map((item: any) => item.police_zone_name);
         this.policeRanges = data.map((item: any) => item.police_range_name);
         this.revenueDistricts = data.map((item: any) => item.revenue_district_name);
         // this.firForm.patchValue({
@@ -2454,6 +2455,19 @@ handleCaseTypeChange() {
         //   policeRange: this.policeRanges ,
         //   revenueDistrict: this.revenueDistricts,
         // });
+      },
+      (error: any) => {
+        Swal.fire('Error', 'Failed to load division details.', 'error');
+      }
+    );
+  }
+
+
+
+    loadPolicecity() {
+    this.policeDivisionService.getpoliceCity().subscribe(
+      (data: any) => {
+        this.police_Cities_data = data.map((item: any) => item.district_division_name);
       },
       (error: any) => {
         Swal.fire('Error', 'Failed to load division details.', 'error');

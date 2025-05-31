@@ -60,7 +60,7 @@
         <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
     </select>
 
-    <select class="form-select" [(ngModel)]="selectedPoliceCity" (change)="applyFilters()">
+    <select class="form-select" [(ngModel)]="selectedPoliceCity" (change)="applyFilters();loadPoliceStations(selectedPoliceCity)">
         <option value="" selected hidden disabled>Police City</option>
         <option *ngFor="let city of policeCities" [value]="city">{{ city }}</option>
     </select>
@@ -120,9 +120,9 @@
               <td *ngSwitchCase="'fir_id'">{{ fir.fir_number }}</td>
               <td *ngSwitchCase="'victim_id'">{{ fir.victim_id }}</td>
               <td *ngSwitchCase="'victim_name'">{{ fir.victim_name }}</td>
-              <td *ngSwitchCase="'disctrict'">{{ fir.disctrict }}</td>
+              <td *ngSwitchCase="'revenue_district'">{{ fir.revenue_district }}</td>
               <td *ngSwitchCase="'police_city'">{{ fir.police_city }}</td>
-              <td *ngSwitchCase="'station_name'">{{ fir.station_name }}</td>
+              <td *ngSwitchCase="'police_station'">{{ fir.police_station }}</td>
               <td *ngSwitchCase="'actions'">
                 <button class="btn btn-primary btn-sm" (click)="navigateToRelief(fir.fir_id,fir.victim_id)">
                   View

@@ -9,6 +9,9 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { FirService } from 'src/app/services/fir.service';
+import { VmcMeetingService } from 'src/app/services/vmc-meeting.service';
+import { PoliceDivisionService } from 'src/app/services/police-division.service';
 
 @Component({
   selector: 'app-relief-list',
@@ -28,23 +31,36 @@ export class ReliefListComponent implements OnInit {
   searchText: string = '';
   dorf:any;
   dort:any;
+  Parsed_UserInfo : any;
+  policeStationlist : any;
 
   constructor(
     private reliefService: ReliefService,
     private cdr: ChangeDetectorRef,
-    private router: Router
-  ) {}
+    private router: Router,
+    private firService: FirService,
+    private vmcMeeting: VmcMeetingService,
+    private policeDivisionService :PoliceDivisionService
+  ) {
+    const UserInfo : any = sessionStorage.getItem('user_data');
+    this.Parsed_UserInfo = JSON.parse(UserInfo)
+    this.vmcMeeting.getDistricts().subscribe((data) => {
+    this.districts = Object.keys(data);
+    this.cdr.detectChanges();
+  });
+  }
 
   ngOnInit(): void {
 
     this.updateSelectedColumns();
     this.fetchFIRList();
+    this.loadPolicecity();
   }
 
   // Fetch FIR data from the service
   fetchFIRList(): void {
     this.isLoading = true;
-    this.reliefService.getFIRReliefList().subscribe(
+    this.reliefService.getFIRReliefList(this.getFilterParams()).subscribe(
       (data) => {
         this.firList = (data || []).filter((fir) => [4 ,5, 6, 7, 11, 12,13].includes(fir.status)); // Filter data
         this.updatePagination();
@@ -213,51 +229,13 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
 
   // Filters
   selectedDistrict: string = '';
+  policeStationName : string = '';
   selectedNatureOfOffence: string = '';
   selectedStatusOfCase: string = '';
   selectedStatusOfRelief: string = '';
 
   // Filter options
-  districts: string[] = [
-    'Ariyalur',
-    'Chengalpattu',
-    'Chennai',
-    'Coimbatore',
-    'Cuddalore',
-    'Dharmapuri',
-    'Dindigul',
-    'Erode',
-    'Kallakurichi',
-    'Kanchipuram',
-    'Kanniyakumari',
-    'Karur',
-    'Krishnagiri',
-    'Madurai',
-    'Mayiladuthurai',
-    'Nagapattinam',
-    'Namakkal',
-    'Nilgiris',
-    'Perambalur',
-    'Pudukkottai',
-    'Ramanathapuram',
-    'Ranipet',
-    'Salem',
-    'Sivagangai',
-    'Tenkasi',
-    'Thanjavur',
-    'Theni',
-    'Thoothukudi (Tuticorin)',
-    'Tiruchirappalli (Trichy)',
-    'Tirunelveli',
-    'Tirupathur',
-    'Tiruppur',
-    'Tiruvallur',
-    'Tiruvannamalai',
-    'Tiruvarur',
-    'Vellore',
-    'Viluppuram',
-    'Virudhunagar'
-  ];
+  districts: any;
 
   naturesOfOffence: string[] = [
     'Theft',
@@ -333,63 +311,145 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
   }
 
 
-  filteredFirList() {
-    const searchLower = this.searchText.toLowerCase();
-    console.log(searchLower)
-    return this.firList.filter((fir) => {
-      // Apply search filter
-      const matchesSearch =
-        fir.fir_id.toString().toLowerCase().includes(searchLower) ||
-        (fir.police_city || '').toLowerCase().includes(searchLower) ||
-        (fir.fir_number || '').toLowerCase().includes(searchLower) ||
-        (fir.police_station || '').toLowerCase().includes(searchLower);
+  // filteredFirList() {
+  //   const searchLower = this.searchText.toLowerCase();
+  //   console.log(searchLower)
+  //   return this.firList.filter((fir) => {
+  //     // Apply search filter
+  //     const matchesSearch =
+  //       fir.fir_id.toString().toLowerCase().includes(searchLower) ||
+  //       (fir.police_city || '').toLowerCase().includes(searchLower) ||
+  //       (fir.fir_number || '').toLowerCase().includes(searchLower) ||
+  //       (fir.police_station || '').toLowerCase().includes(searchLower);
 
-      // Apply dropdown filters
-      const matchesDistrict = this.selectedDistrict ? fir.police_city === this.selectedDistrict : true;
-      const matchesNatureOfOffence = this.selectedNatureOfOffence? fir.police_station === this.selectedNatureOfOffence: true;
-      // const matchesStatusOfCase = this.selectedStatusOfCase ? fir.relief_status == this.selectedStatusOfCase : true;
-      // const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status == this.selectedStatusOfRelief : true;
-      let matchesStatusOfRelief = true;
-      if (this.selectedStatusOfRelief) {
-        if (this.selectedStatusOfRelief === 'FIR Stage') {
-          matchesStatusOfRelief = fir.relief_status == '1';
-        } else if (this.selectedStatusOfRelief === 'ChargeSheet Stage') {
-          matchesStatusOfRelief = fir.relief_status == '2';
-        } else if (this.selectedStatusOfRelief === 'Trial Stage') {
-          matchesStatusOfRelief = fir.relief_status == '3';
-        }
+  //     // Apply dropdown filters
+  //     const matchesDistrict = this.selectedDistrict ? fir.police_city === this.selectedDistrict : true;
+  //     const matchesNatureOfOffence = this.selectedNatureOfOffence? fir.police_station === this.selectedNatureOfOffence: true;
+  //     // const matchesStatusOfCase = this.selectedStatusOfCase ? fir.relief_status == this.selectedStatusOfCase : true;
+  //     // const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status == this.selectedStatusOfRelief : true;
+  //     let matchesStatusOfRelief = true;
+  //     if (this.selectedStatusOfRelief) {
+  //       if (this.selectedStatusOfRelief === 'FIR Stage') {
+  //         matchesStatusOfRelief = fir.relief_status == '1';
+  //       } else if (this.selectedStatusOfRelief === 'ChargeSheet Stage') {
+  //         matchesStatusOfRelief = fir.relief_status == '2';
+  //       } else if (this.selectedStatusOfRelief === 'Trial Stage') {
+  //         matchesStatusOfRelief = fir.relief_status == '3';
+  //       }
+  //     }
+
+  //     let matchesStatusOfCase = true;
+  //     if (this.selectedStatusOfCase) {
+  //       if (this.selectedStatusOfCase === 'Just Starting') {
+  //         matchesStatusOfCase = fir.status == '0';
+  //       } else if (this.selectedStatusOfCase === 'Pending') {
+  //         matchesStatusOfCase = (fir.status >= '1' && fir.status <= '12') ;
+  //       } else if (this.selectedStatusOfCase === 'Completed') {
+  //         matchesStatusOfCase = fir.status == '13';
+  //       }
+  //     }
+
+  //     return (
+  //       matchesSearch &&
+  //       matchesDistrict &&
+  //       matchesNatureOfOffence &&
+  //       matchesStatusOfCase &&
+  //       matchesStatusOfRelief
+  //     );
+  //   });
+  // }
+
+
+  getFilterParams() {
+  const params: any = {};
+  
+  if (this.searchText) {
+    params.search = this.searchText;
+  }
+  
+  if (this.selectedDistrict) {
+    params.district = this.selectedDistrict;
+  }
+
+  if (this.policeStationName) {
+    params.policeStationName = this.policeStationName;
+  }
+
+  if (this.dorf) {
+    params.start_date = this.dorf;
+  }
+
+  if (this.dort) {
+    params.end_date = this.dort;
+  }
+
+  
+  if(this.Parsed_UserInfo.role == '3'){
+    params.district = this.Parsed_UserInfo.police_city
+  } 
+  else {
+    if(this.Parsed_UserInfo.access_type == 'District'){
+    params.revenue_district = this.Parsed_UserInfo.district;
+    } 
+  }
+
+  
+  return params;
+}
+
+   filteredFirList() {
+    this.reliefService.getFIRReliefList(this.getFilterParams()).subscribe(
+      (data) => {
+        this.firList = [];
+        this.firList = (data || []).filter((fir) => [4 ,5, 6, 7, 11, 12,13].includes(fir.status)); // Filter data
+        this.updatePagination();
+        this.isLoading = false;
+        this.cdr.detectChanges(); // Ensure the UI is updated immediately
+      },
+      (error) => {
+        console.error('Error fetching FIR data:', error);
+        this.isLoading = false;
       }
+    );
+  }
 
-      let matchesStatusOfCase = true;
-      if (this.selectedStatusOfCase) {
-        if (this.selectedStatusOfCase === 'Just Starting') {
-          matchesStatusOfCase = fir.status == '0';
-        } else if (this.selectedStatusOfCase === 'Pending') {
-          matchesStatusOfCase = (fir.status >= '1' && fir.status <= '12') ;
-        } else if (this.selectedStatusOfCase === 'Completed') {
-          matchesStatusOfCase = fir.status == '13';
+    loadPoliceStations(district: string): void {
+    if (district) {
+      this.firService.getPoliceStations(district).subscribe(
+        (stations: string[]) => {
+          this.policeStationlist = stations.map(station =>
+            station.replace(/\s+/g, '-')); // Replace spaces with "-"
+          // this.firForm.get('stationName')?.setValue(''); // Reset selected station if district changes
+          this.cdr.detectChanges(); // Trigger UI update
+        },
+        (error) => {
+          console.error('Error fetching police stations:', error);
         }
-      }
-
-      return (
-        matchesSearch &&
-        matchesDistrict &&
-        matchesNatureOfOffence &&
-        matchesStatusOfCase &&
-        matchesStatusOfRelief
       );
-    });
+    }
   }
 
     clearfilter(){
     this.searchText = '';
     this.selectedDistrict = '';
-    this.selectedNatureOfOffence = '';
-    this.selectedStatusOfCase = '';
-    this.selectedStatusOfRelief = '';
+    this.policeStationName = '';
+    this.dorf = '';
+    this.dort = '';
     this.applyFilters();
   }
   
+
+
+      loadPolicecity() {
+      this.policeDivisionService.getpoliceCity().subscribe(
+        (data: any) => {
+          this.districts = data.map((item: any) => item.district_division_name);
+        },
+        (error: any) => {
+          // Swal.fire('Error', 'Failed to load division details.', 'error');
+        }
+      );
+    }
 
 
   // Sorting logic
@@ -423,16 +483,16 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
   // Paginated FIR list
   paginatedFirList() {
     const startIndex = (this.page - 1) * this.itemsPerPage;
-    return this.filteredFirList().slice(startIndex, startIndex + this.itemsPerPage);
+    return this.firList.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
   hasNextPage(): boolean {
-    return this.page * this.itemsPerPage < this.filteredFirList().length;
+    return this.page * this.itemsPerPage < this.firList.length;
   }
 
 
   totalPagesArray(): number[] {
-    const totalPages = Math.ceil(this.filteredFirList().length / this.itemsPerPage);
+    const totalPages = Math.ceil(this.firList.length / this.itemsPerPage);
     const pageNumbers = [];
   
     // Define how many pages to show before and after the current page
