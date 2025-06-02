@@ -3,7 +3,7 @@ import Swal from 'sweetalert2';
 import { FirListTestService } from 'src/app/services/fir-list-test.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ChangeDetectorRef } from '@angular/core';
-import { Router , ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -30,22 +30,22 @@ export class FirListComponent implements OnInit {
   stationName: string = '';
 
   officerName: string = '';
-  complaintReceivedType:string='';
-  complaintRegisteredBy:string='';
-  complaintReceiverName:string='';
+  complaintReceivedType: string = '';
+  complaintRegisteredBy: string = '';
+  complaintReceiverName: string = '';
   officerDesignation: string = '';
   showOtherDesignation = false;
-  otherDesignationValue:string='';
+  otherDesignationValue: string = '';
   officerPhone: string = '';
 
   firNumber: string = '';
   dateOfOccurrence: string = '';
-  date_of_occurrence_to:string='';
+  date_of_occurrence_to: string = '';
   timeOfOccurrence: string = '';
-  time_of_occurrence_to:string='';
+  time_of_occurrence_to: string = '';
   placeOfOccurrence: string = '';
-  is_case_altered : string = '';
-  altered_date : string = '';
+  is_case_altered: string = '';
+  altered_date: string = '';
   dateOfRegistration: string = '';
   timeOfRegistration: string = '';
 
@@ -81,7 +81,7 @@ export class FirListComponent implements OnInit {
 
 
   numberOfAccused: string = ''; // Default: 1 accused
-  accused_remarks:string='';
+  accused_remarks: string = '';
 
 
   accusedsdata: any[] = [];
@@ -101,7 +101,7 @@ export class FirListComponent implements OnInit {
   landOIssues: string = ''; // Default: No L&O issues
   gistOfCurrentCase: string = ''; // Default: Brief case description
   uploadFIRCopy: string = ''; // Default: No file uploaded
-  previous_incident_remarks : string='';
+  previous_incident_remarks: string = '';
   uploadedFIRFileNames: string;
 
   reliefsdata: any[] = [];
@@ -116,25 +116,25 @@ export class FirListComponent implements OnInit {
   proceedingsFileNo: string = ''; // Default: Proceedings file number
   proceedingsFileNo_1: string = '';
   proceedingsDate: string = ''; // Default: YYYY-MM-DD
-  proceedingsDate_1:string='';
+  proceedingsDate_1: string = '';
   proceedingsFile: string = ''; // Default: Text
   proceedingFileName2: string = ''; // Default: Text
   attachments: any; // Default: Text
   chargeSheetattachments: any; // Default: Text
-  quash_petition_no:string='';
-  petition_date:string='';
-  upload_court_order_path : string = '';
-  totalCompensation_1:string='';
+  quash_petition_no: string = '';
+  petition_date: string = '';
+  upload_court_order_path: string = '';
+  totalCompensation_1: string = '';
   chargeSheetFiled: string = ''; // Default: Yes
   courtDistrict: string = ''; // Default: Court District
   courtName: string = ''; // Default: Court Range
   caseType: string = ''; // Default: Case Type
   caseNumber: string = ''; // Default: Case Number Report
-  chargeSheetDate:string='';
+  chargeSheetDate: string = '';
   rcsFileNumber: string = ''; // Default: RCS File Number
   rcsFilingDate: string = ''; // Default: YYYY-MM-DD
   mfCopy: string = ''; // Default: Upload MF Copy
-  ChargeSheet_CRL_number:string='';
+  ChargeSheet_CRL_number: string = '';
 
   victimName2: string = ''; // Default: Victim Name
   reliefAmountScst1: string = ''; // Default: Relief Amount (SC/ST Act)
@@ -159,7 +159,7 @@ export class FirListComponent implements OnInit {
   judgementAwarded: string = ''; // Default: Judgement awarded status
 
 
-  hearingdetailsdata: any[] =[];
+  hearingdetailsdata: any[] = [];
   nextHearingDate: string = '';
   reasonNextHearing: string = '';
 
@@ -196,7 +196,7 @@ export class FirListComponent implements OnInit {
 
 
   // 1st Acquitted
-  appealdata: any[]=[];
+  appealdata: any[] = [];
   opinionObtained_1stAccquitted: string = ''; // Default: Has legal opinion obtained
   caseFit_1stAccquitted: string = ''; // Default: Is the case fit for appeal
   governmentApproved_1stAccquitted: string = ''; // Default: Has the government approved for appeal
@@ -248,7 +248,7 @@ export class FirListComponent implements OnInit {
 
 
   // 2n Accquitted
-  appealonedata: any[]=[];
+  appealonedata: any[] = [];
   opinionObtained_2nd_Accquitted: string = ''; // Default: Has legal opinion obtained
   caseFit_2nd_Accquitted: string = ''; // Default: Is the case fit for appeal
   governmentApproved_2nd_Accquitted: string = ''; // Default: Has the government approved for appeal
@@ -256,19 +256,19 @@ export class FirListComponent implements OnInit {
   specialCourtName_2nd_Accquitted: string = ''; // Default: Name of the Designated/Special court
 
   // Case Trial and Court Details
-  casedetailstwodata: any [] = [];
+  casedetailstwodata: any[] = [];
   districtOfCourt_2nd_Accquitted: string = ''; // Default: District in which court is present
   scNumber1_2nd_Accquitted: string = ''; // Default: Case Number Report (CNR) / Special SC number
   prosecutorName1_2nd_Accquitted: string = ''; // Default: Special Public Prosecutor's Name
   phoneNumber1_2nd_Accquitted: string = ''; // Default: Special Public Prosecutor's Phone Number
 
   // Select Hearing Date
-  courtdetailstwodata: any [] = [];
+  courtdetailstwodata: any[] = [];
   hearingDate1_2nd_Accquitted: string = ''; // Default: First Hearing Date
   judgementAwarded1_2nd_Accquitted: string = ''; // Default: Judgement awarded status
 
   // Judgement Details
-  hearingdetailtwodata: any [] = [];
+  hearingdetailtwodata: any[] = [];
   judgementNature_2nd_Accquitted: string = ''; // Default: Nature of Judgement
   judgementCopy1_2nd_Accquitted: string = ''; // Default: Upload Judgement Copy
 
@@ -300,7 +300,7 @@ export class FirListComponent implements OnInit {
 
   // 3rd accquitted
   // Appeal Details
-  caseappealdetailstwodata: any []=[];
+  caseappealdetailstwodata: any[] = [];
   opinionObtained_3rdAccquitted: string = ''; // Default: Has legal opinion obtained
   caseFit_3rdAccquitted: string = ''; // Default: Is the case fit for appeal
   governmentApproved_3rdAccquitted: string = ''; // Default: Has the government approved for appeal
@@ -359,9 +359,9 @@ export class FirListComponent implements OnInit {
 
 
 
-  steps = ['Location Details', 'Offence Information', 'Victim Information', 'Accused Info', 'MRF Info','ChargeSheet Stage','Trail Stage'];
+  steps = ['Location Details', 'Offence Information', 'Victim Information', 'Accused Info', 'MRF Info', 'ChargeSheet Stage', 'Trail Stage'];
   currentStep = 0;
-  step :any;
+  step: any;
   searchText: string = '';
   firList: any[] = [];
   page: number = 1;
@@ -390,7 +390,7 @@ export class FirListComponent implements OnInit {
 
 
 
- @ViewChild('firDetailsModal') firDetailsModal!: TemplateRef<any>;
+  @ViewChild('firDetailsModal') firDetailsModal!: TemplateRef<any>;
 
   // Filter options
   // districts: string[] = [
@@ -434,10 +434,10 @@ export class FirListComponent implements OnInit {
   //   'Virudhunagar'
   // ];
 
-  districts : any;
-  policeZones : any;
-  policeRanges : any;
-  revenueDistricts : any;
+  districts: any;
+  policeZones: any;
+  policeRanges: any;
+  revenueDistricts: any;
 
   naturesOfOffence: string[] = [
     'Theft',
@@ -462,7 +462,7 @@ export class FirListComponent implements OnInit {
     'Terrorism'
   ];
 
-  offenceGroupsList : string[] = [
+  offenceGroupsList: string[] = [
     "Non GCR",
     "Murder",
     "Rape",
@@ -476,11 +476,11 @@ export class FirListComponent implements OnInit {
     "Attempt Murder",
     "Rape POCSO"
   ];
-  
+
 
   statusesOfCase: string[] = ['Just Starting', 'Pending', 'Completed'];
   // statusesOfRelief: string[] = ['FIR Stage', 'ChargeSheet Stage', 'Trial Stage'];
-  statusesOfRelief: any[] = [{value : 0 , label : 'FIR Stage'}, {value : 6 , label :'ChargeSheet Stage'} , {value : 7 , label : 'Trial Stage'}];
+  statusesOfRelief: any[] = [{ value: 0, label: 'FIR Stage' }, { value: 6, label: 'ChargeSheet Stage' }, { value: 7, label: 'Trial Stage' }];
 
   // Visible Columns Management
 
@@ -524,7 +524,7 @@ export class FirListComponent implements OnInit {
   // Sorting variables
   currentSortField: string = '';
   isAscending: boolean = true;
-  RecivedFirData : any;
+  RecivedFirData: any;
 
 
   pageSizeOptions: number[] = [5, 10, 20, 50]; // Available page size options
@@ -532,7 +532,7 @@ export class FirListComponent implements OnInit {
   totalRecords: number = 0; // Total number of records
   currentPage: number = 1; // Current page
   totalPages: number = 0;
-  Parsed_UserInfo : any;
+  Parsed_UserInfo: any;
   showDuplicateSection = false;
   showDuplicateSection_1: boolean = false;
 
@@ -545,11 +545,11 @@ export class FirListComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private modalService: NgbModal,
-    private policeDivisionService :PoliceDivisionService
-  ) {}
+    private policeDivisionService: PoliceDivisionService
+  ) { }
 
   ngOnInit(): void {
-    const UserInfo : any = sessionStorage.getItem('user_data');
+    const UserInfo: any = sessionStorage.getItem('user_data');
     this.Parsed_UserInfo = JSON.parse(UserInfo)
     this.loadFirList(1, this.pageSize);
     this.updateSelectedColumns();
@@ -562,123 +562,124 @@ export class FirListComponent implements OnInit {
       this.route.queryParams.subscribe(params => {
         if (params['shouldCallFunction'] == 'true') {
           this.RecivedFirData = decodeURIComponent(params['data']);
-          if(this.RecivedFirData){
+          if (this.RecivedFirData) {
             let data = {
-              fir_id : this.RecivedFirData.replace(/"/g, '')
+              fir_id: this.RecivedFirData.replace(/"/g, '')
             }
             this.openModal(data);
           }
         }
-      });    
+      });
     }, 2000);
   }
   isPreviewVisible = false;
   showPreview() {
     this.isPreviewVisible = !this.isPreviewVisible;
-  }  
+  }
   courtDetails: any = {};
 
   generateYearOptions(): void {
-  const currentYear = new Date().getFullYear();
-  for (let year = currentYear; year >= 1980; year--) {
-    this.years.push(year);
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 1980; year--) {
+      this.years.push(year);
+    }
   }
-}
 
 
-loadFirDetails(firId: any){
+  loadFirDetails(firId: any) {
     this.firGetService.getFirDetails(firId).subscribe(
       (response) => {
-          console.log("response view",response);
-          this.policeCity = response.data.police_city;
-          this.policeZone = response.data.police_zone;
-          this.policeRange = response.data.police_range;
-          this.revenueDistrict = response.data.revenue_district;
-          this.stationName = response.data.police_station;
-          this.officerName = response.data.officer_name;
-          this.complaintReceivedType = response.data.complaintReceivedType;
-          this.complaintRegisteredBy = response.data.complaintRegisteredBy;
-          this.complaintReceiverName = response.data.complaintReceiverName;
-          this.officerDesignation=response.data.officer_designation;
-          this.officerPhone=response.data.officer_phone;
-          this.firNumber=response.data.fir_number+'/'+response.data.fir_number_suffix;
-          this.dateOfOccurrence= response.data.date_of_occurrence ? this.convertToNormalDate(response.data.date_of_occurrence) : response.data.date_of_occurrence;
-          this.date_of_occurrence_to= response.data.date_of_occurrence_to ? this.convertToNormalDate(response.data.date_of_occurrence_to) : response.data.date_of_occurrence_to;
-          this.timeOfOccurrence=response.data.time_of_occurrence;
-          this.time_of_occurrence_to=response.data.time_of_occurrence_to;
-          this.placeOfOccurrence=response.data.place_of_occurrence;
-          this.dateOfRegistration= response.data.date_of_registration ? this.convertToNormalDate(response.data.date_of_registration) : response.data.date_of_registration;
-          this.timeOfRegistration=response.data.time_of_registration;
-          this.is_case_altered=response.data.is_case_altered;
-          this.altered_date=response.data.altered_date ? this.convertToNormalDate(response.data.altered_date) : response.data.altered_date;
+        console.log("response view", response);
+        this.policeCity = response.data.police_city;
+        this.policeZone = response.data.police_zone;
+        this.policeRange = response.data.police_range;
+        this.revenueDistrict = response.data.revenue_district;
+        this.stationName = response.data.police_station;
+        this.officerName = response.data.officer_name;
+        this.complaintReceivedType = response.data.complaintReceivedType;
+        this.complaintRegisteredBy = response.data.complaintRegisteredBy;
+        this.complaintReceiverName = response.data.complaintReceiverName;
+        this.officerDesignation = response.data.officer_designation;
+        this.officerPhone = response.data.officer_phone;
+        this.firNumber = response.data.fir_number + '/' + response.data.fir_number_suffix;
+        this.dateOfOccurrence = response.data.date_of_occurrence ? this.convertToNormalDate(response.data.date_of_occurrence) : response.data.date_of_occurrence;
+        this.date_of_occurrence_to = response.data.date_of_occurrence_to ? this.convertToNormalDate(response.data.date_of_occurrence_to) : response.data.date_of_occurrence_to;
+        this.timeOfOccurrence = response.data.time_of_occurrence;
+        this.time_of_occurrence_to = response.data.time_of_occurrence_to;
+        this.placeOfOccurrence = response.data.place_of_occurrence;
+        this.dateOfRegistration = response.data.date_of_registration ? this.convertToNormalDate(response.data.date_of_registration) : response.data.date_of_registration;
+        this.timeOfRegistration = response.data.time_of_registration;
+        this.is_case_altered = response.data.is_case_altered;
+        this.altered_date = response.data.altered_date ? this.convertToNormalDate(response.data.altered_date) : response.data.altered_date;
 
-          this.nameOfComplainant=response.data.name_of_complainant;
-          this.mobileNumberOfComplainant=response.data.mobile_number_of_complainant;
-          if(response.data && response.data.is_victim_same_as_complainant){
-            if(response.data.is_victim_same_as_complainant == 'true'){
-              this.isVictimSameAsComplainant= 'Yes';
-            } else {
-              this.isVictimSameAsComplainant= 'No';
-            }
+        this.nameOfComplainant = response.data.name_of_complainant;
+        this.mobileNumberOfComplainant = response.data.mobile_number_of_complainant;
+        if (response.data && response.data.is_victim_same_as_complainant) {
+          if (response.data.is_victim_same_as_complainant == 'true') {
+            this.isVictimSameAsComplainant = 'Yes';
+          } else {
+            this.isVictimSameAsComplainant = 'No';
           }
-          this.numberOfVictims=response.data.number_of_victim;
-          this.victimsdata =response.data1;
-          this.victimsdata = this.victimsdata.map((victim) => {
+        }
+        this.numberOfVictims = response.data.number_of_victim;
+        this.victimsdata = response.data1;
+        this.victimsdata = this.victimsdata.map((victim) => {
           const age = Number(victim.victim_age);
           const name = !isNaN(age) && age < 18 ? 'Minor' : victim.victim_name;
 
-        return {
-          ...victim,
-          victim_name: name,
-          scst_sections: victim.scst_sections ? this.formatedata(victim.scst_sections) : victim.scst_sections,
-          offence_committed: victim.offence_committed ? this.formatedata(victim.offence_committed) : victim.offence_committed,
-          sectionsIPC: victim.sectionsIPC_JSON ? JSON.parse(victim.sectionsIPC_JSON) : []
-        };
+          return {
+            ...victim,
+            victim_name: name,
+            scst_sections: victim.scst_sections ? this.formatedata(victim.scst_sections) : victim.scst_sections,
+            offence_committed: victim.offence_committed ? this.formatedata(victim.offence_committed) : victim.offence_committed,
+            sectionsIPC: victim.sectionsIPC_JSON ? JSON.parse(victim.sectionsIPC_JSON) : []
+          };
 
-        
-      });
-       this.isDeceased = response.data.is_deceased == 1 ? 'Yes' : 'No';
-       this.deceasedPersonNames= response.data.deceased_person_names ? this.formatedata(response.data.deceased_person_names) : response.data.deceased_person_names;
-       this.numberOfAccused=response.data.number_of_accused;
-       this.accused_remarks=response.data.accused_remarks;
-       this.accusedsdata =response.data2;
-       this.reliefsdata = response.data;
-       this.gistOfCurrentCase =response.data.gist_of_current_case;
-       this.uploadFIRCopy=response.data.upload_fir_copy;
-       this.uploadedFIRFileNames = response.data.upload_fir_copy;
-       this.totalCompensation=response.data3.total_compensation;
-       console.log(this.totalCompensation, response.data3.total_amount_third_stage);
-       this.proceedingsFileNo=response.data3.proceedings_file_no;
-       this.proceedingsDate= response.data3.proceedings_date ? this.convertToNormalDate(response.data3.proceedings_date) : response.data3.proceedings_date;
-       this.proceedingsFile=response.data3.proceedings_file;
-       this.loadVictimsDetails();
-       this.attachments = response.data3.file_paths || [];
-       this.chargeSheetFiled=response.data4.charge_sheet_filed;
-       this.courtDistrict=response.data4.court_district;
-       this.courtName=response.data4.court_name;
-       this.caseType=response.data4.case_type;
-      // this.caseType = 'referredChargeSheet';
-       this.caseNumber=response.data4.case_number;
-       this.chargeSheetDate= response.data4.chargesheetDate ? this.convertToNormalDate(response.data4.chargesheetDate) : response.data4.chargesheetDate;
-       this.ChargeSheet_CRL_number = response.data4.ChargeSheet_CRL_number;
-       this.rcsFileNumber=response.data4.rcs_file_number;
-       this.rcsFilingDate=response.data4.rcs_filing_date  ? this.convertToNormalDate(response.data4.rcs_filing_date) : response.data4.rcs_filing_date;
-       this.mfCopy=response.data4.mf_copy_path;
-       this.proceedingsFileNo_1=response.data4.proceedings_file_no;
-       this.proceedingsDate_1 = response.data4.proceedings_date ? this.convertToNormalDate(response.data4.proceedings_date) : response.data4.proceedings_date;
-       this.proceedingFileName2 = response.data4.upload_proceedings_path;
-       this.quash_petition_no = response.data4.quash_petition_no;
-       this.petition_date = response.data4.petition_date ? this.convertToNormalDate(response.data4.petition_date) : response.data4.petition_date;
-       this.upload_court_order_path = response.data4.upload_court_order_path;
-       this.totalCompensation_1=response.data4.total_compensation_1;
-       this.chargeSheetattachments = response.data4.attachments || [];
-       
 
-       this.showDuplicateSection = false;
+        });
+        this.isDeceased = response.data.is_deceased == 1 ? 'Yes' : 'No';
+        this.deceasedPersonNames = response.data.deceased_person_names ? this.formatedata(response.data.deceased_person_names) : response.data.deceased_person_names;
+        this.numberOfAccused = response.data.number_of_accused;
+        this.accused_remarks = response.data.accused_remarks;
+        this.accusedsdata = response.data2;
+        this.reliefsdata = response.data;
+        this.gistOfCurrentCase = response.data.gist_of_current_case;
+        this.uploadFIRCopy = response.data.upload_fir_copy;
+        this.uploadedFIRFileNames = response.data.upload_fir_copy;
+        this.totalCompensation = response.data3.total_compensation;
+        console.log(this.totalCompensation, response.data3.total_amount_third_stage);
+        this.proceedingsFileNo = response.data3.proceedings_file_no;
+        this.proceedingsDate = response.data3.proceedings_date ? this.convertToNormalDate(response.data3.proceedings_date) : response.data3.proceedings_date;
+        this.proceedingsFile = response.data3.proceedings_file;
+        this.loadVictimsDetails();
+        this.attachments = response.data3.file_paths || [];
+        this.chargeSheetFiled = response.data4.charge_sheet_filed;
+        this.courtDistrict = response.data4.court_district;
+        this.courtName = response.data4.court_name;
+        this.caseType = response.data4.case_type;
+        // this.caseType = 'referredChargeSheet';
+        this.caseNumber = response.data4.case_number;
+        this.chargeSheetDate = response.data4.chargesheetDate ? this.convertToNormalDate(response.data4.chargesheetDate) : response.data4.chargesheetDate;
+        this.ChargeSheet_CRL_number = response.data4.ChargeSheet_CRL_number;
+        this.rcsFileNumber = response.data4.rcs_file_number;
+        this.rcsFilingDate = response.data4.rcs_filing_date ? this.convertToNormalDate(response.data4.rcs_filing_date) : response.data4.rcs_filing_date;
+        this.mfCopy = response.data4.mf_copy_path;
+        this.proceedingsFileNo_1 = response.data4.proceedings_file_no;
+        this.proceedingsDate_1 = response.data4.proceedings_date ? this.convertToNormalDate(response.data4.proceedings_date) : response.data4.proceedings_date;
+        this.proceedingFileName2 = response.data4.upload_proceedings_path;
+        this.quash_petition_no = response.data4.quash_petition_no;
+        this.petition_date = response.data4.petition_date ? this.convertToNormalDate(response.data4.petition_date) : response.data4.petition_date;
+        this.upload_court_order_path = response.data4.upload_court_order_path;
+        this.totalCompensation_1 = response.data4.total_compensation_1;
+        this.chargeSheetattachments = response.data4.attachments || [];
+
+
+        this.showDuplicateSection = false;
         this.showDuplicateSection_1 = false;
 
         // Assign data from response
         if (response && response.data5 && response.data5.length > 0) {
+          console.log('response.data5', response.data5);
           const item = response.data5[0];
           this.courtDistrict = item.court_district || '';
           this.Court_name1 = item.court_name || '';
@@ -695,8 +696,12 @@ loadFirDetails(firId: any){
           this.Judgement_Date = item.Judgement_Date ? formatDate(item.Judgement_Date, 'yyyy-MM-dd', 'en') : '';
           this.Conviction_Type = item.Conviction_Type || '';
           this.judgement_nature_remarks = item.judgement_nature_remarks || '';
+          this.judgementAwarded1 = item.judgementAwarded1;
+          this.judgementAwarded2 = item.judgementAwarded2;
+          this.judgementAwarded3 = item.judgementAwarded3;
 
           // Hearing Details
+          console.log('item.hearingDetails', item.hearingDetails);
           if (item.hearingDetails && Array.isArray(item.hearingDetails)) {
             this.hearingDetails = item.hearingDetails.map((hearing: any) => ({
               nextHearingDate: hearing.next_hearing_date ? formatDate(hearing.next_hearing_date, 'yyyy-MM-dd', 'en') : '',
@@ -704,6 +709,10 @@ loadFirDetails(firId: any){
             }));
           }
         }
+
+        this.hearingDetails = response.hearingDetails;
+        this.hearingDetails_one = response.hearingDetails_one;
+        this.hearingDetails_two = response.hearingDetails_two;
 
         // Appeal Details
         if (response.appeal_details && response.appeal_details.length > 0) {
@@ -810,7 +819,7 @@ loadFirDetails(firId: any){
         this.cdr.detectChanges();
 
       });
-}
+  }
 
   Court_name1: string = '';
   trialCaseNumber: string = '';
@@ -880,34 +889,34 @@ loadFirDetails(firId: any){
   hearingDetails_two: any[] = [];
 
 
- viewuploadJudgement(path:any){
+  viewuploadJudgement(path: any) {
 
   }
-  view_pdf(path:any){
-     if (path) {
-        const url = `${env.file_access}${path.startsWith('/') ? '' : '/'}${path}`;
-        window.open(url, '_blank');
-      }
+  view_pdf(path: any) {
+    if (path) {
+      const url = `${env.file_access}${path.startsWith('/') ? '' : '/'}${path}`;
+      window.open(url, '_blank');
+    }
   }
 
-getFileName(path: string): string {
-  return path.split('/').pop() || path;
-}
-
-getChargeFileName(path: string): string {
-  return path.split('/').pop() || path;
-}
-
-parseAdditionalRelief(data: string): any[] {
-  try {
-    const parsed = JSON.parse(data);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+  getFileName(path: string): string {
+    return path.split('/').pop() || path;
   }
-}
 
-loadVictimsDetails(): void {
+  getChargeFileName(path: string): string {
+    return path.split('/').pop() || path;
+  }
+
+  parseAdditionalRelief(data: string): any[] {
+    try {
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  loadVictimsDetails(): void {
     // if (!this.firId || this.firId !== sessionStorage.getItem('firId')) { 
     //   return;
     // }
@@ -916,16 +925,16 @@ loadVictimsDetails(): void {
       (response: any) => {
         // this.numberOfVictims = response.numberOfVictims || "";
         this.victimNames = response.victimNames;
-          this.victimsReliefDetails = response.victimsReliefDetails;
-          this.reliefsdata = this.victimsReliefDetails;
-          console.log("vidtim",this.victimsReliefDetails);
-          const data = response.victimsReliefDetails[0];  // get the first object from the array
+        this.victimsReliefDetails = response.victimsReliefDetails;
+        this.reliefsdata = this.victimsReliefDetails;
+        console.log("vidtim", this.victimsReliefDetails);
+        const data = response.victimsReliefDetails[0];  // get the first object from the array
 
-          this.victimName2 = data.victim_name;
-          this.reliefAmountScst1 = data.relief_amount_scst_1;
-          this.reliefAmountExGratia1 = data.relief_amount_ex_gratia_1;
-          this.totalCompensation1 = data.relief_amount_second_stage;
-          this.populateVictimsRelief(response.victimsReliefDetails)
+        this.victimName2 = data.victim_name;
+        this.reliefAmountScst1 = data.relief_amount_scst_1;
+        this.reliefAmountExGratia1 = data.relief_amount_ex_gratia_1;
+        this.totalCompensation1 = data.relief_amount_second_stage;
+        this.populateVictimsRelief(response.victimsReliefDetails)
       },
       (error) => {
         console.error('Error fetching victim details:', error);
@@ -958,8 +967,10 @@ loadVictimsDetails(): void {
   }
 
   populateVictimsRelief(victimsReliefDetails: any[]): void {
+    console.log('victimsReliefDetails', victimsReliefDetails);
     this.victimNames = [];
     this.victimsReliefs = [];
+    this.victimsRelief = [];
     let totalReliefSecondStage = 0;
 
     victimsReliefDetails.forEach((victimReliefDetail) => {
@@ -970,13 +981,19 @@ loadVictimsDetails(): void {
         (parseFloat(victimReliefDetail.relief_amount_ex_gratia_1) || 0)
       ).toFixed(2);
 
+      this.victimsRelief.push({
+        reliefAmountScst_2: victimReliefDetail.relief_amount_act || '0',
+        reliefAmountExGratia_2: victimReliefDetail.relief_amount_government || '0',
+        reliefAmountThirdStage: victimReliefDetail.relief_amount_final_stage
+      })
+
       this.victimsReliefs.push({
-        reliefAmountScst_1: victimReliefDetail.relief_amount_scst_1 || '0',
-        reliefAmountExGratia_1: victimReliefDetail.relief_amount_ex_gratia_1 || '0',
-        reliefAmountSecondStage: reliefAmountSecondStage
+        reliefAmountScst_2: victimReliefDetail.relief_amount_scst_1 || '0',
+        reliefAmountExGratia_2: victimReliefDetail.relief_amount_ex_gratia_1 || '0',
+        reliefAmountThirdStage: reliefAmountSecondStage
       });
 
-      console.log('victimsReliefs',this.victimsReliefs);
+      console.log('victimsReliefs', this.victimsReliefs);
 
       totalReliefSecondStage += parseFloat(reliefAmountSecondStage);
     });
@@ -997,7 +1014,7 @@ loadVictimsDetails(): void {
 
 
   // funtions
-  fetchFirDetails(firId:any): void {
+  fetchFirDetails(firId: any): void {
 
 
     console.log(firId)
@@ -1009,61 +1026,61 @@ loadVictimsDetails(): void {
           alert('No FIR found for the given ID');
         } else {
           console.log(data.queryResults);
-          this.victimsdata =data.queryResults1;
+          this.victimsdata = data.queryResults1;
           this.victimsdata = this.victimsdata.map((victim) => ({
             ...victim, // Keep all existing properties
-            scst_sections: victim.scst_sections ? this.formatedata(victim.scst_sections) : victim.scst_sections ,
+            scst_sections: victim.scst_sections ? this.formatedata(victim.scst_sections) : victim.scst_sections,
             offence_committed: victim.offence_committed ? this.formatedata(victim.offence_committed) : victim.offence_committed
           }));
-          this.accusedsdata =data.queryResults2;
-          this.reliefsdata =data.queryResults3;
+          this.accusedsdata = data.queryResults2;
+          this.reliefsdata = data.queryResults3;
 
 
 
 
           // step 7
-          this.casedetailsdata =data.queryResults4;
-          this.hearingdetaildata =data.queryResults6;
+          this.casedetailsdata = data.queryResults4;
+          this.hearingdetaildata = data.queryResults6;
 
-console.log(  this.hearingdetaildata,"  this.hearingdetaildata")
+          console.log(this.hearingdetaildata, "  this.hearingdetaildata")
 
-          this.Judgementdata =data.queryResults7;
+          this.Judgementdata = data.queryResults7;
           this.Judgementdata = data.queryResults7.map((judgement: any) => ({
             ...judgement,
             judgement_copy: `${this.image_access2}${judgement.judgement_copy}`
           }));
-          
-          this.hearingdetailonedata =data.queryResults11;
-console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
-          this.trialreliefdata =data.queryResults8;
+
+          this.hearingdetailonedata = data.queryResults11;
+          console.log(this.hearingdetailonedata, " this.hearingdetailonedata ")
+          this.trialreliefdata = data.queryResults8;
 
 
-          this.firtraildata =data.queryResults5;
-          this.compensation_details_2 =data.compensation_details_2;
+          this.firtraildata = data.queryResults5;
+          this.compensation_details_2 = data.compensation_details_2;
           // console.log( this.firtraildata,"firtraildata")
 
           if (data.compensation_details_2 && data.compensation_details_2.length > 0) {
             this.uploadProceedingsUrl = `${this.image_access2}${data.compensation_details_2[0].upload_proceedings}`;
           }
 
-          this.appealdata =data.queryResults9;
-          this.casedetailsonedata =data.queryResults10;
-          this.appealonedata =data.queryResults12;
-          this.casedetailstwodata =data.queryResults13;
-          this.courtdetailstwodata =data.queryResults14;
-          this.hearingdetailsdata =data.queryResults15;
-      
-            this.courtDetails =  data.courtDetails.caseCourtDetailOne;
-            console.log( this.courtDetails," this.courtDetails")
-           
-        
-          
-      
+          this.appealdata = data.queryResults9;
+          this.casedetailsonedata = data.queryResults10;
+          this.appealonedata = data.queryResults12;
+          this.casedetailstwodata = data.queryResults13;
+          this.courtdetailstwodata = data.queryResults14;
+          this.hearingdetailsdata = data.queryResults15;
 
-          this.hearingdetailtwodata =data.queryResults16;
-          this.caseappealdetailstwodata =data.queryResults17;
-          this.hearingdetailstwodata =data.queryResults18;
-          this.hearingdetailsthreedata =data.queryResults19;
+          this.courtDetails = data.courtDetails.caseCourtDetailOne;
+          console.log(this.courtDetails, " this.courtDetails")
+
+
+
+
+
+          this.hearingdetailtwodata = data.queryResults16;
+          this.caseappealdetailstwodata = data.queryResults17;
+          this.hearingdetailstwodata = data.queryResults18;
+          this.hearingdetailsthreedata = data.queryResults19;
 
 
 
@@ -1083,45 +1100,45 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
           this.complaintReceivedType = data.queryResults[0].complaintReceivedType;
           this.complaintRegisteredBy = data.queryResults[0].complaintRegisteredBy;
           this.complaintReceiverName = data.queryResults[0].complaintReceiverName;
-          this.officerDesignation=data.queryResults[0].officer_designation;
+          this.officerDesignation = data.queryResults[0].officer_designation;
           if (this.officerDesignation.startsWith("Others")) {
             const parts = this.officerDesignation.split(" - ");
             this.showOtherDesignation = true;
             this.officerDesignation = parts[0];
-            this.otherDesignationValue = parts[1] || ''; 
+            this.otherDesignationValue = parts[1] || '';
           }
-          else{
+          else {
             this.showOtherDesignation = false;
           }
-          this.officerPhone=data.queryResults[0].officer_phone;
+          this.officerPhone = data.queryResults[0].officer_phone;
 
-          this.firNumber=data.queryResults[0].fir_number+'/'+data.queryResults[0].fir_number_suffix;
-          this.dateOfOccurrence= data.queryResults[0].date_of_occurrence ? this.convertToNormalDate(data.queryResults[0].date_of_occurrence) : data.queryResults[0].date_of_occurrence;
-          this.date_of_occurrence_to= data.queryResults[0].date_of_occurrence_to ? this.convertToNormalDate(data.queryResults[0].date_of_occurrence_to) : data.queryResults[0].date_of_occurrence_to;
-          this.timeOfOccurrence=data.queryResults[0].time_of_occurrence;
-          this.time_of_occurrence_to=data.queryResults[0].time_of_occurrence_to;
-          this.placeOfOccurrence=data.queryResults[0].place_of_occurrence;
-          this.dateOfRegistration= data.queryResults[0].date_of_registration ? this.convertToNormalDate(data.queryResults[0].date_of_registration) : data.queryResults[0].date_of_registration;
-          this.timeOfRegistration=data.queryResults[0].time_of_registration;
-          this.is_case_altered=data.queryResults[0].is_case_altered;
-          this.altered_date=data.queryResults[0].altered_date ? this.convertToNormalDate(data.queryResults[0].altered_date) : data.queryResults[0].altered_date;
+          this.firNumber = data.queryResults[0].fir_number + '/' + data.queryResults[0].fir_number_suffix;
+          this.dateOfOccurrence = data.queryResults[0].date_of_occurrence ? this.convertToNormalDate(data.queryResults[0].date_of_occurrence) : data.queryResults[0].date_of_occurrence;
+          this.date_of_occurrence_to = data.queryResults[0].date_of_occurrence_to ? this.convertToNormalDate(data.queryResults[0].date_of_occurrence_to) : data.queryResults[0].date_of_occurrence_to;
+          this.timeOfOccurrence = data.queryResults[0].time_of_occurrence;
+          this.time_of_occurrence_to = data.queryResults[0].time_of_occurrence_to;
+          this.placeOfOccurrence = data.queryResults[0].place_of_occurrence;
+          this.dateOfRegistration = data.queryResults[0].date_of_registration ? this.convertToNormalDate(data.queryResults[0].date_of_registration) : data.queryResults[0].date_of_registration;
+          this.timeOfRegistration = data.queryResults[0].time_of_registration;
+          this.is_case_altered = data.queryResults[0].is_case_altered;
+          this.altered_date = data.queryResults[0].altered_date ? this.convertToNormalDate(data.queryResults[0].altered_date) : data.queryResults[0].altered_date;
 
-          this.nameOfComplainant=data.queryResults[0].name_of_complainant;
-          this.mobileNumberOfComplainant=data.queryResults[0].mobile_number_of_complainant;
-            // this.isVictimSameAsComplainant=data.queryResults[0].is_victim_same_as_complainant;
-            if(data && data.queryResults[0] && data.queryResults[0].is_victim_same_as_complainant){
-            if(data.queryResults[0].is_victim_same_as_complainant == 'true'){
-              this.isVictimSameAsComplainant= 'Yes';
+          this.nameOfComplainant = data.queryResults[0].name_of_complainant;
+          this.mobileNumberOfComplainant = data.queryResults[0].mobile_number_of_complainant;
+          // this.isVictimSameAsComplainant=data.queryResults[0].is_victim_same_as_complainant;
+          if (data && data.queryResults[0] && data.queryResults[0].is_victim_same_as_complainant) {
+            if (data.queryResults[0].is_victim_same_as_complainant == 'true') {
+              this.isVictimSameAsComplainant = 'Yes';
             } else {
-              this.isVictimSameAsComplainant= 'No';
+              this.isVictimSameAsComplainant = 'No';
             }
           }
-          this.numberOfVictims=data.queryResults[0].number_of_victim || "";
+          this.numberOfVictims = data.queryResults[0].number_of_victim || "";
 
 
-          this.judgementBeenAwardednxt=data.queryResults[0].judgement_awarded;
-          this.judgementBeenAwardednxt1=data.queryResults[0].judgement_awarded;
-          this.judgementBeenAwardednxt2=data.queryResults[0].judgement_awarded;
+          this.judgementBeenAwardednxt = data.queryResults[0].judgement_awarded;
+          this.judgementBeenAwardednxt1 = data.queryResults[0].judgement_awarded;
+          this.judgementBeenAwardednxt2 = data.queryResults[0].judgement_awarded;
 
           // this.victimAge=data.queryResults1[0].victim_age;
           // this.victimName=data.queryResults1[0].victim_name;
@@ -1133,7 +1150,7 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
           // this.victimCaste=data.queryResults1[0].caste;
           // this.victimGuardian=data.queryResults1[0].guardian_name;
           // this.isNativeDistrictSame=data.queryResults1[0].is_native_district_same;
-          this.nativeDistrict=data.queryResults1[0].native_district;
+          this.nativeDistrict = data.queryResults1[0].native_district;
           // this.victimOffence=data.queryResults1[0].offence_committed;
           // this.invokedAct=data.queryResults1[0].scst_sections;
           // this.sectionsIPC=data.queryResults1[0].sectionsIPC;
@@ -1143,14 +1160,14 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
           } catch (error) {
             console.error("Error parsing sectionsIPC_JSON:", error);
           }
-          console.log("section",data.queryResults1[0].sectionsIPC_JSON);
-          
+          console.log("section", data.queryResults1[0].sectionsIPC_JSON);
+
           // this.isDeceased=data.queryResults[0].is_deceased;
           this.isDeceased = data.queryResults[0].is_deceased == 1 ? 'Yes' : 'No';
-          this.deceasedPersonNames= data.queryResults[0].deceased_person_names ? this.formatedata(data.queryResults[0].deceased_person_names) : data.queryResults[0].deceased_person_names;
+          this.deceasedPersonNames = data.queryResults[0].deceased_person_names ? this.formatedata(data.queryResults[0].deceased_person_names) : data.queryResults[0].deceased_person_names;
 
-          this.numberOfAccused=data.queryResults[0].number_of_accused;
-          this.accused_remarks=data.queryResults[0].accused_remarks;
+          this.numberOfAccused = data.queryResults[0].number_of_accused;
+          this.accused_remarks = data.queryResults[0].accused_remarks;
           // this.accusedAge=data.queryResults2[0].age;
           // this.accusedName=data.queryResults2[0].name;
           // this.accusedGender=data.queryResults2[0].gender;
@@ -1172,9 +1189,9 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
           // this.gistOfCurrentCase=data.queryResults2[0].gist_of_current_case;
 
           // need to check
-          console.log(data.queryResults[0], "case",data.firDetails);
+          console.log(data.queryResults[0], "case", data.firDetails);
           this.gistOfCurrentCase = data.queryResults[0].gist_of_current_case;
-          this.uploadFIRCopy=data.queryResults[0].upload_fir_copy;
+          this.uploadFIRCopy = data.queryResults[0].upload_fir_copy;
           this.uploadedFIRFileNames = data.queryResults[0].upload_fir_copy;
 
 
@@ -1184,11 +1201,11 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
           // this.reliefAmountExGratia=data.queryResults3[0].relief_amount_exgratia;
           // this.reliefAmountFirstStage=data.queryResults3[0].relief_amount_first_stage;
           // this.additionalRelief=data.queryResults[0].additional_relief;
-          this.totalCompensation=data.queryResults[0].total_amount_third_stage;
-          this.proceedingsFileNo=data.queryResults[0].proceedings_file_no;
-          this.proceedingsDate= data.queryResults[0].proceedings_date ? this.convertToNormalDate(data.queryResults[0].proceedings_date) : data.queryResults[0].proceedings_date;
+          this.totalCompensation = data.queryResults[0].total_amount_third_stage;
+          this.proceedingsFileNo = data.queryResults[0].proceedings_file_no;
+          this.proceedingsDate = data.queryResults[0].proceedings_date ? this.convertToNormalDate(data.queryResults[0].proceedings_date) : data.queryResults[0].proceedings_date;
           //need to check
-          this.proceedingsFile=data.queryResults[0].Commissionerate_file;
+          this.proceedingsFile = data.queryResults[0].Commissionerate_file;
           // this.attachments=data.queryResults[0].file_path;
 
           // this.attachments = data.queryResults.map((item: any) => {
@@ -1202,34 +1219,34 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
               return '';  // Return an empty string or handle it as needed
             }
           });
-          
 
 
 
-          this.chargeSheetFiled=data.queryResults[0].charge_sheet_filed;
-          this.courtDistrict=data.queryResults[0].court_district;
-          this.courtName=data.queryResults[0].court_name;
-          this.caseType=data.queryResults[0].case_type;
-          this.caseNumber=data.queryResults[0].case_number;
-          this.chargeSheetDate=data.queryResults[0].chargesheetDate;
+
+          this.chargeSheetFiled = data.queryResults[0].charge_sheet_filed;
+          this.courtDistrict = data.queryResults[0].court_district;
+          this.courtName = data.queryResults[0].court_name;
+          this.caseType = data.queryResults[0].case_type;
+          this.caseNumber = data.queryResults[0].case_number;
+          this.chargeSheetDate = data.queryResults[0].chargesheetDate;
           console.log(data.queryResults[0].chargeSheetDate);
           // this.chargeSheetDate= data.queryResults[0].chargeSheetDate ? this.convertToNormalDate(data.queryResults[0].chargeSheetDate) : data.queryResults[0].chargeSheetDate;
 
-          this.rcsFileNumber=data.queryResults[0].rcs_file_number;
-          this.rcsFilingDate=data.queryResults[0].rcs_filing_date;
-          this.mfCopy=data.queryResults[0].mf_copy_path;
+          this.rcsFileNumber = data.queryResults[0].rcs_file_number;
+          this.rcsFilingDate = data.queryResults[0].rcs_filing_date;
+          this.mfCopy = data.queryResults[0].mf_copy_path;
 
           // 71  need to check
-          this.victimName2=data.queryResults[0].victim_name;
-          this.reliefAmountScst1=data.queryResults[0].relief_amount_scst_1;
-          this.reliefAmountExGratia1=data.queryResults[0].relief_amount_ex_gratia_1;
-          this.totalCompensation1=data.queryResults[0].relief_amount_second_stage;
+          this.victimName2 = data.queryResults[0].victim_name;
+          this.reliefAmountScst1 = data.queryResults[0].relief_amount_scst_1;
+          this.reliefAmountExGratia1 = data.queryResults[0].relief_amount_ex_gratia_1;
+          this.totalCompensation1 = data.queryResults[0].relief_amount_second_stage;
 
-          this.totalCompensation2=data.queryResults[0].total_compensation_1;
-          this.proceedingsFileNo1=data.queryResults[0].proceedings_file_no;
+          this.totalCompensation2 = data.queryResults[0].total_compensation_1;
+          this.proceedingsFileNo1 = data.queryResults[0].proceedings_file_no;
           // this.proceedingsDate1=data.queryResults[0].proceedings_date;
-          this.proceedingsDate1= data.queryResults[0].proceedings_date ? this.convertToNormalDate(data.queryResults[0].proceedings_date) : data.queryResults[0].proceedings_date;
-          this.uploadProceedings=data.queryResults[0].upload_proceedings_path;
+          this.proceedingsDate1 = data.queryResults[0].proceedings_date ? this.convertToNormalDate(data.queryResults[0].proceedings_date) : data.queryResults[0].proceedings_date;
+          this.uploadProceedings = data.queryResults[0].upload_proceedings_path;
           // need to know 79
           // this.attachments1=data.queryResults[0].victim_name;
 
@@ -1298,52 +1315,52 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
           // this.filedAppeal1=data.[0].specialCourtName;
 
 
-           console.log('FIR details:', data);
+          console.log('FIR details:', data);
         }
       }
     );
   }
 
 
-viewFIRCopy(): void {
-  const path = this.uploadFIRCopy;
-  if (path) {
-    const url = `${env.file_access}${path}`;
-    window.open(url, '_blank');
+  viewFIRCopy(): void {
+    const path = this.uploadFIRCopy;
+    if (path) {
+      const url = `${env.file_access}${path}`;
+      window.open(url, '_blank');
+    }
   }
-}
 
-viewmfCopy(){
-  const path = this.mfCopy;
-  if (path) {
-    const url = `${env.file_access}${path}`;
-    window.open(url, '_blank');
+  viewmfCopy() {
+    const path = this.mfCopy;
+    if (path) {
+      const url = `${env.file_access}${path}`;
+      window.open(url, '_blank');
+    }
   }
-}
 
-viewProceedingsCopy2(){
-  const path = this.proceedingFileName2;
-  if (path) {
-    const url = `${env.file_access}${path}`;
-    window.open(url, '_blank');
+  viewProceedingsCopy2() {
+    const path = this.proceedingFileName2;
+    if (path) {
+      const url = `${env.file_access}${path}`;
+      window.open(url, '_blank');
+    }
   }
-}
 
-viewProceedingFileName(): void {
-  const path = this.proceedingsFile;
-  if (path) {
-    const url = `${env.file_access}${path}`;
-    window.open(url, '_blank');
+  viewProceedingFileName(): void {
+    const path = this.proceedingsFile;
+    if (path) {
+      const url = `${env.file_access}${path}`;
+      window.open(url, '_blank');
+    }
   }
-}
 
-view_upload_court_order() : void {
-  const path = this.upload_court_order_path;
-  if (path) {
-    const url = `${env.file_access}${path}`;
-    window.open(url, '_blank');
+  view_upload_court_order(): void {
+    const path = this.upload_court_order_path;
+    if (path) {
+      const url = `${env.file_access}${path}`;
+      window.open(url, '_blank');
+    }
   }
-}
 
   updateSelectedColumns() {
     this.selectedColumns = this.displayedColumns.filter((col) => col.visible);
@@ -1383,7 +1400,7 @@ view_upload_court_order() : void {
   openModal(data: any): void {
 
 
-    this.firId = data.fir_id; 
+    this.firId = data.fir_id;
 
     // alert(this.firId)
     this.currentStep = 0; // Reset to the first step
@@ -1394,97 +1411,97 @@ view_upload_court_order() : void {
 
 
   // Load FIR list from the backend
-//   loadFirList() {
-//     this.isLoading = true;
-//     this.firService.getFirList().subscribe(
-//       (data: any[]) => {
-//         this.firList = data;
+  //   loadFirList() {
+  //     this.isLoading = true;
+  //     this.firService.getFirList().subscribe(
+  //       (data: any[]) => {
+  //         this.firList = data;
 
-// console.log(this.firList,"loadfirst")
+  // console.log(this.firList,"loadfirst")
 
-//         this.filteredList = [...this.firList];
-//         this.isLoading = false;
-//         this.cdr.detectChanges();
-//       },
-//       (error) => {
-//         this.isLoading = false;
-//         Swal.fire('Error', 'Failed to load FIR data', 'error');
-//       }
-//     );
-//   }
-
-
-
-// loadFirList(page: number = 1) {
-//   this.isLoading = true;
-//   this.currentPage = page;
-  
-//   this.firService.getPaginatedFirList(page, this.pageSize,'','').subscribe(
-//     (response: any) => {
-//       this.firList = response.data;
-//       this.totalRecords = response.total;
-//       this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
-//       this.filteredList = [...this.firList];
-//       this.isLoading = false;
-//       this.cdr.detectChanges();
-//     },
-//     (error : any) => {
-//       this.isLoading = false;
-//       Swal.fire('Error', 'Failed to load FIR data', 'error');
-//     }
-//   );
-// }
+  //         this.filteredList = [...this.firList];
+  //         this.isLoading = false;
+  //         this.cdr.detectChanges();
+  //       },
+  //       (error) => {
+  //         this.isLoading = false;
+  //         Swal.fire('Error', 'Failed to load FIR data', 'error');
+  //       }
+  //     );
+  //   }
 
 
-loadFirList(page: number = 1, pageSize: number = this.pageSize) {
-  this.isLoading = true;
-  this.currentPage = page;
-  this.pageSize = pageSize;
-  
-  this.firService.getPaginatedFirList(page, pageSize, this.getFilterParams()).subscribe(
-    (response: any) => {
-      this.firList = response.data;
-      this.totalRecords = response.total;
-      this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
-      this.filteredList = [...this.firList];
-      // this.policeRanges = response.data.map((item: any) => item.police_range);
-      // this.policeRanges = [...new Set(this.policeRanges)];
-      // this.revenueDistricts = response.data.map((item: any) => item.revenue_district_name);
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    },
-    (error) => {
-      this.isLoading = false;
-      Swal.fire('Error', 'Failed to load FIR data', 'error');
-    }
-  );
-}
 
-loadPoliceRanges(){
-  this.firService.getPoliceRanges().subscribe(
-    (response: any) => {
-      this.policeRanges = response;
-    },
-    (error : any) => {
-      console.error('Error', 'Failed to load FIR data', 'error',error);
-    }
-  );
-}
+  // loadFirList(page: number = 1) {
+  //   this.isLoading = true;
+  //   this.currentPage = page;
+
+  //   this.firService.getPaginatedFirList(page, this.pageSize,'','').subscribe(
+  //     (response: any) => {
+  //       this.firList = response.data;
+  //       this.totalRecords = response.total;
+  //       this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
+  //       this.filteredList = [...this.firList];
+  //       this.isLoading = false;
+  //       this.cdr.detectChanges();
+  //     },
+  //     (error : any) => {
+  //       this.isLoading = false;
+  //       Swal.fire('Error', 'Failed to load FIR data', 'error');
+  //     }
+  //   );
+  // }
 
 
-loadRevenue_district(){
-  this.firService.getRevenue_district().subscribe(
-    (response: any) => {
-      this.revenueDistricts = response;
-    },
-    (error : any) => {
-      console.error('Error', 'Failed to load FIR data', 'error',error);
-    }
-  );
-}
+  loadFirList(page: number = 1, pageSize: number = this.pageSize) {
+    this.isLoading = true;
+    this.currentPage = page;
+    this.pageSize = pageSize;
+
+    this.firService.getPaginatedFirList(page, pageSize, this.getFilterParams()).subscribe(
+      (response: any) => {
+        this.firList = response.data;
+        this.totalRecords = response.total;
+        this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
+        this.filteredList = [...this.firList];
+        // this.policeRanges = response.data.map((item: any) => item.police_range);
+        // this.policeRanges = [...new Set(this.policeRanges)];
+        // this.revenueDistricts = response.data.map((item: any) => item.revenue_district_name);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      (error) => {
+        this.isLoading = false;
+        Swal.fire('Error', 'Failed to load FIR data', 'error');
+      }
+    );
+  }
+
+  loadPoliceRanges() {
+    this.firService.getPoliceRanges().subscribe(
+      (response: any) => {
+        this.policeRanges = response;
+      },
+      (error: any) => {
+        console.error('Error', 'Failed to load FIR data', 'error', error);
+      }
+    );
+  }
 
 
-loadPoliceDivision() {
+  loadRevenue_district() {
+    this.firService.getRevenue_district().subscribe(
+      (response: any) => {
+        this.revenueDistricts = response;
+      },
+      (error: any) => {
+        console.error('Error', 'Failed to load FIR data', 'error', error);
+      }
+    );
+  }
+
+
+  loadPoliceDivision() {
     this.policeDivisionService.getAllPoliceDivisions().subscribe(
       (data: any) => {
 
@@ -1499,150 +1516,150 @@ loadPoliceDivision() {
   }
 
 
-// Change page size
-changePageSize(newSize: number) {
-  this.pageSize = newSize;
-  this.loadFirList(1, newSize); // Reset to first page with new size
-}
-
-// Navigation methods
-goToFirstPage() {
-  if (this.currentPage !== 1) {
-    this.loadFirList(1);
+  // Change page size
+  changePageSize(newSize: number) {
+    this.pageSize = newSize;
+    this.loadFirList(1, newSize); // Reset to first page with new size
   }
-}
 
-goToLastPage() {
-  if (this.currentPage !== this.totalPages) {
-    this.loadFirList(this.totalPages);
-  }
-}
-
-previousPage() {
-  if (this.currentPage > 1) {
-    this.loadFirList(this.currentPage - 1);
-  }
-}
-
-nextPage() {
-  if (this.currentPage < this.totalPages) {
-    this.loadFirList(this.currentPage + 1);
-  }
-}
-
-goToPage(pageNum: number) {
-  if (pageNum >= 1 && pageNum <= this.totalPages) {
-    this.loadFirList(pageNum);
-  }
-}
-
-// Generate visible page numbers for pagination (with ellipsis for many pages)
-getVisiblePageNumbers(): (number | string)[] {
-  const visiblePages: (number | string)[] = [];
-  const totalPages = this.totalPages;
-  
-  if (totalPages <= 10) {
-    // If we have 10 or fewer pages, show all of them
-    for (let i = 1; i <= totalPages; i++) {
-      visiblePages.push(i);
+  // Navigation methods
+  goToFirstPage() {
+    if (this.currentPage !== 1) {
+      this.loadFirList(1);
     }
-  } else {
-    // Always show first page
-    visiblePages.push(1);
-    
-    // Calculate range of pages to show around current page
-    let startPage = Math.max(2, this.currentPage - 2);
-    let endPage = Math.min(this.totalPages - 1, this.currentPage + 2);
-    
-    // Add ellipsis if needed before the range
-    if (startPage > 2) {
-      visiblePages.push('...');
+  }
+
+  goToLastPage() {
+    if (this.currentPage !== this.totalPages) {
+      this.loadFirList(this.totalPages);
     }
-    
-    // Add the range of pages
-    for (let i = startPage; i <= endPage; i++) {
-      visiblePages.push(i);
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.loadFirList(this.currentPage - 1);
     }
-    
-    // Add ellipsis if needed after the range
-    if (endPage < this.totalPages - 1) {
-      visiblePages.push('...');
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.loadFirList(this.currentPage + 1);
     }
-    
-    // Always show last page
-    visiblePages.push(this.totalPages);
-  }
-  
-  return visiblePages;
-}
-
-
-getFilterParams() {
-  const params: any = {};
-  
-  if (this.searchText) {
-    params.search = this.searchText;
-  }
-  
-  if (this.selectedDistrict) {
-    params.district = this.selectedDistrict;
   }
 
-  if (this.selectedPoliceZone) {
-    params.police_zone = this.selectedPoliceZone;
+  goToPage(pageNum: number) {
+    if (pageNum >= 1 && pageNum <= this.totalPages) {
+      this.loadFirList(pageNum);
+    }
   }
 
-  if (this.selectedPoliceRange) {
-    params.police_range = this.selectedPoliceRange;
-  }
+  // Generate visible page numbers for pagination (with ellipsis for many pages)
+  getVisiblePageNumbers(): (number | string)[] {
+    const visiblePages: (number | string)[] = [];
+    const totalPages = this.totalPages;
 
-  if (this.selectedRevenue_district) {
-    params.revenue_district = this.selectedRevenue_district;
-  }
+    if (totalPages <= 10) {
+      // If we have 10 or fewer pages, show all of them
+      for (let i = 1; i <= totalPages; i++) {
+        visiblePages.push(i);
+      }
+    } else {
+      // Always show first page
+      visiblePages.push(1);
 
-  if (this.selectedComplaintReceivedType) {
-    params.complaintReceivedType = this.selectedComplaintReceivedType;
-  }
+      // Calculate range of pages to show around current page
+      let startPage = Math.max(2, this.currentPage - 2);
+      let endPage = Math.min(this.totalPages - 1, this.currentPage + 2);
 
-  if (this.startDate) {
-    params.start_date = this.startDate;
-  }
+      // Add ellipsis if needed before the range
+      if (startPage > 2) {
+        visiblePages.push('...');
+      }
 
-  if (this.endDate) {
-    params.end_date = this.endDate;
-  }
+      // Add the range of pages
+      for (let i = startPage; i <= endPage; i++) {
+        visiblePages.push(i);
+      }
 
-  if (this.selectedUIPT) {
-    params.UIPT = this.selectedUIPT;
-  }
-  
-  if (this.selectedStatusOfRelief) {
-    params.status = this.selectedStatusOfRelief;
-  }
+      // Add ellipsis if needed after the range
+      if (endPage < this.totalPages - 1) {
+        visiblePages.push('...');
+      }
 
-  if (this.selectedOffenceGroup) {
-    params.Offence_group = this.selectedOffenceGroup;
-  }
+      // Always show last page
+      visiblePages.push(this.totalPages);
+    }
 
-  if (this.RegistredYear) {
-    params.year = this.RegistredYear;
-  }
-
-  if(this.Parsed_UserInfo.role == '3'){
-    params.district = this.Parsed_UserInfo.police_city
-  } 
-  else {
-    if(this.Parsed_UserInfo.access_type == 'District'){
-    params.revenue_district = this.Parsed_UserInfo.district;
-    } 
+    return visiblePages;
   }
 
 
-  
-  // Add other filters as needed
-  
-  return params;
-}
+  getFilterParams() {
+    const params: any = {};
+
+    if (this.searchText) {
+      params.search = this.searchText;
+    }
+
+    if (this.selectedDistrict) {
+      params.district = this.selectedDistrict;
+    }
+
+    if (this.selectedPoliceZone) {
+      params.police_zone = this.selectedPoliceZone;
+    }
+
+    if (this.selectedPoliceRange) {
+      params.police_range = this.selectedPoliceRange;
+    }
+
+    if (this.selectedRevenue_district) {
+      params.revenue_district = this.selectedRevenue_district;
+    }
+
+    if (this.selectedComplaintReceivedType) {
+      params.complaintReceivedType = this.selectedComplaintReceivedType;
+    }
+
+    if (this.startDate) {
+      params.start_date = this.startDate;
+    }
+
+    if (this.endDate) {
+      params.end_date = this.endDate;
+    }
+
+    if (this.selectedUIPT) {
+      params.UIPT = this.selectedUIPT;
+    }
+
+    if (this.selectedStatusOfRelief) {
+      params.status = this.selectedStatusOfRelief;
+    }
+
+    if (this.selectedOffenceGroup) {
+      params.Offence_group = this.selectedOffenceGroup;
+    }
+
+    if (this.RegistredYear) {
+      params.year = this.RegistredYear;
+    }
+
+    if (this.Parsed_UserInfo.role == '3') {
+      params.district = this.Parsed_UserInfo.police_city
+    }
+    else {
+      if (this.Parsed_UserInfo.access_type == 'District') {
+        params.revenue_district = this.Parsed_UserInfo.district;
+      }
+    }
+
+
+
+    // Add other filters as needed
+
+    return params;
+  }
 
   // Apply filters to the FIR list
   // applyFilters() {
@@ -1680,8 +1697,8 @@ getFilterParams() {
     //   ? (this.selectedStatusOfRelief == 0 ? fir.status >= 0 && fir.status <= 5 : fir.status == this.selectedStatusOfRelief)
     //   : true;
 
-    
-    
+
+
     //   return (
     //     matchesSearch &&
     //     matchesDistrict &&
@@ -1693,7 +1710,7 @@ getFilterParams() {
     return this.firList;
   }
 
-  clearfilter(){
+  clearfilter() {
     this.searchText = '';
     this.selectedDistrict = '';
     this.selectedPoliceZone = '';
@@ -1775,24 +1792,24 @@ getFilterParams() {
   }
 
   // Get CSS class for status badge
-// Get CSS class for status badge
-getStatusBadgeClass(status: number): string {
-  const badgeClassMap = {
-    0: 'badge bg-info text-white',
-    1: 'badge bg-warning text-dark',
-    2: 'badge bg-warning text-dark',
-    3: 'badge bg-warning text-dark',
-    4: 'badge bg-success text-white',
-    5: 'badge bg-success text-white',
-    6: 'badge bg-success text-white',
-    7: 'badge bg-success text-white',
-    8: 'badge bg-danger text-white',
-    9: 'badge bg-danger text-white',
-    10: 'badge bg-danger text-white', // Add this entry for status 12
-  } as { [key: number]: string };
+  // Get CSS class for status badge
+  getStatusBadgeClass(status: number): string {
+    const badgeClassMap = {
+      0: 'badge bg-info text-white',
+      1: 'badge bg-warning text-dark',
+      2: 'badge bg-warning text-dark',
+      3: 'badge bg-warning text-dark',
+      4: 'badge bg-success text-white',
+      5: 'badge bg-success text-white',
+      6: 'badge bg-success text-white',
+      7: 'badge bg-success text-white',
+      8: 'badge bg-danger text-white',
+      9: 'badge bg-danger text-white',
+      10: 'badge bg-danger text-white', // Add this entry for status 12
+    } as { [key: number]: string };
 
-  return badgeClassMap[status] || 'badge bg-secondary text-white';
-}
+    return badgeClassMap[status] || 'badge bg-secondary text-white';
+  }
 
 
   // Paginated FIR list
@@ -1864,9 +1881,9 @@ getStatusBadgeClass(status: number): string {
   //   this.router.navigate(['/widgets-examples/fir-view'], { queryParams: { fir_id: firId } });
   // }
 
-  openEditPage(firId: number,step:number) {
-    this.router.navigate(['/fir-edit-module'], { queryParams: { fir_id: firId,step:step+1 } });
-    console.log(step,"step");
+  openEditPage(firId: number, step: number) {
+    this.router.navigate(['/fir-edit-module'], { queryParams: { fir_id: firId, step: step + 1 } });
+    console.log(step, "step");
   }
 
   navigateToMistakeOfFact(firId: number) {
@@ -1880,25 +1897,25 @@ getStatusBadgeClass(status: number): string {
   // totalPagesArray(): number[] {
   //   const totalPages = Math.ceil(this.filteredFirList().length / this.itemsPerPage);
   //   const pageNumbers = [];
-  
+
   //   // Define how many pages to show before and after the current page
   //   const delta = 2; // Number of pages to show before and after the current page
-  
+
   //   // Calculate start and end page numbers
   //   let startPage = Math.max(1, this.page - delta);
   //   let endPage = Math.min(this.totalPages, this.page + delta);
-  
+
   //   // Adjust start and end if there are not enough pages before or after
   //   if (this.page <= delta) {
   //     endPage = Math.min(this.totalPages, startPage + delta * 2);
   //   } else if (this.page + delta >= this.totalPages) {
   //     startPage = Math.max(1, endPage - delta * 2);
   //   }
-  
+
   //   for (let i = startPage; i <= endPage; i++) {
   //     pageNumbers.push(i);
   //   }
-  
+
   //   return pageNumbers;
   // }
 
@@ -1906,25 +1923,25 @@ getStatusBadgeClass(status: number): string {
     // Use total pages from server-side pagination
     const totalPages = this.totalPages;
     const pageNumbers: number[] = [];
-  
+
     // Define how many pages to show before and after the current page
     const delta = 2; // Number of pages to show before and after the current page
-  
+
     // Calculate start and end page numbers
     let startPage = Math.max(1, this.currentPage - delta);
     let endPage = Math.min(totalPages, this.currentPage + delta);
-  
+
     // Adjust start and end if there are not enough pages before or after
     if (this.currentPage <= delta) {
       endPage = Math.min(totalPages, startPage + delta * 2);
     } else if (this.currentPage + delta >= totalPages) {
       startPage = Math.max(1, endPage - delta * 2);
     }
-  
+
     for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(i);
     }
-  
+
     return pageNumbers;
   }
 
@@ -1935,12 +1952,12 @@ getStatusBadgeClass(status: number): string {
 
   convertToNormalDate(isoDate: string): string {
     if (!isoDate) return '';
-  
+
     const date = new Date(isoDate);
     const day = date.getDate().toString().padStart(2, '0'); // Ensure two digits
     const month = date.toLocaleString('en-US', { month: 'short' }); // Get short month (Jan, Feb, etc.)
     const year = date.getFullYear();
-  
+
     return `${day}-${month}-${year}`; // Format as DD-MMM-YYYY
   }
 
@@ -1948,7 +1965,7 @@ getStatusBadgeClass(status: number): string {
   //   if(value == '[]'){
   //     return ''
   //   }
-    
+
   //   var data2 = JSON.parse(value)
   //   var data3 = data2.join(',')
   //   return data3;
@@ -1959,9 +1976,9 @@ getStatusBadgeClass(status: number): string {
     if (value === '[]' || !value) {
       return '';
     }
-  
+
     let data2;
-    
+
     // Try parsing the JSON value safely
     try {
       data2 = JSON.parse(value);
@@ -1969,7 +1986,7 @@ getStatusBadgeClass(status: number): string {
       console.error('Invalid JSON format:', error);
       return '';
     }
-  
+
     // Check if the parsed data is actually an array
     if (Array.isArray(data2)) {
       return data2.join(',');
@@ -1981,9 +1998,9 @@ getStatusBadgeClass(status: number): string {
       return String(data2);
     }
   }
-  
 
-  GotoRelief(){
+
+  GotoRelief() {
     this.router.navigate(['/widgets-examples/relief-list'], {
       queryParams: { shouldCallFunction: 'true', data: encodeURIComponent(JSON.stringify(this.RecivedFirData)) }
     }).catch(err => {
