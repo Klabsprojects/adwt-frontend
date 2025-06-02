@@ -1181,29 +1181,29 @@
         </div>
 
         <!-- Victim Relief Details -->
-        <div class="card border-primary mb-4">
+        <!-- <div class="card border-primary mb-4">
           <div class="card-body">
             <h5>Victim Relief Details</h5>
             <div class="row mb-3">
-              <!-- Name of the Victim -->
+              
               <div class="col-md-6">
                 <label for="victimName2" class="form-label">71. Name of the Victim *</label>
                 <input readonly type="text" name="victimName2" id="victimName2" class="form-control"
                   [value]="victimName2" />
               </div>
-              <!-- Relief Amount (SC/ST Act) -->
+              
               <div class="col-md-6">
                 <label for="reliefAmountScst1" class="form-label">72. Relief Amount (SC/ST Act)</label>
                 <input readonly type="text" name="reliefAmountScst1" id="reliefAmountScst1" class="form-control"
                   [value]="reliefAmountScst1" />
               </div>
-              <!-- Relief Amount (Ex-Gratia) -->
+              
               <div class="col-md-6">
                 <label for="reliefAmountExGratia1" class="form-label">73. Relief Amount (Ex-Gratia)</label>
                 <input readonly type="text" name="reliefAmountExGratia1" id="reliefAmountExGratia1" class="form-control"
                   [value]="reliefAmountExGratia1" />
               </div>
-              <!-- Total Eligible Amount for the Second Stage of Relief -->
+              
               <div class="col-md-6">
                 <label for="totalCompensation1" class="form-label">74. Total eligible amount for the victim for the
                   second stage of relief *</label>
@@ -1213,6 +1213,49 @@
             </div>
           </div>
 
+        </div> -->
+        <div class="card border-primary mb-4">
+          <div class="card-body">
+            <h4 class="mb-4">Victim Relief Details</h4>
+            <div *ngFor="let victimRelief of victimsReliefs; let i = index"
+              class="border border-primary rounded p-3 mb-4">
+              <h5 class="text-primary">Victim #{{ i + 1 }} Relief Details</h5>
+              <div class="mb-4 col-lg-4">
+                <label class="form-label">71. Name of the Victim</label>
+                <input type="text" class="form-control mb-3" readonly [value]="victimNames[i] || ''" />
+              </div>
+              <div class="row mb-3">
+                <div class="col-8">
+                  <label class="form-label">72. Eligible second stage relief amount for the victim as per the SC and ST
+                    Prevention of Atrocities Act (amended upto 2016)</label>
+                </div>
+                <div class="col-4">
+                  <input type="text" class="form-control text-end" readonly
+                    [value]="victimRelief.reliefAmountScst_1 || ''" />
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-8">
+                  <label class="form-label">73. Eligible second stage relief amount for the victim (ex-gratia) by the
+                    Govt. of Tamil Nadu</label>
+                </div>
+                <div class="col-4">
+                  <input type="text" class="form-control text-end" readonly
+                    [value]="victimRelief.reliefAmountExGratia_1 || ''" />
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-8">
+                  <label class="form-label">74. Total eligible amount for the victim for the second stage of
+                    relief</label>
+                </div>
+                <div class="col-4">
+                  <input type="text" class="form-control text-end" readonly
+                    [value]="victimRelief.reliefAmountSecondStage || ''" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Compensation and Attachments -->
@@ -1760,8 +1803,8 @@
                   {{attachment.fileName_2}}
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
-                    <button class="btn btn-primary btn-sm me-2" (click)="view_pdf(attachment.fileName_2)">View</button>
-                  </div>
+                  <button class="btn btn-primary btn-sm me-2" (click)="view_pdf(attachment.fileName_2)">View</button>
+                </div>
               </div>
             </div>
           </div>

@@ -914,7 +914,7 @@ loadVictimsDetails(): void {
 
     this.firGetService.getVictimsReliefDetails(this.firId).subscribe(
       (response: any) => {
-        this.numberOfVictims = response.numberOfVictims;
+        this.numberOfVictims = response.numberOfVictims || "";
         this.victimNames = response.victimNames;
           this.victimsReliefDetails = response.victimsReliefDetails;
           this.reliefsdata = this.victimsReliefDetails;
@@ -925,12 +925,63 @@ loadVictimsDetails(): void {
           this.reliefAmountScst1 = data.relief_amount_scst_1;
           this.reliefAmountExGratia1 = data.relief_amount_ex_gratia_1;
           this.totalCompensation1 = data.relief_amount_second_stage;
+          this.populateVictimsRelief(response.victimsReliefDetails)
       },
       (error) => {
         console.error('Error fetching victim details:', error);
         Swal.fire('Error', 'Failed to load victim details', 'error');
       }
     );
+  }
+
+  victimsReliefs: any[] = [];
+
+  loadVictimsReliefDetails(): void {
+    if (!this.firId) {
+      console.error('FIR ID is missing.');
+      return;
+    }
+
+    this.firGetService.getVictimsReliefDetails(this.firId).subscribe(
+      (response: any) => {
+        if (response && response.victimsReliefDetails) {
+          this.populateVictimsRelief(response.victimsReliefDetails);
+        } else {
+          console.warn('No victim relief details found.');
+        }
+        this.cdr.detectChanges();
+      },
+      (error: any) => {
+        console.error('Failed to fetch victim relief details:', error);
+      }
+    );
+  }
+
+  populateVictimsRelief(victimsReliefDetails: any[]): void {
+    this.victimNames = [];
+    this.victimsReliefs = [];
+    let totalReliefSecondStage = 0;
+
+    victimsReliefDetails.forEach((victimReliefDetail) => {
+      this.victimNames.push(victimReliefDetail.victim_name || '');
+
+      const reliefAmountSecondStage = (
+        (parseFloat(victimReliefDetail.relief_amount_scst_1) || 0) +
+        (parseFloat(victimReliefDetail.relief_amount_ex_gratia_1) || 0)
+      ).toFixed(2);
+
+      this.victimsReliefs.push({
+        reliefAmountScst_1: victimReliefDetail.relief_amount_scst_1 || '0',
+        reliefAmountExGratia_1: victimReliefDetail.relief_amount_ex_gratia_1 || '0',
+        reliefAmountSecondStage: reliefAmountSecondStage
+      });
+
+      console.log('victimsReliefs',this.victimsReliefs);
+
+      totalReliefSecondStage += parseFloat(reliefAmountSecondStage);
+    });
+
+    this.totalCompensation_1 = totalReliefSecondStage.toFixed(2);
   }
 
 
@@ -1065,7 +1116,7 @@ console.log( this.hearingdetailonedata ," this.hearingdetailonedata ")
               this.isVictimSameAsComplainant= 'No';
             }
           }
-          this.numberOfVictims=data.queryResults[0].number_of_victim;
+          this.numberOfVictims=data.queryResults[0].number_of_victim || "";
 
 
           this.judgementBeenAwardednxt=data.queryResults[0].judgement_awarded;
