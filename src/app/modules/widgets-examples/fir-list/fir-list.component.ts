@@ -726,8 +726,8 @@ export class FirListComponent implements OnInit {
 
         // Duplicate Section (High Court)
         if (response.casedetail_one && response.casedetail_one.length > 0) {
-          this.showDuplicateSection = true;
-          this.selectedCourtType = 'highCourt';
+          this.showDuplicateSection = response.appeal_details.designated_court === 'highCourt' || response.appeal_details.designated_court === 'supremeCourt';
+          this.selectedCourtType = response.appeal_details.designated_court;
           const item = response.casedetail_one[0];
           this.courtDistrict_one = item.court_district || '';
           this.caseNumber_one = item.case_number || '';
@@ -761,7 +761,7 @@ export class FirListComponent implements OnInit {
 
         // Duplicate Section 1 (Supreme Court)
         if (response.casedetail_two && response.casedetail_two.length > 0) {
-          this.showDuplicateSection_1 = true;
+          this.showDuplicateSection_1 = response.appeal_details_one.designated_court === 'highCourt_one' || response.appeal_details_one.designated_court === 'supremeCourt_one'
           const item = response.casedetail_two[0];
           this.courtDistrict_two = item.court_district || '';
           this.caseNumber_two = item.case_number || '';

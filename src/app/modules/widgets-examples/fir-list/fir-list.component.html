@@ -776,10 +776,10 @@
                       *
                     </label>
                     <input readonly type="text" name="scstOffence{{ i }}" id="scstOffence{{ i }}" class="form-control"
-                      [value]="accused.scst_offence === true  ? 'Yes' : 'No'" />
+                      [value]="accused.scst_offence === 'true'  ? 'Yes' : 'No'" />
                   </div>
 
-                  <div class="col-md-6 mb-3" *ngIf="accused.previous_incident === true ">
+                  <div class="col-md-6 mb-3" *ngIf="accused.previous_incident === 'true' ">
                     <label for="scstFIRNumber" class="form-label">47. FIR number of previous cases *</label>
                     <input readonly type="text" name="scstFIRNumber{{ i }}" id="scstFIRNumber{{ i }}"
                       class="form-control" [value]="accused.scst_fir_number + accused.scst_fir_number_suffix" />
@@ -1231,7 +1231,7 @@
                 </div>
                 <div class="col-4">
                   <input type="text" class="form-control text-end" readonly
-                    [value]="victimRelief.reliefAmountScst_1 || ''" />
+                    [value]="victimRelief.reliefAmountScst_2 || ''" />
                 </div>
               </div>
               <div class="row mb-3">
@@ -1241,7 +1241,7 @@
                 </div>
                 <div class="col-4">
                   <input type="text" class="form-control text-end" readonly
-                    [value]="victimRelief.reliefAmountExGratia_1 || ''" />
+                    [value]="victimRelief.reliefAmountExGratia_2 || ''" />
                 </div>
               </div>
               <div class="row mb-3">
@@ -1251,7 +1251,7 @@
                 </div>
                 <div class="col-4">
                   <input type="text" class="form-control text-end" readonly
-                    [value]="victimRelief.reliefAmountSecondStage || ''" />
+                    [value]="victimRelief.reliefAmountThirdStage || ''" />
                 </div>
               </div>
             </div>
