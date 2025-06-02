@@ -914,7 +914,7 @@ loadVictimsDetails(): void {
 
     this.firGetService.getVictimsReliefDetails(this.firId).subscribe(
       (response: any) => {
-        this.numberOfVictims = response.numberOfVictims || "";
+        // this.numberOfVictims = response.numberOfVictims || "";
         this.victimNames = response.victimNames;
           this.victimsReliefDetails = response.victimsReliefDetails;
           this.reliefsdata = this.victimsReliefDetails;
