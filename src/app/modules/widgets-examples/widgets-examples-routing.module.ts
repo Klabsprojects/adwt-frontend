@@ -35,6 +35,7 @@ import { EditAdditionalReliefReportComponent } from './edit-additional-relief-re
 import { VmcComponent  } from './vmc/vmc.component';
 import { VmcmeetingComponent  } from './vmcmeeting/vmcmeeting.component';
 import { VmcReportComponent } from './Vmc-Report/Vmc-Report.component';
+import { AlteredCaseListComponent } from './altered-case-list/altered-case-list.component';
 const routes: Routes = [
   {
     path: '',
@@ -72,6 +73,7 @@ const routes: Routes = [
       { path: 'edit-monetary-relief', component: EditMonetaryReliefComponent },
       { path: 'edit-additional-relief-report', component: EditAdditionalReliefReportComponent },
       { path: 'Vmc-Report', component: VmcReportComponent },
+      { path: 'altered-case-list', component: AlteredCaseListComponent },
       {
   path: 'offence-act-scst',
   component: OffenceActScStComponent,

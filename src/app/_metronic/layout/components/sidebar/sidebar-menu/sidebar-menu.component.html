@@ -223,6 +223,14 @@
             <span class="menu-title">Add New Case</span>
           </a>
         </div>
+        <div class="menu-item" *ngIf="hasPermission('Altered Cases')">
+          <a class="menu-link without-sub" routerLink="/widgets-examples/altered-case-list" routerLinkActive="active">
+            <span class="menu-bullet">
+              <span class="bullet bullet-dot"></span>
+            </span>
+            <span class="menu-title">Altered Cases</span>
+          </a>
+        </div>
 
       </div>
     </div>

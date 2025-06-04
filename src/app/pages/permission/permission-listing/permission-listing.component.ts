@@ -118,7 +118,7 @@ export class PermissionListingComponent implements OnInit {
         this.categorizedPermissions['Master Data'].push(permission);
       }
       // Matching for FIR
-      else if (['fir', 'fir list', 'add fir', 'edit fir', 'view fir'].some(sub => permissionName.includes(sub))) {
+      else if (['fir', 'fir list', 'add fir', 'edit fir', 'view fir', 'altered cases'].some(sub => permissionName.includes(sub))) {
         this.categorizedPermissions['FIR'].push(permission);
       }
       // Matching for DLVMC

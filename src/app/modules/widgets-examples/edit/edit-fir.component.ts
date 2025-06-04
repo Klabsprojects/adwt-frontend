@@ -5019,10 +5019,9 @@ uploadedImageSrc: any | ArrayBuffer;
         (offences: any) => {
           // console.log(offences);
           this.offenceOptions = offences
-            .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
+            .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v)');
             this.offenceOptions.push(
               { offence_act_name: '3(2)(va)', offence_name: '3(2)(va)', id : 24 },
-              { offence_act_name: '3(2)(v), 3(2)(va)', offence_name: '3(2)(v), 3(2)(va)', id: 25 }
             );
             this.offenceOptionData = offences.map((offence: any) => offence);
         },
@@ -8452,7 +8451,7 @@ getPoliceStation(district: string): void {
       'Rape',
       'Gang Rape',
       'Murder',
-      '3(2)(v), 3(2)(va)',
+      '3(2)(v)',
       '3(2)(va)'
     ];
     return excluded.includes(act);

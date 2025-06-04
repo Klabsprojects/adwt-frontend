@@ -27,6 +27,10 @@ export class FirService {
     return this.http.get<string[]>(`${this.baseUrl}/police-stations?district=${district}`);
   }
 
+  getalteredcasebasedID(id: string): Observable<string[]> {
+    return this.http.get<string[]>(`${this.baseUrl}/alterd-case-detail?id=${id}`);
+  }
+
 
 
   // Get police division details by district
@@ -535,6 +539,10 @@ saveStepFourAsDraft(firData: any): Observable<any> {
   deleteVictim(victim_id: any, UserId : any, number_of_victim : any, fir_id : any): Observable<any> {
   let body = {victim_id , UserId , number_of_victim, fir_id}
   return this.http.post(`${this.baseUrl}/deleteVictim`, body);
+}
+
+AlterSave(firData: any): Observable<any> {
+  return this.http.post(`${this.baseUrl}/AlterSave`, firData);
 }
   
 }

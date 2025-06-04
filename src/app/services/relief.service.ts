@@ -21,6 +21,16 @@ export class ReliefService {
     return this.http.get<any[]>(this.apiUrl, { params });
   }
 
+  getAlteredList(filters: any = {}): Observable<any[]> {
+  let params = new HttpParams()
+    
+      Object.keys(filters).forEach(key => {
+        params = params.set(key, filters[key]);
+      });
+        // Add other filters as needed
+    return this.http.get<any[]>(environment.apiUrl+'getAlteredList', { params });
+  }
+
   // Save First Installment Details
   saveFirstInstallmentDetails(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/save-first-installment`, data);

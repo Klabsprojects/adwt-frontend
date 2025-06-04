@@ -1774,6 +1774,14 @@ export class FirListComponent implements OnInit {
     return statusTextMap[status] || 'Unknown';
   }
 
+    isaltered(status: number): string {
+      if(status == 1){
+        return 'Altered Case'
+      } else {
+         return ''
+      }
+  }
+
   getStatusTextUIPT(status: number): string {
     const statusTextMap = {
       0: 'UI',
@@ -1809,6 +1817,14 @@ export class FirListComponent implements OnInit {
     } as { [key: number]: string };
 
     return badgeClassMap[status] || 'badge bg-secondary text-white';
+  }
+
+    alteredBadgeClass(status: number): string {
+       if(status == 1){
+        return 'badge bg-danger text-white'
+      } else {
+         return ''
+      }
   }
 
 
