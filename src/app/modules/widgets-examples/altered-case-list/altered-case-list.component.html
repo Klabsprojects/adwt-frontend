@@ -180,7 +180,7 @@
 
 <div *ngIf="view == 'view'" class="card">
 
-  <div *ngIf="firDetails">
+  <div *ngIf="firDetails && firDetails.data">
   <div class="card">
     <div class="card-header bg-primary text-white">
     <h5 class="text-white mt-8 mb-1 text-center">Basic Details</h5>
@@ -207,10 +207,6 @@
           <strong>Date of Occurrence:</strong>
           <p class="text-dark">{{ firDetails.data.date_of_occurrence || 'N/A' }}</p>
         </div>
-        <!-- <div class="col-md-3 mb-3">
-          <strong>Nature of Offence:</strong>
-          <p class="text-dark">{{ firDetails.data.nature_of_offence || 'N/A' }}</p>
-        </div> -->
         <div class="col-md-3 mb-3">
           <strong>Place of Occurrence:</strong>
           <p class="text-dark">{{ firDetails.data.place_of_occurrence || 'N/A' }}</p>
@@ -229,7 +225,7 @@
   </div>
 </div>
 
-<div class="card-header bg-primary text-white">
+<!-- <div class="card-header bg-primary text-white">
     <h5 class="text-white mt-8 mb-1 text-center">Before Sections Alteration</h5>
   </div>
    <form [formGroup]="firForm" id="firForm" >
@@ -261,27 +257,19 @@
                 [id]="'victimOffence' + i"
                 required
               >
-                <!-- Custom selected label -->
                 <ng-template ng-label-tmp let-item="item" let-clear="clear">
                   <span>
                     {{ item.offence_act_name }}
                     <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
                   </span>
-                  <!-- <span class="remove-icon" (click)="removeSelectedOffence(i, item.offence_name)">
-                    &times;
-                  </span> -->
                 </ng-template>
 
-                <!-- Custom dropdown option -->
                 <ng-template ng-option-tmp let-item="item">
                   {{ item.offence_act_name }}
                   <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
                 </ng-template>
               </ng-select>
                 </div>
-
-
-
 
                 <div class="col-md-12 mb-3"> 
                   <label class="form-label">Sections of the SC/ST POA Act Invoked for the Offence *</label><br>
@@ -290,7 +278,6 @@
                 </div>
                 <div class="col-md-12 mb-3">
                   <label for="sectionsIPC" readonly class="form-label w-100 inactive">Section Invoked Under IPC/POCSO/etc.
-                    <!-- <button type="button" class="btn btn-primary mt-2 float-right py-2" (click)="addSection(i)" style="float: right!important;">Add Section</button> -->
 
                   </label>
                   <div formArrayName="sectionDetails2">
@@ -313,10 +300,6 @@
                         <div class="col-md-5 float-left">
                           <input type="text" id="sectionName2{{ i }}-{{ j }}" readonly class="form-control inactive" formControlName="Section2" placeholder="Enter section name" />
                         </div>
-          
-                        <!-- <div class="col-md-2 text-center float-left">
-                          <button *ngIf="j !== 0" type="button" class="btn btn-danger btn-sm" (click)="removeSection(i, j)">Delete</button>
-                        </div> -->
                       </div>
                     </div>
                   </div>
@@ -358,7 +341,6 @@
                 [id]="'victimOffence' + i"
                 required
               >
-                <!-- Custom selected label -->
                 <ng-template ng-label-tmp let-item="item" let-clear="clear">
                   <span>
                     {{ item.offence_act_name }}
@@ -368,16 +350,12 @@
                  
                 </ng-template>
 
-                <!-- Custom dropdown option -->
                 <ng-template ng-option-tmp let-item="item">
                   {{ item.offence_act_name }}
                   <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
                 </ng-template>
               </ng-select>
                 </div>
-
-
-
 
                 <div class="col-md-12 mb-3"> 
                   <label class="form-label">Sections of the SC/ST POA Act Invoked for the Offence *</label><br>
@@ -407,7 +385,6 @@
                           <input type="text" id="sectionName{{ i }}-{{ j }}" class="form-control inactive" formControlName="Section" placeholder="Enter section name" />
                         </div>
           
-                        
                       </div>
                     </div>
                   </div>
@@ -421,17 +398,289 @@
           <button type="button" class="btn btn-primary me-2"  (click)="back()">Back</button>
         </div>
       </div>
-    </form>
+    </form> -->
+
+
+    <form [formGroup]="firForm" id="firForm">
+    <!-- Loop through each victim index -->
+    <div *ngFor="let victim of victims.controls; let i = index" class="victim-section mb-5">
+      
+      <!-- Current Section Header -->
+      <div style="align-items: center;" class="card-header bg-info text-white">
+        <h5 class="text-white mt-2 mb-1 text-center">
+          Victim {{ i + 1 }} - Sections Before Alteration
+        </h5>
+      </div>
+
+      <!-- Current Section (Read-only) -->
+      <div formArrayName="victims2" class="mb-4">
+        <div *ngIf="victims2.at(i)" [formGroupName]="i" class="victim-entry card border-info">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4 float-left mr-2">
+                <label class="form-label"><strong>Victim Name:</strong></label>
+                <input 
+                  id="victimName2_{{ i }}" 
+                  type="text" 
+                  class="form-control mb-3 inactive" 
+                  formControlName="victimName2" 
+                  placeholder="Name of the Victim" 
+                  readonly 
+                />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label class="form-label"><strong>Current Sections of SC/ST POA Act:</strong></label>
+                <ng-select
+                  class="form-select inactive"
+                  [items]="offenceOptions"
+                  bindLabel="offence_name"
+                  bindValue="offence_name"
+                  [multiple]="true"
+                  formControlName="offenceCommitted2"
+                  [searchable]="false"
+                  [clearable]="false"
+                  [placeholder]="victims2.at(i).get('offenceCommitted2')?.value?.length ? '' : 'Select offences'"
+                  [id]="'victimOffence2_' + i"
+                >
+                  <ng-template ng-label-tmp let-item="item" let-clear="clear">
+                    <span>
+                      {{ item.offence_act_name }}
+                      <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
+                    </span>
+                  </ng-template>
+
+                  <ng-template ng-option-tmp let-item="item">
+                    {{ item.offence_act_name }}
+                    <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
+                  </ng-template>
+                </ng-select>
+              </div>
+
+              <div class="col-md-12 mb-3">
+                <label class="form-label"><strong>Current SC/ST POA Sections:</strong></label>
+                <input 
+                  type="text" 
+                  formControlName="scstSections2" 
+                  class="form-control inactive" 
+                  readonly 
+                />
+              </div>
+
+              <div class="col-md-12 mb-3">
+                <label for="sectionsIPC2_{{ i }}" class="form-label w-100">
+                  <strong>Current Sections Under IPC/POCSO/etc.:</strong>
+                </label>
+                <div formArrayName="sectionDetails2">
+                  <div 
+                    *ngFor="let section of getSectionDetails2(i).controls; let j = index" 
+                    [formGroupName]="j" 
+                    class="section-entry mb-3"
+                  >
+                    <div class="row">
+                      <div class="col-md-4 float-left mr-2">
+                        <select 
+                          id="sectionType2_{{ i }}_{{ j }}" 
+                          class="form-control inactive" 
+                          formControlName="SectionType2"
+                          
+                        >
+                          <option value="">Select</option>
+                          <option value="IPC">IPC</option>
+                          <option value="BNS">BNS</option>
+                          <option value="BNSS">BNSS</option>
+                          <option value="POCSO">POCSO</option>
+                          <option value="Child Marriage Act">Child Marriage Act</option>
+                          <option value="Women Harassment Act">Women Harassment Act</option>
+                          <option value="PPDL">PPDL</option>
+                          <option value="Others">Others</option>
+                        </select>
+                      </div>
+                      <div class="col-md-5 float-left">
+                        <input 
+                          type="text" 
+                          id="sectionName2_{{ i }}_{{ j }}" 
+                          class="form-control inactive" 
+                          formControlName="Section2" 
+                          placeholder="Enter section name" 
+                          readonly
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section to be Altered Header -->
+      <div  style="align-items: center !important; " class="card-header bg-info text-white">
+        <h5 style="color: #fff !important;" class=" mt-2 mb-1 text-center">
+          Victim {{ i + 1 }} - Sections After Alteration
+        </h5>
+      </div>
+
+      <!-- Section to be Altered (Editable) -->
+      <div formArrayName="victims" class="mb-4">
+        <div *ngIf="victims.at(i)" [formGroupName]="i" class="victim-entry card border-warning">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4 float-left mr-2">
+                <label class="form-label"><strong>Victim Name:</strong></label>
+                <input 
+                  id="victimName_{{ i }}" 
+                  type="text" 
+                  class="form-control mb-3" 
+                  formControlName="victimName" 
+                  placeholder="Name of the Victim" 
+                  readonly 
+                />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label class="form-label"><strong>New Sections of SC/ST POA Act: *</strong></label>
+                <ng-select
+                  class="form-select inactive"
+                  [items]="offenceOptions"
+                  bindLabel="offence_name"
+                  bindValue="offence_name"
+                  [multiple]="true"
+                  formControlName="offenceCommitted"
+                  [searchable]="true"
+                  [clearable]="true"
+                  [placeholder]="victims.at(i).get('offenceCommitted')?.value?.length ? '' : 'Select offences'"
+                  [id]="'victimOffence_' + i"
+                  required
+                >
+                  <ng-template ng-label-tmp let-item="item" let-clear="clear">
+                    <span>
+                      {{ item.offence_act_name }}
+                      <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
+                    </span>
+                    <!-- <span class="remove-icon" (click)="removeSelectedOffence(i, item.offence_name)">
+                      &times;
+                    </span> -->
+                  </ng-template>
+
+                  <ng-template ng-option-tmp let-item="item">
+                    {{ item.offence_act_name }}
+                    <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
+                  </ng-template>
+                </ng-select>
+              </div>
+
+              <div class="col-md-12 mb-3">
+                <label class="form-label"><strong>New SC/ST POA Sections: *</strong></label>
+                <input 
+                  type="text" 
+                  formControlName="scstSections" 
+                  class="form-control inactive" 
+                  readonly 
+                />
+              </div>
+
+              <div class="col-md-12 mb-3">
+                <!-- <label for="sectionsIPC" class="form-label w-100">Section Invoked Under IPC/POCSO/etc.
+                    <button type="button" class="btn btn-primary mt-2 float-right py-2" (click)="addSection(i)" style="float: right!important;">Add Section</button>
+                  </label> -->
+                <div formArrayName="sectionDetails">
+                  <div 
+                    *ngFor="let section of getSectionDetails(i).controls; let j = index" 
+                    [formGroupName]="j" 
+                    class="section-entry mb-3"
+                  >
+                    <div class="row">
+                      <div class="col-md-4 float-left mr-2">
+                        <select 
+                          id="sectionType_{{ i }}_{{ j }}" 
+                          class="form-control inactive" 
+                          formControlName="SectionType"
+                        >
+                          <option value="">Select</option>
+                          <option value="IPC">IPC</option>
+                          <option value="BNS">BNS</option>
+                          <option value="BNSS">BNSS</option>
+                          <option value="POCSO">POCSO</option>
+                          <option value="Child Marriage Act">Child Marriage Act</option>
+                          <option value="Women Harassment Act">Women Harassment Act</option>
+                          <option value="PPDL">PPDL</option>
+                          <option value="Others">Others</option>
+                        </select>
+                      </div>
+                      <div class="col-md-5 float-left">
+                        <input 
+                          type="text" 
+                          id="sectionName_{{ i }}_{{ j }}" 
+                          class="form-control inactive" 
+                          formControlName="Section" 
+                          placeholder="Enter section name" 
+                        />
+                      </div>
+                      <!-- <div class="col-md-2 text-center float-left">
+                        <button 
+                          *ngIf="j !== 0" 
+                          type="button" 
+                          class="btn btn-danger btn-sm" 
+                          (click)="removeSection(i, j)"
+                        >
+                          Delete
+                        </button>
+                      </div> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+     <div style="padding :10px">
+          <button style="margin-top: 0px" type="button" class="btn btn-primary"  (click)="back()">Back</button>
+    </div>
+  </form>
 </div>
 
 
 
 <style>
-  .inactive {
-  pointer-events: none;   /* Prevents all mouse interactions */
-  opacity: 0.6;           /* Makes it look disabled */
-  background-color: #e9ecef !important; /* Light gray bg */
-/*  color: #eef0f1 !important;  Dimmed text color */
-  cursor: not-allowed;    /* Shows "not allowed" cursor */
+.inactive {
+  pointer-events: none;
+  opacity: 0.6;
+  background-color: #e9ecef !important;
+  cursor: not-allowed;
 }
+
+/* .victim-section {
+  border-left: 4px solid #007bff;
+  padding-left: 15px;
+  margin-bottom: 30px;
+} */
+
+.card-header.bg-info {
+  background-color: #17a2b8 !important;
+   color: #fff;
+}
+
+.card-header.bg-warning {
+  background-color: #51b3bb !important;
+  color: #fff;
+}
+
+/* .remove-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.remove-icon:hover {
+  color: #c82333;
+} */
 </style>

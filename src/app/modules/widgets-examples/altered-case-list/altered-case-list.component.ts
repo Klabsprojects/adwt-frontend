@@ -777,4 +777,14 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
         console.log(error)
       }
     )};
+
+
+  getVictimIndices(): number[] {
+  const victimsLength = this.victims.length;
+  const victims2Length = this.victims2.length;
+  const maxLength = Math.max(victimsLength, victims2Length);
+  
+  return Array.from({ length: maxLength }, (_, index) => index);
+}
+
 }

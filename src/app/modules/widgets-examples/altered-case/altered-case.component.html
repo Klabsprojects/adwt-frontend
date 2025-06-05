@@ -1,137 +1,153 @@
-<!-- working altred cases -->
+<!-- working altered cases -->
 <div class="card border-secondary shadow-sm">
   <div class="card-header bg-primary text-white">
     <h5 class="text-white mt-8 mb-1 text-center">Altered Case Details</h5>
   </div>
-   <div *ngIf="firDetails.data" class="card-body">
-      <div class="row text-left">
-        <div class="col-md-3 mb-3">
-          <strong>FIR Number:</strong>
-          <p class="text-dark">{{ (firDetails.data.fir_number + '/' + firDetails.data.fir_number_suffix) || 'N/A' }}</p>
-        </div>
-        <div class="col-md-3 mb-3">
-          <strong>District:</strong>
-          <p class="text-dark">{{ firDetails.data.revenue_district || 'N/A' }}</p>
-        </div>
-        <div class="col-md-3 mb-3">
-          <strong>Police Station Details:</strong>
-          <p class="text-dark">{{ firDetails.data.police_station || 'N/A' }}</p>
-        </div>
-        <div class="col-md-3 mb-3">
-          <strong>Date of Reporting:</strong>
-          <p class="text-dark">{{ firDetails.data.date_of_registration || 'N/A' }}</p>
-        </div>
-        <div class="col-md-3 mb-3">
-          <strong>Date of Occurrence:</strong>
-          <p class="text-dark">{{ firDetails.data.date_of_occurrence || 'N/A' }}</p>
-        </div>
-        <!-- <div class="col-md-3 mb-3">
-          <strong>Nature of Offence:</strong>
-          <p class="text-dark">{{ firDetails.data.nature_of_offence || 'N/A' }}</p>
-        </div> -->
-        <div class="col-md-3 mb-3">
-          <strong>Place of Occurrence:</strong>
-          <p class="text-dark">{{ firDetails.data.place_of_occurrence || 'N/A' }}</p>
-        </div>
-        <div class="col-md-3 mb-3">
-          <strong>Number of Victims:</strong>
-          <p class="text-dark">{{ firDetails.data.number_of_victim || 'N/A' }}</p>
-        </div>
-        <div class="col-md-3 mb-3">
-          <strong>Number of Accused:</strong>
-          <p class="text-dark">{{ firDetails.data.number_of_accused || 'N/A' }}</p>
-        </div>
-
+  
+  <div *ngIf="firDetails && firDetails.data" class="card-body">
+    <div class="row text-left">
+      <div class="col-md-3 mb-3">
+        <strong>FIR Number:</strong>
+        <p class="text-dark">{{ (firDetails.data.fir_number + '/' + firDetails.data.fir_number_suffix) || 'N/A' }}</p>
+      </div>
+      <div class="col-md-3 mb-3">
+        <strong>District:</strong>
+        <p class="text-dark">{{ firDetails.data.revenue_district || 'N/A' }}</p>
+      </div>
+      <div class="col-md-3 mb-3">
+        <strong>Police Station Details:</strong>
+        <p class="text-dark">{{ firDetails.data.police_station || 'N/A' }}</p>
+      </div>
+      <div class="col-md-3 mb-3">
+        <strong>Date of Reporting:</strong>
+        <p class="text-dark">{{ firDetails.data.date_of_registration || 'N/A' }}</p>
+      </div>
+      <div class="col-md-3 mb-3">
+        <strong>Date of Occurrence:</strong>
+        <p class="text-dark">{{ firDetails.data.date_of_occurrence || 'N/A' }}</p>
+      </div>
+      <div class="col-md-3 mb-3">
+        <strong>Place of Occurrence:</strong>
+        <p class="text-dark">{{ firDetails.data.place_of_occurrence || 'N/A' }}</p>
+      </div>
+      <div class="col-md-3 mb-3">
+        <strong>Number of Victims:</strong>
+        <p class="text-dark">{{ firDetails.data.number_of_victim || 'N/A' }}</p>
+      </div>
+      <div class="col-md-3 mb-3">
+        <strong>Number of Accused:</strong>
+        <p class="text-dark">{{ firDetails.data.number_of_accused || 'N/A' }}</p>
       </div>
     </div>
-  <div class="card-header bg-primary text-white">
-    <h5 class="text-white mt-8 mb-1 text-center">Current Sections</h5>
   </div>
-   <form [formGroup]="firForm" id="firForm" >
-   <div class="form-step">
-       
-        <div formArrayName="victims2">
-          <div *ngFor="let victim of victims2.controls; let i = index" [formGroupName]="i" class="victim-entry mb-4 card border-primary">           
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-4 float-left mr-2">
-                  <input id="victimName2" type="text" class="form-control mb-3" formControlName="victimName2" placeholder="Name of the Victim" readonly />
-                </div>
 
-                <div class="col-md-12 mb-3">
-                  <label class="form-label">Sections of the SC/ST POA Act Invoked for the Offence *</label>
+  <form [formGroup]="firForm" id="firForm">
+    <!-- Loop through each victim index -->
+    <div *ngFor="let victim of victims.controls; let i = index" class="victim-section mb-5">
+      
+      <!-- Current Section Header -->
+      <div style="align-items: center;" class="card-header bg-info text-white">
+        <h5 class="text-white mt-2 mb-1 text-center">
+          Victim {{ i + 1 }} - Current Sections
+        </h5>
+      </div>
 
-                  
+      <!-- Current Section (Read-only) -->
+      <div formArrayName="victims2" class="mb-4">
+        <div *ngIf="victims2.at(i)" [formGroupName]="i" class="victim-entry card border-info">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4 float-left mr-2">
+                <label class="form-label"><strong>Victim Name:</strong></label>
+                <input 
+                  id="victimName2_{{ i }}" 
+                  type="text" 
+                  class="form-control mb-3 inactive" 
+                  formControlName="victimName2" 
+                  placeholder="Name of the Victim" 
+                  readonly 
+                />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label class="form-label"><strong>Current Sections of SC/ST POA Act:</strong></label>
                 <ng-select
-                class="form-select inactive"
-                [items]="offenceOptions"
-                bindLabel="offence_name"
-                bindValue="offence_name"
-                [multiple]="true"
-                formControlName="offenceCommitted2"
-                [searchable]="false"
-                [clearable]="false"
-                [disabled]="true"
-                [placeholder]="victims.at(i).get('offenceCommitted2')?.value?.length ? '' : 'Select offences'"
-                [id]="'victimOffence' + i"
-                required
-              >
-                <!-- Custom selected label -->
-                <ng-template ng-label-tmp let-item="item" let-clear="clear">
-                  <span>
+                  class="form-select inactive"
+                  [items]="offenceOptions"
+                  bindLabel="offence_name"
+                  bindValue="offence_name"
+                  [multiple]="true"
+                  formControlName="offenceCommitted2"
+                  [searchable]="false"
+                  [clearable]="false"
+                  [disabled]="true"
+                  [placeholder]="victims2.at(i).get('offenceCommitted2')?.value?.length ? '' : 'Select offences'"
+                  [id]="'victimOffence2_' + i"
+                >
+                  <ng-template ng-label-tmp let-item="item" let-clear="clear">
+                    <span>
+                      {{ item.offence_act_name }}
+                      <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
+                    </span>
+                  </ng-template>
+
+                  <ng-template ng-option-tmp let-item="item">
                     {{ item.offence_act_name }}
                     <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
-                  </span>
-                  <!-- <span class="remove-icon" (click)="removeSelectedOffence(i, item.offence_name)">
-                    &times;
-                  </span> -->
-                </ng-template>
+                  </ng-template>
+                </ng-select>
+              </div>
 
-                <!-- Custom dropdown option -->
-                <ng-template ng-option-tmp let-item="item">
-                  {{ item.offence_act_name }}
-                  <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
-                </ng-template>
-              </ng-select>
-                </div>
+              <div class="col-md-12 mb-3">
+                <label class="form-label"><strong>Current SC/ST POA Sections:</strong></label>
+                <input 
+                  type="text" 
+                  formControlName="scstSections2" 
+                  class="form-control inactive" 
+                  readonly 
+                />
+              </div>
 
-
-
-
-                <div class="col-md-12 mb-3"> 
-                  <label class="form-label">Sections of the SC/ST POA Act Invoked for the Offence *</label><br>
-                  <input type="text"  formControlName="scstSections2" class="form-control inactive" readonly />
-
-                </div>
-                <div class="col-md-12 mb-3">
-                  <label for="sectionsIPC" class="form-label w-100">Section Invoked Under IPC/POCSO/etc.
-                    <!-- <button type="button" class="btn btn-primary mt-2 float-right py-2" (click)="addSection(i)" style="float: right!important;">Add Section</button> -->
-
-                  </label>
-                  <div formArrayName="sectionDetails2">
-                    <div *ngFor="let section of getSectionDetails2(i).controls; let j = index" [formGroupName]="j" class="section-entry mb-3">
-                      <div class="row">
-                        <div class="col-md-4 float-left mr-2">
-                          <select id="sectionType2{{ i }}-{{ j }}" class="form-control inactive" formControlName="SectionType2">
-                            <option selected value="">Select</option>
-                            <option value="IPC">IPC</option>
-                            <option value="BNS">BNS</option>
-                            <option value="BNSS">BNSS</option>
-                            <option value="POCSO">POCSO</option>
-                            <option value="Child Marriage Act">Child Marriage Act</option>
-                            <option value="Women Harassment Act">Women Harassment Act</option>
-                            <option value="PPDL">PPDL</option>
-                            <option value="Others">Others</option>
-                          </select>
-                        </div>
-          
-                        <div class="col-md-5 float-left">
-                          <input type="text" id="sectionName2{{ i }}-{{ j }}" class="form-control inactive" formControlName="Section2" placeholder="Enter section name" />
-                        </div>
-          
-                        <!-- <div class="col-md-2 text-center float-left">
-                          <button *ngIf="j !== 0" type="button" class="btn btn-danger btn-sm" (click)="removeSection(i, j)">Delete</button>
-                        </div> -->
+              <div class="col-md-12 mb-3">
+                <label for="sectionsIPC2_{{ i }}" class="form-label w-100">
+                  <strong>Current Sections Under IPC/POCSO/etc.:</strong>
+                </label>
+                <div formArrayName="sectionDetails2">
+                  <div 
+                    *ngFor="let section of getSectionDetails2(i).controls; let j = index" 
+                    [formGroupName]="j" 
+                    class="section-entry mb-3"
+                  >
+                    <div class="row">
+                      <div class="col-md-4 float-left mr-2">
+                        <select 
+                          id="sectionType2_{{ i }}_{{ j }}" 
+                          class="form-control inactive" 
+                          formControlName="SectionType2"
+                          
+                        >
+                          <option value="">Select</option>
+                          <option value="IPC">IPC</option>
+                          <option value="BNS">BNS</option>
+                          <option value="BNSS">BNSS</option>
+                          <option value="POCSO">POCSO</option>
+                          <option value="Child Marriage Act">Child Marriage Act</option>
+                          <option value="Women Harassment Act">Women Harassment Act</option>
+                          <option value="PPDL">PPDL</option>
+                          <option value="Others">Others</option>
+                        </select>
+                      </div>
+                      <div class="col-md-5 float-left">
+                        <input 
+                          type="text" 
+                          id="sectionName2_{{ i }}_{{ j }}" 
+                          class="form-control inactive" 
+                          formControlName="Section2" 
+                          placeholder="Enter section name" 
+                          readonly
+                        />
                       </div>
                     </div>
                   </div>
@@ -142,94 +158,121 @@
         </div>
       </div>
 
-    <div class="card-header bg-primary text-white">
-    <h5 class="text-white mt-8 mb-1 text-center">Sections to be Changed</h5>
-    </div>
-      <div class="form-step">
-       
-        <div formArrayName="victims">
-          <div *ngFor="let victim of victims.controls; let i = index" [formGroupName]="i" class="victim-entry mb-4 card border-primary">           
-            <div class="card-body">
-              <div class="row">
+      <!-- Section to be Altered Header -->
+      <div  style="align-items: center !important; " class="card-header bg-info text-white">
+        <h5 style="color: #fff !important;" class=" mt-2 mb-1 text-center">
+          Victim {{ i + 1 }} - Sections to be Altered
+        </h5>
+      </div>
 
-                <div class="col-md-4 float-left mr-2">
-                  <input id="victimName" type="text" class="form-control mb-3" formControlName="victimName" placeholder="Name of the Victim" readonly />
-                </div>
+      <!-- Section to be Altered (Editable) -->
+      <div formArrayName="victims" class="mb-4">
+        <div *ngIf="victims.at(i)" [formGroupName]="i" class="victim-entry card border-warning">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4 float-left mr-2">
+                <label class="form-label"><strong>Victim Name:</strong></label>
+                <input 
+                  id="victimName_{{ i }}" 
+                  type="text" 
+                  class="form-control mb-3" 
+                  formControlName="victimName" 
+                  placeholder="Name of the Victim" 
+                  readonly 
+                />
+              </div>
+            </div>
 
-                <div class="col-md-12 mb-3">
-                  <label class="form-label">Sections of the SC/ST POA Act Invoked for the Offence *</label>
-
-                  
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label class="form-label"><strong>New Sections of SC/ST POA Act: *</strong></label>
                 <ng-select
-                class="form-select"
-                [items]="offenceOptions"
-                bindLabel="offence_name"
-                bindValue="offence_name"
-                [multiple]="true"
-                formControlName="offenceCommitted"
-                [searchable]="true"
-                [clearable]="true"
-                [placeholder]="victims.at(i).get('offenceCommitted')?.value?.length ? '' : 'Select offences'"
-                (change)="onOffenceCommittedChange(i)"
-                [id]="'victimOffence' + i"
-                required
-              >
-                <!-- Custom selected label -->
-                <ng-template ng-label-tmp let-item="item" let-clear="clear">
-                  <span>
+                  class="form-select"
+                  [items]="offenceOptions"
+                  bindLabel="offence_name"
+                  bindValue="offence_name"
+                  [multiple]="true"
+                  formControlName="offenceCommitted"
+                  [searchable]="true"
+                  [clearable]="true"
+                  [placeholder]="victims.at(i).get('offenceCommitted')?.value?.length ? '' : 'Select offences'"
+                  (change)="onOffenceCommittedChange(i)"
+                  [id]="'victimOffence_' + i"
+                  required
+                >
+                  <ng-template ng-label-tmp let-item="item" let-clear="clear">
+                    <span>
+                      {{ item.offence_act_name }}
+                      <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
+                    </span>
+                    <span class="remove-icon" (click)="removeSelectedOffence(i, item.offence_name)">
+                      &times;
+                    </span>
+                  </ng-template>
+
+                  <ng-template ng-option-tmp let-item="item">
                     {{ item.offence_act_name }}
                     <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
-                  </span>
-                  <span class="remove-icon" (click)="removeSelectedOffence(i, item.offence_name)">
-                    &times;
-                  </span>
-                </ng-template>
+                  </ng-template>
+                </ng-select>
+              </div>
 
-                <!-- Custom dropdown option -->
-                <ng-template ng-option-tmp let-item="item">
-                  {{ item.offence_act_name }}
-                  <span *ngIf="!isActExcluded(item.offence_act_name)"> - {{ item.offence_name }}</span>
-                </ng-template>
-              </ng-select>
-                </div>
+              <div class="col-md-12 mb-3">
+                <label class="form-label"><strong>New SC/ST POA Sections: *</strong></label>
+                <input 
+                  type="text" 
+                  formControlName="scstSections" 
+                  class="form-control" 
+                  readonly 
+                />
+              </div>
 
-
-
-
-                <div class="col-md-12 mb-3"> 
-                  <label class="form-label">Sections of the SC/ST POA Act Invoked for the Offence *</label><br>
-                  <input type="text"  formControlName="scstSections" class="form-control" readonly />
-
-                </div>
-                <div class="col-md-12 mb-3">
-                  <label for="sectionsIPC" class="form-label w-100">Section Invoked Under IPC/POCSO/etc.
+              <div class="col-md-12 mb-3">
+                <label for="sectionsIPC" class="form-label w-100">Section Invoked Under IPC/POCSO/etc.
                     <button type="button" class="btn btn-primary mt-2 float-right py-2" (click)="addSection(i)" style="float: right!important;">Add Section</button>
-
                   </label>
-                  <div formArrayName="sectionDetails">
-                    <div *ngFor="let section of getSectionDetails(i).controls; let j = index" [formGroupName]="j" class="section-entry mb-3">
-                      <div class="row">
-                        <div class="col-md-4 float-left mr-2">
-                          <select id="sectionType{{ i }}-{{ j }}" class="form-control" formControlName="SectionType">
-                            <option selected value="">Select</option>
-                            <option value="IPC">IPC</option>
-                            <option value="BNS">BNS</option>
-                            <option value="BNSS">BNSS</option>
-                            <option value="POCSO">POCSO</option>
-                            <option value="Child Marriage Act">Child Marriage Act</option>
-                            <option value="Women Harassment Act">Women Harassment Act</option>
-                            <option value="PPDL">PPDL</option>
-                            <option value="Others">Others</option>
-                          </select>
-                        </div>
-          
-                        <div class="col-md-5 float-left">
-                          <input type="text" id="sectionName{{ i }}-{{ j }}" class="form-control" formControlName="Section" placeholder="Enter section name" />
-                        </div>
-          
-                        <div class="col-md-2 text-center float-left">
-                          <button *ngIf="j !== 0" type="button" class="btn btn-danger btn-sm" (click)="removeSection(i, j)">Delete</button>
-                        </div>
+                <div formArrayName="sectionDetails">
+                  <div 
+                    *ngFor="let section of getSectionDetails(i).controls; let j = index" 
+                    [formGroupName]="j" 
+                    class="section-entry mb-3"
+                  >
+                    <div class="row">
+                      <div class="col-md-4 float-left mr-2">
+                        <select 
+                          id="sectionType_{{ i }}_{{ j }}" 
+                          class="form-control" 
+                          formControlName="SectionType"
+                        >
+                          <option value="">Select</option>
+                          <option value="IPC">IPC</option>
+                          <option value="BNS">BNS</option>
+                          <option value="BNSS">BNSS</option>
+                          <option value="POCSO">POCSO</option>
+                          <option value="Child Marriage Act">Child Marriage Act</option>
+                          <option value="Women Harassment Act">Women Harassment Act</option>
+                          <option value="PPDL">PPDL</option>
+                          <option value="Others">Others</option>
+                        </select>
+                      </div>
+                      <div class="col-md-5 float-left">
+                        <input 
+                          type="text" 
+                          id="sectionName_{{ i }}_{{ j }}" 
+                          class="form-control" 
+                          formControlName="Section" 
+                          placeholder="Enter section name" 
+                        />
+                      </div>
+                      <div class="col-md-2 text-center float-left">
+                        <button 
+                          *ngIf="j !== 0" 
+                          type="button" 
+                          class="btn btn-danger btn-sm" 
+                          (click)="removeSection(i, j)"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -238,39 +281,55 @@
             </div>
           </div>
         </div>
-        <!-- <div class="row mt-4">
-          <div class="col-md-6 mb-3">
-            <label for="isDeceased" class="form-label d-block">33. Has the victim deceased due to the offence? *</label>
-            <select id="isDeceased" class="form-select" formControlName="isDeceased" (change)="onIsDeceasedChangeOutside()" required>
-              <option value="" disabled>Select an option</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          </div>
-          <div class="col-md-6 mb-3" *ngIf="firForm.get('isDeceased')?.value === 'yes'">
-            <label class="form-label">34. Name(s) of the deceased person *</label>
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Select deceased person names</mat-label>
-              <mat-select formControlName="deceasedPersonNames" multiple>
-                <mat-option *ngFor="let name of victimNames" [value]="name">{{ name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-        </div> -->
-        <div class="mt-4">
-          <button type="button" class="btn btn-primary me-2"  (click)="AlterSave()">Submit</button>
-        </div>
       </div>
-    </form>
+    </div>
+
+    <!-- Submit Button -->
+    <div style="padding :10px">
+          <button style="margin-top: 0px" type="button" class="btn btn-primary"  (click)="AlterSave()">Submit</button>
+        </div>
+  </form>
 </div>
 
-
 <style>
-  .inactive {
-  pointer-events: none;   /* Prevents all mouse interactions */
-  opacity: 0.6;           /* Makes it look disabled */
-  background-color: #e9ecef !important; /* Light gray bg */
-/*  color: #eef0f1 !important;  Dimmed text color */
-  cursor: not-allowed;    /* Shows "not allowed" cursor */
+.inactive {
+  pointer-events: none;
+  opacity: 0.6;
+  background-color: #e9ecef !important;
+  cursor: not-allowed;
 }
+
+/* .victim-section {
+  border-left: 4px solid #007bff;
+  padding-left: 15px;
+  margin-bottom: 30px;
+} */
+
+.card-header.bg-info {
+  background-color: #17a2b8 !important;
+   color: #fff;
+}
+
+.card-header.bg-warning {
+  background-color: #51b3bb !important;
+  color: #fff;
+}
+
+  .remove-icon {
+    margin-left: 8px;
+    color: red;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+/* .remove-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.remove-icon:hover {
+  color: #c82333;
+} */
 </style>

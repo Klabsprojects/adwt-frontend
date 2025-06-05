@@ -1776,7 +1776,7 @@ export class FirListComponent implements OnInit {
 
     isaltered(status: number): string {
       if(status == 1){
-        return 'Altered Case'
+        return 'Section Altered'
       } else {
          return ''
       }
