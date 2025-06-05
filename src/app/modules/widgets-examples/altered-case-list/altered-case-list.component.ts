@@ -40,6 +40,7 @@ export class AlteredCaseListComponent implements OnInit {
   firForm: FormGroup;
   offenceOptions: any[] = [];
   offenceOptionData:any[]=[];
+  firDetails : any;
   isActExcluded(act: string): boolean {
     const excluded = [
       '100 percent incapacitation',
@@ -624,9 +625,11 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
   }
 
 
-  viewpage(id : any){
-    console.log(id)
+  viewpage(id : any, fir_id : any){
+    // console.log(id)
+    this.firDetails = [];
   if (id) {
+    this.loadfirdetails(fir_id)
       this.firService.getalteredcasebasedID(id).subscribe(
         (response: string[]) => {
       
@@ -763,4 +766,15 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
   back(){
     this.view = 'list'
   }
+
+
+   loadfirdetails(firId : any){
+       this.firService.getFirDetails(firId).subscribe(
+      (response) => {
+        this.firDetails = response;
+      },
+      (error) => {
+        console.log(error)
+      }
+    )};
 }

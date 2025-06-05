@@ -145,7 +145,7 @@
               <span *ngSwitchCase="'actions'">
                   <button *ngIf="fir.status > 4"
                   class="btn btn-primary btn-sm"
-                   (click)="viewpage(fir.id)"
+                   (click)="viewpage(fir.id, fir.fir_id)"
                 >
                   View
                 </button>
@@ -180,6 +180,55 @@
 
 <div *ngIf="view == 'view'" class="card">
 
+  <div *ngIf="firDetails">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+    <h5 class="text-white mt-8 mb-1 text-center">Basic Details</h5>
+  </div>
+    <div class="card-body">
+      <div class="row text-left">
+        <div class="col-md-3 mb-3">
+          <strong>FIR Number:</strong>
+          <p class="text-dark">{{ (firDetails.data.fir_number + '/' + firDetails.data.fir_number_suffix) || 'N/A' }}</p>
+        </div>
+         <div class="col-md-3 mb-3">
+          <strong>District:</strong>
+          <p class="text-dark">{{ firDetails.data.revenue_district || 'N/A' }}</p>
+        </div>
+        <div class="col-md-3 mb-3">
+          <strong>Police Station Details:</strong>
+          <p class="text-dark">{{ firDetails.data.police_station || 'N/A' }}</p>
+        </div>
+        <div class="col-md-3 mb-3">
+          <strong>Date of Reporting:</strong>
+          <p class="text-dark">{{ firDetails.data.date_of_registration || 'N/A' }}</p>
+        </div>
+        <div class="col-md-3 mb-3">
+          <strong>Date of Occurrence:</strong>
+          <p class="text-dark">{{ firDetails.data.date_of_occurrence || 'N/A' }}</p>
+        </div>
+        <!-- <div class="col-md-3 mb-3">
+          <strong>Nature of Offence:</strong>
+          <p class="text-dark">{{ firDetails.data.nature_of_offence || 'N/A' }}</p>
+        </div> -->
+        <div class="col-md-3 mb-3">
+          <strong>Place of Occurrence:</strong>
+          <p class="text-dark">{{ firDetails.data.place_of_occurrence || 'N/A' }}</p>
+        </div>
+        <div class="col-md-3 mb-3">
+          <strong>Number of Victims:</strong>
+          <p class="text-dark">{{ firDetails.data.number_of_victim || 'N/A' }}</p>
+        </div>
+        <div class="col-md-3 mb-3">
+          <strong>Number of Accused:</strong>
+          <p class="text-dark">{{ firDetails.data.number_of_accused || 'N/A' }}</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="card-header bg-primary text-white">
     <h5 class="text-white mt-8 mb-1 text-center">Before Sections Alteration</h5>
   </div>
@@ -199,7 +248,7 @@
 
                   
                 <ng-select
-                class="form-select"
+                class="form-select inactive"
                 [items]="offenceOptions"
                 bindLabel="offence_name"
                 bindValue="offence_name"
@@ -236,11 +285,11 @@
 
                 <div class="col-md-12 mb-3"> 
                   <label class="form-label">Sections of the SC/ST POA Act Invoked for the Offence *</label><br>
-                  <input type="text"  formControlName="scstSections2" class="form-control" readonly />
+                  <input type="text"  formControlName="scstSections2" class="form-control inactive" readonly />
 
                 </div>
                 <div class="col-md-12 mb-3">
-                  <label for="sectionsIPC" class="form-label w-100">Section Invoked Under IPC/POCSO/etc.
+                  <label for="sectionsIPC" readonly class="form-label w-100 inactive">Section Invoked Under IPC/POCSO/etc.
                     <!-- <button type="button" class="btn btn-primary mt-2 float-right py-2" (click)="addSection(i)" style="float: right!important;">Add Section</button> -->
 
                   </label>
@@ -248,7 +297,7 @@
                     <div *ngFor="let section of getSectionDetails2(i).controls; let j = index" [formGroupName]="j" class="section-entry mb-3">
                       <div class="row">
                         <div class="col-md-4 float-left mr-2">
-                          <select id="sectionType2{{ i }}-{{ j }}" class="form-control" formControlName="SectionType2">
+                          <select id="sectionType2{{ i }}-{{ j }}" class="form-control inactive" formControlName="SectionType2">
                             <option selected value="">Select</option>
                             <option value="IPC">IPC</option>
                             <option value="BNS">BNS</option>
@@ -262,7 +311,7 @@
                         </div>
           
                         <div class="col-md-5 float-left">
-                          <input type="text" id="sectionName2{{ i }}-{{ j }}" class="form-control" formControlName="Section2" placeholder="Enter section name" />
+                          <input type="text" id="sectionName2{{ i }}-{{ j }}" readonly class="form-control inactive" formControlName="Section2" placeholder="Enter section name" />
                         </div>
           
                         <!-- <div class="col-md-2 text-center float-left">
@@ -297,7 +346,7 @@
 
                   
                 <ng-select
-                class="form-select"
+                class="form-select inactive"
                 [items]="offenceOptions"
                 bindLabel="offence_name"
                 bindValue="offence_name"
@@ -332,7 +381,7 @@
 
                 <div class="col-md-12 mb-3"> 
                   <label class="form-label">Sections of the SC/ST POA Act Invoked for the Offence *</label><br>
-                  <input type="text"  formControlName="scstSections" class="form-control" readonly />
+                  <input type="text"  formControlName="scstSections" class="form-control inactive" readonly />
 
                 </div>
                 <div class="col-md-12 mb-3">
@@ -341,7 +390,7 @@
                     <div *ngFor="let section of getSectionDetails(i).controls; let j = index" [formGroupName]="j" class="section-entry mb-3">
                       <div class="row">
                         <div class="col-md-4 float-left mr-2">
-                          <select id="sectionType{{ i }}-{{ j }}" class="form-control" formControlName="SectionType">
+                          <select id="sectionType{{ i }}-{{ j }}" class="form-control inactive" formControlName="SectionType">
                             <option selected value="">Select</option>
                             <option value="IPC">IPC</option>
                             <option value="BNS">BNS</option>
@@ -355,7 +404,7 @@
                         </div>
           
                         <div class="col-md-5 float-left">
-                          <input type="text" id="sectionName{{ i }}-{{ j }}" class="form-control" formControlName="Section" placeholder="Enter section name" />
+                          <input type="text" id="sectionName{{ i }}-{{ j }}" class="form-control inactive" formControlName="Section" placeholder="Enter section name" />
                         </div>
           
                         
@@ -374,3 +423,15 @@
       </div>
     </form>
 </div>
+
+
+
+<style>
+  .inactive {
+  pointer-events: none;   /* Prevents all mouse interactions */
+  opacity: 0.6;           /* Makes it look disabled */
+  background-color: #e9ecef !important; /* Light gray bg */
+/*  color: #eef0f1 !important;  Dimmed text color */
+  cursor: not-allowed;    /* Shows "not allowed" cursor */
+}
+</style>

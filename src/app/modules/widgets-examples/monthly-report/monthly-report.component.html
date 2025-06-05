@@ -174,7 +174,7 @@
                 <span *ngSwitchDefault>{{ report[column.field] }}</span>
                 <span *ngSwitchCase="'caseStatus'">
                   <span class="badge" [ngClass]="getStatusBadgeClass(report[column.field])">
-                    {{ report[column.field] }}
+                    {{ getStatusTextUIPT(report[column.field]) }}
                   </span>
                 </span>
                 <span *ngSwitchCase="'action'">

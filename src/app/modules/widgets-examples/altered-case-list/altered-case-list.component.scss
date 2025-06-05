@@ -1,0 +1,7 @@
+.inactive {
+  pointer-events: none;   /* Prevents all mouse interactions */
+  opacity: 0.6;           /* Makes it look disabled */
+  background-color: #e9ecef !important; /* Light gray bg */
+  color: #6c757d !important; /* Dimmed text color */
+  cursor: not-allowed;    /* Shows "not allowed" cursor */
+}

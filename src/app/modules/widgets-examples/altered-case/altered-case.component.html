@@ -10,8 +10,8 @@
           <p class="text-dark">{{ (firDetails.data.fir_number + '/' + firDetails.data.fir_number_suffix) || 'N/A' }}</p>
         </div>
         <div class="col-md-3 mb-3">
-          <strong>FIR ID:</strong>
-          <p class="text-dark">{{ firDetails.data.fir_id || 'N/A' }}</p>
+          <strong>District:</strong>
+          <p class="text-dark">{{ firDetails.data.revenue_district || 'N/A' }}</p>
         </div>
         <div class="col-md-3 mb-3">
           <strong>Police Station Details:</strong>
@@ -63,7 +63,7 @@
 
                   
                 <ng-select
-                class="form-select"
+                class="form-select inactive"
                 [items]="offenceOptions"
                 bindLabel="offence_name"
                 bindValue="offence_name"
@@ -100,7 +100,7 @@
 
                 <div class="col-md-12 mb-3"> 
                   <label class="form-label">Sections of the SC/ST POA Act Invoked for the Offence *</label><br>
-                  <input type="text"  formControlName="scstSections2" class="form-control" readonly />
+                  <input type="text"  formControlName="scstSections2" class="form-control inactive" readonly />
 
                 </div>
                 <div class="col-md-12 mb-3">
@@ -112,7 +112,7 @@
                     <div *ngFor="let section of getSectionDetails2(i).controls; let j = index" [formGroupName]="j" class="section-entry mb-3">
                       <div class="row">
                         <div class="col-md-4 float-left mr-2">
-                          <select id="sectionType2{{ i }}-{{ j }}" class="form-control" formControlName="SectionType2">
+                          <select id="sectionType2{{ i }}-{{ j }}" class="form-control inactive" formControlName="SectionType2">
                             <option selected value="">Select</option>
                             <option value="IPC">IPC</option>
                             <option value="BNS">BNS</option>
@@ -126,7 +126,7 @@
                         </div>
           
                         <div class="col-md-5 float-left">
-                          <input type="text" id="sectionName2{{ i }}-{{ j }}" class="form-control" formControlName="Section2" placeholder="Enter section name" />
+                          <input type="text" id="sectionName2{{ i }}-{{ j }}" class="form-control inactive" formControlName="Section2" placeholder="Enter section name" />
                         </div>
           
                         <!-- <div class="col-md-2 text-center float-left">
@@ -265,3 +265,12 @@
 </div>
 
 
+<style>
+  .inactive {
+  pointer-events: none;   /* Prevents all mouse interactions */
+  opacity: 0.6;           /* Makes it look disabled */
+  background-color: #e9ecef !important; /* Light gray bg */
+/*  color: #eef0f1 !important;  Dimmed text color */
+  cursor: not-allowed;    /* Shows "not allowed" cursor */
+}
+</style>

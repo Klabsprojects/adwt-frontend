@@ -328,6 +328,7 @@ export class MonthlyReportComponent implements OnInit {
   }
 
   getStatusTextUIPT(status: number): string {
+    console.log(status,'statussssssss')
     const statusTextMap = {
       0: 'UI',
       1: 'UI',
@@ -341,7 +342,7 @@ export class MonthlyReportComponent implements OnInit {
       9: 'PT',
     } as { [key: number]: string };
 
-    return statusTextMap[status] || 'Unknown';
+    return statusTextMap[status] || '';
   }
   // new end
   // Filters the report data based on the selected case status.
@@ -375,7 +376,7 @@ export class MonthlyReportComponent implements OnInit {
             courtDistrict: item.court_district || '',
             courtName: item.court_name || '',
             caseNumber: item.case_number || '',
-            caseStatus: this.reportsCommonService.caseStatusOptions.find(option => option.value === item.status)?.label || '',
+            caseStatus: item.status || '',
             uiPendingDays: item.under_investigation_case_days || '',
             ptPendingDays: item.pending_trial_case_days || '',
             reasonPreviousMonth: item.previous_month_reason_for_status || '',
