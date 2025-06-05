@@ -207,4 +207,111 @@ export class ReportsCommonService {
       return matchesSearchText && matchesDistrict && matchesNature && matchesStatus && matchesReliefStatus;
     });
   }
+  applyFiltersMonthly(
+  reportData: any[],
+  searchText: string,
+  selectedDistrict: string,
+  selectedNatureOfOffence: string,
+  selectedStatusOfCase: string,
+  selectedStatusOfRelief: string,
+  districtKey: string,
+  offenceKey: string,
+  caseStatusKey: string,
+  selectedStatus: string,
+  selectedDistricts: string | string[],
+  selectedCommunity: string,
+  selectedCaste: string,
+  selectedZone: string,
+  selectedOffence: string | string[],
+  selectedPoliceCity: string,
+  selectedFromDate: string,
+  selectedToDate: string
+): any[] {
+  return reportData.filter((report) => {
+    // Helper function to check if a value matches (handles strings and arrays)
+    const matchesField = (reportValue: any, filterValue: any, isPartialMatch: boolean = false) => {
+      // Skip empty, undefined, or null filters
+      if (filterValue === undefined || filterValue === null || filterValue === '') {
+        return true;
+      }
+      // Handle array-based filters (e.g., selectedDistricts, selectedOffence)
+      if (Array.isArray(filterValue)) {
+        return filterValue.includes(reportValue);
+      }
+      // Partial matching for strings
+      if (isPartialMatch && typeof reportValue === 'string' && typeof filterValue === 'string') {
+        return reportValue.toLowerCase().includes(filterValue.toLowerCase());
+      }
+      // Exact matching
+      return reportValue === filterValue;
+    };
+
+    // Date range filtering
+    const matchesDateRange = () => {
+      if (!selectedFromDate || !selectedToDate) {
+        return true; // Skip if either date is not set
+      }
+      const reportDate = report.reportDate; // Adjust to your date field name
+      if (!reportDate) {
+        return false;
+      }
+      const from = new Date(selectedFromDate);
+      const to = new Date(selectedToDate);
+      const reportDateObj = new Date(reportDate);
+      return reportDateObj >= from && reportDateObj <= to;
+    };
+
+    // Search text applies to a specific field (e.g., reportName or description)
+    // Adjust 'reportName' to the actual field you want to search
+    const matchesSearchText = searchText
+      ? report.reportName?.toString().toLowerCase().includes(searchText.toLowerCase())
+      : true;
+
+    // Field-specific matches
+    const matchesDistrict = matchesField(report[districtKey], selectedDistrict);
+    const matchesNature = matchesField(report[offenceKey], selectedNatureOfOffence);
+    const matchesDistricts = matchesField(report[districtKey], selectedDistricts);
+    const matchesOffence = matchesField(report[offenceKey], selectedOffence);
+
+    // Handle caseStatus with special logic
+    let caseStatus = report[caseStatusKey] || '';
+    if (caseStatus.includes('Pending |') && caseStatus.includes('Completed')) {
+      caseStatus = caseStatus.replace('Completed', '').trim();
+    }
+    const matchesStatus = selectedStatusOfCase
+      ? (selectedStatusOfCase === 'Just Starting' && caseStatus === 'FIR Draft') ||
+        (selectedStatusOfCase === 'Pending' && caseStatus.includes('Pending')) ||
+        (selectedStatusOfCase === 'Completed' && caseStatus.includes('Completed'))
+      : true;
+
+    const matchesReliefStatus = selectedStatusOfRelief
+      ? (selectedStatusOfRelief === 'FIR Stage' && caseStatus.includes('FIR Stage')) ||
+        (selectedStatusOfRelief === 'ChargeSheet Stage' && caseStatus.includes('Charge Sheet')) ||
+        (selectedStatusOfRelief === 'Trial Stage' && caseStatus.includes('Trial'))
+      : true;
+
+    // Exact matches for other fields
+    const matchesStatusField = matchesField(caseStatus, selectedStatus);
+    const matchesCommunity = matchesField(report.community, selectedCommunity);
+    const matchesCaste = matchesField(report.caste, selectedCaste);
+    const matchesZone = matchesField(report.zone, selectedZone);
+    const matchesPoliceCity = matchesField(report.policeCity, selectedPoliceCity);
+
+    // Combine all conditions
+    return (
+      matchesSearchText &&
+      matchesDistrict &&
+      matchesNature &&
+      matchesStatus &&
+      matchesReliefStatus &&
+      matchesDistricts &&
+      matchesOffence &&
+      matchesCommunity &&
+      matchesCaste &&
+      matchesZone &&
+      matchesPoliceCity &&
+      matchesDateRange()
+    );
+  });
+}
 }

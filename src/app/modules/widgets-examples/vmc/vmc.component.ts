@@ -6,6 +6,7 @@ import { Vmcservice } from 'src/app/services/Vmc.Service';
 import { Router, NavigationEnd } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { filter } from 'rxjs/operators';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 @Component({
   selector: 'app-vmc',
@@ -40,19 +41,60 @@ export class VmcComponent implements OnInit {
   searchText: string = '';
   page: number = 1;
   currentUser: any = {};
-  Parsed_UserInfo : any;
+  Parsed_UserInfo: any;
 
   // Dropdown enable/disable states
   isDistrictDisabled: boolean = false;
   isSubdivisionDisabled: boolean = false;
 
+  // new
+  selectedDistrict: any;
+  selectedSubDivision: any;
+  distandsubdivs: any;
+  selectedStatus: any;
+  selectedMemberType: any;
+  selectedDesignationMember: any;
+  doa: any;
+  selectedMemberLevel: any;
+  subdivs: any[] = [];
+  status: any[] = ['Active', 'Inactive']
+  options = [
+    "Hon'ble Chief Minister (Chairperson)",
+    "Hon'ble Minister for Home Affairs",
+    "Hon'ble Minister for Finance",
+    "Hon'ble Minister for Adi Dravidar Welfare",
+    "Member of Parliament (MP)",
+    "Member of Legislative Assembly (MLA)",
+    "Chief Secretary of the Government of Tamil Nadu",
+    "Secretary, Home Department",
+    "Director General of Police (DGP)",
+    "Director, National Commission for the SCs and STs",
+    "Deputy Director, National Commission for SCs and STs",
+    "Secretary, Adi Dravidar and Tribal Welfare Department",
+    "District Collector",
+    "Superintendent of Police (SP)",
+    "Deputy Superintendent of Police (DSP)",
+    "DADTWO",
+    "Sub-Divisional Magistrate (SDM)",
+    "Member of Legislative Council (Councillor)",
+    "Panchayat President",
+    "Panchayat Vice-President",
+    "Member of Panchayat",
+    "Tahsildar",
+    "Block Development Officer",
+    "Others"
+  ];
+  filteredJson: any = {}
+
+
   constructor(
     private modalService: NgbModal,
     private vmcService: Vmcservice,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private ds: DashboardService
   ) {
-    const UserInfo : any = sessionStorage.getItem('user_data');
+    const UserInfo: any = sessionStorage.getItem('user_data');
     this.Parsed_UserInfo = JSON.parse(UserInfo)
     // Reload members when navigating back to this component
     // this.router.events
@@ -63,12 +105,81 @@ export class VmcComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.get_filter_json();
     this.loadUserFromSession();
     this.loadMembers();
     this.resetForm();
-    this.loadDistricts();
- 
+    // this.loadDistricts();
+    this.getDisctricts();
   }
+
+  // new
+  getDisctricts() {
+    this.ds.userGetMethod('vmcmeeting/districts').subscribe((res: any) => {
+      this.distandsubdivs = res;
+      this.districts = Object.keys(res);
+    })
+  }
+  getSubdivisions() {
+    if (this.selectedDistrict) {
+      this.subdivs = this.distandsubdivs[this.selectedDistrict];
+    }
+    else {
+      this.subdivs = [];
+    }
+  }
+
+  get_filter_json(){
+    return this.filteredJson = {
+      member_type: this.selectedMemberType,
+      name: this.searchText,
+      level_of_member: this.selectedMemberLevel,
+      district: this.selectedDistrict,
+      subdivision: this.selectedSubDivision,
+      designation: this.selectedDesignationMember,
+      appointment_date: this.doa
+    }
+  }
+
+  clear(){
+    this.selectedMemberType = '';
+    this.searchText = '';
+    this.selectedMemberLevel = '';
+    this.selectedDistrict = '';
+    this.selectedSubDivision = '';
+    this.selectedDesignationMember = '';
+    this.doa = '';
+    this.get_filter_json();
+  }
+  
+  getFilteredTable(data: any[], filter: any) {
+    return data.filter((item: any) =>
+      Object.entries(filter).every(([key, value]) => {
+        // Skip filtering for undefined, null, or empty string values
+        if (value === undefined || value === null || value === '') {
+          return true; // Ignore this filter key if not set
+        }
+
+        // Handle member_type (supports single value or array)
+        if (key === 'member_type') {
+          if (Array.isArray(value)) {
+            return value.includes(item[key]);
+          }
+          return item[key] === value;
+        }
+
+        // Case-insensitive partial match for name
+        if (key === 'name' && typeof value === 'string' && typeof item[key] === 'string') {
+          return item[key].toLowerCase().includes(value.toLowerCase());
+        }
+
+        // Exact match for all other fields
+        return item[key] === value;
+      })
+    );
+  }
+
+  // newend
 
   // Load logged-in user from session
   loadUserFromSession() {
@@ -82,7 +193,7 @@ export class VmcComponent implements OnInit {
 
   // Load all members
   loadMembers() {
-    if(this.Parsed_UserInfo.role == '4'){
+    if (this.Parsed_UserInfo.role == '4') {
       this.vmcService.getDistrictLevelMember(this.Parsed_UserInfo.district).subscribe(
         (results: any[]) => {
           this.members = results;
@@ -99,22 +210,23 @@ export class VmcComponent implements OnInit {
         }
       );
     } else {
-    this.vmcService.getAllMembers().subscribe(
-      (results: any[]) => {
-        this.members = results;
-        this.filteredMembers = this.members;
-        this.cdr.detectChanges();
-      },
-      () => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Failed to load members. Please try again later.',
-          confirmButtonColor: '#d33',
-        });
-      }
-    );
-  }
+      this.vmcService.getAllMembers().subscribe(
+        (results: any[]) => {
+          this.members = results;
+          this.filteredMembers = this.members;
+          console.log('filteredMembers', this.filteredMembers);
+          this.cdr.detectChanges();
+        },
+        () => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load members. Please try again later.',
+            confirmButtonColor: '#d33',
+          });
+        }
+      );
+    }
   }
 
   // Filter members based on search text
@@ -147,7 +259,7 @@ export class VmcComponent implements OnInit {
 
   onLevelChange(level: string): void {
 
-    if(this.Parsed_UserInfo.role == '4'){
+    if (this.Parsed_UserInfo.role == '4') {
       console.log(this.districts)
       console.log(this.Parsed_UserInfo.district)
       this.member.district = this.Parsed_UserInfo.district;
@@ -306,28 +418,28 @@ export class VmcComponent implements OnInit {
   }
 
   loadDistricts() {
-    if(this.Parsed_UserInfo.role == '4'){
+    if (this.Parsed_UserInfo.role == '4') {
       this.districts.push({ district: this.Parsed_UserInfo.district });
       // this.member.district = this.Parsed_UserInfo.district;
       // setTimeout(() => {
       //   this.member.district = this.Parsed_UserInfo.district;
       //   console.log("After Timeout:", this.member.district);
       // });
-      console.log(this.districts,this.Parsed_UserInfo.district,this.member.district)
+      console.log(this.districts, this.Parsed_UserInfo.district, this.member.district)
     } else {
-    this.vmcService.getAllDistricts().subscribe(
-      (results: any[]) => {
-        this.districts = results;
-      },
-      () => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Failed to load districts. Please try again later.',
-        });
-      }
-    );
-  }
+      this.vmcService.getAllDistricts().subscribe(
+        (results: any[]) => {
+          this.districts = results;
+        },
+        () => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load districts. Please try again later.',
+          });
+        }
+      );
+    }
   }
 
   onDistrictChange(event: Event): void {
@@ -396,27 +508,27 @@ export class VmcComponent implements OnInit {
 
 
 
-// Toggle member status
-toggleStatus(member: any): void {
-  const newStatus = member.status == '1' ? '0' : '1';
-  this.vmcService.toggleMemberStatus(member.id, newStatus).subscribe(
-    () => {
-      this.showSuccessAlert(
-        `Member status changed to ${newStatus === '1' ? 'Active' : 'Inactive'}`
-      );
-      this.loadMembers();
-    },
-    () => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Failed to update member status. Please try again later.',
-        confirmButtonColor: '#d33',
-      });
-    }
-  );
+  // Toggle member status
+  toggleStatus(member: any): void {
+    const newStatus = member.status == '1' ? '0' : '1';
+    this.vmcService.toggleMemberStatus(member.id, newStatus).subscribe(
+      () => {
+        this.showSuccessAlert(
+          `Member status changed to ${newStatus === '1' ? 'Active' : 'Inactive'}`
+        );
+        this.loadMembers();
+      },
+      () => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to update member status. Please try again later.',
+          confirmButtonColor: '#d33',
+        });
+      }
+    );
 
-}
+  }
 
 
   formatDateForBackend(date: string | Date): string | null {

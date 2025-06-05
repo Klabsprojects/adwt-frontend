@@ -15,6 +15,7 @@ import { inject, signal, TemplateRef, WritableSignal } from '@angular/core';
 
 import { ModalDismissReasons, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 
 
@@ -56,7 +57,7 @@ export class MonthlyReportComponent implements OnInit {
     'Trichy Court',
   ];
   courtNames: string[] = ['Court A', 'Court B', 'Court C'];
-  status: string[] = ['Just Starting', 'Pending', 'Completed'];
+  // status: string[] = ['Just Starting', 'Pending', 'Completed'];
   statusesOfRelief: string[] = [
     'FIR Stage',
     'ChargeSheet Stage',
@@ -235,10 +236,32 @@ export class MonthlyReportComponent implements OnInit {
   totalItems5 = 0;
   // table 5
 
+  // new
+  status: any[]=[
+    { key: 'UI', value: 'UI Stage' },
+    { key: 'PT', value: 'PT Stage' },
+  ]
+  // districts:any=[];
+  communities:any[]=[];
+  castes:any[]=[];
+  zones:any[]=[];
+  offences:any[]=[];
+  policeCities:any[]=[];
+
+  selectedStatus:string='';
+  selectedDistricts:string='';
+  selectedCommunity:string='';
+  selectedCaste:string='';
+  selectedZone:string='';
+  selectedOffence:string='';
+  selectedPoliceCity:string=''
+  selectedFromDate:any="";
+  selectedToDate:any="";
   constructor(
     private cdr: ChangeDetectorRef,
     private reportsCommonService: ReportsCommonService,
-    private monthlyReportService: MonthlyReportService
+    private monthlyReportService: MonthlyReportService,
+    private dashboardService: DashboardService
   ) {
     this.loader = true;
     const currentYear = new Date().getFullYear();
@@ -257,8 +280,70 @@ export class MonthlyReportComponent implements OnInit {
     this.filteredData = [...this.reportData];
     this.selectedColumns = this.displayedColumns.map((column) => column.field);
     // this.getReportData();
+    this.getDropdowns();
   }
 
+  // new
+  getDropdowns() {
+    // this.dashboardService.userGetMethod('districts').subscribe((res:any)=>{
+    //   this.districts = res;
+    // })
+    this.dashboardService.userGetMethod('fir/communities').subscribe((res:any)=>{
+      this.communities = res;
+    })
+    this.dashboardService.userGetMethod('Zone_Filter_Data').subscribe((res:any)=>{
+      this.zones = res.data;
+    })
+    this.dashboardService.userGetMethod('GetOffence').subscribe((res:any)=>{
+      this.offences = res.data;
+    })
+    this.dashboardService.userGetMethod('Police_City_filtet_data').subscribe((res:any)=>{
+      this.policeCities = res.data;
+    })
+  }
+  getCaste(){
+    if(this.selectedCommunity){
+      this.dashboardService.userGetMethod(`fir/castes-by-community?community=${this.selectedCommunity}`).subscribe((res:any)=>{
+        this.castes = res;
+      })
+    }
+  }
+
+  getStatusBadgeClass(status: number): string {
+    const badgeClassMap = {
+      0: 'badge bg-info text-white',
+      1: 'badge bg-warning text-dark',
+      2: 'badge bg-warning text-dark',
+      3: 'badge bg-warning text-dark',
+      4: 'badge bg-success text-white',
+      5: 'badge bg-success text-white',
+      6: 'badge bg-success text-white',
+      7: 'badge bg-success text-white',
+      8: 'badge bg-danger text-white',
+      9: 'badge bg-danger text-white',
+      10: 'badge bg-danger text-white', // Add this entry for status 12
+    } as { [key: number]: string };
+
+    return badgeClassMap[status] || 'badge bg-secondary text-white';
+  }
+
+  getStatusTextUIPT(status: number): string {
+    const statusTextMap = {
+      0: 'UI',
+      1: 'UI',
+      2: 'UI',
+      3: 'UI',
+      4: 'UI',
+      5: 'UI',
+      6: 'PT',
+      7: 'PT',
+      8: 'PT',
+      9: 'PT',
+    } as { [key: number]: string };
+
+    return statusTextMap[status] || 'Unknown';
+  }
+  // new end
   // Filters the report data based on the selected case status.
   filterByCaseStatus(): void {
     if (this.selectedCaseStatus) {
@@ -322,14 +407,23 @@ export class MonthlyReportComponent implements OnInit {
 
   // Applies filters, assigns serial numbers, and resets pagination
   applyFilters(): void {
-    this.filteredData = this.reportsCommonService.applyFilters(
+    this.filteredData = this.reportsCommonService.applyFiltersMonthly(
       this.reportData,
       this.searchText,
       this.selectedDistrict,
       this.selectedNatureOfOffence,
       this.selectedStatusOfCase,
       this.selectedStatusOfRelief,
-      'policeCity', 'natureOfOffence', 'caseStatus'
+      'policeCity', 'natureOfOffence', 'caseStatus',
+      this.selectedStatus,
+      this.selectedDistricts,
+      this.selectedCommunity,
+      this.selectedCaste,
+      this.selectedZone,
+      this.selectedOffence,
+      this.selectedPoliceCity,
+      this.selectedFromDate,
+      this.selectedToDate
     );
     this.filteredData = this.filteredData.map((report, index) => ({...report, sl_no: index + 1 })); // Assign sl_no starting from 1
     this.page = 1; // Reset to the first page
@@ -342,6 +436,15 @@ export class MonthlyReportComponent implements OnInit {
       this.selectedNatureOfOffence = '';
       this.selectedStatusOfCase = '';
       this.selectedStatusOfRelief = '';
+      this.selectedStatus='';
+      this.selectedDistricts='';
+      this.selectedCommunity='';
+      this.selectedCaste='';
+      this.selectedZone='';
+      this.selectedOffence='';
+      this.selectedPoliceCity='';
+      this.selectedFromDate='';
+      this.selectedToDate = '';
       this.applyFilters();
   }
 

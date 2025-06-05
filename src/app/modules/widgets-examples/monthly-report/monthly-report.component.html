@@ -1,92 +1,146 @@
-
-
 <div id="scrollbar" class="card">
-    <div class="loader-overlay" *ngIf="loader">
-       <mat-spinner></mat-spinner>
-      </div>
-  <div class=" p-4" >
+  <div class="loader-overlay" *ngIf="loader">
+    <mat-spinner></mat-spinner>
+  </div>
+  <div class=" p-4">
     <label style="padding: 5px;font-size: 16px;font-weight: 500;" for="ReportType">Report Type</label>
     <select class="form-select w-250px" (change)="getReportData()" [(ngModel)]="ReportType">
       <option value="General" selected>General</option>
-      <option value="District_Wise_Pending_UI" >District Wise Pending UI</option>
-      <option value="Reason_for_Pending_UI" >Reason for Pending UI</option>
-      <option value="Community_Certificate" >Community Certificate</option>
-      <option value="District_wise_PT" >District-wise PT</option>
-      <option value="Conviction" >Conviction for this Year</option>
+      <option value="District_Wise_Pending_UI">District Wise Pending UI</option>
+      <option value="Reason_for_Pending_UI">Reason for Pending UI</option>
+      <option value="Community_Certificate">Community Certificate</option>
+      <option value="District_wise_PT">District-wise PT</option>
+      <option value="Conviction">Conviction for this Year</option>
       <!-- <option value="general" >Conviction</option> -->
     </select>
   </div>
 
   <div *ngIf="ReportType == 'General'">
 
-  <div class="card-header border-0 pt-6">
-    <div class="card-title">
-      <div class="d-flex align-items-center position-relative my-1">
-        <i class="fas fa-search fs-3 position-absolute ms-5"></i>
-        <input type="text" [(ngModel)]="searchText" (input)="applyFilters()"
-          class="form-control form-control-solid w-250px ps-12" placeholder="Search Reports" />
+    <div class="card-header border-0 pt-6">
+      <div class="card-title">
+        <div class="d-flex align-items-center position-relative my-1">
+          <i class="fas fa-search fs-3 position-absolute ms-5"></i>
+          <input type="text" [(ngModel)]="searchText" (input)="applyFilters()"
+            class="form-control form-control-solid w-250px ps-12" placeholder="Search Reports" />
+        </div>
+      </div>
+      <div class="toolbar mb-3">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Select Columns</mat-label>
+          <mat-select [(ngModel)]="selectedColumns" (selectionChange)="onColumnSelectionChange()" multiple>
+            <mat-option *ngFor="let column of displayedColumns" [value]="column.field">
+              {{ column.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
     </div>
-    <div class="toolbar mb-3">
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Select Columns</mat-label>
-        <mat-select [(ngModel)]="selectedColumns" (selectionChange)="onColumnSelectionChange()" multiple>
-          <mat-option *ngFor="let column of displayedColumns" [value]="column.field">
-            {{ column.label }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+    <div class="row d-flex mb-3 p-4 align-items-center">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
+          <option value="" selected>District</option>
+          <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
+          <option value="" selected>Offence</option>
+          <option *ngFor="let nature of natureOfOffences" [value]="nature">{{ nature }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
+          <option value="" selected>Relief Status</option>
+          <option *ngFor="let reliefStatus of statusesOfRelief" [value]="reliefStatus">
+            {{ reliefStatus }}
+          </option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <!-- <p>Status Of Case</p> -->
+        <select class="form-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+          <option value="" selected>Status Of Case</option>
+          <option *ngFor="let option of status" [value]="option.key">
+            {{ option.value }}
+          </option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <!-- <p>Community</p> -->
+        <select name="" id="" [(ngModel)]="selectedCommunity" (change)="getCaste()" class="form-select" (change)="applyFilters()">
+          <option value="">Community</option>
+          <option [value]="community" *ngFor="let community of communities">{{community}}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <!-- <p>Caste</p> -->
+        <select class="form-select" [(ngModel)]="selectedCaste" (change)="applyFilters()">
+          <option value="" selected>Caste</option>
+          <option *ngFor="let option of castes" [value]="option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <!-- <p>Police Zone</p> -->
+        <select name="" id="" [(ngModel)]="selectedZone" class="form-select" (change)="applyFilters()">
+          <option value="">Police Zone</option>
+          <option [value]="zone.police_zone" *ngFor="let zone of zones">{{zone.police_zone}}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <!-- <p>Police City</p> -->
+        <select name="" id="" [(ngModel)]="selectedPoliceCity" class="form-select" (change)="applyFilters()">
+          <option value="">Police City</option>
+          <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <!-- <p>Nature of Offence</p> -->
+        <select name="" id="" [(ngModel)]="selectedOffence" class="form-select" (change)="applyFilters()">
+          <option value="">Nature of Offence</option>
+          <option [value]="offence" *ngFor="let offence of offences">{{offence}}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <!-- <label for="">From</label> -->
+        <input type="date" class="form-control" [(ngModel)]="selectedFromDate" (change)="applyFilters()"/>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <!-- <label for="">To</label> -->
+        <input type="date" class="form-control" [(ngModel)]="selectedToDate" (change)="applyFilters()"/>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
+      </div>
     </div>
-  </div>
-  <div class="d-flex gap-3 mb-3 p-4">
-    <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
-      <option value="" selected>District</option>
-      <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
-    </select>
 
-    <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
-      <option value="" selected>Offence</option>
-      <option *ngFor="let nature of natureOfOffences" [value]="nature">{{ nature }}</option>
-    </select>
-
-
-    <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
-      <option value="" selected>Status</option>
-      <option *ngFor="let status of caseStatuses" [value]="status">{{ status }}</option>
-    </select>
-
-    <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
-      <option value="" selected>Relief Status</option>
-      <option *ngFor="let reliefStatus of statusesOfRelief" [value]="reliefStatus">
-        {{ reliefStatus }}
-      </option>
-    </select>
-
-    <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
-
-  </div>
-
-  <div class="card-body pt-0 overflow-auto">
-    <table class="table table-bordered  tab-border">
-      <thead  class="table-dark side_border">
-        <tr>
-          <th *ngFor="let column of displayedColumns" [hidden]="!column.visible"
-            (click)="column.sortable ? sortTable(column.field) : null">
-            <!-- <div *ngIf="column.field === 'caseStatus'; else defaultHeader"> -->
-            <label>{{ column.label }}</label>
-            <!-- <select class="form-select" [(ngModel)]="selectedCaseStatus" (change)="filterByCaseStatus()">
+    <div class="card-body pt-0 overflow-auto">
+      <table class="table table-bordered  tab-border">
+        <thead class="table-dark side_border">
+          <tr>
+            <th *ngFor="let column of displayedColumns" [hidden]="!column.visible"
+              (click)="column.sortable ? sortTable(column.field) : null">
+              <!-- <div *ngIf="column.field === 'caseStatus'; else defaultHeader"> -->
+              <label>{{ column.label }}</label>
+              <!-- <select class="form-select" [(ngModel)]="selectedCaseStatus" (change)="filterByCaseStatus()">
                 <option value="">All</option>
                 <option *ngFor="let status of getCaseStatusDropdown()" [value]="status">{{ status }}</option>
               </select>
             </div>
             <ng-template #defaultHeader>
               {{ column.label }} -->
-            <i *ngIf="column.sortable" class="fas" [ngClass]="getSortIcon(column.field)"></i>
-            <!-- </ng-template> -->
-          </th>
-        </tr>
-      </thead>
-      <tbody>
+              <i *ngIf="column.sortable" class="fas" [ngClass]="getSortIcon(column.field)"></i>
+              <!-- </ng-template> -->
+            </th>
+          </tr>
+        </thead>
+        <tbody>
           <tr *ngFor="let report of paginatedData()">
             <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
               <ng-container [ngSwitch]="column.field">
@@ -118,97 +172,107 @@
                 </span> -->
                 <!-- Default Case -->
                 <span *ngSwitchDefault>{{ report[column.field] }}</span>
+                <span *ngSwitchCase="'caseStatus'">
+                  <span class="badge" [ngClass]="getStatusBadgeClass(report[column.field])">
+                    {{ report[column.field] }}
+                  </span>
+                </span>
                 <span *ngSwitchCase="'action'">
                   <div class="d-inline-block">
-                    <button class="btn btn-primary btn-sm" (click)="openMessageBox(report);open(content)">Update Reason</button>
+                    <button class="btn btn-primary btn-sm" (click)="openMessageBox(report);open(content)">Update
+                      Reason</button>
                   </div>
                 </span>
               </ng-container>
             </td>
           </tr>
-      </tbody>
-    </table>
-    <!-- Show message if data is loading -->
-    <div *ngIf="loading" class="alert alert-warning">Loading...</div>
-    <!-- Show message if filtered data is empty -->
-    <div *ngIf="filteredData.length === 0 && !loading" class="alert alert-warning">No FIR data available.</div>
-    <!-- <button class="btn btn-primary mt-3" (click)="saveData()">Save Changes</button> -->
-    <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button>
-
-    <nav *ngIf="filteredData.length > itemsPerPage" class="d-flex justify-content-end mt-3">
-      <ul class="pagination">
-        <li class="page-item" [class.disabled]="page === 1">
-          <button class="page-link" (click)="previousPage()">Previous</button>
-        </li>
-        <li class="page-item" *ngFor="let pageNum of totalPagesArray()">
-          <button class="page-link" (click)="goToPage(pageNum)" [class.active]="page === pageNum">
-            {{ pageNum }}
-          </button>
-        </li>
-        <li class="page-item" [class.disabled]="page === totalPages()">
-          <button class="page-link" (click)="nextPage()">Next</button>
-        </li>
-      </ul>
-    </nav>
-  </div>
-</div>
-
-
-<div *ngIf="ReportType == 'District_Wise_Pending_UI'">
-  <div style="padding-right: 35px;" class="mt-0">
-    <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel1()">Download as Excel</button>
-  </div>
-  <div class="p-10 mt-0">
-    <h2>District Wise Pending UI</h2>
-    
-    <!-- Bootstrap Table -->
-    <div class="table-responsive">
-      <table class="table table-bordered tab-border">
-        <thead class="table-dark">
-          <tr>
-            <!-- Regular columns -->
-            <th rowspan="2" class="align-middle side_border">SI.</th>
-            <th rowspan="2" class="align-middle side_border">District</th>
-            <th rowspan="2" class="align-middle side_border">UI Total Number of Cases</th>
-            <th rowspan="2" class="align-middle side_border">Less than 60 Days</th>
-            
-            <!-- Spanning header for years -->
-            <th style="border-bottom: #fff solid 1px; text-align: center;" [colSpan]="yearColumns1.length">More than 60 Days</th>
-          </tr>
-          <tr>
-            <!-- Year columns under "More than 60 Days" -->
-            <!-- <ng-container *ngFor="let year of yearColumns1">
-              <th>{{ year }}</th>
-            </ng-container> -->
-            <ng-container>
-              <th class="side_border">{{currentYear}}</th>
-            </ng-container>
-            <ng-container>
-              <th class="side_border">{{(currentYear - 1)}}</th>
-            </ng-container>
-            <ng-container>
-              <th class="side_border">{{(currentYear - 2)}}</th>
-            </ng-container>
-          </tr>
-        </thead>
-        <tbody>
-          <tr  [ngClass]="{ 'grandTotalStyle side_border': item.revenue_district === 'Grand Total' }" *ngFor="let item of TypeReport1; let i = index">
-            <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
-            <td *ngIf="item.revenue_district == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{ item.revenue_district }}</td>
-            <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ item.revenue_district }}</td>
-            <td style="text-align: center;">{{ item.ui_total_cases }}</td>
-            <td style="text-align: center;">{{ item.less_than_60_days }}</td>
-            <td style="text-align: center;">{{ item.more_than_60_current_year }}</td>
-            <td style="text-align: center;">{{ item.more_than_60_last_year }}</td>
-            <td style="text-align: center;">{{ item.more_than_60_two_years_ago }}</td>
-    
-          </tr>
         </tbody>
       </table>
+      <!-- Show message if data is loading -->
+      <div *ngIf="loading" class="alert alert-warning">Loading...</div>
+      <!-- Show message if filtered data is empty -->
+      <div *ngIf="filteredData.length === 0 && !loading" class="alert alert-warning">No FIR data available.</div>
+      <!-- <button class="btn btn-primary mt-3" (click)="saveData()">Save Changes</button> -->
+      <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button>
+
+      <nav *ngIf="filteredData.length > itemsPerPage" class="d-flex justify-content-end mt-3">
+        <ul class="pagination">
+          <li class="page-item" [class.disabled]="page === 1">
+            <button class="page-link" (click)="previousPage()">Previous</button>
+          </li>
+          <li class="page-item" *ngFor="let pageNum of totalPagesArray()">
+            <button class="page-link" (click)="goToPage(pageNum)" [class.active]="page === pageNum">
+              {{ pageNum }}
+            </button>
+          </li>
+          <li class="page-item" [class.disabled]="page === totalPages()">
+            <button class="page-link" (click)="nextPage()">Next</button>
+          </li>
+        </ul>
+      </nav>
     </div>
-    
-    <!-- Pagination -->
-    <!-- <nav aria-label="Page navigation">
+  </div>
+
+
+  <div *ngIf="ReportType == 'District_Wise_Pending_UI'">
+    <div style="padding-right: 35px;" class="mt-0">
+      <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel1()">Download as Excel</button>
+    </div>
+    <div class="p-10 mt-0">
+      <h2>District Wise Pending UI</h2>
+
+      <!-- Bootstrap Table -->
+      <div class="table-responsive">
+        <table class="table table-bordered tab-border">
+          <thead class="table-dark">
+            <tr>
+              <!-- Regular columns -->
+              <th rowspan="2" class="align-middle side_border">SI.</th>
+              <th rowspan="2" class="align-middle side_border">District</th>
+              <th rowspan="2" class="align-middle side_border">UI Total Number of Cases</th>
+              <th rowspan="2" class="align-middle side_border">Less than 60 Days</th>
+
+              <!-- Spanning header for years -->
+              <th style="border-bottom: #fff solid 1px; text-align: center;" [colSpan]="yearColumns1.length">More than
+                60 Days</th>
+            </tr>
+            <tr>
+              <!-- Year columns under "More than 60 Days" -->
+              <!-- <ng-container *ngFor="let year of yearColumns1">
+              <th>{{ year }}</th>
+            </ng-container> -->
+              <ng-container>
+                <th class="side_border">{{currentYear}}</th>
+              </ng-container>
+              <ng-container>
+                <th class="side_border">{{(currentYear - 1)}}</th>
+              </ng-container>
+              <ng-container>
+                <th class="side_border">{{(currentYear - 2)}}</th>
+              </ng-container>
+            </tr>
+          </thead>
+          <tbody>
+            <tr [ngClass]="{ 'grandTotalStyle side_border': item.revenue_district === 'Grand Total' }"
+              *ngFor="let item of TypeReport1; let i = index">
+              <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
+              <td *ngIf="item.revenue_district == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{
+                item.revenue_district }}</td>
+              <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ item.revenue_district }}
+              </td>
+              <td style="text-align: center;">{{ item.ui_total_cases }}</td>
+              <td style="text-align: center;">{{ item.less_than_60_days }}</td>
+              <td style="text-align: center;">{{ item.more_than_60_current_year }}</td>
+              <td style="text-align: center;">{{ item.more_than_60_last_year }}</td>
+              <td style="text-align: center;">{{ item.more_than_60_two_years_ago }}</td>
+
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <!-- <nav aria-label="Page navigation">
       <ul class="pagination justify-content-center">
         <li class="page-item" [class.disabled]="currentPage1 === 1">
           <a class="page-link" href="javascript:void(0)" (click)="prevPage1()">Previous</a>
@@ -228,68 +292,72 @@
       Showing {{ ((currentPage1 - 1) * itemsPerPage1) + 1 }} to 
       {{ getMinValue(currentPage1 * itemsPerPage1, totalItems1) }} of {{ totalItems1 }} entries
     </div> -->
+    </div>
   </div>
-</div>
 
 
 
-<div *ngIf="ReportType == 'Reason_for_Pending_UI'">
-  <div style="padding-right: 35px;" class="mt-0">
-    <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel2()">Download as Excel</button>
-  </div>
-  <div class="p-10 mt-0">
-    <h2>Reason for Pending UI</h2>
-    
-    <!-- Bootstrap Table -->
-    <div class="table-responsive">
-      <table class="table table-bordered tab-border">
-        <thead class="table-dark">
-          <tr>
-            <!-- Regular columns -->
-            <th rowspan="2" class="align-middle side_border">SI.</th>
-            <th rowspan="2" class="align-middle side_border">Reason for Status</th>
-            <th rowspan="2" class="align-middle side_border">UI Total Number of Cases</th>
-            <th rowspan="2" class="align-middle side_border">Less than 60 Days</th>
-            
-            <!-- Spanning header for years -->
-            <th style="border-bottom: #fff solid 1px; text-align: center;" [colSpan]="yearColumns1.length">More than 60 Days</th>
-          </tr>
-          <tr>
-            <!-- Year columns under "More than 60 Days" -->
-            <!-- <ng-container *ngFor="let year of yearColumns1">
+  <div *ngIf="ReportType == 'Reason_for_Pending_UI'">
+    <div style="padding-right: 35px;" class="mt-0">
+      <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel2()">Download as Excel</button>
+    </div>
+    <div class="p-10 mt-0">
+      <h2>Reason for Pending UI</h2>
+
+      <!-- Bootstrap Table -->
+      <div class="table-responsive">
+        <table class="table table-bordered tab-border">
+          <thead class="table-dark">
+            <tr>
+              <!-- Regular columns -->
+              <th rowspan="2" class="align-middle side_border">SI.</th>
+              <th rowspan="2" class="align-middle side_border">Reason for Status</th>
+              <th rowspan="2" class="align-middle side_border">UI Total Number of Cases</th>
+              <th rowspan="2" class="align-middle side_border">Less than 60 Days</th>
+
+              <!-- Spanning header for years -->
+              <th style="border-bottom: #fff solid 1px; text-align: center;" [colSpan]="yearColumns1.length">More than
+                60 Days</th>
+            </tr>
+            <tr>
+              <!-- Year columns under "More than 60 Days" -->
+              <!-- <ng-container *ngFor="let year of yearColumns1">
               <th>{{ year }}</th>
             </ng-container> -->
-            <ng-container>
-              <th class="side_border">{{currentYear}}</th>
-            </ng-container>
-            <ng-container>
-              <th class="side_border">{{(currentYear - 1)}}</th>
-            </ng-container>
-            <ng-container>
-              <th class="side_border">{{(currentYear - 2)}}</th>
-            </ng-container>
-          </tr>
-        </thead>
-        <tbody>
-          <tr  [ngClass]="{ 'grandTotalStyle side_border': item.reason_for_status === 'Grand Total' }" *ngFor="let item of TypeReport2; let i = index">
-            <td *ngIf="item.reason_for_status != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
-            <td *ngIf="item.reason_for_status == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{ item.reason_for_status }}</td>
-            <td *ngIf="item.reason_for_status != 'Grand Total'" style="text-align: center;">{{ item.reason_for_status }}</td>
-            <!-- <td style="text-align: center;">{{ i + 1 }}</td>
+              <ng-container>
+                <th class="side_border">{{currentYear}}</th>
+              </ng-container>
+              <ng-container>
+                <th class="side_border">{{(currentYear - 1)}}</th>
+              </ng-container>
+              <ng-container>
+                <th class="side_border">{{(currentYear - 2)}}</th>
+              </ng-container>
+            </tr>
+          </thead>
+          <tbody>
+            <tr [ngClass]="{ 'grandTotalStyle side_border': item.reason_for_status === 'Grand Total' }"
+              *ngFor="let item of TypeReport2; let i = index">
+              <td *ngIf="item.reason_for_status != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
+              <td *ngIf="item.reason_for_status == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{
+                item.reason_for_status }}</td>
+              <td *ngIf="item.reason_for_status != 'Grand Total'" style="text-align: center;">{{ item.reason_for_status
+                }}</td>
+              <!-- <td style="text-align: center;">{{ i + 1 }}</td>
             <td style="text-align: center;">{{ item.reason_for_status }}</td> -->
-            <td style="text-align: center;">{{ item.ui_total_cases }}</td>
-            <td style="text-align: center;">{{ item.less_than_60_days }}</td>
-            <td style="text-align: center;">{{ item.more_than_60_current_year }}</td>
-            <td style="text-align: center;">{{ item.more_than_60_last_year }}</td>
-            <td style="text-align: center;">{{ item.more_than_60_two_years_ago }}</td>
-    
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    
-    <!-- Pagination -->
-    <!-- <nav aria-label="Page navigation">
+              <td style="text-align: center;">{{ item.ui_total_cases }}</td>
+              <td style="text-align: center;">{{ item.less_than_60_days }}</td>
+              <td style="text-align: center;">{{ item.more_than_60_current_year }}</td>
+              <td style="text-align: center;">{{ item.more_than_60_last_year }}</td>
+              <td style="text-align: center;">{{ item.more_than_60_two_years_ago }}</td>
+
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <!-- <nav aria-label="Page navigation">
       <ul class="pagination justify-content-center">
         <li class="page-item" [class.disabled]="currentPage2 === 1">
           <a class="page-link" href="javascript:void(0)" (click)="prevPage2()">Previous</a>
@@ -309,68 +377,72 @@
       Showing {{ ((currentPage2 - 1) * itemsPerPage2) + 1 }} to 
       {{ getMinValue(currentPage2 * itemsPerPage2, totalItems2) }} of {{ totalItems2 }} entries
     </div> -->
+    </div>
   </div>
-</div>
 
 
 
-<div *ngIf="ReportType == 'Community_Certificate'">
-  <div style="padding-right: 35px;" class="mt-0">
-    <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel3()">Download as Excel</button>
-  </div>
-  <div class="p-10 mt-0">
-    <h2>Community Certificate</h2>
-    
-    <!-- Bootstrap Table -->
-    <div class="table-responsive">
-      <table class="table table-bordered tab-border">
-        <thead class="table-dark">
-          <tr>
-            <!-- Regular columns -->
-            <th rowspan="2" class="align-middle side_border">SI.</th>
-            <th rowspan="2" class="align-middle side_border">District</th>
-            <th rowspan="2" class="align-middle side_border">UI Total Number of Cases</th>
-            <th rowspan="2" class="align-middle side_border">Less than 60 Days</th>
-            
-            <!-- Spanning header for years -->
-            <th style="border-bottom: #fff solid 1px; text-align: center;" [colSpan]="yearColumns1.length">More than 60 Days</th>
-          </tr>
-          <tr>
-            <!-- Year columns under "More than 60 Days" -->
-            <!-- <ng-container *ngFor="let year of yearColumns1">
+  <div *ngIf="ReportType == 'Community_Certificate'">
+    <div style="padding-right: 35px;" class="mt-0">
+      <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel3()">Download as Excel</button>
+    </div>
+    <div class="p-10 mt-0">
+      <h2>Community Certificate</h2>
+
+      <!-- Bootstrap Table -->
+      <div class="table-responsive">
+        <table class="table table-bordered tab-border">
+          <thead class="table-dark">
+            <tr>
+              <!-- Regular columns -->
+              <th rowspan="2" class="align-middle side_border">SI.</th>
+              <th rowspan="2" class="align-middle side_border">District</th>
+              <th rowspan="2" class="align-middle side_border">UI Total Number of Cases</th>
+              <th rowspan="2" class="align-middle side_border">Less than 60 Days</th>
+
+              <!-- Spanning header for years -->
+              <th style="border-bottom: #fff solid 1px; text-align: center;" [colSpan]="yearColumns1.length">More than
+                60 Days</th>
+            </tr>
+            <tr>
+              <!-- Year columns under "More than 60 Days" -->
+              <!-- <ng-container *ngFor="let year of yearColumns1">
               <th>{{ year }}</th>
             </ng-container> -->
-            <ng-container>
-              <th class="side_border">{{currentYear}}</th>
-            </ng-container>
-            <ng-container>
-              <th class="side_border">{{(currentYear - 1)}}</th>
-            </ng-container>
-            <ng-container>
-              <th class="side_border">{{(currentYear - 2)}}</th>
-            </ng-container>
-          </tr>
-        </thead>
-        <tbody>
-          <tr  [ngClass]="{ 'grandTotalStyle side_border': item.revenue_district === 'Grand Total' }" *ngFor="let item of TypeReport3; let i = index">
-            <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
-            <td *ngIf="item.revenue_district == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{ item.revenue_district }}</td>
-            <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ item.revenue_district }}</td>
-            <!-- <td style="text-align: center;">{{ i + 1 }}</td>
+              <ng-container>
+                <th class="side_border">{{currentYear}}</th>
+              </ng-container>
+              <ng-container>
+                <th class="side_border">{{(currentYear - 1)}}</th>
+              </ng-container>
+              <ng-container>
+                <th class="side_border">{{(currentYear - 2)}}</th>
+              </ng-container>
+            </tr>
+          </thead>
+          <tbody>
+            <tr [ngClass]="{ 'grandTotalStyle side_border': item.revenue_district === 'Grand Total' }"
+              *ngFor="let item of TypeReport3; let i = index">
+              <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
+              <td *ngIf="item.revenue_district == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{
+                item.revenue_district }}</td>
+              <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ item.revenue_district }}
+              </td>
+              <!-- <td style="text-align: center;">{{ i + 1 }}</td>
             <td style="text-align: center;">{{ item.revenue_district }}</td> -->
-            <td style="text-align: center;">{{ item.ui_total_cases }}</td>
-            <td style="text-align: center;">{{ item.less_than_60_days }}</td>
-            <td style="text-align: center;">{{ item.more_than_60_current_year }}</td>
-            <td style="text-align: center;">{{ item.more_than_60_last_year }}</td>
-            <td style="text-align: center;">{{ item.more_than_60_two_years_ago }}</td>
-    
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    
-    <!-- Pagination -->
-    <!-- <nav aria-label="Page navigation">
+              <td style="text-align: center;">{{ item.ui_total_cases }}</td>
+              <td style="text-align: center;">{{ item.less_than_60_days }}</td>
+              <td style="text-align: center;">{{ item.more_than_60_current_year }}</td>
+              <td style="text-align: center;">{{ item.more_than_60_last_year }}</td>
+              <td style="text-align: center;">{{ item.more_than_60_two_years_ago }}</td>
+
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <!-- <nav aria-label="Page navigation">
       <ul class="pagination justify-content-center">
         <li class="page-item" [class.disabled]="currentPage3 === 1">
           <a class="page-link" href="javascript:void(0)" (click)="prevPage3()">Previous</a>
@@ -390,60 +462,63 @@
       Showing {{ ((currentPage3 - 1) * itemsPerPage3) + 1 }} to 
       {{ getMinValue(currentPage3 * itemsPerPage3, totalItems3) }} of {{ totalItems3 }} entries
     </div> -->
-  </div>
-</div>
-
-
-
-
-
-<div *ngIf="ReportType == 'District_wise_PT'">
-  <div style="padding-right: 35px;" class="mt-0">
-    <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel4()">Download as Excel</button>
-  </div>
-  <div class="p-10 mt-0">
-    <h2>District Wise PT</h2>
-    
-    <!-- Bootstrap Table -->
-    <div class="table-responsive">
-      <table class="table table-bordered tab-border">
-        <thead class="table-dark">
-          <tr>
-            <!-- Regular columns -->
-            <th rowspan="2" class="align-middle side_border">SI.</th>
-            <th rowspan="2" class="align-middle side_border">District</th>
-            <th rowspan="2" class="align-middle side_border">PT Total Number of Cases</th>
-            <th rowspan="2" class="align-middle side_border">Less than one Year</th>
-            <th rowspan="2" class="align-middle side_border">1-5 Yrs</th>
-            <th rowspan="2" class="align-middle side_border">6-10 Yrs</th>
-            <th rowspan="2" class="align-middle side_border">11-15 Yrs</th>
-            <th rowspan="2" class="align-middle side_border">16-20 Yrs</th>
-            <th rowspan="2" class="align-middle side_border">Above 20 Yrs</th>
-            
-          </tr>
-        </thead>
-        <tbody>
-             <tr  [ngClass]="{ 'grandTotalStyle side_border': item.revenue_district === 'Grand Total' }" *ngFor="let item of TypeReport4; let i = index">
-            <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
-            <td *ngIf="item.revenue_district == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{ item.revenue_district }}</td>
-            <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ item.revenue_district }}</td>
-            <!-- <td style="text-align: center;">{{ i + 1 }}</td>
-            <td style="text-align: center;">{{ item.revenue_district }}</td> -->
-            <td style="text-align: center;">{{ item.total }}</td>
-            <td style="text-align: center;">{{ item.less_than_one_year }}</td>
-            <td style="text-align: center;">{{ item.between_1_and_5_years }}</td>
-            <td style="text-align: center;">{{ item.between_6_and_10_years }}</td>
-            <td style="text-align: center;">{{ item.between_11_and_15_years }}</td>
-            <td style="text-align: center;">{{ item.between_16_and_20_years }}</td>
-            <td style="text-align: center;">{{ item.above_20_years }}</td>
-    
-          </tr>
-        </tbody>
-      </table>
     </div>
-    
-    <!-- Pagination -->
-    <!-- <nav aria-label="Page navigation">
+  </div>
+
+
+
+
+
+  <div *ngIf="ReportType == 'District_wise_PT'">
+    <div style="padding-right: 35px;" class="mt-0">
+      <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel4()">Download as Excel</button>
+    </div>
+    <div class="p-10 mt-0">
+      <h2>District Wise PT</h2>
+
+      <!-- Bootstrap Table -->
+      <div class="table-responsive">
+        <table class="table table-bordered tab-border">
+          <thead class="table-dark">
+            <tr>
+              <!-- Regular columns -->
+              <th rowspan="2" class="align-middle side_border">SI.</th>
+              <th rowspan="2" class="align-middle side_border">District</th>
+              <th rowspan="2" class="align-middle side_border">PT Total Number of Cases</th>
+              <th rowspan="2" class="align-middle side_border">Less than one Year</th>
+              <th rowspan="2" class="align-middle side_border">1-5 Yrs</th>
+              <th rowspan="2" class="align-middle side_border">6-10 Yrs</th>
+              <th rowspan="2" class="align-middle side_border">11-15 Yrs</th>
+              <th rowspan="2" class="align-middle side_border">16-20 Yrs</th>
+              <th rowspan="2" class="align-middle side_border">Above 20 Yrs</th>
+
+            </tr>
+          </thead>
+          <tbody>
+            <tr [ngClass]="{ 'grandTotalStyle side_border': item.revenue_district === 'Grand Total' }"
+              *ngFor="let item of TypeReport4; let i = index">
+              <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
+              <td *ngIf="item.revenue_district == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{
+                item.revenue_district }}</td>
+              <td *ngIf="item.revenue_district != 'Grand Total'" style="text-align: center;">{{ item.revenue_district }}
+              </td>
+              <!-- <td style="text-align: center;">{{ i + 1 }}</td>
+            <td style="text-align: center;">{{ item.revenue_district }}</td> -->
+              <td style="text-align: center;">{{ item.total }}</td>
+              <td style="text-align: center;">{{ item.less_than_one_year }}</td>
+              <td style="text-align: center;">{{ item.between_1_and_5_years }}</td>
+              <td style="text-align: center;">{{ item.between_6_and_10_years }}</td>
+              <td style="text-align: center;">{{ item.between_11_and_15_years }}</td>
+              <td style="text-align: center;">{{ item.between_16_and_20_years }}</td>
+              <td style="text-align: center;">{{ item.above_20_years }}</td>
+
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <!-- <nav aria-label="Page navigation">
       <ul class="pagination justify-content-center">
         <li class="page-item" [class.disabled]="currentPage4 === 1">
           <a class="page-link" href="javascript:void(0)" (click)="prevPage4()">Previous</a>
@@ -463,44 +538,47 @@
       Showing {{ ((currentPage4 - 1) * itemsPerPage4) + 1 }} to 
       {{ getMinValue(currentPage4 * itemsPerPage4, totalItems4) }} of {{ totalItems4 }} entries
     </div> -->
-  </div>
-</div>
-
-
-
-<div *ngIf="ReportType == 'Conviction'">
-  <div style="padding-right: 35px;" class="mt-0">
-    <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel5()">Download as Excel</button>
-  </div>
-  <div class="p-10 mt-0">
-    <h2>Conviction for the Year {{currentYear}}</h2>
-    
-    <!-- Bootstrap Table -->
-    <div class="table-responsive">
-      <table class="table table-bordered tab-border">
-        <thead class="table-dark">
-          <tr>
-            <!-- Regular columns -->
-            <th rowspan="2" class="align-middle side_border">SI.</th>
-            <th rowspan="2" class="align-middle side_border">Judgement Type</th>
-            <th rowspan="2" class="align-middle side_border">Number of Cases</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr  [ngClass]="{ 'grandTotalStyle side_border': item.Conviction_Type === 'Grand Total' }" *ngFor="let item of TypeReport5; let i = index">
-            <td *ngIf="item.Conviction_Type != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
-            <td *ngIf="item.Conviction_Type == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{ item.Conviction_Type }}</td>
-            <td *ngIf="item.Conviction_Type != 'Grand Total'" style="text-align: center;">{{ item.Conviction_Type }}</td>
-            <!-- <td style="text-align: center;">{{ i + 1 }}</td>
-            <td style="text-align: center;">{{ item.Conviction_Type }}</td> -->
-            <td style="text-align: center;">{{ item.case_count }}</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
-    
-    <!-- Pagination -->
-    <!-- <nav aria-label="Page navigation">
+  </div>
+
+
+
+  <div *ngIf="ReportType == 'Conviction'">
+    <div style="padding-right: 35px;" class="mt-0">
+      <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel5()">Download as Excel</button>
+    </div>
+    <div class="p-10 mt-0">
+      <h2>Conviction for the Year {{currentYear}}</h2>
+
+      <!-- Bootstrap Table -->
+      <div class="table-responsive">
+        <table class="table table-bordered tab-border">
+          <thead class="table-dark">
+            <tr>
+              <!-- Regular columns -->
+              <th rowspan="2" class="align-middle side_border">SI.</th>
+              <th rowspan="2" class="align-middle side_border">Judgement Type</th>
+              <th rowspan="2" class="align-middle side_border">Number of Cases</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr [ngClass]="{ 'grandTotalStyle side_border': item.Conviction_Type === 'Grand Total' }"
+              *ngFor="let item of TypeReport5; let i = index">
+              <td *ngIf="item.Conviction_Type != 'Grand Total'" style="text-align: center;">{{ i + 1 }}</td>
+              <td *ngIf="item.Conviction_Type == 'Grand Total'" [colSpan]="2" style="text-align: center;">{{
+                item.Conviction_Type }}</td>
+              <td *ngIf="item.Conviction_Type != 'Grand Total'" style="text-align: center;">{{ item.Conviction_Type }}
+              </td>
+              <!-- <td style="text-align: center;">{{ i + 1 }}</td>
+            <td style="text-align: center;">{{ item.Conviction_Type }}</td> -->
+              <td style="text-align: center;">{{ item.case_count }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <!-- <nav aria-label="Page navigation">
       <ul class="pagination justify-content-center">
         <li class="page-item" [class.disabled]="currentPage5 === 1">
           <a class="page-link" href="javascript:void(0)" (click)="prevPage5()">Previous</a>
@@ -520,31 +598,30 @@
       Showing {{ ((currentPage5 - 1) * itemsPerPage5) + 1 }} to 
       {{ getMinValue(currentPage5 * itemsPerPage5, totalItems5) }} of {{ totalItems5 }} entries
     </div> -->
+    </div>
   </div>
-</div>
 
 </div>
 
 
 
 <ng-template #content let-modal>
-	<div class="modal-header">
-		<h4 class="modal-title" id="modal-basic-title">{{getCurrentMonthShort()}}</h4>
-		<button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
-	</div>
-	<div class="modal-body">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{getCurrentMonthShort()}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
     <div class="modal-body">
       <label class="form-label" for="name">Reason</label>
       <!-- <textarea id="name" class="form-control" name="name"></textarea> -->
       <textarea class="form-control h-auto p-1 mr-2 float-left"
-      style="min-height: 70px;;border: 1px solid #ccc;width:95%"
-      [(ngModel)]="reason_Update" #text="ngModel" name="text"></textarea>
+        style="min-height: 70px;;border: 1px solid #ccc;width:95%" [(ngModel)]="reason_Update" #text="ngModel"
+        name="text"></textarea>
+    </div>
   </div>
-	</div>
-	<div class="modal-footer">
+  <div class="modal-footer">
     <button (click)="MonnthlyUpdateSubmit();modal.close('Cross click')" type="button" class="btn btn-info ">
       Submit
-  </button>
-	</div>
+    </button>
+  </div>
 </ng-template>
-

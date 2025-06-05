@@ -26,6 +26,18 @@
                     <option [value]="subdiv" *ngFor="let subdiv of subdivs">{{subdiv}}</option>
                 </select>
             </div>
+            <div>
+                <p>Year</p>
+                <select name="" id="">
+                    <option value="" selected>Select</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <!-- <option [value]="subdiv" *ngFor="let subdiv of subdivs">{{subdiv}}</option> -->
+                </select>
+            </div>
         </li>
         <li class="d-flex justify-content-end align-items-center">
             <img src="assets/images/filter.png" alt="filter" width="40px" (click)="clear()">

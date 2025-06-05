@@ -4,14 +4,70 @@
       <div class="d-flex align-items-center position-relative my-1">
         <i class="fas fa-search fs-3 position-absolute ms-5"></i>
         <input type="text" [(ngModel)]="searchText" class="form-control form-control-solid w-250px ps-12"
-          placeholder="Search Member Name" (input)="filterMembers()" />
+          placeholder="Search Member Name" (input)="get_filter_json()" />
       </div>
     </div>
     <div class="card-toolbar">
       <button class="btn btn-primary" (click)="openModal()">
-        <i class="fas fa-plus-circle"></i> Add Member 
+        <i class="fas fa-plus-circle"></i> Add Member
       </button>
     </div>
+  </div>
+  <div class="row d-flex mb-3 p-4 align-items-center">
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <label for="form-label">District</label>
+      <select class="form-control" [(ngModel)]="selectedDistrict" (change)="getSubdivisions();get_filter_json()">
+        <option value="" selected>District</option>
+        <option [value]="district" *ngFor="let district of districts">{{district}}</option>
+      </select>
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <label for="form-label">Sub Division</label>
+      <select class="form-control" [(ngModel)]="selectedSubDivision" (change)="get_filter_json()">
+        <option value="" selected>Sub Division</option>
+        <option [value]="subdiv" *ngFor="let subdiv of subdivs">{{subdiv}}</option>
+      </select>
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <label for="form-label">Status</label>
+      <select class="form-control" [(ngModel)]="selectedStatus" (change)="get_filter_json()">
+        <option value="" selected>Status</option>
+        <option *ngFor="let option of status" [value]="option">
+          {{ option }}
+        </option>
+      </select>
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <label for="form-label">Member Type</label>
+      <select class="form-control" [(ngModel)]="selectedMemberType" (change)="get_filter_json()">
+        <option value="" selected>Member Type</option>
+        <option value="Official Member">Official Member</option>
+        <option value="Non-Official Member">Non-Official Member</option>
+      </select>
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <label for="form-label">Designation of Member</label>
+      <select class="form-control" [(ngModel)]="selectedDesignationMember" (change)="get_filter_json()">
+        <option value="" disabled>Select Designation</option>
+        <option [value]="option" *ngFor="let option of options">{{option}}</option>
+      </select>
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <label for="form-label">Date of Appointment</label>
+      <input type="date" class="form-control" [(ngModel)]="doa" (change)="get_filter_json()">
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <label for="form-label">Level of Member</label>
+      <select class="form-control" [(ngModel)]="selectedMemberLevel" (change)="get_filter_json()">
+        <option value="" disabled>Select Level</option>
+            <option *ngIf="Parsed_UserInfo.role != '4'" value="State Level">State Level</option>
+            <option value="District Level">District Level</option>
+            <option value="Subdivision">Subdivision</option>
+      </select>
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <button class="btn btn-primary btn-sm" (click)="clear()">Clear Filters</button>
+      </div>
   </div>
 
   <div class="card-body pt-0">
@@ -37,7 +93,7 @@
         <tr *ngIf="filteredMembers.length === 0">
           <td colspan="9" class="text-center">No data found</td>
         </tr>
-        <tr *ngFor="let member of filteredMembers | paginate: { itemsPerPage: 10, currentPage: page }; let i = index">
+        <tr *ngFor="let member of getFilteredTable(filteredMembers,filteredJson) | paginate: { itemsPerPage: 10, currentPage: page }; let i = index">
           <td>{{ (page - 1) * 10 + i + 1 }}</td>
           <td>{{ member.member_type || 'N/A' }}</td>
           <td>{{ member.salutation || 'N/A' }}</td>
@@ -127,18 +183,23 @@
             <option value="Hon'ble Minister for Adi Dravidar Welfare">Hon'ble Minister for Adi Dravidar Welfare</option>
             <option value="Member of Parliament (MP)">Member of Parliament (MP)</option>
             <option value="Member of Legislative Assembly (MLA)">Member of Legislative Assembly (MLA)</option>
-            <option value="Chief Secretary of the Government of Tamil Nadu">Chief Secretary of the Government of Tamil Nadu</option>
+            <option value="Chief Secretary of the Government of Tamil Nadu">Chief Secretary of the Government of Tamil
+              Nadu</option>
             <option value="Secretary, Home Department">Secretary, Home Department</option>
             <option value="Director General of Police (DGP)">Director General of Police (DGP)</option>
-            <option value="Director, National Commission for the SCs and STs">Director, National Commission for the SCs and STs</option>
-            <option value="Deputy Director, National Commission for SCs and STs">Deputy Director, National Commission for SCs and STs</option>
-            <option value="Secretary, Adi Dravidar and Tribal Welfare Department">Secretary, Adi Dravidar and Tribal Welfare Department</option>
+            <option value="Director, National Commission for the SCs and STs">Director, National Commission for the SCs
+              and STs</option>
+            <option value="Deputy Director, National Commission for SCs and STs">Deputy Director, National Commission
+              for SCs and STs</option>
+            <option value="Secretary, Adi Dravidar and Tribal Welfare Department">Secretary, Adi Dravidar and Tribal
+              Welfare Department</option>
             <option value="District Collector">District Collector</option>
             <option value="Superintendent of Police (SP)">Superintendent of Police (SP)</option>
             <option value="Deputy Superintendent of Police (DSP)">Deputy Superintendent of Police (DSP)</option>
             <option value="DADTWO">DADTWO</option>
             <option value="Sub-Divisional Magistrate (SDM)">Sub-Divisional Magistrate (SDM)</option>
-            <option value="Member of Legislative Council (Councillor)">Member of Legislative Council (Councillor)</option>
+            <option value="Member of Legislative Council (Councillor)">Member of Legislative Council (Councillor)
+            </option>
             <option value="Panchayat President">Panchayat President</option>
             <option value="Panchayat Vice-President">Panchayat Vice-President</option>
             <option value="Member of Panchayat">Member of Panchayat</option>
@@ -151,8 +212,8 @@
         <!-- Non-Official Member Designation -->
         <div class="col-md-12 mt-3" *ngIf="member.member_type == 'Non-Official Member'">
           <label for="designation" class="form-label">Designation</label>
-          <input type="text" class="form-control" id="designation" name="designation"
-            [(ngModel)]="member.designation" placeholder="Enter Other Designation" required />
+          <input type="text" class="form-control" id="designation" name="designation" [(ngModel)]="member.designation"
+            placeholder="Enter Other Designation" required />
         </div>
 
         <!-- Other Designation -->
@@ -165,8 +226,8 @@
         <!-- Meeting Date -->
         <div class="col-md-12 mt-3">
           <label for="appointment_date" class="form-label">Date of Appointment</label><span class="required"></span>
-          <input type="date" class="form-control" id="appointment_date" name="appointment_date" [(ngModel)]="member.appointment_date"
-            required />
+          <input type="date" class="form-control" id="appointment_date" name="appointment_date"
+            [(ngModel)]="member.appointment_date" required />
         </div>
 
         <!-- Validity End Date -->
@@ -189,8 +250,9 @@
 
         <div class="col-md-12 mt-3">
           <label for="district" class="form-label">District</label>
-          <select class="form-select" id="district" name="district" [(ngModel)]="member.district" (ngModelChange)="onDistrictChange($event)"
-            (change)="onDistrictChange($event)" [disabled]="isDistrictDisabled" required>
+          <select class="form-select" id="district" name="district" [(ngModel)]="member.district"
+            (ngModelChange)="onDistrictChange($event)" (change)="onDistrictChange($event)"
+            [disabled]="isDistrictDisabled" required>
             <option value="" disabled>Select District</option>
             <option *ngFor="let district of districts" [value]="district.district">
               {{ district.district }}
