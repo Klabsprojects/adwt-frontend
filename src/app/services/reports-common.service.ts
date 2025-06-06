@@ -227,6 +227,7 @@ export class ReportsCommonService {
   selectedFromDate: string,
   selectedToDate: string
 ): any[] {
+  console.log("reportData", reportData);
   return reportData.filter((report) => {
     // Helper function to check if a value matches (handles strings and arrays)
     const matchesField = (reportValue: any, filterValue: any, isPartialMatch: boolean = false) => {
@@ -236,14 +237,14 @@ export class ReportsCommonService {
       }
       // Handle array-based filters (e.g., selectedDistricts, selectedOffence)
       if (Array.isArray(filterValue)) {
-        return filterValue.includes(reportValue);
+        return filterValue.includes(String(reportValue));
       }
       // Partial matching for strings
       if (isPartialMatch && typeof reportValue === 'string' && typeof filterValue === 'string') {
         return reportValue.toLowerCase().includes(filterValue.toLowerCase());
       }
       // Exact matching
-      return reportValue === filterValue;
+      return String(reportValue) === String(filterValue);
     };
 
     // Date range filtering
@@ -261,10 +262,10 @@ export class ReportsCommonService {
       return reportDateObj >= from && reportDateObj <= to;
     };
 
-    // Search text applies to a specific field (e.g., reportName or description)
-    // Adjust 'reportName' to the actual field you want to search
+    // Search text applies to specific fields (e.g., firNumber, stationName)
     const matchesSearchText = searchText
-      ? report.reportName?.toString().toLowerCase().includes(searchText.toLowerCase())
+      ? report.firNumber?.toString().toLowerCase().includes(searchText.toLowerCase()) ||
+        report.stationName?.toString().toLowerCase().includes(searchText.toLowerCase())
       : true;
 
     // Field-specific matches
@@ -272,30 +273,57 @@ export class ReportsCommonService {
     const matchesNature = matchesField(report[offenceKey], selectedNatureOfOffence);
     const matchesDistricts = matchesField(report[districtKey], selectedDistricts);
     const matchesOffence = matchesField(report[offenceKey], selectedOffence);
-
-    // Handle caseStatus with special logic
-    let caseStatus = report[caseStatusKey] || '';
-    if (caseStatus.includes('Pending |') && caseStatus.includes('Completed')) {
-      caseStatus = caseStatus.replace('Completed', '').trim();
-    }
-    const matchesStatus = selectedStatusOfCase
-      ? (selectedStatusOfCase === 'Just Starting' && caseStatus === 'FIR Draft') ||
-        (selectedStatusOfCase === 'Pending' && caseStatus.includes('Pending')) ||
-        (selectedStatusOfCase === 'Completed' && caseStatus.includes('Completed'))
-      : true;
-
-    const matchesReliefStatus = selectedStatusOfRelief
-      ? (selectedStatusOfRelief === 'FIR Stage' && caseStatus.includes('FIR Stage')) ||
-        (selectedStatusOfRelief === 'ChargeSheet Stage' && caseStatus.includes('Charge Sheet')) ||
-        (selectedStatusOfRelief === 'Trial Stage' && caseStatus.includes('Trial'))
-      : true;
-
-    // Exact matches for other fields
-    const matchesStatusField = matchesField(caseStatus, selectedStatus);
     const matchesCommunity = matchesField(report.community, selectedCommunity);
     const matchesCaste = matchesField(report.caste, selectedCaste);
     const matchesZone = matchesField(report.zone, selectedZone);
     const matchesPoliceCity = matchesField(report.policeCity, selectedPoliceCity);
+
+    // Handle caseStatus as a number
+    const caseStatus = report[caseStatusKey];
+
+    // Mapping for caseStatus to UI/PT status
+    const statusMap: { [key: number]: string } = {
+      0: 'UI',
+      1: 'UI',
+      2: 'UI',
+      3: 'UI',
+      4: 'UI',
+      5: 'UI',
+      6: 'PT',
+      7: 'PT',
+      8: 'PT',
+      9: 'PT',
+    };
+
+    // Mapping for caseStatus to descriptive status (for matchesStatus and matchesReliefStatus)
+    const caseStatusMap: { [key: number]: string } = {
+      1: 'FIR Draft',
+      2: 'Pending',
+      3: 'Charge Sheet',
+      4: 'Trial',
+      5: 'Completed',
+      // Add more mappings as needed
+    };
+
+    const caseStatusString = caseStatusMap[caseStatus] || String(caseStatus);
+    const uiPtStatus = statusMap[caseStatus] || '';
+
+    // Case status logic
+    const matchesStatus = selectedStatusOfCase
+      ? (selectedStatusOfCase === 'Just Starting' && caseStatusString === 'FIR Draft') ||
+        (selectedStatusOfCase === 'Pending' && caseStatusString.includes('Pending')) ||
+        (selectedStatusOfCase === 'Completed' && caseStatusString.includes('Completed'))
+      : true;
+
+    // Relief status logic
+    const matchesReliefStatus = selectedStatusOfRelief
+      ? (selectedStatusOfRelief === 'FIR Stage' && caseStatusString.includes('FIR')) ||
+        (selectedStatusOfRelief === 'ChargeSheet Stage' && caseStatusString.includes('Charge Sheet')) ||
+        (selectedStatusOfRelief === 'Trial Stage' && caseStatusString.includes('Trial'))
+      : true;
+
+    // UI/PT status filtering
+    const matchesStatusField = selectedStatus ? uiPtStatus === selectedStatus : true;
 
     // Combine all conditions
     return (
@@ -310,6 +338,7 @@ export class ReportsCommonService {
       matchesCaste &&
       matchesZone &&
       matchesPoliceCity &&
+      matchesStatusField &&
       matchesDateRange()
     );
   });
