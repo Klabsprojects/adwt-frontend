@@ -29,6 +29,9 @@
   </div>
 
   <div style="min-height: 500px;" class="card-body pt-0">
+    <div class="loader-overlay" *ngIf="loader">
+      <mat-spinner></mat-spinner>
+    </div>
     <!-- Filters -->
 
     <div class="d-flex gap-3 mb-3">
@@ -1862,4 +1865,16 @@
     visibility: visible;
     opacity: 1;
   }
+  .loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 99;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 </style>

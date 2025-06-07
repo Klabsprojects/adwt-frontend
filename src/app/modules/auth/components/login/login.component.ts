@@ -82,6 +82,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         ]),
       ],
       rememberMe: [rememberMe], // Set checkbox state
+      // recaptcha: ['', Validators.required]
     });
   }
 
@@ -158,5 +159,27 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());
+  }
+
+
+  //captcha code
+
+  siteKey: string = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
+
+  handleReset(): void {
+    console.log('reCAPTCHA reset');
+  }
+  
+  handleExpire(): void {
+    console.log('reCAPTCHA expired');
+  }
+  
+  handleLoad(): void {
+    console.log('reCAPTCHA loaded');
+  }
+  
+  handleSuccess(token: string): void {
+    // console.log('reCAPTCHA success, token:', token);
+    this.loginForm.get('recaptcha')?.setValue(token); // set the token in form control
   }
 }

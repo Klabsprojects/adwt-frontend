@@ -18,7 +18,7 @@ import { formatDate } from '@angular/common';
 })
 
 export class FirListComponent implements OnInit {
-
+  loader : boolean = false;
   firId: any;
   image_access = environment.image_access;
   image_access2 = environment.image_access2;
@@ -1457,6 +1457,7 @@ export class FirListComponent implements OnInit {
     this.isLoading = true;
     this.currentPage = page;
     this.pageSize = pageSize;
+    this.loader = true;
 
     this.firService.getPaginatedFirList(page, pageSize, this.getFilterParams()).subscribe(
       (response: any) => {
@@ -1468,6 +1469,7 @@ export class FirListComponent implements OnInit {
         // this.policeRanges = [...new Set(this.policeRanges)];
         // this.revenueDistricts = response.data.map((item: any) => item.revenue_district_name);
         this.isLoading = false;
+        this.loader = false;
         this.cdr.detectChanges();
       },
       (error) => {

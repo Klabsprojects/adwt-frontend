@@ -38,7 +38,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { VmcComponent  } from './vmc/vmc.component';
 import { LayoutModule } from 'src/app/_metronic/layout/layout.module';
-
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -77,7 +77,8 @@ import { LayoutModule } from 'src/app/_metronic/layout/layout.module';
     MatCheckboxModule,
     MatOptionModule,
     SweetAlert2Module,
-    LayoutModule
+    LayoutModule,
+    MatProgressSpinnerModule
   ],
 })
 export class WidgetsExamplesModule {}
