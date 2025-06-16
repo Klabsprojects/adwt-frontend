@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { ReportsCommonService } from 'src/app/services/reports-common.service';
 import { AdditionalReportService } from 'src/app/services/additional-report.service';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 @Component({
   selector: 'app-additional-relief-report',
@@ -89,6 +90,55 @@ export class AdditionalReliefReportComponent implements OnInit {
     {
       label: 'Revenue District',
       field: 'revenue_district',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+      {
+      label: 'Police City',
+      field: 'police_city',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+      {
+      label: 'Police Zone',
+      field: 'police_zone',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+      {
+      label: 'Community',
+      field: 'community',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+      {
+      label: 'Caste',
+      field: 'caste',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+      {
+      label: 'Data Entry Status',
+      field: 'status',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+     {
+      label: 'Case Status',
+      field: 'case_status',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+      {
+      label: 'Reporting Date',
+      field: 'date_of_registration',
       sortable: true,
       visible: true,
       sortDirection: null,
@@ -305,12 +355,31 @@ export class AdditionalReliefReportComponent implements OnInit {
   currentSortField: string = '';
   isAscending: boolean = true;
 
+  communities:any[]=[];
+  castes:any[]=[];
+  zones:any[]=[];
+  policeCities:any[]=[];
+   status: any[]=[
+    { key: 'UI', value: 'UI Stage' },
+    { key: 'PT', value: 'PT Stage' },
+  ]
+
+  selectedStatus:string='';
+  selectedDistricts:string='';
+  selectedCommunity:string='';
+  selectedCaste:string='';
+  selectedZone:string='';
+  selectedPoliceCity:string=''
+  selectedFromDate:any="";
+  selectedToDate:any="";
+
   constructor(
     // private firService: FirListTestService,
     private cdr: ChangeDetectorRef,
     private reportsCommonService: ReportsCommonService,
     private additionalReportService: AdditionalReportService,
-    private router: Router
+    private router: Router,
+    private dashboardService: DashboardService
   ) {
     this.loader = true;
   }
@@ -324,9 +393,32 @@ export class AdditionalReliefReportComponent implements OnInit {
         this.districts = districts;
         this.naturesOfOffence = offences;
         this.fetchAdditionalReports();
+        this.getDropdowns();
       });
     this.filteredData = [...this.reportData];
     this.selectedColumns = this.displayedColumns.map((column) => column.field);
+  }
+
+      getDropdowns() {
+    // this.dashboardService.userGetMethod('districts').subscribe((res:any)=>{
+    //   this.districts = res;
+    // })
+    this.dashboardService.userGetMethod('fir/communities').subscribe((res:any)=>{
+      this.communities = res;
+    })
+    this.dashboardService.userGetMethod('Zone_Filter_Data').subscribe((res:any)=>{
+      this.zones = res.data;
+    })
+    this.dashboardService.userGetMethod('Police_City_filtet_data').subscribe((res:any)=>{
+      this.policeCities = res.data;
+    })
+  }
+  getCaste(){
+    if(this.selectedCommunity){
+      this.dashboardService.userGetMethod(`fir/castes-by-community?community=${this.selectedCommunity}`).subscribe((res:any)=>{
+        this.castes = res;
+      })
+    }
   }
   
   // Updates the displayed columns based on the selected type of additional relief.
@@ -384,56 +476,27 @@ export class AdditionalReliefReportComponent implements OnInit {
     this.updateColumnVisibility();
   }
 
-  // Load all fir reports details into UI
-  fetchAdditionalReports(): void {
-    this.loader = true;
-    this.additionalReportService.getAdditionalReportDetails().subscribe({
-      next: (response) => {
-        //console.log('Additional Reports:', response.data); // Debugging
-        // Transform API response to match frontend structure
-        this.reportData = response.data.map((item: { revenue_district: any; police_station: any; fir_number: any; victim_name: any; victim_age: any; victim_gender: any; status: number; offence_committed: string; scst_sections: any; }, index: number) => ({
-          sl_no: index + 1,
-          revenue_district: item.revenue_district,
-          police_station_name: item.police_station,
-          fir_number: item.fir_number,
-          victim_name: item.victim_name === "NULL" ? '' : item.victim_name,
-          age: item.victim_age === "NULL" ? '' : item.victim_age,
-          gender: item.victim_gender === "NULL" ? '' : item.victim_gender,
-          status: this.reportsCommonService.caseStatusOptions.find(option => option.value === item.status)?.label || '',
-          nature_of_offence: (item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, '')), 
-          poa_section: (item.scst_sections || '').replace(/"/g, ''), // Remove double quotes
-        }));
-        // Update filteredData to reflect the API data
-        this.filteredData = [...this.reportData]; 
-        this.loader = false;
-        this.cdr.detectChanges(); // Trigger change detection
-      },
-      error: (error) => {
-        this.loader = false;
-        console.error('Error fetching reports:', error);
-      }
-    });
-  }
+
 
   // Applies filters, assigns serial numbers, and resets pagination
-  applyFilters(): void {
-    this.filteredData = this.reportsCommonService.applyFilters(
-      this.reportData,
-      this.searchText,
-      this.selectedDistrict,
-      this.selectedNatureOfOffence,
-      this.selectedStatusOfCase,
-      this.selectedStatusOfRelief,
-      'revenue_district',
-      'nature_of_offence',
-      'status'
-    );
-    this.filteredData = this.filteredData.map((report, index) => ({
-      ...report,
-      sl_no: index + 1,
-    })); // Assign sl_no starting from 1
-    this.page = 1; // Reset to the first page
-  }
+  // applyFilters(): void {
+  //   this.filteredData = this.reportsCommonService.applyFilters(
+  //     this.reportData,
+  //     this.searchText,
+  //     this.selectedDistrict,
+  //     this.selectedNatureOfOffence,
+  //     this.selectedStatusOfCase,
+  //     this.selectedStatusOfRelief,
+  //     'revenue_district',
+  //     'nature_of_offence',
+  //     'status'
+  //   );
+  //   this.filteredData = this.filteredData.map((report, index) => ({
+  //     ...report,
+  //     sl_no: index + 1,
+  //   })); // Assign sl_no starting from 1
+  //   this.page = 1; // Reset to the first page
+  // }
 
   // Sorting logic
   sortTable(field: string) {
@@ -509,4 +572,160 @@ export class AdditionalReliefReportComponent implements OnInit {
       'Additional-Reports'
     );
   }
+
+  clearfilter(){
+  this.searchText = '';
+  this.selectedDistrict = '';
+  this.selectedStatus='';
+  this.selectedDistricts='';
+  this.selectedCommunity='';
+  this.selectedCaste='';
+  this.selectedZone=''; 
+  this.selectedPoliceCity='';
+  this.selectedFromDate='';
+  this.selectedToDate = '';
+  this.filteredData = [...this.reportData]; 
+  }
+     getStatusTextUIPT(status: number): string {
+    console.log(status,'statussssssss')
+    const statusTextMap = {
+      0: 'UI',
+      1: 'UI',
+      2: 'UI',
+      3: 'UI',
+      4: 'UI',
+      5: 'UI',
+      6: 'PT',
+      7: 'PT',
+      8: 'PT',
+      9: 'PT',
+    } as { [key: number]: string };
+
+    return statusTextMap[status] || '';
+  }
+
+  
+  applyFilters() {
+  this.filteredData = this.reportData.filter(item => {
+
+    // Search filter for FIR number
+    if (this.searchText && this.searchText.trim() !== '' && 
+        item.fir_number.toLowerCase() !== this.searchText.toLowerCase().trim()) {
+      return false;
+    }
+
+    // District filter
+    if (this.selectedDistrict && this.selectedDistrict !== '' && 
+        item.revenue_district !== this.selectedDistrict) {
+      return false;
+    }
+
+    // Police City filter
+    if (this.selectedPoliceCity && this.selectedPoliceCity !== '' && 
+        item.police_city !== this.selectedPoliceCity) {
+      return false;
+    }
+
+    // Police Zone filter
+    if (this.selectedZone && this.selectedZone !== '' && 
+        item.police_zone !== this.selectedZone) {
+      return false;
+    }
+
+    // Community filter
+    if (this.selectedCommunity && this.selectedCommunity !== '' && 
+        item.community !== this.selectedCommunity) {
+      return false;
+    }
+
+    // Caste filter
+    if (this.selectedCaste && this.selectedCaste !== '' && 
+        item.caste !== this.selectedCaste) {
+      return false;
+    }
+
+    // Status filter (UI: status <= 5, PT: status > 5)
+    if (this.selectedStatus && this.selectedStatus !== '') {
+      if (this.selectedStatus === 'UI' && item.filter_status > 5) {
+        return false;
+      }
+      if (this.selectedStatus === 'PT' && item.filter_status <= 5) {
+        return false;
+      }
+    }
+
+    // Date range filter
+  if (this.selectedFromDate || this.selectedToDate) {
+  const registrationDate = new Date(item.date_of_registration);
+  
+  if (this.selectedFromDate && !this.selectedToDate) {
+    const fromDate = new Date(this.selectedFromDate);
+    if (registrationDate < fromDate) {
+      return false;
+    }
+  }
+  
+  if (this.selectedToDate && !this.selectedFromDate) {
+    const toDate = new Date(this.selectedToDate);
+    if (registrationDate > toDate) {
+      return false;
+    }
+  }
+
+  if (this.selectedToDate && this.selectedFromDate) {
+    const fromDate = new Date(this.selectedFromDate);
+    const toDate = new Date(this.selectedToDate);
+    if (registrationDate < fromDate || registrationDate > toDate) {
+      return false;
+    }
+  }
+}
+
+    return true;
+  });
+}
+
+ fetchAdditionalReports(): void {
+    this.loader = true;
+    this.additionalReportService.getAdditionalReportDetails().subscribe({
+      next: (response) => {
+        //console.log('Additional Reports:', response.data); // Debugging
+        // Transform API response to match frontend structure
+        this.reportData = response.data.map((item: { 
+          revenue_district: any; police_station: any; fir_number: any; victim_name: any; 
+          victim_age: any; victim_gender: any; status: number; 
+          offence_committed: string; scst_sections: any; 
+           police_zone : any; community : any; caste : any; date_of_registration : any; police_city : any;
+        }, index: number) => ({
+          sl_no: index + 1,
+          revenue_district: item.revenue_district,
+          police_station_name: item.police_station,
+          fir_number: item.fir_number === "NULL" || !item.fir_number ? '' : item.fir_number, // Fix this line
+          victim_name: item.victim_name === "NULL" ? '' : item.victim_name,
+          age: item.victim_age === "NULL" ? '' : item.victim_age,
+          gender: item.victim_gender === "NULL" ? '' : item.victim_gender,
+          status: this.reportsCommonService.caseStatusOptions.find(option => option.value === item.status)?.label || '',
+          nature_of_offence: (item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, '')), 
+          poa_section: (item.scst_sections || '').replace(/"/g, ''), // Remove double quotes
+          police_zone : item.police_zone,
+          community : item.community,
+          caste : item.caste,
+          date_of_registration : item.date_of_registration,
+          filter_status : item.status,
+          police_city:  item.police_city,
+          case_status: this.getStatusTextUIPT(item.status) || '',
+        }));
+        // Update filteredData to reflect the API data
+        this.filteredData = [...this.reportData]; 
+        this.loader = false;
+        this.cdr.detectChanges(); // Trigger change detection
+      },
+      error: (error) => {
+        this.loader = false;
+        console.error('Error fetching reports:', error);
+      }
+    });
+  }
+
+
 }

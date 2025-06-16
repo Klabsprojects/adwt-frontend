@@ -757,18 +757,18 @@
                       victim’s family? *
                     </label>
                     <input readonly type="text" name="previousIncident{{i}}" id="previousIncident{{i}}"
-                      class="form-control" [value]="accused.previous_incident === true ? 'Yes' : 'No'" />
+                      class="form-control" [value]="accused.previous_incident == 'true' ? 'Yes' : 'No'" />
                   </div>
 
                   <!-- Previous FIR Number -->
-                  <div class="col-md-6 mb-3" *ngIf="accused.previous_incident === true">
+                  <div class="col-md-6 mb-3" *ngIf="accused.previous_incident == 'true'">
                     <label for="previousFIRNumber{{i}}" class="form-label">45. FIR number of previous cases *</label>
                     <input readonly type="text" name="previousFIRNumber{{i}}" id="previousFIRNumber{{i}}"
-                      class="form-control" [value]="accused.previous_fir_number + accused.previous_fir_number_suffix" />
+                      class="form-control" [value]="accused.previous_fir_number +'/'+ accused.previous_fir_number_suffix" />
                   </div>
 
                   <!-- Question 45a: Remarks - Show only if previous_incident is true -->
-                  <div *ngIf="accused.previous_incident === true" class="col-md-12 mb-3">
+                  <div *ngIf="accused.previous_incident === 'true'" class="col-md-12 mb-3">
                     <label for="previous_incident_remarks{{ i }}" class="form-label">45a. Remarks</label>
                     <textarea [id]="'previous_incident_remarks' + i" class="form-control"
                       [value]="accused.previous_incident_remarks" rows="4" readonly placeholder="Remarks">
@@ -781,17 +781,17 @@
                       *
                     </label>
                     <input readonly type="text" name="scstOffence{{ i }}" id="scstOffence{{ i }}" class="form-control"
-                      [value]="accused.scst_offence === 'true'  ? 'Yes' : 'No'" />
+                      [value]="accused.scst_offence == 'true'  ? 'Yes' : 'No'" />
                   </div>
 
-                  <div class="col-md-6 mb-3" *ngIf="accused.previous_incident === 'true' ">
+                  <div class="col-md-6 mb-3" *ngIf="accused.scst_offence == 'true'">
                     <label for="scstFIRNumber" class="form-label">47. FIR number of previous cases *</label>
-                    <input readonly type="text" name="scstFIRNumber{{ i }}" id="scstFIRNumber{{ i }}"
-                      class="form-control" [value]="accused.scst_fir_number + accused.scst_fir_number_suffix" />
+                    <input readonly type="text" name="scstFIRNumber{{ i }}" id="{{ i }}scstFIRNumber"
+                      class="form-control" [value]="accused.scst_fir_number +'/'+ accused.scst_fir_number_suffix" />
                   </div>
 
 
-                  <div class="col-md-12 mb-3" *ngIf="accused.previous_incident === true">
+                  <div class="col-md-12 mb-3" *ngIf="accused.scst_offence == 'true'">
                     <label for="previous_offence_remarks{{ i }}" class="form-label">47a. Remarks</label>
                     <textarea readonly name="previous_offence_remarks{{ i }}" id="previous_offence_remarks{{ i }}"
                       class="form-control" rows="4" [value]="accused.previous_offence_remarks"></textarea>

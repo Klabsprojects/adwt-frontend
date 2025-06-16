@@ -22,7 +22,7 @@ import { Router, ActivatedRoute, RouterEvent, NavigationStart} from '@angular/ro
 import Swal from 'sweetalert2';
 // import { MatRadioModule } from '@angular/material/radio';
 import Tagify from '@yaireo/tagify';
-import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators , AbstractControl , ValidationErrors, ValidatorFn} from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatRadioModule } from '@angular/material/radio';
@@ -909,7 +909,7 @@ loadAccusedCommunities(): void {
         (response: any) => {
           // console.log(response)
           if(response.datacount.id == 0){
-            Swal.fire('Warning', "Kindly Complete Chargesheet Stage First!", 'warning');
+            Swal.fire('Warning', "Kindly Complete Chargesheet Information First!", 'warning');
           } else {
             this.mainStep = stepNumber;
             this.step = 1; 
@@ -3941,6 +3941,7 @@ onAccusedAgeChange(index: number): void {
         governmentApprovalForAppeal_two: [''],
         filedBy_two: [''],
       }),
+   
 
 
       hearingDetails: this.fb.array([this.createHearingDetailGroup()]),
@@ -3964,10 +3965,11 @@ onAccusedAgeChange(index: number): void {
       proceedingsFileNo: ['', Validators.required],
       proceedingsDate: ['', Validators.required],
       uploadProceedings: ['', Validators.required],
-      attachments: this.fb.array([]), // Dynamic attachments array
-
-
-    });
+      attachments: this.fb.array([]),
+       // Dynamic attachments array
+    },
+    { validators: this.dateTimeValidator() },
+  );
 
     // Other setup functions
     this.trackStep1FormValidity();
@@ -3978,6 +3980,27 @@ onAccusedAgeChange(index: number): void {
     this.firForm.get('policeRange')?.disable();
     this.firForm.get('revenueDistrict')?.disable();
   }
+
+
+  dateTimeValidator(): ValidatorFn {
+    return (formGroup: AbstractControl): ValidationErrors | null => {
+        const dateOfOccurrence = formGroup.get('dateOfOccurrence')?.value;
+        const timeOfOccurrence = formGroup.get('timeOfOccurrence')?.value || '00:00';
+        const dateOfRegistration = formGroup.get('dateOfRegistration')?.value;
+        const timeOfRegistration = formGroup.get('timeOfRegistration')?.value || '00:00';
+  
+        if (dateOfOccurrence && dateOfRegistration) {
+            const occurrenceDateTime = new Date(`${dateOfOccurrence}T${timeOfOccurrence}`);
+            const registrationDateTime = new Date(`${dateOfRegistration}T${timeOfRegistration}`);
+  
+            if (registrationDateTime < occurrenceDateTime) {
+                return { invalidRegistrationDateTime: true };
+            }
+        }
+        return null;
+    };
+  }
+
   handleCaseTypeChange() {
     const caseType = this.firForm.get('caseType')?.value;
   
@@ -5018,11 +5041,11 @@ uploadedImageSrc: any | ArrayBuffer;
       this.firService.getOffences().subscribe(
         (offences: any) => {
           // console.log(offences);
-          this.offenceOptions = offences
-            .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v)');
-            this.offenceOptions.push(
-              { offence_act_name: '3(2)(va)', offence_name: '3(2)(va)', id : 24 },
-            );
+          this.offenceOptions = offences;
+            // .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v)');
+            // this.offenceOptions.push(
+            //   { offence_act_name: '3(2)(va)', offence_name: '3(2)(va)', id : 24 },
+            // );
             this.offenceOptionData = offences.map((offence: any) => offence);
         },
         (error: any) => {
@@ -6000,7 +6023,7 @@ controls.forEach((controlName) => {
       () => {
         Swal.fire({
           title: 'Success',
-          text: 'Chargesheet Stage Updated',
+          text: 'Chargesheet Information Updated',
           icon: 'success',
           confirmButtonText: 'OK',
         }).then(() => {
@@ -7253,6 +7276,14 @@ isStep1Valid(): boolean {
       return false;
     }  
   }
+
+  if( this.firForm.get('dateOfOccurrence')?.value && this.firForm.get('dateOfRegistration')?.value){
+     const noCustomErrors = !this.firForm.hasError('invalidRegistrationDateTime');
+     if(!noCustomErrors){
+      return false;
+     }
+  }
+
   
   return true;
 }
@@ -7739,34 +7770,34 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
             Swal.fire('Error', 'Please fill in all required fields before proceeding.', 'error');
             return;
           }
-      if (this.isStepOneModified === true) { 
+      // if (this.isStepOneModified === true) { 
         this.saveStepOneAsDraft();
         this.updateFirStatus(1);
         this.isStepOneModified = false;
-      }
+      // }
       this.step++;
     } else if (this.step === 2 && this.isStep2Valid()) {
-      if (this.isStepTwoModified == true) {
+      // if (this.isStepTwoModified == true) {
         this.saveStepTwoAsDraft();
         this.updateFirStatus(2);
         this.isStepTwoModified = false;
-      }
+      // }
       this.step++;
     } else if (this.step === 3 && this.isStep3Valid()) {
-      if (this.isStepThreeModified == true) {
+      // if (this.isStepThreeModified == true) {
       this.location.replaceState(`/fir-edit-module?fir_id=${this.firId}&step=4`);
       this.saveStepThreeAsDraft();
       this.updateFirStatus(3); 
       this.isStepThreeModified = false;
-      }
+      // }
       this.step++;
     } else if (this.step === 4 && this.isStep4Valid()) {
-      if(this.isStepFourModified == true){
+      // if(this.isStepFourModified == true){
         this.location.replaceState(`/fir-edit-module?fir_id=${this.firId}&step=5`);
         this.saveStepFourAsDraft();
         this.updateFirStatus(4); 
         this.isStepFourModified = false;
-      }
+      // }
       this.firService.GetVictimInformationDetails(this.firId).subscribe(
         (response: any) => {
           // console.log(response)
@@ -7783,11 +7814,11 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
           Swal.fire('Error', 'Unable to Get Detail.', 'error');
         })
     } else if (this.step === 5 && this.isSubmitButtonEnabled()) {
-      if(this.isStepFiveModified == true){
+      // if(this.isStepFiveModified == true){
       this.submitStepFive(); // Final submission for Step 5
       this.updateFirStatus(5); // Update status for step 5 on submission
       this.isStepFiveModified = false;
-      }
+      // }
     } else {
       Swal.fire('Error', 'Please fill in all required fields before proceeding.', 'error');
     }
@@ -8451,8 +8482,6 @@ getPoliceStation(district: string): void {
       'Rape',
       'Gang Rape',
       'Murder',
-      '3(2)(v)',
-      '3(2)(va)'
     ];
     return excluded.includes(act);
   }

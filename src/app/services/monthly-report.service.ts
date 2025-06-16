@@ -23,24 +23,117 @@ export class MonthlyReportService {
     return this.http.get(`${this.baseUrl}/get-monthly-report-details`);
   }
 
-  GetDistrictWisePendingUI(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/GetDistrictWisePendingUI`);
+  GetDistrictWisePendingUI( filters: any = {}): Observable<any> {
+  let params = new HttpParams();
+  
+  Object.keys(filters).forEach(key => {
+    const value = filters[key];
+    
+    // Handle multiple districts as array
+    if (key === 'districts' && Array.isArray(value)) {
+      // For multiple districts, append each district separately
+      value.forEach((district: string) => {
+        params = params.append('districts', district);
+      });
+    } else if (key === 'districts' && value) {
+      // For single district
+      params = params.set(key, value);
+    } else if (value !== null && value !== undefined && value !== '') {
+      // Handle other parameters normally
+      params = params.set(key, value);
+    }
+  });
+    return this.http.get(`${this.baseUrl}/GetDistrictWisePendingUI`, { params });
   }
 
-  GetReasonWisePendingUI(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/GetReasonWisePendingUI`);
+  GetReasonWisePendingUI(filters: any = {}): Observable<any> {
+    let params = new HttpParams();
+  
+  Object.keys(filters).forEach(key => {
+    const value = filters[key];
+    
+    // Handle multiple districts as array
+    if (key === 'districts' && Array.isArray(value)) {
+      // For multiple districts, append each district separately
+      value.forEach((district: string) => {
+        params = params.append('districts', district);
+      });
+    } else if (key === 'districts' && value) {
+      // For single district
+      params = params.set(key, value);
+    } else if (value !== null && value !== undefined && value !== '') {
+      // Handle other parameters normally
+      params = params.set(key, value);
+    }
+  });
+    return this.http.get(`${this.baseUrl}/GetReasonWisePendingUI`, { params });
   }
 
-  GetCommunity_Certificate_Report(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/GetCommunity_Certificate_Report`);
+  GetCommunity_Certificate_Report(filters: any = {}): Observable<any> {
+      let params = new HttpParams();
+  
+  Object.keys(filters).forEach(key => {
+    const value = filters[key];
+    
+    // Handle multiple districts as array
+    if (key === 'districts' && Array.isArray(value)) {
+      // For multiple districts, append each district separately
+      value.forEach((district: string) => {
+        params = params.append('districts', district);
+      });
+    } else if (key === 'districts' && value) {
+      // For single district
+      params = params.set(key, value);
+    } else if (value !== null && value !== undefined && value !== '') {
+      // Handle other parameters normally
+      params = params.set(key, value);
+    }
+  });
+    return this.http.get(`${this.baseUrl}/GetCommunity_Certificate_Report`, { params });
   }
 
-  GetDistrictWisePendingPT(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/GetDistrictWisePendingPT`);
+  GetDistrictWisePendingPT(filters: any = {}): Observable<any> {
+  let params = new HttpParams();
+  Object.keys(filters).forEach(key => {
+    const value = filters[key];
+    
+    // Handle multiple districts as array
+    if (key === 'districts' && Array.isArray(value)) {
+      // For multiple districts, append each district separately
+      value.forEach((district: string) => {
+        params = params.append('districts', district);
+      });
+    } else if (key === 'districts' && value) {
+      // For single district
+      params = params.set(key, value);
+    } else if (value !== null && value !== undefined && value !== '') {
+      // Handle other parameters normally
+      params = params.set(key, value);
+    }
+  });
+    return this.http.get(`${this.baseUrl}/GetDistrictWisePendingPT`, { params });
   }
 
-  GetConvictionTypeRepot(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/GetConvictionTypeRepot`);
+  GetConvictionTypeRepot(filters: any = {}): Observable<any> {
+    let params = new HttpParams();
+  Object.keys(filters).forEach(key => {
+    const value = filters[key];
+    
+    // Handle multiple districts as array
+    if (key === 'districts' && Array.isArray(value)) {
+      // For multiple districts, append each district separately
+      value.forEach((district: string) => {
+        params = params.append('districts', district);
+      });
+    } else if (key === 'districts' && value) {
+      // For single district
+      params = params.set(key, value);
+    } else if (value !== null && value !== undefined && value !== '') {
+      // Handle other parameters normally
+      params = params.set(key, value);
+    }
+  });
+    return this.http.get(`${this.baseUrl}/GetConvictionTypeRepot`, { params });
   }
 
   MonnthlyUpdate(fir_id: any, Reason : any): Observable<any[]> {

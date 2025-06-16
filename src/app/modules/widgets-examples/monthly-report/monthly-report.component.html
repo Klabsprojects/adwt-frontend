@@ -43,32 +43,40 @@
           <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
         </select>
       </div>
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <!-- <p>Police City</p> -->
+        <select name="" id="" [(ngModel)]="selectedPoliceCity" class="form-select" (change)="applyFilters()">
+          <option value="">Police City</option>
+          <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
+        </select>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <!-- <p>Police Zone</p> -->
+        <select name="" id="" [(ngModel)]="selectedZone" class="form-select" (change)="applyFilters()">
+          <option value="">Police Zone</option>
+          <option [value]="zone.police_zone" *ngFor="let zone of zones">{{zone.police_zone}}</option>
+        </select>
+      </div>
+
+      <!-- <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
         <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
           <option value="" selected>Offence</option>
           <option *ngFor="let nature of natureOfOffences" [value]="nature">{{ nature }}</option>
         </select>
-      </div>
+      </div> -->
 
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <!-- <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
         <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
           <option value="" selected>Relief Status</option>
           <option *ngFor="let reliefStatus of statusesOfRelief" [value]="reliefStatus">
             {{ reliefStatus }}
           </option>
         </select>
-      </div>
+      </div> -->
 
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <!-- <p>Status Of Case</p> -->
-        <select class="form-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
-          <option value="" selected>Status Of Case</option>
-          <option *ngFor="let option of status" [value]="option.key">
-            {{ option.value }}
-          </option>
-        </select>
-      </div>
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
         <!-- <p>Community</p> -->
         <select name="" id="" [(ngModel)]="selectedCommunity" (change)="getCaste()" class="form-select" (change)="applyFilters()">
           <option value="">Community</option>
@@ -84,36 +92,32 @@
           </option>
         </select>
       </div>
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <!-- <p>Police Zone</p> -->
-        <select name="" id="" [(ngModel)]="selectedZone" class="form-select" (change)="applyFilters()">
-          <option value="">Police Zone</option>
-          <option [value]="zone.police_zone" *ngFor="let zone of zones">{{zone.police_zone}}</option>
-        </select>
-      </div>
 
       <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <!-- <p>Police City</p> -->
-        <select name="" id="" [(ngModel)]="selectedPoliceCity" class="form-select" (change)="applyFilters()">
-          <option value="">Police City</option>
-          <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
+        <!-- <p>Status Of Case</p> -->
+        <select class="form-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+          <option value="" selected>Status Of Case</option>
+          <option *ngFor="let option of status" [value]="option.key">
+            {{ option.value }}
+          </option>
         </select>
       </div>
-
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <!-- <p>Nature of Offence</p> -->
+  
+      <!-- <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
         <select name="" id="" [(ngModel)]="selectedOffence" class="form-select" (change)="applyFilters()">
           <option value="">Nature of Offence</option>
           <option [value]="offence" *ngFor="let offence of offences">{{offence}}</option>
         </select>
-      </div>
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      </div> -->
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
         <!-- <label for="">From</label> -->
         <input type="date" class="form-control" [(ngModel)]="selectedFromDate" (change)="applyFilters()"/>
+        <span class="tooltip-text">Date of Registration From Date</span>
       </div>
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
         <!-- <label for="">To</label> -->
         <input type="date" class="form-control" [(ngModel)]="selectedToDate" (change)="applyFilters()"/>
+        <span class="tooltip-text">Date of Registration To Date</span>
       </div>
       <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
         <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
@@ -172,11 +176,11 @@
                 </span> -->
                 <!-- Default Case -->
                 <span *ngSwitchDefault>{{ report[column.field] }}</span>
-                <span *ngSwitchCase="'caseStatus'">
+                <!-- <span *ngSwitchCase="'caseStatus'">
                   <span class="badge" [ngClass]="getStatusBadgeClass(report[column.field])">
                     {{ getStatusTextUIPT(report[column.field]) }}
                   </span>
-                </span>
+                </span> -->
                 <span *ngSwitchCase="'action'">
                   <div class="d-inline-block">
                     <button class="btn btn-primary btn-sm" (click)="openMessageBox(report);open(content)">Update
@@ -215,6 +219,75 @@
 
 
   <div *ngIf="ReportType == 'District_Wise_Pending_UI'">
+     <div class="row d-flex mb-3 p-4 align-items-center">
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+            <ng-select
+            class="form-select"
+            [items]="districts"
+            bindLabel="selectedFilterDistricts"
+            bindValue="selectedFilterDistricts"
+            [multiple]="true"
+            [(ngModel)]="selectedFilterDistricts"
+            [searchable]="true"
+            [clearable]="true"
+            placeholder="Select Districts"
+            (change)="GetDistrictWisePendingUI()"
+            [id]="selectedFilterDistricts"
+          >
+              </ng-select> 
+          </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedPoliceCity" class="form-select" (change)="GetDistrictWisePendingUI()">
+          <option value="">Police City</option>
+          <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
+        </select>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedZone" class="form-select" (change)="GetDistrictWisePendingUI()">
+          <option value="">Police Zone</option>
+          <option [value]="zone.police_zone" *ngFor="let zone of zones">{{zone.police_zone}}</option>
+        </select>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedCommunity" (change)="getCaste()" class="form-select" (change)="GetDistrictWisePendingUI()">
+          <option value="">Community</option>
+          <option [value]="community" *ngFor="let community of communities">{{community}}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedCaste" (change)="GetDistrictWisePendingUI()">
+          <option value="" selected>Caste</option>
+          <option *ngFor="let option of castes" [value]="option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+
+      <!-- <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedStatus" (change)="GetDistrictWisePendingUI()">
+          <option value="" selected>Status Of Case</option>
+          <option *ngFor="let option of status" [value]="option.key">
+            {{ option.value }}
+          </option>
+        </select>
+      </div> -->
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedFromDate" (change)="GetDistrictWisePendingUI()"/>
+        <span class="tooltip-text">Date of Registration From Date</span>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedToDate" (change)="GetDistrictWisePendingUI()"/>
+        <span class="tooltip-text">Date of Registration To Date</span>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <button (click)="clearfilterReport1()" class="btn btn-primary btn-sm">Clear Filters</button>
+      </div>
+    </div>
     <div style="padding-right: 35px;" class="mt-0">
       <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel1()">Download as Excel</button>
     </div>
@@ -298,6 +371,77 @@
 
 
   <div *ngIf="ReportType == 'Reason_for_Pending_UI'">
+
+     <div class="row d-flex mb-3 p-4 align-items-center">
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+            <ng-select
+            class="form-select"
+            [items]="districts"
+            bindLabel="selectedFilterDistricts"
+            bindValue="selectedFilterDistricts"
+            [multiple]="true"
+            [(ngModel)]="selectedFilterDistricts"
+            [searchable]="true"
+            [clearable]="true"
+            placeholder="Select Districts"
+            (change)="GetReasonWisePendingUI()"
+            [id]="selectedFilterDistricts"
+          >
+              </ng-select> 
+          </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedPoliceCity" class="form-select" (change)="GetReasonWisePendingUI()">
+          <option value="">Police City</option>
+          <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
+        </select>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedZone" class="form-select" (change)="GetReasonWisePendingUI()">
+          <option value="">Police Zone</option>
+          <option [value]="zone.police_zone" *ngFor="let zone of zones">{{zone.police_zone}}</option>
+        </select>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedCommunity" (change)="getCaste()" class="form-select" (change)="GetReasonWisePendingUI()">
+          <option value="">Community</option>
+          <option [value]="community" *ngFor="let community of communities">{{community}}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedCaste" (change)="GetReasonWisePendingUI()">
+          <option value="" selected>Caste</option>
+          <option *ngFor="let option of castes" [value]="option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+
+      <!-- <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedStatus" (change)="GetReasonWisePendingUI()">
+          <option value="" selected>Status Of Case</option>
+          <option *ngFor="let option of status" [value]="option.key">
+            {{ option.value }}
+          </option>
+        </select>
+      </div> -->
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedFromDate" (change)="GetReasonWisePendingUI()"/>
+        <span class="tooltip-text">Date of Registration From Date</span>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedToDate" (change)="GetReasonWisePendingUI()"/>
+        <span class="tooltip-text">Date of Registration To Date</span>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <button (click)="clearfilterReport2()" class="btn btn-primary btn-sm">Clear Filters</button>
+      </div>
+    </div>
+
     <div style="padding-right: 35px;" class="mt-0">
       <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel2()">Download as Excel</button>
     </div>
@@ -383,6 +527,77 @@
 
 
   <div *ngIf="ReportType == 'Community_Certificate'">
+
+     <div class="row d-flex mb-3 p-4 align-items-center">
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+            <ng-select
+            class="form-select"
+            [items]="districts"
+            bindLabel="selectedFilterDistricts"
+            bindValue="selectedFilterDistricts"
+            [multiple]="true"
+            [(ngModel)]="selectedFilterDistricts"
+            [searchable]="true"
+            [clearable]="true"
+            placeholder="Select Districts"
+            (change)="GetCommunity_Certificate_Report()"
+            [id]="selectedFilterDistricts"
+          >
+              </ng-select> 
+          </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedPoliceCity" class="form-select" (change)="GetCommunity_Certificate_Report()">
+          <option value="">Police City</option>
+          <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
+        </select>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedZone" class="form-select" (change)="GetCommunity_Certificate_Report()">
+          <option value="">Police Zone</option>
+          <option [value]="zone.police_zone" *ngFor="let zone of zones">{{zone.police_zone}}</option>
+        </select>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedCommunity" (change)="getCaste()" class="form-select" (change)="GetCommunity_Certificate_Report()">
+          <option value="">Community</option>
+          <option [value]="community" *ngFor="let community of communities">{{community}}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedCaste" (change)="GetCommunity_Certificate_Report()">
+          <option value="" selected>Caste</option>
+          <option *ngFor="let option of castes" [value]="option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+
+      <!-- <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedStatus" (change)="GetCommunity_Certificate_Report()">
+          <option value="" selected>Status Of Case</option>
+          <option *ngFor="let option of status" [value]="option.key">
+            {{ option.value }}
+          </option>
+        </select>
+      </div> -->
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedFromDate" (change)="GetCommunity_Certificate_Report()"/>
+        <span class="tooltip-text">Date of Registration From Date</span>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedToDate" (change)="GetCommunity_Certificate_Report()"/>
+        <span class="tooltip-text">Date of Registration To Date</span>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <button (click)="clearfilterReport3()" class="btn btn-primary btn-sm">Clear Filters</button>
+      </div>
+    </div>
+
     <div style="padding-right: 35px;" class="mt-0">
       <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel3()">Download as Excel</button>
     </div>
@@ -470,6 +685,77 @@
 
 
   <div *ngIf="ReportType == 'District_wise_PT'">
+
+    <div class="row d-flex mb-3 p-4 align-items-center">
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+            <ng-select
+            class="form-select"
+            [items]="districts"
+            bindLabel="selectedFilterDistricts"
+            bindValue="selectedFilterDistricts"
+            [multiple]="true"
+            [(ngModel)]="selectedFilterDistricts"
+            [searchable]="true"
+            [clearable]="true"
+            placeholder="Select Districts"
+            (change)="GetDistrictWisePendingPT()"
+            [id]="selectedFilterDistricts"
+          >
+              </ng-select> 
+          </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedPoliceCity" class="form-select" (change)="GetDistrictWisePendingPT()">
+          <option value="">Police City</option>
+          <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
+        </select>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedZone" class="form-select" (change)="GetDistrictWisePendingPT()">
+          <option value="">Police Zone</option>
+          <option [value]="zone.police_zone" *ngFor="let zone of zones">{{zone.police_zone}}</option>
+        </select>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedCommunity" (change)="getCaste()" class="form-select" (change)="GetDistrictWisePendingPT()">
+          <option value="">Community</option>
+          <option [value]="community" *ngFor="let community of communities">{{community}}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedCaste" (change)="GetDistrictWisePendingPT()">
+          <option value="" selected>Caste</option>
+          <option *ngFor="let option of castes" [value]="option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+
+      <!-- <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedStatus" (change)="GetDistrictWisePendingPT()">
+          <option value="" selected>Status Of Case</option>
+          <option *ngFor="let option of status" [value]="option.key">
+            {{ option.value }}
+          </option>
+        </select>
+      </div> -->
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedFromDate" (change)="GetDistrictWisePendingPT()"/>
+        <span class="tooltip-text">Date of Registration From Date</span>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedToDate" (change)="GetDistrictWisePendingPT()"/>
+        <span class="tooltip-text">Date of Registration To Date</span>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <button (click)="clearfilterReport4()" class="btn btn-primary btn-sm">Clear Filters</button>
+      </div>
+    </div>
+
     <div style="padding-right: 35px;" class="mt-0">
       <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel4()">Download as Excel</button>
     </div>
@@ -544,6 +830,77 @@
 
 
   <div *ngIf="ReportType == 'Conviction'">
+
+    <div class="row d-flex mb-3 p-4 align-items-center">
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+            <ng-select
+            class="form-select"
+            [items]="districts"
+            bindLabel="selectedFilterDistricts"
+            bindValue="selectedFilterDistricts"
+            [multiple]="true"
+            [(ngModel)]="selectedFilterDistricts"
+            [searchable]="true"
+            [clearable]="true"
+            placeholder="Select Districts"
+            (change)="GetConvictionTypeRepot()"
+            [id]="selectedFilterDistricts"
+          >
+              </ng-select> 
+          </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedPoliceCity" class="form-select" (change)="GetConvictionTypeRepot()">
+          <option value="">Police City</option>
+          <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
+        </select>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedZone" class="form-select" (change)="GetConvictionTypeRepot()">
+          <option value="">Police Zone</option>
+          <option [value]="zone.police_zone" *ngFor="let zone of zones">{{zone.police_zone}}</option>
+        </select>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedCommunity" (change)="getCaste()" class="form-select" (change)="GetConvictionTypeRepot()">
+          <option value="">Community</option>
+          <option [value]="community" *ngFor="let community of communities">{{community}}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedCaste" (change)="GetConvictionTypeRepot()">
+          <option value="" selected>Caste</option>
+          <option *ngFor="let option of castes" [value]="option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+
+      <!-- <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedStatus" (change)="GetConvictionTypeRepot()">
+          <option value="" selected>Status Of Case</option>
+          <option *ngFor="let option of status" [value]="option.key">
+            {{ option.value }}
+          </option>
+        </select>
+      </div> -->
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedFromDate" (change)="GetConvictionTypeRepot()"/>
+        <span class="tooltip-text">Date of Registration From Date</span>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedToDate" (change)="GetConvictionTypeRepot()"/>
+        <span class="tooltip-text">Date of Registration To Date</span>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <button (click)="clearfilterReport5()" class="btn btn-primary btn-sm">Clear Filters</button>
+      </div>
+    </div>
+
     <div style="padding-right: 35px;" class="mt-0">
       <button style="float: right;" class="btn btn-primary mt-3" (click)="exportToExcel5()">Download as Excel</button>
     </div>

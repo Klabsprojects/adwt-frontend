@@ -144,8 +144,6 @@ victim_relif_section_values = ['Rape, etc., or unnatural Offences', 'Gang rape',
       'Rape',
       'Gang Rape',
       'Murder',
-      '3(2)(v)',
-      '3(2)(va)'
     ];
     return excluded.includes(act);
   }
@@ -364,10 +362,10 @@ onOffenceCommittedChange(index: number): void {
       (offences: any) => {
         // console.log(offences);
         this.offenceOptions = offences
-          .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
-          this.offenceOptions.push(
-            { offence_act_name: '3(2)(va)', offence_name: '3(2)(va)', id : 24 },
-          );
+          // .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
+          // this.offenceOptions.push(
+          //   { offence_act_name: '3(2)(va)', offence_name: '3(2)(va)', id : 24 },
+          // );
           this.offenceOptionData = offences.map((offence: any) => offence);
       },
       (error: any) => {

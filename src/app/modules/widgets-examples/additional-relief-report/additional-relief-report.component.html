@@ -45,36 +45,65 @@
 
   
     <div class="card-body pt-0">
-      <!-- Filters -->
-      <div class="d-flex gap-3 mb-3">
+     
+      <div class="row d-flex mb-3 p-4 align-items-center">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
         <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
-          <option value="" selected >Select One</option>
+          <option value="" selected>District</option>
           <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
         </select>
-  
-        <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
-          <option value="" selected >Select One</option>
-          <option *ngFor="let nature of naturesOfOffence" [value]="nature">{{ nature }}</option>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedPoliceCity" class="form-select" (change)="applyFilters()">
+          <option value="">Police City</option>
+          <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
         </select>
-  
-        <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
-          <option value="" selected >Select One</option>
-          <option *ngFor="let status of statusesOfCase" [value]="status">{{ status }}</option>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedZone" class="form-select" (change)="applyFilters()">
+          <option value="">Police Zone</option>
+          <option [value]="zone.police_zone" *ngFor="let zone of zones">{{zone.police_zone}}</option>
         </select>
-  
-        <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
-          <option value="" selected >Select One</option>
-          <option *ngFor="let reliefStatus of statusesOfRelief" [value]="reliefStatus">
-            {{ reliefStatus }}
-          </option>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select name="" id="" [(ngModel)]="selectedCommunity" (change)="getCaste()" class="form-select" (change)="applyFilters()">
+          <option value="">Community</option>
+          <option [value]="community" *ngFor="let community of communities">{{community}}</option>
         </select>
-        <select class="form-select" [(ngModel)]="selectedtypeOfAdditionalReleif" (change)="updateDisplayedColumns()">
-          <option value="" selected >Select Type of Additional Relief</option>
-          <option *ngFor="let type of typeOfAdditionalReleif" [value]="type">
-            {{ type }}
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedCaste" (change)="applyFilters()">
+          <option value="" selected>Caste</option>
+          <option *ngFor="let option of castes" [value]="option">
+            {{ option }}
           </option>
         </select>
       </div>
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <select class="form-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+          <option value="" selected>Status Of Case</option>
+          <option *ngFor="let option of status" [value]="option.key">
+            {{ option.value }}
+          </option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedFromDate" (change)="applyFilters()"/>
+        <span class="tooltip-text">Date of Registration From Date</span>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedToDate" (change)="applyFilters()"/>
+        <span class="tooltip-text">Date of Registration To Date</span>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
+      </div>
+    </div>
   
       <div class="card-body pt-0 overflow-auto">
         <table class="table table-bordered table-responsive">
@@ -136,4 +165,32 @@
   justify-content: center;
   align-items: center;
 }
+
+ .tooltip-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .tooltip-text {
+    visibility: hidden;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 6px 8px;
+    border-radius: 5px;
+    position: absolute;
+    top: -35px;
+    /* Position above the input */
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
 </style>

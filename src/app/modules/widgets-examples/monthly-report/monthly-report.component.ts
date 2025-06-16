@@ -16,6 +16,7 @@ import { inject, signal, TemplateRef, WritableSignal } from '@angular/core';
 import { ModalDismissReasons, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 
@@ -31,7 +32,8 @@ declare var bootstrap: any;
     MatCheckboxModule,
     MatSelectModule,
     MatFormFieldModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    NgSelectModule
   ],
   templateUrl: './monthly-report.component.html',
   styleUrls: ['./monthly-report.component.scss'],
@@ -44,6 +46,7 @@ export class MonthlyReportComponent implements OnInit {
   filteredData: Array<any> = [];
   searchText: string = '';
   selectedDistrict: string = '';
+  selectedFilterDistricts : string[] = []
   selectedColumns: string[] = [];
   selectedNatureOfOffence: string = '';
   selectedStatusOfCase: string = '';
@@ -86,10 +89,38 @@ export class MonthlyReportComponent implements OnInit {
       sortDirection: null,
     },
     {
-      field: 'policeCity',
-      label: 'Police City/District',
+      field: 'revenue_district',
+      label: 'District',
       visible: true,
       sortable: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Police City',
+      field: 'policeCity',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+      {
+      label: 'Police Zone',
+      field: 'police_zone',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+      {
+      label: 'Community',
+      field: 'community',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+      {
+      label: 'Caste',
+      field: 'caste',
+      sortable: true,
+      visible: true,
       sortDirection: null,
     },
     {
@@ -100,10 +131,31 @@ export class MonthlyReportComponent implements OnInit {
       sortDirection: null,
     },
     {
-      field: 'firNumber',
+      field: 'fir_number',
       label: 'FIR Number',
       visible: true,
       sortable: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Reporting Date',
+      field: 'date_of_registration',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Created By',
+      field: 'created_by',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Created AT',
+      field: 'created_at',
+      sortable: true,
+      visible: true,
       sortDirection: null,
     },
     {
@@ -328,7 +380,7 @@ export class MonthlyReportComponent implements OnInit {
   }
 
   getStatusTextUIPT(status: number): string {
-    console.log(status,'statussssssss')
+    // console.log(status,'statussssssss')
     const statusTextMap = {
       0: 'UI',
       1: 'UI',
@@ -365,23 +417,34 @@ export class MonthlyReportComponent implements OnInit {
            this.loader = false;
           //console.log('Monthly Reports:', response.data); // Debugging
           // Transform API response to match frontend structure
-          this.reportData = response.data.map((item: { police_city: any; police_station: any; fir_number: any; offence_committed: any; scst_sections: any; number_of_victim: any; court_district: any; court_name: any; case_number: any; status: number; under_investigation_case_days: any; pending_trial_case_days: any; previous_month_reason_for_status: any; current_month_reason_for_status: any; fir_id : any }, index: number) => ({
+          this.reportData = response.data.map((item: { police_city: any; police_station: any; fir_number: any; offence_committed: any; scst_sections: any; number_of_victim: any; court_district: any; court_name: any; case_number: any; status: number; under_investigation_case_days: any; pending_trial_case_days: any; previous_month_reason_for_status: any; current_month_reason_for_status: any; fir_id : any;
+            revenue_district : any; police_zone : any; community : any; caste : any; date_of_registration : any; created_by : any; created_at : any;
+           }, index: number) => ({
             sl_no: index + 1,
             policeCity: item.police_city,
             stationName: item.police_station,
-            firNumber: item.fir_number,
+            // firNumber: item.fir_number,
+            fir_number: item.fir_number === "NULL" || !item.fir_number ? '' : item.fir_number,
             natureOfOffence: (item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, '')), 
             poaSection: (item.scst_sections || '').replace(/"/g, ''), // Remove double quotes
             noOfVictim: item.number_of_victim,
             courtDistrict: item.court_district || '',
             courtName: item.court_name || '',
             caseNumber: item.case_number || '',
-            caseStatus: item.status || '',
+            caseStatus: this.getStatusTextUIPT(item.status) || '',
             uiPendingDays: item.under_investigation_case_days || '',
             ptPendingDays: item.pending_trial_case_days || '',
             reasonPreviousMonth: item.previous_month_reason_for_status || '',
             reasonCurrentMonth: item.current_month_reason_for_status || '',
             fir_id: item.fir_id || '',
+            revenue_district : item.revenue_district,
+            police_zone : item.police_zone,
+            community : item.community,
+            caste : item.caste,
+            date_of_registration : item.date_of_registration,
+            created_by : item.created_by,
+            created_at : item.created_at,
+            filter_status : item.status
           }));
           // Update filteredData to reflect the API data
           this.filteredData = [...this.reportData]; 
@@ -393,6 +456,86 @@ export class MonthlyReportComponent implements OnInit {
         }
       });
   }
+
+  
+  applyFilters() {
+  this.filteredData = this.reportData.filter(item => {
+
+    if (this.searchText && this.searchText.trim() !== '' && 
+    item.fir_number.toLowerCase() !== this.searchText.toLowerCase().trim()) {
+    return false;
+    }
+
+    // District filter
+    if (this.selectedDistrict && this.selectedDistrict !== '' && 
+        item.revenue_district !== this.selectedDistrict) {
+      return false;
+    }
+
+    // Police City filter
+    if (this.selectedPoliceCity && this.selectedPoliceCity !== '' && 
+        item.policeCity !== this.selectedPoliceCity) {
+      return false;
+    }
+
+    // Police Zone filter
+    if (this.selectedZone && this.selectedZone !== '' && 
+        item.police_zone !== this.selectedZone) {
+      return false;
+    }
+
+    // Community filter
+    if (this.selectedCommunity && this.selectedCommunity !== '' && 
+        item.community !== this.selectedCommunity) {
+      return false;
+    }
+
+    // Caste filter
+    if (this.selectedCaste && this.selectedCaste !== '' && 
+        item.caste !== this.selectedCaste) {
+      return false;
+    }
+
+    // Status filter (UI: status <= 5, PT: status > 5)
+    if (this.selectedStatus && this.selectedStatus !== '') {
+      if (this.selectedStatus === 'UI' && item.filter_status > 5) {
+        return false;
+      }
+      if (this.selectedStatus === 'PT' && item.filter_status <= 5) {
+        return false;
+      }
+    }
+
+    // Date range filter
+    if (this.selectedFromDate || this.selectedToDate) {
+    const registrationDate = new Date(item.date_of_registration);
+    
+    if (this.selectedFromDate && !this.selectedToDate) {
+      const fromDate = new Date(this.selectedFromDate);
+      if (registrationDate < fromDate) {
+        return false;
+      }
+    }
+    
+    if (this.selectedToDate && !this.selectedFromDate) {
+      const toDate = new Date(this.selectedToDate);
+      if (registrationDate > toDate) {
+        return false;
+      }
+    }
+
+    if (this.selectedToDate && this.selectedFromDate) {
+      const fromDate = new Date(this.selectedFromDate);
+      const toDate = new Date(this.selectedToDate);
+      if (registrationDate < fromDate || registrationDate > toDate) {
+        return false;
+      }
+    }
+  }
+
+    return true;
+  });
+}
 
   // Updates the visibility of columns based on the selected columns.
   updateColumnVisibility(): void {
@@ -407,29 +550,90 @@ export class MonthlyReportComponent implements OnInit {
   }
 
   // Applies filters, assigns serial numbers, and resets pagination
-  applyFilters(): void {
-    this.filteredData = this.reportsCommonService.applyFiltersMonthly(
-      this.reportData,
-      this.searchText,
-      this.selectedDistrict,
-      this.selectedNatureOfOffence,
-      this.selectedStatusOfCase,
-      this.selectedStatusOfRelief,
-      'policeCity', 'natureOfOffence', 'caseStatus',
-      this.selectedStatus,
-      this.selectedDistricts,
-      this.selectedCommunity,
-      this.selectedCaste,
-      this.selectedZone,
-      this.selectedOffence,
-      this.selectedPoliceCity,
-      this.selectedFromDate,
-      this.selectedToDate
-    );
-    this.filteredData = this.filteredData.map((report, index) => ({...report, sl_no: index + 1 })); // Assign sl_no starting from 1
-    this.page = 1; // Reset to the first page
+  // applyFilters(): void {
+  //   this.filteredData = this.reportsCommonService.applyFiltersMonthly(
+  //     this.reportData,
+  //     this.searchText,
+  //     this.selectedDistrict,
+  //     this.selectedNatureOfOffence,
+  //     this.selectedStatusOfCase,
+  //     this.selectedStatusOfRelief,
+  //     'policeCity', 'natureOfOffence', 'caseStatus',
+  //     this.selectedStatus,
+  //     this.selectedDistricts,
+  //     this.selectedCommunity,
+  //     this.selectedCaste,
+  //     this.selectedZone,
+  //     this.selectedOffence,
+  //     this.selectedPoliceCity,
+  //     this.selectedFromDate,
+  //     this.selectedToDate
+  //   );
+  //   this.filteredData = this.filteredData.map((report, index) => ({...report, sl_no: index + 1 })); // Assign sl_no starting from 1
+  //   this.page = 1; // Reset to the first page
+  // }
+
+
+  clearfilterReport1(){
+    this.selectedFilterDistricts = [];
+    this.selectedPoliceCity = '';
+    this.selectedZone = '';
+    this.selectedCommunity = '';
+    this.selectedCaste = '';
+    this.selectedStatus = '';
+    this.selectedFromDate = '';
+    this.selectedToDate ='';
+    this.GetDistrictWisePendingUI();
   }
-  
+
+    clearfilterReport4(){
+    this.selectedFilterDistricts = [];
+    this.selectedPoliceCity = '';
+    this.selectedZone = '';
+    this.selectedCommunity = '';
+    this.selectedCaste = '';
+    this.selectedStatus = '';
+    this.selectedFromDate = '';
+    this.selectedToDate ='';
+    this.GetDistrictWisePendingPT();
+  }
+
+    clearfilterReport2(){
+    this.selectedFilterDistricts = [];
+    this.selectedPoliceCity = '';
+    this.selectedZone = '';
+    this.selectedCommunity = '';
+    this.selectedCaste = '';
+    this.selectedStatus = '';
+    this.selectedFromDate = '';
+    this.selectedToDate ='';
+    this.GetReasonWisePendingUI();
+  }
+
+    clearfilterReport3(){
+    this.selectedFilterDistricts = [];
+    this.selectedPoliceCity = '';
+    this.selectedZone = '';
+    this.selectedCommunity = '';
+    this.selectedCaste = '';
+    this.selectedStatus = '';
+    this.selectedFromDate = '';
+    this.selectedToDate ='';
+    this.GetCommunity_Certificate_Report();
+  }
+
+    clearfilterReport5(){
+    this.selectedFilterDistricts = [];
+    this.selectedPoliceCity = '';
+    this.selectedZone = '';
+    this.selectedCommunity = '';
+    this.selectedCaste = '';
+    this.selectedStatus = '';
+    this.selectedFromDate = '';
+    this.selectedToDate ='';
+    this.GetConvictionTypeRepot();
+  }
+
 
   clearfilter(){
       this.searchText = '';
@@ -446,7 +650,7 @@ export class MonthlyReportComponent implements OnInit {
       this.selectedPoliceCity='';
       this.selectedFromDate='';
       this.selectedToDate = '';
-      this.applyFilters();
+     this.filteredData = [...this.reportData]; 
   }
 
   // Sorting logic
@@ -548,10 +752,12 @@ export class MonthlyReportComponent implements OnInit {
 // table 1
 
 GetDistrictWisePendingUI(){
-  this.monthlyReportService.GetDistrictWisePendingUI().subscribe({
+  this.monthlyReportService.GetDistrictWisePendingUI(this.getFilterParams()).subscribe({
     next: (response) => {
       this.TypeReport1 = response.data;
-      this.totalItems1 = this.TypeReport1.length;
+      if(this.TypeReport1 && this.TypeReport1.length > 0){
+        this.totalItems1 = this.TypeReport1.length;
+      }
       this.cdr.detectChanges(); 
     },
     error: (error) => {
@@ -755,10 +961,12 @@ lastRow.eachCell((cell: any) => {
 // table 2
 
 GetReasonWisePendingUI(){
-  this.monthlyReportService.GetReasonWisePendingUI().subscribe({
+  this.monthlyReportService.GetReasonWisePendingUI(this.getFilterParams()).subscribe({
     next: (response) => {
       this.TypeReport2 = response.data;
-      this.totalItems2 = this.TypeReport2.length;
+      if(this.TypeReport2 && this.TypeReport2 > 0){
+        this.totalItems2 = this.TypeReport2.length;
+      }
       this.cdr.detectChanges(); 
     },
     error: (error) => {
@@ -908,10 +1116,12 @@ lastRow.eachCell((cell: any) => {
 // table 3
 
 GetCommunity_Certificate_Report(){
-  this.monthlyReportService.GetCommunity_Certificate_Report().subscribe({
+  this.monthlyReportService.GetCommunity_Certificate_Report(this.getFilterParams()).subscribe({
     next: (response) => {
       this.TypeReport3 = response.data;
-      this.totalItems3 = this.TypeReport3.length;
+      if(this.TypeReport3 && this.TypeReport3.length > 0){
+        this.totalItems3 = this.TypeReport3.length;
+      }
       this.cdr.detectChanges(); 
     },
     error: (error) => {
@@ -1075,10 +1285,12 @@ exportToExcel3(): void {
 // table 4
 
 GetDistrictWisePendingPT(){
-  this.monthlyReportService.GetDistrictWisePendingPT().subscribe({
+  this.monthlyReportService.GetDistrictWisePendingPT(this.getFilterParams()).subscribe({
     next: (response) => {
       this.TypeReport4 = response.data;
-      this.totalItems4 = this.TypeReport4.length;
+      if(this.TypeReport4 && this.TypeReport4.length > 0){
+        this.totalItems4 = this.TypeReport4.length;
+      }
       this.cdr.detectChanges(); 
     },
     error: (error) => {
@@ -1287,10 +1499,12 @@ lastRow.eachCell((cell: any) => {
 // table 5
 
 GetConvictionTypeRepot(){
-  this.monthlyReportService.GetConvictionTypeRepot().subscribe({
+  this.monthlyReportService.GetConvictionTypeRepot(this.getFilterParams()).subscribe({
     next: (response) => {
       this.TypeReport5 = response.data;
-      this.totalItems5 = this.TypeReport5.length;
+      if(this.TypeReport5 && this.TypeReport5.length > 0){
+        this.totalItems5 = this.TypeReport5.length;
+      }
       this.cdr.detectChanges(); 
     },
     error: (error) => {
@@ -1582,5 +1796,47 @@ private getDismissReason(reason: any): string {
       return `with: ${reason}`;
   }
 }
+
+
+ getFilterParams() {
+    const params: any = {};
+
+    if (this.selectedDistrict) {
+      params.district = this.selectedDistrict;
+    }
+
+    if (this.selectedFilterDistricts) {
+      params.districts = this.selectedFilterDistricts;
+    }
+
+    if (this.selectedZone) {
+      params.police_zone = this.selectedZone;
+    }
+
+    if (this.selectedPoliceCity) {
+      params.Police_City = this.selectedPoliceCity;
+    }
+
+    if (this.selectedFromDate) {
+      params.start_date = this.selectedFromDate;
+    }
+
+    if (this.selectedToDate) {
+      params.end_date = this.selectedToDate;
+    }
+
+    if (this.selectedStatus) {
+      params.Status = this.selectedStatus;
+    }
+
+    if (this.selectedCommunity) {
+      params.Community = this.selectedCommunity;
+    }
+
+    if (this.selectedCaste) {
+      params.Caste = this.selectedCaste;
+    }
+    return params;
+  }
 
 }

@@ -12,6 +12,8 @@ export class AuthInterceptor implements HttpInterceptor {
     const userDataString = sessionStorage.getItem('user_data');
     const token = userDataString ? JSON.parse(userDataString).token : null;
 
+    console.log('auth interceptor is working')
+
     if (token) {
       req = req.clone({
         setHeaders: {

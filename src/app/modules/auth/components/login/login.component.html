@@ -78,24 +78,14 @@
   </div>
 
 </form> -->
-<div class="container">
-  <!-- <div class="header">
-    <div class="title-head">
-      <img src="./assets/images/image.png" alt="Login Image" class="login-image">
-      <h2>Adi Dravidar and Tribal Welfare Department <br>
-        Government of Tamil Nadu
-      </h2>
-    </div>
-    <img src="./assets/images/cm.png" alt="CM Image" class="cm-image">
-  </div>
-  <h2 class="title">Prevention of Atrocities (PoA) Portal</h2> -->
+
+<!-- <div class="container">
   <div class="login-box">
     <div class="angleimage-box">
       <img src="./assets/images/image.png" alt="" class="login-image">
       <div class="d-flex justify-content-center align-items-center" style="flex-direction: column;">
         <h1>{{lang.lang.adwt}}</h1>
       </div>
-      <!-- <img src="./assets/images/angelofjustice.jpg" alt="archangel raguel" class="archangel-raguel"> -->
     </div>
     <div class="form-box-outer">
       <h3>Officer's Login</h3>
@@ -130,12 +120,15 @@
             <div *ngIf="f.password.errors?.maxlength">Password cannot be more than 100 characters long.</div>
           </div>
         </div>
-        <!-- <div class="d-grid">
-          <ngx-recaptcha2 #captchaElem [siteKey]="siteKey" (reset)="handleReset()" (expire)="handleExpire()"
-            (load)="handleLoad()" (success)="handleSuccess($event)" [useGlobalDomain]="false"
-            formControlName="recaptcha">
-          </ngx-recaptcha2>
-        </div> -->
+        <div class="form-group">
+          <label>Solve the CAPTCHA *</label>
+          <div class="d-flex align-items-center">
+            <strong class="me-2">{{ captchaQuestion }}</strong>
+            <input type="text" class="form-control w-auto" [(ngModel)]="captchaAnswer" (input)="validateCaptcha()" />
+            <button type="button" class="btn btn-sm btn-secondary ms-2" (click)="generateCaptcha()">⟳</button>
+          </div>
+          <div *ngIf="captchaError" class="text-danger mt-1">Wrong answer. Try again.</div>
+        </div>
         <div class="d-grid">
           <button type="submit" id="kt_sign_in_submit" class="btn btn-primary" [disabled]="loginForm.invalid">
             <ng-container *ngIf="isLoading$ | async">
@@ -149,6 +142,120 @@
           </button>
         </div>
         <a routerLink="/auth/forgot-password" class="link-primary">Forgot Password?</a>
+      </form>
+    </div>
+  </div>
+</div> -->
+
+<div class="container">
+  <div class="login-box">
+    <div class="angleimage-box">
+      <img src="./assets/images/image.png" alt="" class="login-image">
+      <div class="d-flex justify-content-center align-items-center" style="flex-direction: column;">
+        <h1>{{lang.lang.adwt}}</h1>
+      </div>
+    </div>
+    
+    <div class="form-box-outer">
+      <h3>Officer's Login</h3>
+      
+      <!-- Error message -->
+      <div *ngIf="hasError" class="alert alert-danger">
+        Login failed. Please check your credentials and try again.
+      </div>
+      
+      <form class="form-box" *ngIf="loginForm" [formGroup]="loginForm" novalidate="novalidate"
+        id="kt_login_signin_form" (ngSubmit)="submit()">
+        
+        <!-- Email Field -->
+        <div style="width: 75%;margin-left: auto;margin-right: auto;">
+          <input type="email" placeholder="Username" class="form-control" name="email"
+            formControlName="email" autocomplete="off" [ngClass]="{
+              'is-invalid': f.email.invalid && (f.email.touched || f.email.dirty),
+              'is-valid': f.email.valid && (f.email.touched || f.email.dirty)
+            }">
+          <div *ngIf="f.email.invalid && (f.email.dirty || f.email.touched)" class="text-danger mt-2">
+            <div *ngIf="f.email.errors?.['required']">Email is required.</div>
+            <div *ngIf="f.email.errors?.['minlength']">Email must be at least 3 characters long.</div>
+            <div *ngIf="f.email.errors?.['maxlength']">Email cannot be more than 320 characters long.</div>
+            <div *ngIf="f.email.errors?.['invalidEmail']">Please enter a valid email address with a correct domain (e.g., example&#64;domain.com).</div>
+          </div>
+        </div>
+        
+        <!-- Password Field -->
+        <div style="width: 75%;margin-left: auto;margin-right: auto;position: relative;">
+          <input placeholder="Password" class="form-control" [type]="showPassword ? 'text' : 'password'"
+            name="password" formControlName="password" autocomplete="off" [ngClass]="{
+              'is-invalid': f.password.invalid && (f.password.touched || f.password.dirty),
+              'is-valid': f.password.valid && (f.password.touched || f.password.dirty)
+            }">
+          <span class="input-group-text" (click)="togglePasswordVisibility()" 
+            style="cursor: pointer; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none;">
+            <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </span>
+          <div *ngIf="f.password.invalid && (f.password.dirty || f.password.touched)" class="text-danger mt-2">
+            <div *ngIf="f.password.errors?.['required']">Password is required.</div>
+            <div *ngIf="f.password.errors?.['minlength']">Password must be at least 3 characters long.</div>
+            <div *ngIf="f.password.errors?.['maxlength']">Password cannot be more than 100 characters long.</div>
+          </div>
+        </div>
+        
+        <!-- Remember Me Checkbox -->
+        <!-- <div style="width: 75%;margin-left: auto;margin-right: auto;" class="form-check mt-3">
+          <input type="checkbox" class="form-check-input" id="rememberMe" formControlName="rememberMe">
+          <label class="form-check-label" for="rememberMe">Remember Me</label>
+        </div> -->
+        
+        <!-- CAPTCHA Field -->
+        <div class="form-group" style="width: 75%;margin-left: auto;margin-right: auto;">
+          <label>Solve the CAPTCHA *</label>
+          <div style="flex-direction: column;" class="d-flex align-items-center gap-2">
+            <strong class="me-2">{{ captchaQuestion }}</strong>
+            <input 
+              type="text" 
+              (keypress)="allowOnlyNumbers($event)"
+              class="form-control" 
+              [(ngModel)]="captchaAnswer" 
+              [ngModelOptions]="{standalone: true}"
+              (input)="validateCaptcha()" 
+              placeholder="Answer"
+              pattern="^[0-9]{10}$"
+              [ngClass]="{
+                'is-invalid': captchaError || (f.captcha?.invalid && f.captcha?.touched),
+                'is-valid': isCaptchaValid && f.captcha?.valid
+              }"
+            />
+            <button style="width: 45px; color:#fff" type="button" class="btn btn-sm btn-secondary " (click)="generateCaptcha()" title="Generate new CAPTCHA">
+              ⟳
+            </button>
+          </div>
+          <!-- CAPTCHA validation messages -->
+          <div *ngIf="captchaError || (f.captcha?.invalid && f.captcha?.touched)" class="text-danger mt-1">
+            <div *ngIf="f.captcha?.errors?.['required'] && !captchaAnswer">CAPTCHA answer is required.</div>
+            <div *ngIf="captchaError && captchaAnswer">Wrong answer. Try again.</div>
+            <div *ngIf="f.captcha?.errors?.['invalidCaptcha']">Please solve the CAPTCHA correctly.</div>
+          </div>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="d-grid" style="width: 75%;margin-left: auto;margin-right: auto;justify-content: center">
+          <button type="submit" id="kt_sign_in_submit" class="btn btn-primary" 
+            [disabled]="!isFormValid() || (isLoading$ | async)">
+            <ng-container *ngIf="isLoading$ | async">
+              <span class="indicator-progress" [style.display]="'block'">Please wait...
+                <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+              </span>
+            </ng-container>
+            <ng-container *ngIf="(isLoading$ | async) === false">
+              <span class="indicator-label">Login</span>
+            </ng-container>
+          </button>
+        </div>
+        
+        <!-- Forgot Password Link -->
+        <div style="width: 75%;margin-left: auto;margin-right: auto;" class="text-center mt-3">
+          <a routerLink="/auth/forgot-password" class="link-primary">Forgot Password?</a>
+        </div>
       </form>
     </div>
   </div>

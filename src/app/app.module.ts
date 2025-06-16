@@ -16,9 +16,11 @@ import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 // #fake-start#
 import { FakeAPIService } from './_fake/fake-api.service';
+import { AuthInterceptor } from './auth.interceptor';
 // #fake-end#
 
 function appInitializer(authService: AuthService) {
@@ -57,6 +59,11 @@ function appInitializer(authService: AuthService) {
       useFactory: appInitializer,
       multi: true,
       deps: [AuthService],
+    },
+     {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
     },
     [{provide: LocationStrategy, useClass: HashLocationStrategy},AuthService]
   ],

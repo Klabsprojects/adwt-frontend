@@ -259,10 +259,29 @@
               <option value="Yes">Yes</option>
             </select>
           </div>
-          <div class="col-md-4 mb-3">
+          <!-- <div class="col-md-4 mb-3">
             <label for="dateOfRegistration" class="form-label">13a. Date of Case Registration *</label>
             <input type="date" id="dateOfRegistration" class="form-control" formControlName="dateOfRegistration" [max]="today" required />
-          </div>
+             <div *ngIf="firForm.hasError('invalidRegistrationDateTime') && firForm.touched" class="text-danger">
+              Date of Case Registration cannot be earlier than the Date of Occurrence.
+            </div>
+          </div> -->
+
+           <div class="col-md-4 mb-3">
+                      <label for="dateOfRegistration" class="form-label">13a. Date of Case Registration *</label>
+                      <input
+                          type="date"
+                          id="dateOfRegistration"
+                          class="form-control"
+                          formControlName="dateOfRegistration"
+                          [max]="today"
+                          required
+                      />
+                      <div *ngIf="firForm.hasError('invalidRegistrationDateTime') && firForm.touched" class="text-danger">
+                          Date of Case Registration cannot be earlier than the Date of Occurrence.
+                      </div>
+                  </div>
+
           <div *ngIf="firForm.get('is_case_altered')?.value === 'Yes'" class="col-md-4 mb-3">
             <label for="altered_date" class="form-label">13b. Date of Case Alteration *</label>
             <input
@@ -308,10 +327,11 @@
           </div>
           <div class="col-md-2 mb-3">
             <label for="numberOfVictims" class="form-label">18. Number of Victims *</label>
-            <select id="numberOfVictims" class="form-select" formControlName="numberOfVictims" (change)="onNumberOfVictimsChange()" required>
+            <!-- <select id="numberOfVictims" class="form-select" formControlName="numberOfVictims" (change)="onNumberOfVictimsChange()" required>
               <option value="" disabled>Select</option>
               <option *ngFor="let num of victimCountArray" [value]="num">{{ num }}</option>
-            </select>
+            </select> -->
+            <input type="number" class="form-control" formControlName="numberOfVictims" placeholder="Enter Accused Number" (change)="onNumberOfVictimsChange()"  required />
           </div>
         </div>
         <div formArrayName="victims">
@@ -352,7 +372,6 @@
                       required 
                       (change)="updateVictimNames()"  
                       (input)="updateVictimNames()" 
-                      style="text-transform: capitalize;"
                       [readonly]="victims.at(i)?.get('age')?.value < 18" />
                   <!-- <input type="text" id="victimName-{{ i }}" class="form-control" formControlName="name" placeholder="Enter victim's name" required (change)="updateVictimNames()"  (input)="updateVictimNames()" style="text-transform: capitalize;" /> -->
                   <!-- <div *ngIf="isVictimNameInvalid(i)" class="text-danger mt-1">Please enter a valid name (letters only).</div> -->
@@ -608,10 +627,11 @@
       <div class="col-md-12">
         <div class="col-md-3 mb-3">
           <label for="numberOfAccused" class="form-label">35. Number of Accused *</label>
-          <select id="numberOfAccused" class="form-select" formControlName="numberOfAccused" (change)="onNumberOfAccusedChange()" required>
+          <!-- <select id="numberOfAccused" class="form-select" formControlName="numberOfAccused" (change)="onNumberOfAccusedChange()" required>
             <option value="" disabled>Select the number of accused</option>
             <option *ngFor="let num of getAvailableNumbers()" [value]="num">{{ num }}</option>
-          </select>
+          </select> -->
+        <input type="number" class="form-control" formControlName="numberOfAccused" placeholder="Enter Accused Number" (change)="onNumberOfAccusedChange()"  required />
         </div>
         <div class="col-md-12 mb-3">
           <label for="accused_remarks" class="form-label">35a. Remarks</label>
@@ -775,7 +795,7 @@
                       <option value="" disabled>Select FIR Number</option>
                       <option *ngFor="let num of firNumberOptions" [value]="num">{{ num }}</option>
                     </select> -->
-                    <input type="text" [id]="'previousFIRNumber' + i" class="form-control" formControlName="previousFIRNumber" placeholder="FIR Number" required />
+                    <input type="text" [id]="'previousFIRNumber' + i" (keypress)="allowOnlyNumbers($event)" class="form-control" formControlName="previousFIRNumber" placeholder="FIR Number" required />
                     <span class="input-group-text">/</span>
                     <select [id]="'previousFIRNumberSuffix' + i" class="form-select" formControlName="previousFIRNumberSuffix">
                       <option value="" disabled>Select Year</option>
@@ -805,7 +825,7 @@
                       <option value="" disabled>Select FIR Number</option>
                       <option *ngFor="let num of firNumberOptions" [value]="num">{{ num }}</option>
                     </select> -->
-                     <input type="text" [id]="'scstFIRNumber' + i" class="form-control" formControlName="scstFIRNumber" placeholder="FIR Number" required />
+                     <input type="text" [id]="'scstFIRNumber' + i" class="form-control" (keypress)="allowOnlyNumbers($event)" formControlName="scstFIRNumber" placeholder="FIR Number" required />
                     <span class="input-group-text">/</span>
                     <select [id]="'scstFIRNumberSuffix' + i" class="form-select" formControlName="scstFIRNumberSuffix" required>
                       <option value="" disabled>Select Year</option>

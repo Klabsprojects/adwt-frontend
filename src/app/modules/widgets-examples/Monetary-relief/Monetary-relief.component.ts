@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { MonetaryReliefService } from 'src/app/services/monetary-relief.service';
 import { ReportsCommonService } from 'src/app/services/reports-common.service';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 
 @Component({
@@ -55,6 +56,24 @@ export class MonetaryReliefComponent implements OnInit {
     'ChargeSheet Stage',
     'Trial Stage',
   ];
+  communities:any[]=[];
+  castes:any[]=[];
+  zones:any[]=[];
+  policeCities:any[]=[];
+   status: any[]=[
+    { key: 'UI', value: 'UI Stage' },
+    { key: 'PT', value: 'PT Stage' },
+  ]
+
+  selectedStatus:string='';
+  selectedDistricts:string='';
+  selectedCommunity:string='';
+  selectedCaste:string='';
+  selectedZone:string='';
+  selectedPoliceCity:string=''
+  selectedFromDate:any="";
+  selectedToDate:any="";
+
   // Visible Columns Management
   displayedColumns: {
     label: string;
@@ -77,9 +96,37 @@ export class MonetaryReliefComponent implements OnInit {
       visible: true,
       sortDirection: null,
     },
-    {
-      label: 'Police City/District',
+     {
+      label: 'Revenue District',
+      field: 'revenue_district',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+     {
+      label: 'Police City',
       field: 'police_city',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+      {
+      label: 'Police Zone',
+      field: 'police_zone',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+      {
+      label: 'Community',
+      field: 'community',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+      {
+      label: 'Caste',
+      field: 'caste',
       sortable: true,
       visible: true,
       sortDirection: null,
@@ -91,9 +138,9 @@ export class MonetaryReliefComponent implements OnInit {
       visible: true,
       sortDirection: null,
     },
-    {
-      label: 'Status',
-      field: 'status',
+      {
+      label: 'Reporting Date',
+      field: 'date_of_registration',
       sortable: true,
       visible: true,
       sortDirection: null,
@@ -101,6 +148,13 @@ export class MonetaryReliefComponent implements OnInit {
     {
       label: 'Nature of Offence',
       field: 'nature_of_offence',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+    {
+      label: 'Data Entry Status',
+      field: 'status',
       sortable: true,
       visible: true,
       sortDirection: null,
@@ -151,7 +205,8 @@ export class MonetaryReliefComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private reportsCommonService: ReportsCommonService,
     private monetaryReliefService: MonetaryReliefService,
-    private router: Router
+    private router: Router,
+     private dashboardService: DashboardService
   ) {
     this.loader = true;
   }
@@ -165,6 +220,7 @@ export class MonetaryReliefComponent implements OnInit {
         this.naturesOfOffence = offences;
         this.fetchMonetaryReliefDetails();
       });
+      this.getDropdowns();
     this.filteredData = [...this.reportData];
     this.selectedColumns = this.displayedColumns.map((column) => column.field);
   }
@@ -176,62 +232,55 @@ export class MonetaryReliefComponent implements OnInit {
     });
   }
 
+    getDropdowns() {
+    // this.dashboardService.userGetMethod('districts').subscribe((res:any)=>{
+    //   this.districts = res;
+    // })
+    this.dashboardService.userGetMethod('fir/communities').subscribe((res:any)=>{
+      this.communities = res;
+    })
+    this.dashboardService.userGetMethod('Zone_Filter_Data').subscribe((res:any)=>{
+      this.zones = res.data;
+    })
+    this.dashboardService.userGetMethod('Police_City_filtet_data').subscribe((res:any)=>{
+      this.policeCities = res.data;
+    })
+  }
+  getCaste(){
+    if(this.selectedCommunity){
+      this.dashboardService.userGetMethod(`fir/castes-by-community?community=${this.selectedCommunity}`).subscribe((res:any)=>{
+        this.castes = res;
+      })
+    }
+  }
+
   // Handles changes in column selection and updates column visibility.
   onColumnSelectionChange(): void {
     this.updateColumnVisibility();
   }
 
   // Load all monetaty relief reports details into UI
-  fetchMonetaryReliefDetails(): void {
-    this.loader = true;
-    this.monetaryReliefService.getMonetaryReliefDetails().subscribe({
-      next: (response) => {
-        //console.log('Monetary Reliefs:', response.data); // Debugging
-        // Transform API response to match frontend structure
-        this.reportData = response.data.map((item: { fir_number: any; police_city: any; police_station: any; status: number; offence_committed: any; victim_name: any; previous_month_reason_for_status: any; current_month_reason_for_status: any; relief_status: any;}, index: number) => ({
-          sl_no: index + 1,
-          fir_id: item.fir_number,
-          police_city:  item.police_city,
-          police_station: item.police_station,
-          status: this.reportsCommonService.caseStatusOptions.find(option => option.value === item.status)?.label || '',
-          nature_of_offence: (item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, '')), 
-          case_status: this.reportsCommonService.caseStatusOptions.find(option => option.value === item.status)?.label || '',
-          relief_status: this.reportsCommonService.reliefStatusOptions.find(option => option.value === item.relief_status)?.label || '',
-          victim_name: (item.victim_name === "NULL" ? '' : (item.victim_name || '')),
-          reason_previous_month: item.previous_month_reason_for_status || '',
-          reason_current_month: item.current_month_reason_for_status || '',
-        }));
-        // Update filteredData to reflect the API data
-        this.filteredData = [...this.reportData]; 
-        this.loader = false;
-        this.cdr.detectChanges(); // Trigger change detection
-      },
-      error: (error) => {
-        this.loader = false;
-        console.error('Error fetching reports:', error);
-      }
-    });
-  }
+
 
   // Applies filters, assigns serial numbers, and resets pagination
-  applyFilters(): void {
-    this.filteredData = this.reportsCommonService.applyFilters(
-      this.reportData,
-      this.searchText,
-      this.selectedDistrict,
-      this.selectedNatureOfOffence,
-      this.selectedStatusOfCase,
-      this.selectedStatusOfRelief,
-      'police_city',
-      'nature_of_offence',
-      'status'
-    );
-    this.filteredData = this.filteredData.map((report, index) => ({
-      ...report,
-      sl_no: index + 1,
-    })); // Assign sl_no starting from 1
-    this.page = 1; // Reset to the first page
-  }
+  // applyFilters(): void {
+  //   this.filteredData = this.reportsCommonService.applyFilters(
+  //     this.reportData,
+  //     this.searchText,
+  //     this.selectedDistrict,
+  //     this.selectedNatureOfOffence,
+  //     this.selectedStatusOfCase,
+  //     this.selectedStatusOfRelief,
+  //     'police_city',
+  //     'nature_of_offence',
+  //     'status'
+  //   );
+  //   this.filteredData = this.filteredData.map((report, index) => ({
+  //     ...report,
+  //     sl_no: index + 1,
+  //   })); // Assign sl_no starting from 1
+  //   this.page = 1; // Reset to the first page
+  // }
 
   // Sorting logic
   sortTable(field: string) {
@@ -301,4 +350,161 @@ export class MonetaryReliefComponent implements OnInit {
       'Monetary-Reports'
     );
   }
+
+    clearfilter(){
+      this.searchText = '';
+      this.selectedDistrict = '';
+      this.selectedStatus='';
+      this.selectedDistricts='';
+      this.selectedCommunity='';
+      this.selectedCaste='';
+      this.selectedZone=''; 
+      this.selectedPoliceCity='';
+      this.selectedFromDate='';
+      this.selectedToDate = '';
+      this.filteredData = [...this.reportData]; 
+  }
+
+    getStatusTextUIPT(status: number): string {
+    console.log(status,'statussssssss')
+    const statusTextMap = {
+      0: 'UI',
+      1: 'UI',
+      2: 'UI',
+      3: 'UI',
+      4: 'UI',
+      5: 'UI',
+      6: 'PT',
+      7: 'PT',
+      8: 'PT',
+      9: 'PT',
+    } as { [key: number]: string };
+
+    return statusTextMap[status] || '';
+  }
+
+
+  applyFilters() {
+  this.filteredData = this.reportData.filter(item => {
+
+    if (this.searchText && this.searchText.trim() !== '' && 
+    item.fir_number.toLowerCase() !== this.searchText.toLowerCase().trim()) {
+    return false;
+    }
+
+    // District filter
+    if (this.selectedDistrict && this.selectedDistrict !== '' && 
+        item.revenue_district !== this.selectedDistrict) {
+      return false;
+    }
+
+    // Police City filter
+    if (this.selectedPoliceCity && this.selectedPoliceCity !== '' && 
+        item.police_city !== this.selectedPoliceCity) {
+      return false;
+    }
+
+    // Police Zone filter
+    if (this.selectedZone && this.selectedZone !== '' && 
+        item.police_zone !== this.selectedZone) {
+      return false;
+    }
+
+    // Community filter
+    if (this.selectedCommunity && this.selectedCommunity !== '' && 
+        item.community !== this.selectedCommunity) {
+      return false;
+    }
+
+    // Caste filter
+    if (this.selectedCaste && this.selectedCaste !== '' && 
+        item.caste !== this.selectedCaste) {
+      return false;
+    }
+
+    // Status filter (UI: status <= 5, PT: status > 5)
+    if (this.selectedStatus && this.selectedStatus !== '') {
+      if (this.selectedStatus === 'UI' && item.filter_status > 5) {
+        return false;
+      }
+      if (this.selectedStatus === 'PT' && item.filter_status <= 5) {
+        return false;
+      }
+    }
+
+    // Date range filter
+    if (this.selectedFromDate || this.selectedToDate) {
+    const registrationDate = new Date(item.date_of_registration);
+    
+    if (this.selectedFromDate && !this.selectedToDate) {
+      const fromDate = new Date(this.selectedFromDate);
+      if (registrationDate < fromDate) {
+        return false;
+      }
+    }
+    
+    if (this.selectedToDate && !this.selectedFromDate) {
+      const toDate = new Date(this.selectedToDate);
+      if (registrationDate > toDate) {
+        return false;
+      }
+    }
+
+    if (this.selectedToDate && this.selectedFromDate) {
+      const fromDate = new Date(this.selectedFromDate);
+      const toDate = new Date(this.selectedToDate);
+      if (registrationDate < fromDate || registrationDate > toDate) {
+        return false;
+      }
+    }
+  }
+
+    return true;
+  });
+}
+
+
+  fetchMonetaryReliefDetails(): void {
+    this.loader = true;
+    this.monetaryReliefService.getMonetaryReliefDetails().subscribe({
+      next: (response) => {
+        //console.log('Monetary Reliefs:', response.data); // Debugging
+        // Transform API response to match frontend structure
+        this.reportData = response.data.map((item: { 
+          fir_number: any; police_city: any; police_station: any; status: number;
+           offence_committed: any; victim_name: any; previous_month_reason_for_status: any;
+            current_month_reason_for_status: any; relief_status: any;
+            revenue_district : any; police_zone : any; community : any; caste : any; date_of_registration : any;
+          }, index: number) => ({
+          sl_no: index + 1,
+          fir_id: item.fir_number,
+          fir_number: item.fir_number === "NULL" || !item.fir_number ? '' : item.fir_number,
+          police_city:  item.police_city,
+          police_station: item.police_station,
+          status: this.reportsCommonService.caseStatusOptions.find(option => option.value === item.status)?.label || '',
+          nature_of_offence: (item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, '')), 
+          case_status: this.getStatusTextUIPT(item.status) || '',
+          relief_status: this.reportsCommonService.reliefStatusOptions.find(option => option.value === item.relief_status)?.label || '',
+          victim_name: (item.victim_name === "NULL" ? '' : (item.victim_name || '')),
+          reason_previous_month: item.previous_month_reason_for_status || '',
+          reason_current_month: item.current_month_reason_for_status || '',
+          revenue_district : item.revenue_district,
+          police_zone : item.police_zone,
+          community : item.community,
+          caste : item.caste,
+          date_of_registration : item.date_of_registration,
+          filter_status : item.status
+        }));
+        // Update filteredData to reflect the API data
+        this.filteredData = [...this.reportData]; 
+        this.loader = false;
+        this.cdr.detectChanges(); // Trigger change detection
+      },
+      error: (error) => {
+        this.loader = false;
+        console.error('Error fetching reports:', error);
+      }
+    });
+  }
+
 }
