@@ -15,6 +15,7 @@ export class MeetingFilterComponent implements OnInit {
   selectedDistrict:string = '';
   selectedSubDivision:string = '';
   selectedQuarter:string = '';
+  selectedyear:string = '';
   isDistrictDisabled:boolean=false;
   private userData:any;
   ngOnInit(): void {
@@ -56,6 +57,7 @@ export class MeetingFilterComponent implements OnInit {
       "quarter": this.selectedQuarter,
       "district": this.selectedDistrict,
       "subdivision": this.selectedSubDivision,
+      "year":this.selectedyear
     };
   }
 

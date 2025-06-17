@@ -28,7 +28,7 @@
             </div>
             <div>
                 <p>Year</p>
-                <select name="" id="">
+                <select name="" id="" [(ngModel)]="selectedyear" (change)="get_other_values()">
                     <option value="" selected>Select</option>
                     <option value="2025">2025</option>
                     <option value="2024">2024</option>
