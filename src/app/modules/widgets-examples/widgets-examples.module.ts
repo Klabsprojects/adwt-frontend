@@ -39,7 +39,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { VmcComponent  } from './vmc/vmc.component';
 import { LayoutModule } from 'src/app/_metronic/layout/layout.module';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-
+import { LegacyFirListComponent } from './legacy-fir-list/legacy-fir-list.component';
 @NgModule({
   declarations: [
     WidgetsExamplesComponent,
@@ -61,6 +61,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
     FirListComponent,
     VmcComponent,
     VmcmeetingComponent,
+    LegacyFirListComponent
     // Remove AddFirComponent from here
   ],
   imports: [

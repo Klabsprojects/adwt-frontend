@@ -246,8 +246,16 @@ export class AdditionalReliefComponent {
       const totalPensionAmount = pensionAmount + dearnessAllowance;
       this.additionalReliefForm.get('totalPensionAmount')?.setValue(totalPensionAmount, { emitEvent: false });
     }
+    userData:any;
+  isDisable:boolean = false;
 
     ngOnInit(): void {
+      const JsonData = sessionStorage.getItem('user_data');
+    this.userData = JsonData ? JSON.parse(JsonData) : {};
+    this.isDisable = this.userData.role == 3;
+    if(this.isDisable){
+      this.additionalReliefForm.disable();
+    }
       this.loadDistricts()
       this.route.queryParams.subscribe((params) => {
         this.firId = params['fir_id'];

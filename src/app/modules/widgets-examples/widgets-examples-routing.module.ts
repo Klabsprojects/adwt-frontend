@@ -32,10 +32,11 @@ import { EditMonthlyReportComponent } from './edit-monthly-report/edit-monthly-r
 import { EditMonetaryReliefComponent } from './edit-monetary-relief/edit-monetary-relief.component';
 import { EditAdditionalReliefReportComponent } from './edit-additional-relief-report/edit-additional-relief-report.component';
 
-import { VmcComponent  } from './vmc/vmc.component';
-import { VmcmeetingComponent  } from './vmcmeeting/vmcmeeting.component';
+import { VmcComponent } from './vmc/vmc.component';
+import { VmcmeetingComponent } from './vmcmeeting/vmcmeeting.component';
 import { VmcReportComponent } from './Vmc-Report/Vmc-Report.component';
 import { AlteredCaseListComponent } from './altered-case-list/altered-case-list.component';
+import { LegacyFirListComponent } from './legacy-fir-list/legacy-fir-list.component';
 const routes: Routes = [
   {
     path: '',
@@ -63,10 +64,10 @@ const routes: Routes = [
         component: RevenueDistrictComponent,
       },
 
-       {
+      {
         path: 'offence',
         component: OffenceComponent,
-      },{ path: 'mistake-of-fact', component: MistakeOfFactComponent },{ path: 'altered-case', component: AlteredCaseComponent },{ path: 'monthly-report', component: MonthlyReportComponent },
+      }, { path: 'mistake-of-fact', component: MistakeOfFactComponent }, { path: 'altered-case', component: AlteredCaseComponent }, { path: 'monthly-report', component: MonthlyReportComponent },
       { path: 'monetary-relief', component: MonetaryReliefComponent },
       { path: 'additional-relief-report', component: AdditionalReliefReportComponent },
       { path: 'edit-monthly-report', component: EditMonthlyReportComponent },
@@ -75,32 +76,27 @@ const routes: Routes = [
       { path: 'Vmc-Report', component: VmcReportComponent },
       { path: 'altered-case-list', component: AlteredCaseListComponent },
       {
-  path: 'offence-act-scst',
-  component: OffenceActScStComponent,
-},{
-  path: 'district',
-  component: DistrictComponent,
-}, { path: 'relief', component: ReliefComponent },
+        path: 'offence-act-scst',
+        component: OffenceActScStComponent,
+      }, {
+        path: 'district',
+        component: DistrictComponent,
+      }, { path: 'relief', component: ReliefComponent },
 
-{ path: 'vmc', component: VmcComponent },
+      { path: 'vmc', component: VmcComponent },
 
-{path:'VmcmeetingComponent',component: VmcmeetingComponent },
+      { path: 'VmcmeetingComponent', component: VmcmeetingComponent },
 
-{ path: 'relief-list',component: ReliefListComponent},
+      { path: 'relief-list', component: ReliefListComponent },
 
-{ path: 'additional-relief',component: AdditionalReliefComponent},
-{ path: 'additional-relief-list',component: AdditionalReliefListComponent},
+      { path: 'additional-relief', component: AdditionalReliefComponent },
+      { path: 'additional-relief-list', component: AdditionalReliefListComponent },
 
-{ path: 'city', component: CityComponent },
-  { path: 'caste-and-community', component: CasteAndCommunityComponent },{ path: 'fir-list', component: FirListComponent },{
-        path: 'add-fir',
-        data: { title: 'Home Page' },
-        loadComponent: () =>
-          import('./add-fir/add-fir.component').then(m => m.AddFirComponent),
-
-
-          },
-
+      { path: 'city', component: CityComponent },
+      { path: 'caste-and-community', component: CasteAndCommunityComponent },
+      { path: 'fir-list', component: FirListComponent },
+      { path: 'legacy-fir-list', component:LegacyFirListComponent},
+      { path: 'add-fir', data: { title: 'Home Page' }, loadComponent: () => import('./add-fir/add-fir.component').then(m => m.AddFirComponent), },
       {
         path: 'statistics',
         component: StatisticsComponent,
@@ -131,4 +127,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class WidgetsExamplesRoutingModule {}
+export class WidgetsExamplesRoutingModule { }

@@ -215,6 +215,14 @@
             <span class="menu-title">List of Cases</span>
           </a>
         </div>
+        <div class="menu-item" *ngIf="roleId==3">
+          <a class="menu-link without-sub" routerLink="/widgets-examples/legacy-fir-list" routerLinkActive="active">
+            <span class="menu-bullet">
+              <span class="bullet bullet-dot"></span>
+            </span>
+            <span class="menu-title">Legacy Cases</span>
+          </a>
+        </div>
         <div class="menu-item" *ngIf="hasPermission('add fir')">
           <a class="menu-link without-sub" routerLink="/widgets-examples/add-fir" routerLinkActive="active">
             <span class="menu-bullet">

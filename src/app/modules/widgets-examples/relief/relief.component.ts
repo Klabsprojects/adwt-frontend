@@ -59,9 +59,16 @@ export class ReliefComponent implements OnInit {
     });
   }
   loading = true;
-
+  userData:any;
+  isDisable:boolean = false;
   ngOnInit(): void {
+    const JsonData = sessionStorage.getItem('user_data');
+    this.userData = JsonData ? JSON.parse(JsonData) : {};
+    this.isDisable = this.userData.role == 3;
     this.initializeForm();
+    if (this.isDisable) {
+    this.disableEntireForm();
+  }
     this.firId = this.getFirIdFromRouter();
     if (this.firId) {
       this.fetchFirStatus(this.firId); // Fetch status
@@ -88,6 +95,18 @@ export class ReliefComponent implements OnInit {
       this.router.navigate(['/']); // Redirect if FIR ID is missing
     }
   }
+
+  disableEntireForm(): void {
+  this.reliefForm.disable();
+
+  // // Also explicitly disable any nested FormArrays if needed
+  // const victimArrays = ['victims', 'secondInstallmentVictims', 'thirdInstallmentVictims'];
+  // victimArrays.forEach(arrayName => {
+  //   const formArray = this.reliefForm.get(arrayName) as FormArray;
+  //   formArray.controls.forEach(group => group.disable());
+  // });
+}
+
 
 
 
@@ -364,7 +383,9 @@ export class ReliefComponent implements OnInit {
 
     // Add dynamic listeners for calculating totals
     this.addDynamicListeners(group);
-
+    if(this.isDisable){
+      group.disable()
+    }
     return group;
   }
 

@@ -22,11 +22,11 @@ export class SidebarMenuComponent implements OnInit, OnDestroy {
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
-
+  roleId:any;
   ngOnInit(): void {
     const userData = JSON.parse(sessionStorage.getItem('user_data') || '{}');
     const roleId = userData.role;
-
+    this.roleId = roleId;
     if (roleId) {
       this.loadPermissions(roleId);
     } else {

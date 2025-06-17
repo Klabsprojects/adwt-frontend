@@ -114,6 +114,7 @@
                 id="uploadProceedings"
                 (change)="uploadProceedingsDocument($event)" 
                 accept="application/pdf"
+                [disabled] = "isDisable"
               />
           </div> 
         </div>
