@@ -98,6 +98,7 @@
             required
             #districtNameCtrl="ngModel"
             [ngClass]="{ 'is-invalid': districtNameCtrl.invalid && districtNameCtrl.touched }"
+            (keypress)="allowOnlyLetters($event)"
           />
           <div *ngIf="districtNameCtrl.invalid && districtNameCtrl.touched" class="invalid-feedback">
             District name is required.
@@ -116,6 +117,7 @@
             name="policeRange"
             required
             #policeRangeCtrl="ngModel"
+             (keypress)="allowOnlyLetters($event)"
             [ngClass]="{ 'is-invalid': policeRangeCtrl.invalid && policeRangeCtrl.touched }"
           />
           <div *ngIf="policeRangeCtrl.invalid && policeRangeCtrl.touched" class="invalid-feedback">
@@ -134,6 +136,7 @@
             name="policeZone"
             required
             #policeZoneCtrl="ngModel"
+             (keypress)="allowOnlyLetters($event)"
             [ngClass]="{ 'is-invalid': policeZoneCtrl.invalid && policeZoneCtrl.touched }"
           />
           <div *ngIf="policeZoneCtrl.invalid && policeZoneCtrl.touched" class="invalid-feedback">

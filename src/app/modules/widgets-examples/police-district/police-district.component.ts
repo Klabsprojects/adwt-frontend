@@ -191,4 +191,16 @@ export class PoliceDistrictComponent implements OnInit {
     this.policeDivisions = [...this.policeDivisions];
     this.cdr.detectChanges();
   }
+
+    allowOnlyLetters(event: KeyboardEvent): void {
+    const charCode = event.key.charCodeAt(0);
+    // Allow only uppercase (A-Z), lowercase (a-z), and space (charCode 32)
+    if (
+      !(charCode >= 65 && charCode <= 90) && // A-Z
+      !(charCode >= 97 && charCode <= 122) && // a-z
+      charCode !== 32 // space
+    ) {
+      event.preventDefault(); // Prevent the character from being entered
+    }
+  }
 }

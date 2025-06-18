@@ -95,6 +95,7 @@
               name="courtName"
               required
               #courtNameCtrl="ngModel"
+               (keypress)="allowOnlyLetters($event)"
               [ngClass]="{ 'is-invalid': courtNameCtrl.invalid && courtNameCtrl.touched }"
             />
             <div *ngIf="courtNameCtrl.invalid && courtNameCtrl.touched" class="invalid-feedback">
@@ -114,6 +115,7 @@
               name="courtRange"
               required
               #courtRangeCtrl="ngModel"
+               (keypress)="allowOnlyLetters($event)"
               [ngClass]="{ 'is-invalid': courtRangeCtrl.invalid && courtRangeCtrl.touched }"
             />
             <div *ngIf="courtRangeCtrl.invalid && courtRangeCtrl.touched" class="invalid-feedback">

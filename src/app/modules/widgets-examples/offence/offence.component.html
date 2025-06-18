@@ -94,6 +94,7 @@
             name="offenceName"
             required
             #offenceNameCtrl="ngModel"
+            (keypress)="allowOnlyLetters($event)"
             [ngClass]="{ 'is-invalid': offenceNameCtrl.invalid && offenceNameCtrl.touched }"
           />
           <div *ngIf="offenceNameCtrl.invalid && offenceNameCtrl.touched" class="invalid-feedback">

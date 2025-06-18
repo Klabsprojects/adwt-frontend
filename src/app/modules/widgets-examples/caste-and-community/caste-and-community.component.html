@@ -80,6 +80,7 @@
           name="casteName"
           required
           #casteNameCtrl="ngModel"
+          (keypress)="allowOnlyLetters($event)"
           [ngClass]="{ 'is-invalid': casteNameCtrl.invalid && (casteNameCtrl.dirty || casteNameCtrl.touched) }"
         />
         <div *ngIf="casteNameCtrl.invalid && (casteNameCtrl.dirty || casteNameCtrl.touched)" class="invalid-feedback">
@@ -96,6 +97,7 @@
           name="communityName"
           required
           #communityNameCtrl="ngModel"
+          (keypress)="allowOnlyLetters($event)"
           [ngClass]="{ 'is-invalid': communityNameCtrl.invalid && (communityNameCtrl.dirty || communityNameCtrl.touched) }"
         />
         <div *ngIf="communityNameCtrl.invalid && (communityNameCtrl.dirty || communityNameCtrl.touched)" class="invalid-feedback">
