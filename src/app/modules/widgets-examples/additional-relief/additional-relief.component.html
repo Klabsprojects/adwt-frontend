@@ -754,7 +754,7 @@
 
       <!-- Submit Button -->
       <button (click)="BackToList()" type="button" class="btn btn-primary">Back</button>
-      <button style="margin-left: 10px;" type="submit" class="btn btn-primary">Submit</button>
+      <button style="margin-left: 10px;" type="submit" class="btn btn-primary" [disabled]="isDisable">Submit</button>
     </form>
 
   </div>
