@@ -551,6 +551,7 @@ loader : boolean = false;
   ngOnInit(): void {
     const UserInfo: any = sessionStorage.getItem('user_data');
     this.Parsed_UserInfo = JSON.parse(UserInfo)
+    console.log('Parsed_UserInfo',this.Parsed_UserInfo);
     this.loadFirList(1, this.pageSize);
     this.updateSelectedColumns();
     this.loadPoliceDivision();
@@ -1459,18 +1460,18 @@ loader : boolean = false;
     this.pageSize = pageSize;
     this.loader = true;
 
-    this.firService.getPaginatedFirList(page, pageSize, this.getFilterParams()).subscribe(
+    this.firService.getLegacyPaginatedFirList(page, pageSize, this.getFilterParams()).subscribe(
       (response: any) => {
         // const targetDate = "2025-03-20";
         // console.log('firList',response.data);
         // this.firList = response.data.filter((item:any) => item.created_at?.slice(0, 10) === targetDate);
-        // this.firList = response.data;
+        this.firList = response.data;
         this.totalRecords = response.total;
         this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
         // this.filteredList = [...this.firList];
-        for(let i=1;i<=this.totalPages;i++){
-          this.getfirList(i,10);
-        }
+        // for(let i=1;i<=this.totalPages;i++){
+        //   this.getfirList(i,10);
+        // }
         // this.policeRanges = response.data.map((item: any) => item.police_range);
         // this.policeRanges = [...new Set(this.policeRanges)];
         // this.revenueDistricts = response.data.map((item: any) => item.revenue_district_name);
@@ -1485,18 +1486,18 @@ loader : boolean = false;
     );
   }
 
-  getfirList(page: any, pageSize: any) {
-  this.firService.getPaginatedFirList(page, pageSize, this.getFilterParams()).subscribe((response: any) => {
-    const targetDate = "2025-03-20";
+//   getfirList(page: any, pageSize: any) {
+//   this.firService.getPaginatedFirList(page, pageSize, this.getFilterParams()).subscribe((response: any) => {
+//     const targetDate = "2025-03-20";
 
-    const filteredData = response.data.filter((item: any) => {
-      return item.created_at?.slice(0, 10) === targetDate;
-    });
-    console.log('filteredData',filteredData)
-    this.firList.push(...filteredData);  // <-- Fix: spread operator
-    this.filteredList = [...this.firList];
-  });
-}
+//     const filteredData = response.data.filter((item: any) => {
+//       return item.created_at?.slice(0, 10) === targetDate;
+//     });
+//     console.log('filteredData',filteredData)
+//     this.firList.push(...filteredData);  // <-- Fix: spread operator
+//     this.filteredList = [...this.firList];
+//   });
+// }
 
 
 

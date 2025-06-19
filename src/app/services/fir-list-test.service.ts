@@ -54,6 +54,22 @@ export class FirListTestService {
     return this.http.get<any>(`${this.baseUrl}/list_paginated`, { params });
   }
 
+  getLegacyPaginatedFirList(page: number, pageSize: number , filters: any = {}) {
+    // https://adwatrocity.onlinetn.com/api/v1/fir_list/list_paginated?page=29&pageSize=10&district=Villupuram&legacy=yes
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString())
+      .set('legacy','yes')
+      
+      // Add all filters to params
+      Object.keys(filters).forEach(key => {
+        params = params.set(key, filters[key]);
+      });
+        // Add other filters as needed
+    
+    return this.http.get<any>(`${this.baseUrl}/list_paginated`, { params });
+  }
+
 
   getPoliceRanges() {
   return this.http.get<any>(`${this.baseUrl}/getPoliceRanges`);
