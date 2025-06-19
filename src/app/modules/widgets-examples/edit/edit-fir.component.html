@@ -2615,9 +2615,8 @@ maxlength="10"
 
 
 
-
-
-              <div  *ngIf="!hideCompensationSection && (firForm.get('judgementDetails.judgementNature')?.value == 'Convicted' || firForm.get('judgementDetails.filedBy')?.value != 'No appeal yet')">
+              <ng-container *ngIf="firForm.get('judgementAwarded1')?.value === 'yes' || firForm.get('judgementAwarded')?.value === 'yes'">
+                <div  *ngIf="!hideCompensationSection && (firForm.get('judgementDetails.judgementNature')?.value == 'Convicted' || firForm.get('judgementDetails.filedBy')?.value != 'No appeal yet')">
                     <div formArrayName="victimsRelief">
                       <div *ngFor="let victimRelief of victimsRelief.controls; let i = index" [formGroupName]="i"  class="card border-primary mb-4">
                          <div class="card-body">
@@ -2813,6 +2812,8 @@ maxlength="10"
               </div>
           </div>
 </div>
+              </ng-container>
+              
         <!-- Navigation Buttons -->
         <div class="mt-4">
             <button type="button" class="btn btn-warning me-2"  [disabled]="!SubmitButton" (click)="saveAsDraft_7()">
