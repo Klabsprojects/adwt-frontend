@@ -399,23 +399,25 @@ export class LoginComponent implements OnInit, OnDestroy {
 
             // Redirect based on role
             if (userRole === '4') {
-              this.router.navigate(['/dashboard']);
+              this.router.navigate(['/widgets-examples/VmcmeetingComponent']);
               this.loginSuccess.emit();
             } else {
               setTimeout(() => {
                 this.loginSuccess.emit();
-                this.router.navigate(['/dashboard']);
+                this.router.navigate(['/widgets-examples/fir-list']);
               }, 1000);
             }
           } else {
             console.error('Login failed: Invalid response structure');
             this.hasError = true;
+            console.log('credential invalid')
             // Generate new CAPTCHA on login failure
             this.generateCaptcha();
           }
         },
         (error) => {
           console.error('Login failed due to error:', error);
+          console.log('server down')
           this.hasError = true;
           // Generate new CAPTCHA on login failure
           this.generateCaptcha();
