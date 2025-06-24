@@ -1730,6 +1730,10 @@ export class FirListComponent implements OnInit {
     this.applyFilters();
   }
 
+    SearchList() {
+      this.applyFilters();
+  }
+
 
 
   // Sorting logic

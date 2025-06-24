@@ -243,3 +243,8 @@ a:visited {
     max-width: 80px;
   }
 }
+
+label.required::after {
+  content: " *";
+  color: red;
+}

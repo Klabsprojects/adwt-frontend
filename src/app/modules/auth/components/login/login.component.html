@@ -208,13 +208,16 @@
         
         <!-- CAPTCHA Field -->
         <div class="form-group" style="width: 75%;margin-left: auto;margin-right: auto;">
-          <label>Solve the CAPTCHA *</label>
+          <label class="required">Solve the CAPTCHA </label>
           <div style="flex-direction: column;" class="d-flex align-items-center gap-2">
             <strong class="me-2">{{ captchaQuestion }}</strong>
-            <input 
+          </div>
+          <div style="display: flex; justify-content: space-evenly; align-items: center;">
+             <input 
+             style="width: 80%;"
               type="text" 
               (keypress)="allowOnlyNumbers($event)"
-              class="form-control" 
+              class="form-control col-3" 
               [(ngModel)]="captchaAnswer" 
               [ngModelOptions]="{standalone: true}"
               (input)="validateCaptcha()" 
@@ -225,7 +228,7 @@
                 'is-valid': isCaptchaValid && f.captcha?.valid
               }"
             />
-            <button style="width: 45px; color:#fff" type="button" class="btn btn-sm btn-secondary " (click)="generateCaptcha()" title="Generate new CAPTCHA">
+            <button style="width: 45px; color:#fff;height: 40px;" type="button" class="btn btn-sm btn-secondary " (click)="generateCaptcha()" title="Generate new CAPTCHA">
               ⟳
             </button>
           </div>

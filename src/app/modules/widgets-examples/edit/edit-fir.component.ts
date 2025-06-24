@@ -2047,6 +2047,16 @@ onOffenceCommittedChange(index: number): void {
     const selectedFile = event.target.files[0];
     if (!selectedFile) return;
 
+
+    const maxSizeInMB = 2;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    if (selectedFile.size > maxSizeInBytes) {
+      console.error(`File size exceeds ${maxSizeInMB}MB`);
+      alert(`File size must be less than ${maxSizeInMB}MB.`);
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', selectedFile);
 
@@ -2062,6 +2072,8 @@ onOffenceCommittedChange(index: number): void {
       }
     });
   }
+
+
   viewFIRCopy(): void {
   const path = this.firForm.get('uploadFIRCopy')?.value;
   if (path) {
@@ -2081,6 +2093,16 @@ removeFIRCopy(): void {
   onProceedingsFileUpload(event: any): void {
       const selectedFile = event.target.files[0];
       if (!selectedFile) return;
+
+    const maxSizeInMB = 2;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    if (selectedFile.size > maxSizeInBytes) {
+      console.error(`File size exceeds ${maxSizeInMB}MB`);
+      alert(`File size must be less than ${maxSizeInMB}MB.`);
+      return;
+    }
+
 
       const formData = new FormData();
       formData.append('file', selectedFile);
@@ -2134,6 +2156,16 @@ removeFIRCopy(): void {
       const selectedFile = event.target.files[0];
       if (!selectedFile) return;
 
+    const maxSizeInMB = 2;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    if (selectedFile.size > maxSizeInBytes) {
+      console.error(`File size exceeds ${maxSizeInMB}MB`);
+      alert(`File size must be less than ${maxSizeInMB}MB.`);
+      return;
+    }
+
+
       const formData = new FormData();
       formData.append('file', selectedFile);
     
@@ -2168,6 +2200,16 @@ removeFIRCopy(): void {
     uploadProceedings_2New(event:any){
       const selectedFile = event.target.files[0];
       if (!selectedFile) return;
+
+    const maxSizeInMB = 2;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    if (selectedFile.size > maxSizeInBytes) {
+      console.error(`File size exceeds ${maxSizeInMB}MB`);
+      alert(`File size must be less than ${maxSizeInMB}MB.`);
+      return;
+    }
+
 
       const formData = new FormData();
       formData.append('file', selectedFile);
@@ -2388,6 +2430,7 @@ removeFIRCopy(): void {
           sectionsIPC: victim.sectionsIPC
         });
     
+        if(victim.community){
         this.firService.getCastesByCommunity(victim.community).subscribe(
           (castes: string[]) => {
             victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
@@ -2397,6 +2440,7 @@ removeFIRCopy(): void {
             Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
           }
         );
+      }
 
         victimsFormArray.push(victimGroup);
 
@@ -3366,6 +3410,16 @@ removeFIRCopy(): void {
   const file = event.target.files[0];
   if (!file) return;
 
+    const maxSizeInMB = 2;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    if (file.size > maxSizeInBytes) {
+      console.error(`File size exceeds ${maxSizeInMB}MB`);
+      alert(`File size must be less than ${maxSizeInMB}MB.`);
+      return;
+    }
+
+
   const formData = new FormData();
   formData.append('file', file);
 
@@ -3783,7 +3837,7 @@ onAccusedAgeChange(index: number): void {
       stationName: ['', Validators.required],
       uploadProceedings_1: [''],
       proceedingsFile: ['', Validators.required],
-      officerName: ['', [Validators.required, Validators.pattern('^[A-Za-z\\s]*$')]], // Name validation
+      officerName: ['', [Validators.required]], // Name validation
       complaintReceivedType:[''],
       complaintRegisteredBy:[''],
       complaintReceiverName:[''],
@@ -4071,7 +4125,7 @@ uploadedImageSrc: any | ArrayBuffer;
     this.firService.getVictimsReliefDetails(this.firId).subscribe(
       (response: any) => {
         this.numberOfVictims = response.numberOfVictims;
-        this.victimNames = response.victimNames;
+        // this.victimNames = response.victimNames;
           this.victimsReliefDetails = response.victimsReliefDetails;
           // Initialize victimsRelief array based on the number of victims
         // this.populateVictimsRelief();
@@ -6491,6 +6545,15 @@ controls.forEach((controlName) => {
   const file: File = event.target.files?.[0];
   if (!file) return;
 
+    const maxSizeInMB = 2;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    if (file.size > maxSizeInBytes) {
+      console.error(`File size exceeds ${maxSizeInMB}MB`);
+      alert(`File size must be less than ${maxSizeInMB}MB.`);
+      return;
+    }
+
   const formData = new FormData();
   formData.append('file', file);
 
@@ -7385,7 +7448,7 @@ isStep1Valid(): boolean {
     victimMandatoryFields.push('name');
     }
 
-    if(victimGroup.get('mobileNumber')?.value.length != 10){
+    if(victimGroup.get('mobileNumber')?.value && victimGroup.get('mobileNumber')?.value.length != 10){
       return false;
     }
     
@@ -7512,7 +7575,7 @@ isStep1Valid(): boolean {
     
     // Define the list of mandatory fields for accused
     var mandatoryFields = [
-      'age', 
+      
       'gender',
       'community',
       'caste',
@@ -7523,7 +7586,7 @@ isStep1Valid(): boolean {
       'landOIssueOption'
     ];
 
-    if(age > 17){
+    if(!age || age > 17){
       mandatoryFields.push('name');
     }
 
@@ -8121,6 +8184,15 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
     const selectedFile = event.target.files[0];
       if (!selectedFile) return;
 
+    const maxSizeInMB = 2;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    if (selectedFile.size > maxSizeInBytes) {
+      console.error(`File size exceeds ${maxSizeInMB}MB`);
+      alert(`File size must be less than ${maxSizeInMB}MB.`);
+      return;
+    }
+
       const formData = new FormData();
       formData.append('file', selectedFile);
     
@@ -8498,6 +8570,16 @@ getPoliceStation(district: string): void {
 onFileSelect_1New(event: any, index: number, fileControl: string, fileNameControl: string): void {
     const selectedFile = event.target.files[0];
     if (!selectedFile) return;
+
+    const maxSizeInMB = 2;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    if (selectedFile.size > maxSizeInBytes) {
+      console.error(`File size exceeds ${maxSizeInMB}MB`);
+      alert(`File size must be less than ${maxSizeInMB}MB.`);
+      return;
+    }
+
   
     const formData = new FormData();
     formData.append('file', selectedFile);
@@ -8562,6 +8644,16 @@ lebelName(){
       const selectedFile = event.target.files[0];
       if (!selectedFile) return;
 
+    const maxSizeInMB = 2;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    if (selectedFile.size > maxSizeInBytes) {
+      console.error(`File size exceeds ${maxSizeInMB}MB`);
+      alert(`File size must be less than ${maxSizeInMB}MB.`);
+      return;
+    }
+
+
       const formData = new FormData();
       formData.append('file', selectedFile);
     
@@ -8597,6 +8689,15 @@ lebelName(){
   upload_court_order_FileUpload(event: any): void {
       const selectedFile = event.target.files[0];
       if (!selectedFile) return;
+
+    const maxSizeInMB = 2;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    if (selectedFile.size > maxSizeInBytes) {
+      console.error(`File size exceeds ${maxSizeInMB}MB`);
+      alert(`File size must be less than ${maxSizeInMB}MB.`);
+      return;
+    }
 
       const formData = new FormData();
       formData.append('file', selectedFile);

@@ -3,7 +3,7 @@
     <div class="card-title">
       <div class="d-flex align-items-center position-relative my-1">
         <i class="fas fa-search fs-3 position-absolute ms-5"></i>
-        <input type="text" [(ngModel)]="searchText" (input)="applyFilters()"
+        <input type="text" [(ngModel)]="searchText"
           class="form-control form-control-solid w-250px ps-12" placeholder="Search FIR" />
       </div>
     </div>
@@ -36,45 +36,50 @@
 
     <div class="d-flex gap-3 mb-3">
       <select *ngIf="Parsed_UserInfo.access_type != 'District'" class="form-select" [(ngModel)]="selectedDistrict"
-        (change)="applyFilters()">
+        >
         <option value="" selected hidden disabled>Police City</option>
         <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
       </select>
 
       <select *ngIf="Parsed_UserInfo.access_type != 'District'" class="form-select" [(ngModel)]="selectedPoliceZone"
-        (change)="applyFilters()">
+        >
         <option value="" selected hidden disabled>Police Zone</option>
         <option *ngFor="let item of policeZones" [value]="item">{{ item }}</option>
       </select>
 
 
       <select *ngIf="Parsed_UserInfo.access_type != 'District'" class="form-select" [(ngModel)]="selectedPoliceRange"
-        (change)="applyFilters()">
+        >
         <option value="" selected hidden disabled>Police Range</option>
         <option *ngFor="let item of policeRanges" [value]="item.police_range">{{ item.police_range }}</option>
       </select>
 
       <select *ngIf="Parsed_UserInfo.access_type != 'District'" class="form-select"
-        [(ngModel)]="selectedRevenue_district" (change)="applyFilters()">
+        [(ngModel)]="selectedRevenue_district" >
         <option value="" selected hidden disabled>Revenue District</option>
         <option *ngFor="let item of revenueDistricts" [value]="item.revenue_district">{{ item.revenue_district }}
         </option>
       </select>
 
-      <!-- <select class="form-select" [(ngModel)]="selectedComplaintReceivedType" (change)="applyFilters()">
+      <!-- <select class="form-select" [(ngModel)]="selectedComplaintReceivedType" >
         <option value="" selected hidden disabled>Complaint Received Type</option>
         <option value="written" >written</option>
         <option value="oral" >oral</option>
       </select> -->
 
-      <select class="form-select" [(ngModel)]="selectedOffenceGroup" (change)="applyFilters()">
+   
+    </div>
+
+    <div class="d-flex gap-3 mb-3">
+
+         <select class="form-select" [(ngModel)]="selectedOffenceGroup" >
         <option value="" selected hidden disabled>Offence</option>
         <option *ngFor="let item of offenceGroupsList" [value]="item">
           {{ item }}
         </option>
       </select>
 
-      <select class="form-select" [(ngModel)]="RegistredYear" (change)="applyFilters()">
+      <select class="form-select" [(ngModel)]="RegistredYear" >
         <option value="" selected hidden disabled>Year of Registration</option>
         <option *ngFor="let item of years" [value]="item">
           {{ item }}
@@ -82,29 +87,23 @@
       </select>
 
       <div class="tooltip-container">
-        <input type="date" [(ngModel)]="startDate" (change)="applyFilters()" class="form-control"
+        <input type="date" [(ngModel)]="startDate"  class="form-control"
           placeholder="Start Date">
         <span class="tooltip-text">Date of Registration From Date</span>
       </div>
 
       <div class="tooltip-container">
-        <input type="date" [(ngModel)]="endDate" (change)="applyFilters()" class="form-control" placeholder="End Date">
+        <input type="date" [(ngModel)]="endDate"  class="form-control" placeholder="End Date">
         <span class="tooltip-text">Date of Registration To Date</span>
       </div>
 
-      <select class="form-select" [(ngModel)]="selectedUIPT" (change)="applyFilters()">
+      <select class="form-select" [(ngModel)]="selectedUIPT" >
         <option value="" selected hidden disabled>UI/PT</option>
         <option value="UI">UI</option>
         <option value="PT">PT</option>
       </select>
 
-      <!-- <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
-        <option value="" selected hidden disabled>Status</option>
-        <option *ngFor="let reliefStatus of statusesOfRelief" [value]="reliefStatus.value">
-          {{ reliefStatus.label }}
-        </option>
-      </select> -->
-
+      <button style="width: 40% !important;" (click)="SearchList()" class="btn btn-primary btn-sm">Search</button>
       <button style="width: 40% !important;" (click)="clearfilter()" class="btn btn-primary btn-sm">Clear
         Filters</button>
     </div>

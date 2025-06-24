@@ -79,35 +79,35 @@
 
           <div class="row">
             <div class="col-md-6 col-lg-3 mb-3">
-              <label for="policeCity" class="form-label">1. Police City / District *</label>
+              <label for="policeCity" class="form-label required">1. Police City / District</label>
               <select id="policeCity" class="form-select" formControlName="policeCity" (change)="onCityChange($event)" required>
                 <option value="" disabled>Select one</option>
                 <option *ngFor="let city of police_Cities_data" [value]="city">{{ city }}</option>
               </select>
             </div>
             <div class="col-md-6 col-lg-3 mb-3">
-              <label for="policeZone" class="form-label">2. Police Zone *</label>
+              <label for="policeZone" class="form-label required">2. Police Zone</label>
               <select id="policeZone" class="form-select" formControlName="policeZone">
                 <option value="" disabled>Select one</option>
                 <option *ngFor="let zone of policeZones" [value]="zone">{{ zone }}</option>
               </select>
             </div>
             <div class="col-md-6 col-lg-3 mb-3">
-              <label for="policeRange" class="form-label">3. Police Range *</label>
+              <label for="policeRange" class="form-label required">3. Police Range</label>
               <select id="policeRange" class="form-select" formControlName="policeRange">
                 <option value="" disabled>Select one</option>
                 <option *ngFor="let range of policeRanges[0]" [value]="range">{{ range }}</option>
               </select>
             </div>
             <div class="col-md-6 col-lg-3 mb-3">
-              <label for="revenueDistrict" class="form-label">4. Revenue District *</label>
+              <label for="revenueDistrict" class="form-label required">4. Revenue District</label>
               <select id="revenueDistrict" class="form-select" formControlName="revenueDistrict">
                 <option value="" disabled>Select one</option>
                 <option *ngFor="let district of revenueDistricts[0]" [value]="district">{{ district }}</option>
               </select>
             </div>
             <div class="col-md-6 mb-3">
-              <label for="stationName" class="form-label">5. Police Station Name *</label>
+              <label for="stationName" class="form-label required">5. Police Station Name</label>
               <select id="stationName" class="form-select" formControlName="stationName" (change)="getStationName($event)">
                 <option value="" disabled>Select Police Station</option>
                 <option *ngFor="let station of policeStations" [value]="station">{{ station }}</option>
@@ -124,12 +124,12 @@
               <small class="text-danger" *ngIf="firForm.get('officerName')?.invalid && firForm.get('officerName')?.touched">Please enter a valid name.</small>
             </div> -->
             <div class="col-md-6 col-lg-4 mb-3">
-              <label for="officerName" class="form-label">6. Name of the Investigating Officer (IO)*</label>
+              <label for="officerName" class="form-label required">6. Name of the Investigating Officer (IO)</label>
               <input id="officerName" type="text" class="form-control" formControlName="officerName"
               placeholder="Enter Officer Name" required/>
-              <small class="text-danger" *ngIf="firForm.get('officerName')?.invalid && firForm.get('officerName')?.touched">
+              <!-- <small class="text-danger" *ngIf="firForm.get('officerName')?.invalid && firForm.get('officerName')?.touched">
                 Please enter a valid name.
-              </small>
+              </small> -->
             </div>
 
             <div class="col-lg-4">
@@ -161,7 +161,7 @@
               <input  type="text" class="form-control"  placeholder="Enter Complaint Receiver Name" formControlName="complaintReceiverName" />
             </div>
             <div class="col-md-6 col-lg-4 mb-3">
-              <label for="officerDesignation" class="form-label">7.Designation of the Investigating Officer *</label>
+              <label for="officerDesignation" class="form-label required">7.Designation of the Investigating Officer</label>
               <select id="officerDesignation" class="form-select" formControlName="officerDesignation" required (change)="getDesignation($event)">
                 <option value="" disabled>Select Designation</option>
                 <option value="DSP">DSP</option>
@@ -179,7 +179,7 @@
             </div>
 
             <div class="col-md-6 col-lg-4 mb-3">
-              <label for="officerPhone" class="form-label">8. Phone Number of the Investigating Officer *</label>
+              <label for="officerPhone" class="form-label required">8. Phone Number of the Investigating Officer</label>
               <input id="officerPhone" type="text" class="form-control" formControlName="officerPhone" placeholder="Enter Phone Number" (keypress)="allowOnlyNumbers($event)" maxlength="10" required/>
               <small class="text-danger" *ngIf="firForm.get('officerPhone')?.invalid && firForm.get('officerPhone')?.touched">Please enter a valid 10-digit phone number.</small>
             </div>
@@ -193,7 +193,7 @@
         <div class="row mb-3">
           <div class="row mb-3">
             <div class="col-md-5 mb-3">
-              <label for="firNumber" class="form-label">9. FIR Number *</label>
+              <label for="firNumber" class="form-label required">9. FIR Number</label>
               <div class="input-group">
                 <input 
                 type="text" 
@@ -249,7 +249,7 @@
             <input type="time" id="totimeOfOccurrence" class="form-control" formControlName="time_of_occurrence_to"/>
         </div>
           <div class="col-md-4 mb-3">
-            <label for="placeOfOccurrence" class="form-label">12. Place of Occurrence *</label>
+            <label for="placeOfOccurrence" class="form-label required">12. Place of Occurrence</label>
             <input type="text" id="placeOfOccurrence" class="form-control" formControlName="placeOfOccurrence" placeholder="Place of Occurrence" style="text-transform: capitalize;" required />
           </div>
           <div class="col-md-6 col-lg-4 mb-3">
@@ -268,7 +268,7 @@
           </div> -->
 
            <div class="col-md-4 mb-3">
-                      <label for="dateOfRegistration" class="form-label">13a. Date of Case Registration *</label>
+                      <label for="dateOfRegistration" class="form-label required">13a. Date of Case Registration</label>
                       <input
                           type="date"
                           id="dateOfRegistration"
@@ -283,7 +283,7 @@
                   </div>
 
           <div *ngIf="firForm.get('is_case_altered')?.value === 'Yes'" class="col-md-4 mb-3">
-            <label for="altered_date" class="form-label">13b. Date of Case Alteration *</label>
+            <label for="altered_date" class="form-label required">13b. Date of Case Alteration</label>
             <input
                 type="date"
                 id="altered_date"
@@ -294,7 +294,7 @@
             />
         </div>
           <div class="col-md-4 mb-3">
-            <label for="timeOfRegistration" class="form-label">14. Time of Case Registration *</label>
+            <label for="timeOfRegistration" class="form-label required">14. Time of Case Registration</label>
             <input type="time" id="timeOfRegistration" class="form-control" formControlName="timeOfRegistration" required />
           </div>
         </div>
@@ -308,17 +308,17 @@
         <h3 class="mb-4">Step 3: Victim Information</h3>
         <div class="row mb-4" formGroupName="complainantDetails">
           <div class="col-md-4 mb-3">
-            <label for="nameOfComplainant" class="form-label">15. Name of Complainant *</label>
+            <label for="nameOfComplainant" class="form-label required">15. Name of Complainant</label>
             <input type="text" id="nameOfComplainant" class="form-control" formControlName="nameOfComplainant" placeholder="Enter Name of Complainant" required pattern="^[A-Za-z\s]*$" style="text-transform: capitalize;" />
             <!-- <div *ngIf="isNameInvalid()" class="text-danger mt-1">Please enter a valid name (letters only).</div> -->
           </div>
           <div class="col-md-4 mb-3">
-            <label for="mobileNumberOfComplainant" class="form-label">16. Mobile Number of Complainant *</label>
+            <label for="mobileNumberOfComplainant" class="form-label required">16. Mobile Number of Complainant</label>
             <input type="text" id="mobileNumberOfComplainant" class="form-control" formControlName="mobileNumberOfComplainant" placeholder="Enter Mobile Number" required maxlength="10" pattern="^[0-9]{10}$" (keypress)="allowOnlyNumbers($event)" />
             <div *ngIf="isPhoneInvalid(0, 'complainant')" class="text-danger mt-1">Please enter a valid 10-digit mobile number.</div>
           </div>
           <div class="col-md-4 mb-3">
-            <label for="isVictimSameAsComplainant" class="form-label">17. Is the victim same as complainant? *</label>
+            <label for="isVictimSameAsComplainant" class="form-label required">17. Is the victim same as complainant?</label>
             <select id="isVictimSameAsComplainant" class="form-select" formControlName="isVictimSameAsComplainant" required>
               <option value="" disabled>Select</option>
               <option [value]="true">Yes</option>
@@ -326,7 +326,7 @@
             </select>
           </div>
           <div class="col-md-2 mb-3">
-            <label for="numberOfVictims" class="form-label">18. Number of Victims *</label>
+            <label for="numberOfVictims" class="form-label required">18. Number of Victims</label>
             <!-- <select id="numberOfVictims" class="form-select" formControlName="numberOfVictims" (change)="onNumberOfVictimsChange()" required>
               <option value="" disabled>Select</option>
               <option *ngFor="let num of victimCountArray" [value]="num">{{ num }}</option>
@@ -356,14 +356,14 @@
 
 
                 <div class="col-md-4 mb-3">
-                  <label for="victimAge-{{i}}" class="form-label">19. Age of the Victim *</label>
+                  <label for="victimAge-{{i}}" class="form-label required">19. Age of the Victim</label>
                   <input type="number" id="victimAge-{{i}}" class="form-control" formControlName="age" placeholder="Enter victim's age" (input)="onVictimAgeChange(i)" required />
                 </div>
 
 
 
                 <div class="col-md-4 mb-3">
-                  <label for="victimName-{{ i }}" class="form-label">20. Name of the Victim *</label>
+                  <label for="victimName-{{ i }}" class="form-label required">20. Name of the Victim</label>
                   <input type="text" 
                       id="victimName-{{ i }}" 
                       class="form-control" 
@@ -377,7 +377,7 @@
                   <!-- <div *ngIf="isVictimNameInvalid(i)" class="text-danger mt-1">Please enter a valid name (letters only).</div> -->
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label for="victimGender{{ i }}" class="form-label">21. Gender of the Victim *</label>
+                  <label for="victimGender{{ i }}" class="form-label required">21. Gender of the Victim</label>
                   <select [id]="'victimGender' + i" class="form-select" formControlName="gender" required>
                     <option value="" disabled>Select Gender</option>
                     <option value="Male">Male</option>
@@ -386,7 +386,7 @@
                   </select>
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label for="victimMobile{{ i }}" class="form-label">22. Mobile Number of the Victim *</label>
+                  <label for="victimMobile{{ i }}" class="form-label required">22. Mobile Number of the Victim</label>
                   <input type="text" [id]="'victimMobile' + i" class="form-control" formControlName="mobileNumber" placeholder="Enter Mobile Number" maxlength="10" (keypress)="allowOnlyNumbers($event)" />
                   <div *ngIf="isVictimMobileInvalid(i)" class="text-danger mt-1">Please enter a valid 10-digit mobile number.</div>
                 </div>
@@ -400,7 +400,7 @@
                   <!-- <div class="text-danger mt-1">Please enter a valid 6-digit pincode.</div> -->
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label for="victimCommunity{{ i }}" class="form-label">25. Community of the Victim *</label>
+                  <label for="victimCommunity{{ i }}" class="form-label required">25. Community of the Victim</label>
                   <select [id]="'victimCommunity' + i" class="form-select" (change)="onCommunityChange($event, i)"   formControlName="community" required>
                     <option value="" disabled>Select Community</option>
                     <option value="SC">SC</option>
@@ -422,7 +422,7 @@
                   </ng-select> -->
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label for="victimCaste{{ i }}" class="form-label">25. Caste of the Victim *</label>
+                  <label for="victimCaste{{ i }}" class="form-label required">25. Caste of the Victim</label>
                   <select [id]="'victimCaste' + i" class="form-select" formControlName="caste" required>
                     <option value="" disabled>Select Caste</option>
                     <!-- <option *ngFor="let caste of scstSectionsOptions" [value]="caste">{{ caste }}</option> -->
@@ -444,12 +444,12 @@
                   </ng-select> -->
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label for="victimGuardian{{ i }}" class="form-label">27. Name of the Victim's Guardian *</label>
+                  <label for="victimGuardian{{ i }}" class="form-label required">27. Name of the Victim's Guardian</label>
                   <input type="text" [id]="'victimGuardian' + i" class="form-control" formControlName="guardianName" placeholder="Enter Guardian's Name" required style="text-transform: capitalize;" />
                   <!-- <div *ngIf="isGuardianNameInvalid(i)" class="text-danger mt-1">Please enter a valid name (letters only).</div> -->
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label for="isNativeDistrictSame{{ i }}" class="form-label d-block">28. Is the victim’s native district the same as the scene of crime occurrence? *</label>
+                  <label for="isNativeDistrictSame{{ i }}" class="form-label d-block required">28. Is the victim’s native district the same as the scene of crime occurrence?</label>
                   <select [id]="'isNativeDistrictSame' + i" class="form-select" formControlName="isNativeDistrictSame" (change)="onNativeDistrictSameChange(i)" required>
                     <option value="" disabled>Select an option</option>
                     <option value="yes">Yes</option>
@@ -457,7 +457,7 @@
                   </select>
                 </div>
                 <div class="col-md-6 mb-3" *ngIf="victims.at(i).get('isNativeDistrictSame')?.value === 'no'">
-                  <label for="victimNativeDistrict{{ i }}" class="form-label">29. Victim's Native District *</label>
+                  <label for="victimNativeDistrict{{ i }}" class="form-label required">29. Victim's Native District</label>
                   <select [id]="'victimNativeDistrict' + i" class="form-select" formControlName="nativeDistrict" required>
                      <option value="" disabled>Select District</option>
                      <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
@@ -507,7 +507,7 @@
                 </div> -->
 
                 <div class="col-md-12 mb-3">
-                  <label class="form-label">30. Sections of the SC/ST POA Act Invoked for the Offence *</label>
+                  <label class="form-label required">30. Sections of the SC/ST POA Act Invoked for the Offence</label>
 
                   
                 <ng-select
@@ -547,7 +547,7 @@
 
 
                 <div class="col-md-12 mb-3"> 
-                  <label class="form-label">31. Sections of the SC/ST POA Act Invoked for the Offence *</label><br>
+                  <label class="form-label required">31. Sections of the SC/ST POA Act Invoked for the Offence</label><br>
                   <!-- <mat-form-field appearance="outline" class="w-100">
                     <mat-label>Offence Acts</mat-label>
                     <mat-select formControlName="scstSections" multiple>
@@ -599,7 +599,7 @@
         </div>
         <div class="row mt-4">
           <div class="col-md-6 mb-3">
-            <label for="isDeceased" class="form-label d-block">33. Has the victim deceased due to the offence? *</label>
+            <label for="isDeceased" class="form-label d-block required">33. Has the victim deceased due to the offence?</label>
             <select id="isDeceased" class="form-select" formControlName="isDeceased" (change)="onIsDeceasedChangeOutside()" required>
               <option value="" disabled>Select an option</option>
               <option value="yes">Yes</option>
@@ -607,7 +607,7 @@
             </select>
           </div>
           <div class="col-md-6 mb-3" *ngIf="firForm.get('isDeceased')?.value === 'yes'">
-            <label class="form-label">34. Name(s) of the deceased person *</label>
+            <label class="form-label required">34. Name(s) of the deceased person</label>
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Select deceased person names</mat-label>
               <mat-select formControlName="deceasedPersonNames" multiple>
@@ -626,7 +626,7 @@
         <h3 class="mb-4">Step 4: Accused Information</h3>
       <div class="col-md-12">
         <div class="col-md-3 mb-3">
-          <label for="numberOfAccused" class="form-label">35. Number of Accused *</label>
+          <label for="numberOfAccused" class="form-label required">35. Number of Accused</label>
           <!-- <select id="numberOfAccused" class="form-select" formControlName="numberOfAccused" (change)="onNumberOfAccusedChange()" required>
             <option value="" disabled>Select the number of accused</option>
             <option *ngFor="let num of getAvailableNumbers()" [value]="num">{{ num }}</option>
@@ -679,15 +679,15 @@
             <div class="card-body">
               <div class="row">
                 <div class="col-md-4 mb-3">
-                  <label for="accusedAge-{{i}}" class="form-label">36. Age of the Accused *</label>
+                  <label for="accusedAge-{{i}}" class="form-label">36. Age of the Accused</label>
                   <input type="number" id="accusedAge-{{i}}" class="form-control" formControlName="age" placeholder="Enter age" (input)="onAccusedAgeChange(i)" required />
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label for="accusedName-{{i}}" class="form-label">37. Name of the Accused *</label>
+                  <label for="accusedName-{{i}}" class="form-label required">37. Name of the Accused</label>
                   <input type="text" id="accusedName-{{i}}" class="form-control" formControlName="name" placeholder="Enter name" required />
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label for="accusedGender{{ i }}" class="form-label">38. Gender of the Accused *</label>
+                  <label for="accusedGender{{ i }}" class="form-label required">38. Gender of the Accused</label>
                   <select [id]="'accusedGender' + i" class="form-select" formControlName="gender" required>
                     <option value="" disabled>Select Gender</option>
                     <option value="Male">Male</option>
@@ -705,7 +705,7 @@
                   <!-- <div *ngIf="isPincodeInvalid(i)" class="text-danger mt-1">Please enter a valid 6-digit pincode.</div> -->
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label for="accusedCommunity{{ i }}" class="form-label">41. Community of the Accused *</label>
+                  <label for="accusedCommunity{{ i }}" class="form-label required">41. Community of the Accused</label>
                   <!-- <select [id]="'accusedCommunity' + i" class="form-select" (change)="onAccusedCommunityChange($event, i)" formControlName="community" required>
                     <option value="" disabled>Select Community</option>
                     <option value="DNC">DNC</option>
@@ -741,7 +741,7 @@
                 </ng-select> -->
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label for="accusedCaste{{ i }}" class="form-label">42. Caste of the Accused *</label>
+                  <label for="accusedCaste{{ i }}" class="form-label required">42. Caste of the Accused</label>
                   <!-- <select [id]="'accusedCaste' + i" class="form-select" formControlName="caste" required>
                     <option value="" disabled>Select Caste</option>
                     <option *ngFor="let caste of accuseds.at(i).get('availableCastes')?.value" [value]="caste">
@@ -776,11 +776,11 @@
                 <input *ngIf="showSubCasteText" type="text" [id]="'accusedCaste' + i" class="form-control" formControlName="caste"  />
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label for="accusedGuardian{{ i }}" class="form-label">43. Name of Accused person’s Father/ Mother/ Spouse/ guardian *</label>
+                  <label for="accusedGuardian{{ i }}" class="form-label required">43. Name of Accused person’s Father/ Mother/ Spouse/ guardian</label>
                   <input type="text" [id]="'accusedGuardian' + i" class="form-control" formControlName="guardianName" placeholder="Enter father/spouse name" required />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label for="previousIncident{{ i }}" class="form-label">44. Whether the accused person been involved in any previous incident/s against the same victim/ victim’s family? *</label>
+                  <label for="previousIncident{{ i }}" class="form-label required">44. Whether the accused person been involved in any previous incident/s against the same victim/ victim’s family?</label>
                   <select [id]="'previousIncident' + i" class="form-select" formControlName="previousIncident" (change)="onPreviousIncidentsChange(i)">
                     <option value="" disabled>Select</option>
                     <option value="true">Yes</option>
@@ -789,7 +789,7 @@
                 </div>
     
                 <div *ngIf="accused.get('previousIncident')?.value === 'true'" class="col-md-6 mb-3">
-                  <label for="previousFIRNumber{{ i }}" class="form-label">45. FIR number of previous cases *</label>
+                  <label for="previousFIRNumber{{ i }}" class="form-label required">45. FIR number of previous cases</label>
                   <div class="input-group">
                     <!-- <select [id]="'previousFIRNumber' + i" class="form-select" formControlName="previousFIRNumber">
                       <option value="" disabled>Select FIR Number</option>
@@ -811,7 +811,7 @@
                 </div>
                 
                 <div class="col-md-6 mb-3">
-                  <label for="scstOffence{{ i }}" class="form-label">46. Whether the accused person has committed any offence against members of the SC/ ST community? *</label>
+                  <label for="scstOffence{{ i }}" class="form-label required">46. Whether the accused person has committed any offence against members of the SC/ ST community?</label>
                   <select [id]="'scstOffence' + i" class="form-select" formControlName="scstOffence" (change)="onScstOffencesChange(i)">
                     <option value="" disabled>Select</option>
                     <option value="true">Yes</option>
@@ -819,7 +819,7 @@
                   </select>
                 </div>
                 <div class="col-md-6 mb-3" *ngIf="accused.get('scstOffence')?.value === 'true'">
-                  <label for="scstFIRNumber{{ i }}" class="form-label">47. FIR number of previous</label>
+                  <label for="scstFIRNumber{{ i }}" class="form-label required">47. FIR number of previous</label>
                   <div class="input-group">
                     <!-- <select [id]="'scstFIRNumber' + i" class="form-select" formControlName="scstFIRNumber" required>
                       <option value="" disabled>Select FIR Number</option>
@@ -844,7 +844,7 @@
                   <input type="text" [id]="'antecedents' + i" class="form-control" formControlName="antecedents" placeholder="Enter antecedents" required />
                 </div> -->
                 <div class="col-md-6">
-                  <label for="antecedentsOption{{ i }}" class="form-label">48a. Antecedents *</label>
+                  <label for="antecedentsOption{{ i }}" class="form-label required">48a. Antecedents</label>
                   <select class="form-control" formControlName="antecedentsOption">
                     <option value="">Select</option>
                     <option value="Yes">Yes</option>
@@ -853,7 +853,7 @@
                  </div>
 
                 <div class="col-md-6 mb-3" *ngIf="accused.get('antecedentsOption')?.value === 'Yes'">
-                    <label for="antecedents{{ i }}" class="form-label">48b. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.) *</label>
+                    <label for="antecedents{{ i }}" class="form-label required">48b. Antecedents of the Accused (History sheeter / Goondas / Bind over, etc.)</label>
                     <input type="text" [id]="'antecedents' + i" class="form-control" formControlName="antecedents" placeholder="Enter antecedents"  (input)="checkInput(i, 'antecedents')"/>
                 </div>
                 <!-- <div class="col-md-6 mb-3">
@@ -861,7 +861,7 @@
                   <input type="text" [id]="'landOIssues' + i" class="form-control" formControlName="landOIssues" placeholder="Enter L&O issues" required />
                 </div> -->
                 <div class="col-md-6">
-                  <label for="loissue{{ i }}" class="form-label">49a. L & O Issues *</label>
+                  <label for="loissue{{ i }}" class="form-label required">49a. L & O Issues</label>
                   <select class="form-control" formControlName="landOIssueOption">
                     <option value="">Select</option>
                     <option value="Yes">Yes</option>
@@ -869,7 +869,7 @@
                   </select>
                  </div>
                 <div class="col-md-6 mb-3" *ngIf="accused.get('landOIssueOption')?.value === 'Yes'">
-                  <label for="landOIssues{{ i }}" class="form-label">49b. L&O Issues (Pickets, Bandobust, etc) *</label>
+                  <label for="landOIssues{{ i }}" class="form-label required">49b. L&O Issues (Pickets, Bandobust, etc)</label>
                   <input type="text" [id]="'landOIssues' + i" class="form-control" formControlName="landOIssues" placeholder="Enter L&O issues" (input)="checkInput(i, 'landOIssues')"/>
                 </div>
                 <!-- <div class="col-md-12 mb-3">
@@ -914,13 +914,13 @@
         </div>
 
       <div class="col-md-12 mb-3">
-        <label for="gistOfCurrentCase" class="form-label">50. Gist of the Current Case *</label>
+        <label for="gistOfCurrentCase" class="form-label required">50. Gist of the Current Case</label>
         <textarea id="gistOfCurrentCase" class="form-control" formControlName="gistOfCurrentCase" rows="4" maxlength="3000" placeholder="Enter gist of the current case" required></textarea>
         <small class="form-text text-muted">Maximum of 3000 Characters</small>
       </div>
 
       <div class="col-md-6 mb-3">
-        <label class="form-label">51. Upload FIR Copy *</label>
+        <label class="form-label required">51. Upload FIR Copy</label><span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
         <input type="file" id="uploadFIRCopy" class="form-control"
               required (change)="onFIRFileUpload($event)" multiple *ngIf="!uploadedFIRFileNames" />
         <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="uploadedFIRFileNames">
@@ -959,7 +959,7 @@
         <div   *ngFor="let victimRelief of victimsRelief.controls; let i = index" [formGroupName]="i" class="card border-primary mb-4">
           <div class="card-body">
             <div class="mb-4 col-md-4">
-              <label for="communityCertificate" class="form-label">52. Has the Community Certificate of the Victim(s) been Verified and Obtained? *</label>
+              <label for="communityCertificate" class="form-label required">52. Has the Community Certificate of the Victim(s) been Verified and Obtained?</label>
               <select id="communityCertificate" formControlName="communityCertificate" class="form-select" required>
                 <option value="" disabled selected>Select One</option>
                 <option value="yes">Yes</option>
@@ -967,12 +967,12 @@
               </select>
             </div>
             <div class="mb-4 col-lg-4">
-              <label class="form-label">53. Name of the Victim *</label>
+              <label class="form-label required">53. Name of the Victim</label>
               <input id="victimName" type="text" class="form-control mb-3" formControlName="victimName" placeholder="Name of the Victim" readonly />
             </div>
             <div class="row mb-3">
               <div class="col-8">
-                <label for="reliefAmountScst" class="form-label">54. Eligible relief amount for the victim as per SC/ST Act *</label>
+                <label for="reliefAmountScst" class="form-label required">54. Eligible relief amount for the victim as per SC/ST Act</label>
               </div>
               <div class="col-4">
                 <input id="reliefAmountScst" type="text" class="form-control text-end" formControlName="reliefAmountScst" (keypress)="allowOnlyNumbers($event)" />
@@ -980,7 +980,7 @@
             </div>
             <div class="row mb-3">
               <div class="col-8">
-                <label class="form-label">55. Eligible relief amount for the victim (ex-gratia) by Govt. of Tamil Nadu *</label>
+                <label class="form-label required">55. Eligible relief amount for the victim (ex-gratia) by Govt. of Tamil Nadu</label>
               </div>
               <div class="col-4">
                 <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia" placeholder="0" (keypress)="allowOnlyNumbers($event)" />
@@ -988,15 +988,15 @@
             </div>
             <div class="row mb-3">
               <div class="col-8">
-                <label class="form-label">56. Eligible amount for the 1st Stage of Relief *</label>
+                <label class="form-label required">56. Eligible amount for the 1st Stage of Relief</label>
               </div>
               <div class="col-4">
                 <input type="text" class="form-control text-end" formControlName="reliefAmountFirstStage" placeholder="0" (keypress)="allowOnlyNumbers($event)"  />
               </div>
             </div>
             <div class="mb-4" *ngIf="victimRelief.get('relief_applicable')?.value == 1 || victimRelief.get('relief_applicable2')?.value == 1">
-              <label class="form-label d-block mb-2">
-                57. Eligible additional relief for the legal heir of the person died (Victim {{ i + 1 }}) *
+              <label class="form-label d-block mb-2 required">
+                57. Eligible additional relief for the legal heir of the person died (Victim {{ i + 1 }})
               </label>
               
               <div class="d-flex flex-wrap gap-3">
@@ -1024,7 +1024,7 @@
         </div>
         <div class="row mb-4">
           <div class="col-8">
-            <label class="form-label">58. Total Amount for 1st Stage of Compensation (Total across all victims) *</label>
+            <label class="form-label required">58. Total Amount for 1st Stage of Compensation (Total across all victims)</label>
           </div>
           <div class="col-4">
             <input 
@@ -1042,11 +1042,11 @@
     </form>
       <div class="row mb-4">
           <div class="mb-4 col-6">
-            <label class="form-label">59. Proceedings File No. *</label>
+            <label class="form-label required">59. Proceedings File No.</label>
             <input type="text" class="form-control" formControlName="proceedingsFileNo" placeholder="Enter File No." />
           </div>
           <div class="mb-4 col-6">
-            <label class="form-label">60. Proceedings Date *</label>
+            <label class="form-label required">60. Proceedings Date</label>
             <input type="date" class="form-control" formControlName="proceedingsDate" />
           </div>
         </div>
@@ -1064,7 +1064,7 @@
         </div> -->
 
         <div class="col-md-6 mb-3">
-          <label class="form-label">61. Upload Commissionerate / S.P. Office Proceedings *</label>
+          <label class="form-label required">61. Upload Commissionerate / S.P. Office Proceedings</label><span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
           <input type="file" class="form-control" 
                  (change)="onProceedingsFileUpload($event)" required *ngIf="!proceedingFileName"/>
           <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingFileName">
@@ -1095,7 +1095,7 @@
         
         
         <div class="mb-4">
-          <label class="form-label">62. Upload Key Attachments</label>
+          <label class="form-label">62. Upload Key Attachments</label><span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
         
           <div class="mb-3" *ngFor="let attachment of attachmentss_1; let j = index">
             <div class="d-flex align-items-center">
@@ -1182,7 +1182,7 @@
           <div class="card-body">
             <div class="row mb-3">
               <div class="col-md-4">
-                <label for="chargeSheetFiled" class="form-label">63. Charge Sheet filed with the Court? *</label>
+                <label for="chargeSheetFiled" class="form-label required">63. Charge Sheet filed with the Court?</label>
                 <select id="chargeSheetFiled" class="form-select" formControlName="chargeSheetFiled" required>
                   <option value="" disabled>Select One</option>
                   <option value="yes">Yes</option>
@@ -1190,7 +1190,7 @@
                 </select>
               </div>
               <div class="col-md-4">
-                <label for="courtDivision" class="form-label">64. Court Division *</label>
+                <label for="courtDivision" class="form-label required">64. Court Division</label>
                 <select id="courtDivision" class="form-select" formControlName="courtDivision" required (change)="onCourtDivisionChange($event)">
                   <option value="" disabled>Select Court Division</option>
                   <option *ngFor="let division of courtDivisions" [value]="division">{{ division }}</option>
@@ -1210,7 +1210,7 @@
               </ng-select> -->
               </div>
               <div class="col-md-4">
-                <label for="courtName" class="form-label">65. Court Range *</label>
+                <label for="courtName" class="form-label required">65. Court Range</label>
                 <select id="courtName" class="form-select" formControlName="courtName" required>
                   <option value="" disabled>Select Court Range</option>
                   <option *ngFor="let range of courtRanges" [value]="range">{{ range }}</option>
@@ -1231,7 +1231,7 @@
             </div>
             <div class="row mb-3">
               <div class="col-md-4 mb-3">
-                <label for="caseType" class="form-label">66. Select Nature of Final Report *</label>
+                <label for="caseType" class="form-label required">66. Select Nature of Final Report</label>
                 <select id="caseType" class="form-select" formControlName="caseType" required>
                   <option value="" disabled>Select Case Type</option>
                   <option value="chargeSheet">Charge Sheet</option>
@@ -1245,7 +1245,7 @@
                 <input type="text" id="caseNumber" class="form-control" formControlName="caseNumber" placeholder="Enter Case Number" required/>
               </div> -->
               <div class="col-lg-6" *ngIf="firForm.get('caseType')?.value === 'chargeSheet'">
-                <label for="caseNumber" class="form-label">67a. CNR Number *</label>
+                <label for="caseNumber" class="form-label required">67a. CNR Number</label>
                 <input
                   type="text"
                   id="caseNumber"
@@ -1256,7 +1256,7 @@
                 />
                 </div>
                 <div class="col-lg-6" *ngIf="firForm.get('caseType')?.value === 'chargeSheet'">
-                <label for="ChargeSheet_CRL_number" class="form-label">67b. SC/ Special SC Number *</label>
+                <label for="ChargeSheet_CRL_number" class="form-label required">67b. SC/ Special SC Number</label>
                 <input
                   type="text"
                   id="ChargeSheet_CRL_number"
@@ -1282,17 +1282,17 @@
                  
               <div class="row mb-4">
               <div class="mb-4 col-6">
-                <label class="form-label">Quash Petition No. *</label>
+                <label class="form-label required">Quash Petition No.</label>
                 <input type="text" class="form-control" formControlName="quash_petition_no" placeholder="Quash Petition No." required />
               </div>
               <div class="mb-4 col-6">
-                <label class="form-label">Petition Date *</label>
+                <label class="form-label required">Petition Date</label>
                 <input type="date" class="form-control" formControlName="petition_date" [max]="today" required/>
               </div>
             </div>
 
               <div class="mb-4">
-              <label class="form-label">Upload Court Order</label>
+              <label class="form-label">Upload Court Order</label> <span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
          
             <input type="file" id="upload_court_order" class="form-control" required 
             (change)="upload_court_order_FileUpload($event)" multiple *ngIf="!upload_court_order_path"/>
@@ -1317,17 +1317,17 @@
                  
               <div class="row mb-4">
               <div class="mb-4 col-6">
-                <label class="form-label">Proceedings File No. *</label>
+                <label class="form-label required">Proceedings File No.</label>
                 <input type="text" class="form-control" formControlName="proceedingsFileNo_1" placeholder="Enter File No." required />
               </div>
               <div class="mb-4 col-6">
-                <label class="form-label">Proceedings Date *</label>
+                <label class="form-label required">Proceedings Date</label>
                 <input type="date" class="form-control" formControlName="proceedingsDate_1" [max]="today" required/>
               </div>
             </div>
 
               <div class="mb-4">
-              <label class="form-label">Upload Commissionerate / S.P. Office Proceedings *</label>
+              <label class="form-label required">Upload Commissionerate / S.P. Office Proceedings</label> <span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
          
             <input type="file" [id]="'uploadProceedings_1' + i" class="form-control" required 
             (change)="onProceedingsFileUpload2($event)" multiple *ngIf="!proceedingFileName2"/>
@@ -1349,11 +1349,11 @@
               <div *ngIf="firForm.get('caseType')?.value === 'referredChargeSheet'" class="col-md-12">
                 <div class="row">
                   <div class="col-lg-6">
-                    <label for="rcsFileNumber" class="form-label">68. Referred Charge Sheet (RCS) file number *</label>
+                    <label for="rcsFileNumber" class="form-label required">68. Referred Charge Sheet (RCS) file number</label>
                     <input type="text" id="rcsFileNumber" class="form-control" formControlName="rcsFileNumber" required placeholder="Enter RCS File Number"/>
                   </div>
                   <div class="col-lg-6">
-                    <label for="rcsFilingDate" class="form-label">69. Referred Charge Sheet (RCS) filing date *</label>
+                    <label for="rcsFilingDate" class="form-label required">69. Referred Charge Sheet (RCS) filing date</label>
                     <input type="date" id="rcsFilingDate" class="form-control" formControlName="rcsFilingDate" required placeholder="Enter Case Number"/>
                   </div>
 
@@ -1364,7 +1364,7 @@
 
 
                     <div class="mb-4">
-                        <label class="form-label">70. Upload MF copy *</label>
+                        <label class="form-label required">70. Upload MF copy</label><span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
    
                       <input type="file" id = "mfCopy" class="form-control" required 
                       (change)="MFcopyFileUpload($event)" *ngIf="!mfCopyPath"/>
@@ -1391,12 +1391,12 @@
             <div *ngFor="let victimRelief of victimsRelief.controls; let i = index" [formGroupName]="i" class="card border-primary mb-4">
               <div class="card-body">
                 <div class="mb-4 col-lg-4">
-                  <label class="form-label">71. Name of the Victim *</label>
+                  <label class="form-label required">71. Name of the Victim</label>
                   <input type="text" class="form-control mb-3" [value]="victimNames?.[i] || ''" placeholder="Name of the Victim" disabled />
                 </div>
                 <div class="row mb-3">
                   <div class="col-8">
-                    <label class="form-label">72. Eligible second stage relief amount for the victim as per the SC and ST Prevention of Atrocities Act (amended upto 2016) *</label>
+                    <label class="form-label required">72. Eligible second stage relief amount for the victim as per the SC and ST Prevention of Atrocities Act (amended upto 2016)</label>
                   </div>
                   <div class="col-4">
                     <input type="text" class="form-control text-end" formControlName="reliefAmountScst_1" (keypress)="allowOnlyNumbers($event)" />
@@ -1404,7 +1404,7 @@
                 </div>
                 <div class="row mb-3">
                   <div class="col-8">
-                    <label class="form-label">73. Eligible second stage relief amount for the victim (ex-gratia) by the Govt. of Tamil Nadu *</label>
+                    <label class="form-label required">73. Eligible second stage relief amount for the victim (ex-gratia) by the Govt. of Tamil Nadu</label>
                   </div>
                   <div class="col-4">
                     <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia_1" (keypress)="allowOnlyNumbers($event)" />
@@ -1412,7 +1412,7 @@
                 </div>
                 <div class="row mb-3">
                   <div class="col-8">
-                    <label class="form-label">74. Total eligible amount for the victim for the second stage of relief *</label>
+                    <label class="form-label required">74. Total eligible amount for the victim for the second stage of relief</label>
                   </div>
                   <div class="col-4">
                     <input type="text" class="form-control text-end" formControlName="reliefAmountSecondStage" (keypress)="allowOnlyNumbers($event)"  />
@@ -1426,7 +1426,7 @@
           <div class="card-body">
             <div class="row mb-4">
               <div class="col-8">
-                <label class="form-label">75. Total amount for second stage of compensation (total of relief across all victims) *</label>
+                <label class="form-label required">75. Total amount for second stage of compensation (total of relief across all victims)</label>
               </div>
               <div class="col-4">
                 <input type="text" class="form-control text-end" formControlName="totalCompensation_1" />
@@ -1434,11 +1434,11 @@
             </div>
             <div class="row mb-4">
               <div class="mb-4 col-6">
-                <label class="form-label">76. Proceedings File No. *</label>
+                <label class="form-label required">76. Proceedings File No.</label>
                 <input type="text" class="form-control" formControlName="proceedingsFileNo_1" placeholder="Enter File No." required />
               </div>
               <div class="mb-4 col-6">
-                <label class="form-label">77. Proceedings Date *</label>
+                <label class="form-label required">77. Proceedings Date</label>
                 <input type="date" class="form-control" formControlName="proceedingsDate_1" [max]="today" required/>
               </div>
             </div>
@@ -1451,7 +1451,7 @@
             </div> -->
 
             <div class="mb-4">
-              <label class="form-label">78. Upload Commissionerate / S.P. Office Proceedings *</label>
+              <label class="form-label required">78. Upload Commissionerate / S.P. Office Proceedings</label><span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
               <!-- <input type="file" class="form-control" formControlName="uploadProceedings_1" required/> -->
               <!-- <input
               type="file"
@@ -1514,7 +1514,7 @@
             </div> -->
 
                 <div class="mb-4" formArrayName="attachments_1">
-                  <label class="form-label">79. Upload Other Attachments (If any)</label>
+                  <label class="form-label">79. Upload Other Attachments (If any)</label> <span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
 
                   <div
                     class="input-group mb-2"
@@ -1621,15 +1621,15 @@
 
 
                   <div class="col-md-6 mb-3">
-                    <label class="form-label">80. District in which court is present *</label>
-                    <ng-select class="form-select" [items]="courtDistricts" bindLabel="district" bindValue="district"
+                    <label class="form-label required">80. Division in which court is present</label>
+                    <ng-select class="form-select" [items]="courtDivisions" bindLabel="district" bindValue="district"
                       formControlName="courtDistrict" [searchable]="true" [clearable]="false"
                       [placeholder]="firForm.get('courtDistrict')?.value ? '' : 'Select District'" (change)="onCourtDivisionChange2($event)" required>
                     </ng-select>
                   </div>
             
                   <div class="col-md-6 mb-3">
-                    <label class="form-label">81. Name of the Designated / Special court *</label>
+                    <label class="form-label required">81. Name of the Designated / Special court</label>
                     <!-- <input type="text" class="form-control" formControlName="Court_name1" placeholder="Enter Name" required /> -->
                     <ng-select class="form-select" [items]="courtRanges5" bindLabel="label" bindValue="value"
                       formControlName="Court_name1" [searchable]="true" [clearable]="false"
@@ -1639,19 +1639,19 @@
 
                     <!-- Item 76 -->
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">82. CNR Numbers *</label>
+                        <label class="form-label required">82. CNR Numbers</label>
                         <input type="text" class="form-control" formControlName="trialCaseNumber" placeholder="Enter CNR Numbers" required />
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">82.A SC/Special SC Number *</label>
+                        <label class="form-label required">82.A SC/Special SC Number</label>
                         <input type="text" class="form-control" formControlName="CRL_number" placeholder="Enter SC/Special SC Number" required />
                     </div>
 
 <!-- newly addaed item -->
 
 <div class="col-md-6 mb-3">
-<label class="form-label">82. B. Case is handled by *</label>
+<label class="form-label required">82. B. Case is handled by</label>
 <select class="form-select" formControlName="CaseHandledBy"(change)="onCaseHandledByChange($event)" required>
 <option value="" disabled selected>Select </option>
 <option *ngFor="let data of CaseHandledBy" [value]="data">{{ data }}</option>
@@ -1660,7 +1660,7 @@
 
 
 <div *ngIf="show94BAnd94C" class="col-md-6 mb-3">
-<label class="form-label">82. C. Name of the advocate *</label>
+<label class="form-label required">82. C. Name of the advocate</label>
 <input type="text" class="form-control" formControlName="NameOfAdvocate" placeholder="Enter advocate name" required />
 </div>
 
@@ -1669,7 +1669,7 @@
 
 
 <div *ngIf="show94BAnd94C" class="col-md-6 mb-3">
-<label class="form-label">82. D. Phone Number of the advocate *</label>
+<label class="form-label required">82. D. Phone Number of the advocate</label>
 <input
 type="text"
 class="form-control"
@@ -1695,12 +1695,12 @@ maxlength="10"
 
                     <!-- Item 77 -->
                     <div *ngIf="firForm.get('CaseHandledBy')?.value === 'Special Public Prosecutor'" class="col-md-6 mb-3">
-                        <label class="form-label">83. Special Public Prosecutor's Name *</label>
+                        <label class="form-label required">83. Special Public Prosecutor's Name</label>
                         <input type="text" class="form-control" formControlName="publicProsecutor" placeholder="Enter Name" />
                     </div>
                     <!-- Item 78 -->
                     <div *ngIf="firForm.get('CaseHandledBy')?.value === 'Special Public Prosecutor'" class="col-md-6 mb-3">
-                        <label class="form-label">84. Special Public Prosecutor's Phone Number *</label>
+                        <label class="form-label required">84. Special Public Prosecutor's Phone Number</label>
                         <input type="text" class="form-control" formControlName="prosecutorPhone" placeholder="Enter Phone Number"  (keypress)="allowOnlyNumbers($event)"
                         maxlength="10">
                     </div>
@@ -1721,13 +1721,13 @@ maxlength="10"
                 <div class="row">
                     <!-- First Hearing Date -->
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">85. First Hearing Date *</label>
+                        <label class="form-label required">85. First Hearing Date</label>
                         <input type="date" class="form-control" formControlName="firstHearingDate" required />
                     </div>
 
                     <!-- Has a Judgement been awarded in the case? -->
                     <div class="col-md-6">
-                        <label class="form-label">86. Has a Judgement been awarded in the case? *</label>
+                        <label class="form-label required">86. Has a Judgement been awarded in the case?</label>
                         <select formControlName="judgementAwarded" class="form-select" (change)="onJudgementSelectionChange($event)">
                             <option value="" disabled>Select One</option>
                             <option value="yes">Yes</option>
@@ -1760,7 +1760,7 @@ maxlength="10"
               <div *ngFor="let hearing of hearingDetails.controls; let i = index" [formGroupName]="i" class="row mb-3">
                 <!-- Next Hearing Date -->
                 <div class="col-md-4 mb-3">
-                  <label class="form-label">87. Next Hearing Date *</label>
+                  <label class="form-label required">87. Next Hearing Date</label>
                   <input
                     type="date"
                     class="form-control"
@@ -1771,7 +1771,7 @@ maxlength="10"
 
                 <!-- Reason for Next Hearing -->
                 <div class="col-md-4 mb-3">
-                  <label class="form-label">88. Reason for Next Hearing *</label>
+                  <label class="form-label required">88. Reason for Next Hearing</label>
                   <input
                     type="text"
                     class="form-control"
@@ -1800,7 +1800,7 @@ maxlength="10"
             <!-- .......................... -->
             <div class="row align-items-center">
             <div class="col-md-6">
-              <label class="form-label">89. Has a Judgement been awarded in the case? *</label>
+              <label class="form-label required">89. Has a Judgement been awarded in the case?</label>
 
           </div>
           <div class="col-md-3">
@@ -1823,7 +1823,7 @@ maxlength="10"
                     <div class="row align-items-center">
                       <!-- Nature of Judgement -->
                       <div class="col-md-6">
-                        <label class="form-label">87. Nature of Judgement *</label>
+                        <label class="form-label required">87. Nature of Judgement</label>
                         <select
                           class="form-select"
                           formControlName="judgementNature"
@@ -1839,7 +1839,7 @@ maxlength="10"
                       </div>
 
                         <div *ngIf="firForm.get('judgementDetails.judgementNature')?.value" class="col-md-4 mb-3">
-                          <label class="form-label">87a. Judgement Date *</label>
+                          <label class="form-label required">87a. Judgement Date</label>
                           <input
                             type="date"
                             class="form-control"
@@ -1888,7 +1888,7 @@ maxlength="10"
                       </div> -->
 
                       <div class="col-md-6">
-                        <label class="form-label">88. Upload Judgement Copy</label>
+                        <label class="form-label">88. Upload Judgement Copy</label> <span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
                         <input
                           type="file"
                           class="form-control"
@@ -1961,7 +1961,7 @@ maxlength="10"
 
                       <!-- Who has filed the appeal -->
                       <div class="col-md-6 mt-3" *ngIf="showFiledBy">
-                        <label class="form-label">100. Who has filed the appeal? *</label>
+                        <label class="form-label required">100. Who has filed the appeal?</label>
                         <select class="form-select" formControlName="filedBy">
                           <option value="" disabled selected>Select Option</option>
                           <option value="victim">Victim</option>
@@ -2005,7 +2005,7 @@ maxlength="10"
 
 
                             <div class="col-md-6 mb-3" *ngIf="selectedCourtType==='highCourt'">
-                              <label class="form-label">1. District in which court is present *</label>
+                              <label class="form-label required">1. District in which court is present</label>
                               <select class="form-select" formControlName="courtDistrict_one" required>
                                 <option value="" disabled selected>Select District</option>
                                 <option value="Chennai">Chennai</option>
@@ -2015,21 +2015,21 @@ maxlength="10"
                             </div>
                             <!-- Item 76 -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">2. CNR Numbers *</label>
+                                <label class="form-label required">2. CNR Numbers</label>
                                 <input type="text" class="form-control" formControlName="caseNumber_one" placeholder="Enter CNR Number" required />
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">2a. CRL. A Number *</label>
+                                <label class="form-label required">2a. CRL. A Number</label>
                                 <input type="text" class="form-control" formControlName="CRL_number_one" placeholder="Enter CRL Number" required />
                             </div>
                             <!-- Item 77 -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">3. Special Public Prosecutor's Name *</label>
+                                <label class="form-label required">3. Special Public Prosecutor's Name</label>
                                 <input type="text" class="form-control" formControlName="publicProsecutor_one" placeholder="Enter Name" required >
                             </div>
                             <!-- Item 78 -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">4. Special Public Prosecutor's Phone Number *</label>
+                                <label class="form-label required">4. Special Public Prosecutor's Phone Number</label>
                                 <input type="text" class="form-control" formControlName="prosecutorPhone_one" placeholder="Enter Phone Number" required  (keypress)="allowOnlyNumbers($event)"
                                 maxlength="10">
                             </div>
@@ -2044,13 +2044,13 @@ maxlength="10"
                         <div class="row">
                             <!-- First Hearing Date -->
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">5. First Hearing Date *</label>
+                                <label class="form-label required">5. First Hearing Date</label>
                                 <input type="date" class="form-control" formControlName="firstHearingDate_one" required />
                             </div>
 
                             <!-- Has a Judgement been awarded in the case? -->
                             <div class="col-md-4">
-                              <label class="form-label">6. Has a Judgement been awarded in the case? *</label>
+                              <label class="form-label required">6. Has a Judgement been awarded in the case?</label>
                               <select
                                 formControlName="judgementAwarded_one"
                                 class="form-select"
@@ -2084,7 +2084,7 @@ maxlength="10"
                       >
                         <!-- Next Hearing Date -->
                         <div class="col-md-4 mb-3">
-                          <label class="form-label">9. Next Hearing Date *</label>
+                          <label class="form-label required">9. Next Hearing Date</label>
                           <input
                             type="date"
                             class="form-control"
@@ -2095,7 +2095,7 @@ maxlength="10"
 
                         <!-- Reason for Next Hearing -->
                         <div class="col-md-4 mb-3">
-                          <label class="form-label">10. Reason for Next Hearing *</label>
+                          <label class="form-label required">10. Reason for Next Hearing</label>
                           <input
                             type="text"
                             class="form-control"
@@ -2126,7 +2126,7 @@ maxlength="10"
                     </div>
                     <div class="row align-items-center">
                       <div class="col-md-6">
-                        <label class="form-label">11. Has a Judgement been awarded in the case? *</label>
+                        <label class="form-label required">11. Has a Judgement been awarded in the case?</label>
 
                     </div>
                     <div class="col-md-3">
@@ -2149,7 +2149,7 @@ maxlength="10"
                             <div class="row align-items-center">
                               <!-- Nature of Judgement -->
                               <div class="col-md-6">
-                                <label class="form-label">12. Nature of Judgement *</label>
+                                <label class="form-label required">12. Nature of Judgement</label>
                                 <select
                                   class="form-select"
                                   formControlName="judgementNature_one"
@@ -2165,7 +2165,7 @@ maxlength="10"
                               </div>
 
                               <div *ngIf="firForm.get('judgementDetails_one.judgementNature_one')?.value" class="col-md-4 mb-3">
-                                <label class="form-label">12a. Judgement Date *</label>
+                                <label class="form-label required">12a. Judgement Date</label>
                                 <input
                                   type="date"
                                   class="form-control"
@@ -2203,7 +2203,7 @@ maxlength="10"
 
 
                               <div class="col-md-6">
-                                <label class="form-label">13. Upload Judgement Copy *</label>
+                                <label class="form-label required">13. Upload Judgement Copy</label>
                                 <input
                                   type="file"
                                   class="form-control"
@@ -2313,7 +2313,7 @@ maxlength="10"
 
 
                           <div class="col-md-6 mb-3">
-                            <label class="form-label">2. District in which court is present *</label>
+                            <label class="form-label required">2. District in which court is present</label>
                             <select class="form-select" formControlName="courtDistrict_two" required>
                               <option value="" disabled selected>Select District</option>
                               <option *ngFor="let district of courtDistricts" [value]="district">{{ district }}</option>
@@ -2321,23 +2321,23 @@ maxlength="10"
                           </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">3. CNR Number *</label>
+                                <label class="form-label required">3. CNR Number</label>
                                 <input type="text" class="form-control" formControlName="caseNumber_two" placeholder="Enter CRM Number" required />
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">3a. CRL. A Number *</label>
+                                <label class="form-label required">3a. CRL. A Number</label>
                                 <input type="text" class="form-control" formControlName="CRL_number_two" placeholder="Enter CLR Number" required />
                             </div>
 
                             <!-- Item 77 -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">4. Special Public Prosecutor's Name *</label>
+                                <label class="form-label required">4. Special Public Prosecutor's Name</label>
                                 <input type="text" class="form-control" formControlName="publicProsecutor_two" placeholder="Enter Name" required />
                             </div>
                             <!-- Item 78 -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">5. Special Public Prosecutor's Phone Number *</label>
+                                <label class="form-label required">5. Special Public Prosecutor's Phone Number</label>
                                 <input type="text" class="form-control" formControlName="prosecutorPhone_two" placeholder="Enter Phone Number" required  (keypress)="allowOnlyNumbers($event)"
                                 maxlength="10">
                             </div>
@@ -2352,13 +2352,13 @@ maxlength="10"
                         <div class="row">
                             <!-- First Hearing Date -->
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">6. First Hearing Date *</label>
+                                <label class="form-label required">6. First Hearing Date</label>
                                 <input type="date" class="form-control" formControlName="firstHearingDate_two" required />
                             </div>
 
                             <!-- Has a Judgement been awarded in the case? -->
                             <div class="col-md-6">
-                              <label class="form-label">7. Has a Judgement been awarded in the case? *</label>
+                              <label class="form-label required">7. Has a Judgement been awarded in the case?</label>
                               <select
                                 formControlName="judgementAwarded_two"
                                 class="form-select"
@@ -2392,7 +2392,7 @@ maxlength="10"
                       >
                         <!-- Next Hearing Date -->
                         <div class="col-md-4 mb-3">
-                          <label class="form-label">9. Next Hearing Date *</label>
+                          <label class="form-label required">9. Next Hearing Date</label>
                           <input
                             type="date"
                             class="form-control"
@@ -2403,7 +2403,7 @@ maxlength="10"
 
                         <!-- Reason for Next Hearing -->
                         <div class="col-md-4 mb-3">
-                          <label class="form-label">10. Reason for Next Hearing *</label>
+                          <label class="form-label required">10. Reason for Next Hearing</label>
                           <input
                             type="text"
                             class="form-control"
@@ -2434,7 +2434,7 @@ maxlength="10"
                     </div>
                     <div class="row align-items-center">
                       <div class="col-lg-6">
-                        <label class="form-label">11. Has a Judgement been awarded in the case? *</label>
+                        <label class="form-label required">11. Has a Judgement been awarded in the case?</label>
 
                     </div>
                     <div class="col-md-3">
@@ -2457,7 +2457,7 @@ maxlength="10"
                             <div class="row align-items-center">
                               <!-- Nature of Judgement -->
                               <div class="col-md-6">
-                                <label class="form-label">12. Nature of Judgement *</label>
+                                <label class="form-label required">12. Nature of Judgement</label>
                                 <select
                                   class="form-select"
                                   formControlName="judgementNature_two"
@@ -2473,7 +2473,7 @@ maxlength="10"
                               </div>
 
                               <div *ngIf="firForm.get('judgementDetails_two.judgementNature_two')?.value" class="col-md-4 mb-3">
-                                <label class="form-label">12a. Judgement Date *</label>
+                                <label class="form-label required">12a. Judgement Date</label>
                                 <input
                                   type="date"
                                   class="form-control"
@@ -2513,7 +2513,7 @@ maxlength="10"
                               </div> -->
 
                               <div class="col-md-6">
-                                <label class="form-label">13. Upload Judgement Copy *</label>
+                                <label class="form-label required">13. Upload Judgement Copy</label>
                                 <input
                                   type="file"
                                   class="form-control"
@@ -2624,13 +2624,13 @@ maxlength="10"
 
                  
                   <div class="mb-4 col-lg-4">
-                      <label class="form-label">89. Name of the Victim *</label>
+                      <label class="form-label required">89. Name of the Victim</label>
                       <input type="text" class="form-control mb-3" [value]="victimNames?.[i] || ''" placeholder="Name of the Victim" disabled />
                   </div>
 
                   <div class="row mb-3">
                       <div class="col-8">
-                          <label class="form-label">86. Eligible third stage relief amount for the victim as per the SC and ST Prevention of Atrocities Act *</label>
+                          <label class="form-label required">86. Eligible third stage relief amount for the victim as per the SC and ST Prevention of Atrocities Act</label>
                       </div>
                       <div class="col-4 text-end">
                           <input type="text" class="form-control text-end" formControlName="reliefAmountScst_2"  (keypress)="allowOnlyNumbers($event)"/>
@@ -2639,7 +2639,7 @@ maxlength="10"
 
                   <div class="row mb-3">
                       <div class="col-8">
-                          <label class="form-label">90. Eligible third stage relief amount for the victim (ex-gratia) by the Govt. of Tamil Nadu *</label>
+                          <label class="form-label required">90. Eligible third stage relief amount for the victim (ex-gratia) by the Govt. of Tamil Nadu</label>
                       </div>
                       <div class="col-4 text-end">
                           <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia_2"  (keypress)="allowOnlyNumbers($event)"/>
@@ -2648,7 +2648,7 @@ maxlength="10"
 
                   <div class="row mb-3">
                       <div class="col-8">
-                          <label class="form-label">91. Total Eligible amount for the victim for the Third stage of relief *</label>
+                          <label class="form-label required">91. Total Eligible amount for the victim for the Third stage of relief</label>
                       </div>
                       <div class="col-4 text-end">
                           <input type="text" class="form-control text-end" formControlName="reliefAmountThirdStage" (keypress)="allowOnlyNumbers($event)"/>
@@ -2664,7 +2664,7 @@ maxlength="10"
               
                   <div class="row mb-4">
                       <div class="col-8">
-                          <label class="form-label">92. Total amount for third stage of compensation (total of relief across all victims) *</label>
+                          <label class="form-label required">92. Total amount for third stage of compensation (total of relief across all victims)</label>
                       </div>
                       <div class="col-4">
                           <input type="text" class="form-control text-end" formControlName="totalCompensation_2"/>
@@ -2674,16 +2674,16 @@ maxlength="10"
                 
                   <div class="row mb-4">
                       <div class="col-md-6 mb-3">
-                          <label class="form-label">93. Proceedings File No. *</label>
+                          <label class="form-label required">93. Proceedings File No.</label>
                           <input type="text" class="form-control" formControlName="proceedingsFileNo_2" placeholder="Enter File No." />
                       </div>
                       <div class="col-md-6 mb-3">
-                          <label class="form-label">94. Proceedings Date *</label>
+                          <label class="form-label required">94. Proceedings Date</label>
                           <input type="date" class="form-control" formControlName="proceedingsDate_2" [max]="today" />
                       </div>
                
                       <div class="col-md-12 mb-3">
-                        <label class="form-label">95. Upload Commissionerate / S.P. Office Proceedings *</label>
+                        <label class="form-label required">95. Upload Commissionerate / S.P. Office Proceedings</label> <span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
                         <input
                           type="file"
                           (change)="uploadProceedings_2New($event)"
@@ -2756,7 +2756,7 @@ maxlength="10"
                     </button>
                   </div> -->
                   <div class="mb-4" formArrayName="attachments_2">
-  <label class="form-label">96. Upload Other Attachments (If any)</label>
+  <label class="form-label">96. Upload Other Attachments (If any)</label> <span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
 
   <div
     class="mb-3"
