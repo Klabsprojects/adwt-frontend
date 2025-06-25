@@ -412,7 +412,7 @@ loadAccusedCommunities(): void {
     (communities: string[]) => {
       this.accusedCommunitiesOptions = communities; 
       this.accusedCommunitiesOptions.push('General','Others');
-      
+      this.getAccusedCommunityOnLoad();
       // Populate accused community options
     },
     (error) => {
@@ -657,7 +657,7 @@ loadAccusedCommunities(): void {
   //   { communityCertificate: 'no', reliefAmountScst: 1200, reliefAmountExGratia: 4000, reliefAmountFirstStage: 1800, totalCompensation: 7000 },
   // ];
   ngOnInit(): void {
-
+    this.getCommunityOnload();
     this.route.queryParams.subscribe((params) => {
       const firId = params['fir_id'];
       if (firId) {
@@ -5140,54 +5140,96 @@ uploadedImageSrc: any | ArrayBuffer;
   //     }
   //   );
   // }
+  victimSubCaste:any={}
+  getCommunityOnload(){
+     const castes = ['SC','ST'];
+     for(const caste of castes){
+      this.firService.getCastesByCommunity(caste).subscribe((res:any)=>{
+        this.victimSubCaste[caste] = res;
+      })
+     }
+  }
 
   onCommunityChange(event: any, index: number): void {
     const selectedCommunity = event.target.value;
+    if(selectedCommunity){
+      const victimGroup = this.victims.at(index) as FormGroup;
+      victimGroup.patchValue({ caste: '' });
+      victimGroup.get('availableCastes')?.setValue(this.victimSubCaste[selectedCommunity]);
+      this.cdr.detectChanges();
+    }
   // console.log(selectedCommunity,"wssss")
-      if (selectedCommunity) {
-        this.firService.getCastesByCommunity(selectedCommunity).subscribe(
-          (castes: string[]) => {
-            const victimGroup = this.victims.at(index) as FormGroup;
-            victimGroup.patchValue({ caste: '' }); // Reset caste selection
-            victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
-            this.cdr.detectChanges();
-          },
-          (error) => {
-            console.error('Error fetching castes:', error);
-            Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
-          }
-        );
-      }
+      // if (selectedCommunity) {
+      //   this.firService.getCastesByCommunity(selectedCommunity).subscribe(
+      //     (castes: string[]) => {
+      //       const victimGroup = this.victims.at(index) as FormGroup;
+      //       victimGroup.patchValue({ caste: '' }); // Reset caste selection
+      //       victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+      //       this.cdr.detectChanges();
+      //     },
+      //     (error) => {
+      //       console.error('Error fetching castes:', error);
+      //       Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+      //     }
+      //   );
+      // }
   }
   showSubCaste = true;
   showSubCasteText = false;
+  AccusedSubCastes :any ={};
+  getAccusedCommunityOnLoad(){
+    for (const caste of this.accusedCommunitiesOptions){
+      if(caste != 'General' && caste != 'Others'){
+        this.firService.getAccusedCastesByCommunity(caste).subscribe((res:any)=>{
+          this.AccusedSubCastes[caste] = res;
+        })
+      }
+    }
+  }
   onAccusedCommunityChange(event: any, index: number): void {
     const selectedCommunity = event;
-      // console.log(selectedCommunity);
-      if(selectedCommunity == "General" || selectedCommunity == "Others"){
-        this.showSubCaste = false;
-        this.showSubCasteText = true;
-      }
-      else{
-        this.showSubCaste = true;
-        this.showSubCasteText = false;
-      }
-      if (selectedCommunity) {
-        this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
-          (castes: string[]) => {
-            this.scstSectionsOptions = castes;
-            const accusedGroup = this.accuseds.at(index) as FormGroup;
-            accusedGroup.patchValue({ caste: '' }); // Reset caste selection
-            accusedGroup.get('availableCastes')?.setValue(castes);
-            // console.log(accusedGroup.get('availableCastes')?.value,"datdadadadada"); 
-            this.cdr.detectChanges();
-          },
-          (error) => {
-            console.error('Error fetching accused castes:', error);
-            Swal.fire('Error', 'Failed to load castes for the selected accused community.', 'error');
-          }
-        );
-      }
+    if(selectedCommunity == "General" || selectedCommunity == "Others"){
+      this.showSubCaste = false;
+      this.showSubCasteText = true;
+    }
+    else{
+      this.showSubCaste = true;
+      this.showSubCasteText = false;
+    }
+    if (selectedCommunity) {
+      console.log('this.AccusedSubCastes[selectedCommunity]',this.AccusedSubCastes[selectedCommunity]);
+      this.scstSectionsOptions = this.AccusedSubCastes[selectedCommunity];
+      const accusedGroup = this.accuseds.at(index) as FormGroup;
+      accusedGroup.patchValue({ caste: '' }); // Reset caste selection
+      accusedGroup.get('availableCastes')?.setValue(this.AccusedSubCastes[selectedCommunity]);
+      this.cdr.detectChanges();
+    }
+    // const selectedCommunity = event;
+    // // console.log(selectedCommunity);
+    // if(selectedCommunity == "General" || selectedCommunity == "Others"){
+    //   this.showSubCaste = false;
+    //   this.showSubCasteText = true;
+    // }
+    // else{
+    //   this.showSubCaste = true;
+    //   this.showSubCasteText = false;
+    // }
+    // if (selectedCommunity) {
+    //   this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
+    //     (castes: string[]) => {
+    //       this.scstSectionsOptions = castes;
+    //       const accusedGroup = this.accuseds.at(index) as FormGroup;
+    //       accusedGroup.patchValue({ caste: '' }); // Reset caste selection
+    //       accusedGroup.get('availableCastes')?.setValue(castes);
+    //       // console.log(accusedGroup.get('availableCastes')?.value,"datdadadadada"); 
+    //       this.cdr.detectChanges();
+    //     },
+    //     (error) => {
+    //       console.error('Error fetching accused castes:', error);
+    //       Swal.fire('Error', 'Failed to load castes for the selected accused community.', 'error');
+    //     }
+    //   );
+    // }
   }
 
   // loadUserData() {
