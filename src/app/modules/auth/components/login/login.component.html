@@ -161,7 +161,8 @@
       
       <!-- Error message -->
       <div *ngIf="hasError" class="alert alert-danger">
-        Login failed. Please check your credentials and try again.
+        <!-- Login failed. Please check your credentials and try again. -->
+        {{loginErrorMessage}}
       </div>
       
       <form class="form-box" *ngIf="loginForm" [formGroup]="loginForm" novalidate="novalidate"

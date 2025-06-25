@@ -354,6 +354,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     return this.loginForm.valid && this.isCaptchaValid;
   }
 
+  loginErrorMessage:any;
+
   // Form submission with CAPTCHA validation
   submit() {
     this.hasError = false;
@@ -416,7 +418,8 @@ export class LoginComponent implements OnInit, OnDestroy {
           }
         },
         (error) => {
-          console.error('Login failed due to error:', error);
+          this.loginErrorMessage = error.error.message || 'Server Error';
+          console.log('Login failed due to error:', error);
           console.log('server down')
           this.hasError = true;
           // Generate new CAPTCHA on login failure
