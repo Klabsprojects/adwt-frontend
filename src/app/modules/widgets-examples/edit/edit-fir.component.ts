@@ -674,7 +674,7 @@ loadAccusedCommunities(): void {
     { 
       this.clearSession();
     } 
-    this.loadOptions();
+    // this.loadOptions();
     // this.loadOffenceActs();
     // this.loadScstSections();
     this.generateYearOptions();
@@ -691,7 +691,7 @@ loadAccusedCommunities(): void {
     this.loadDistricts();
     this.updateValidationForCaseType(); 
     this.loadAllOffenceReliefDetails();
-    this.loadAccusedCommunities();
+    // this.loadAccusedCommunities();
     // if (this.firId) {
     //   // this.loadFirDetails(this.firId);
     //   // this.loadVictimsReliefDetails();
