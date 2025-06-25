@@ -375,10 +375,10 @@ export class LoginComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const secretKey = env.secretKey;
-    const ciphertext = CryptoJS.AES.encrypt(this.f.password.value, secretKey).toString();
+    // const secretKey = env.secretKey;
+    // const ciphertext = CryptoJS.AES.encrypt(this.f.password.value, secretKey).toString();
 
-    const loginSubscr = this.authService.login(this.f.email.value, ciphertext)
+    const loginSubscr = this.authService.login(this.f.email.value, this.f.password.value)
       .pipe(first())
       .subscribe(
         (response: any) => {
@@ -418,7 +418,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           }
         },
         (error) => {
-          this.loginErrorMessage = error.error.message || 'Server Error';
+          this.loginErrorMessage = error.error.message || 'Login failed. Application Unable to Reach.';
           console.log('Login failed due to error:', error);
           console.log('server down')
           this.hasError = true;
