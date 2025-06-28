@@ -309,6 +309,7 @@ export class MonthlyReportComponent implements OnInit {
   selectedPoliceCity:string=''
   selectedFromDate:any="";
   selectedToDate:any="";
+  selectedCreatedAt:any="";
   constructor(
     private cdr: ChangeDetectorRef,
     private reportsCommonService: ReportsCommonService,
@@ -506,6 +507,16 @@ export class MonthlyReportComponent implements OnInit {
       }
     }
 
+    //createdAt filter
+    if (this.selectedCreatedAt && this.selectedCreatedAt !== '') {
+      const createdAt = new Date(item.created_at).toDateString();
+      const selectedDate = new Date(this.selectedCreatedAt).toDateString();
+      
+      if (createdAt !== selectedDate) {
+        return false;
+      }
+    }
+
     // Date range filter
     if (this.selectedFromDate || this.selectedToDate) {
     const registrationDate = new Date(item.date_of_registration);
@@ -650,6 +661,7 @@ export class MonthlyReportComponent implements OnInit {
       this.selectedPoliceCity='';
       this.selectedFromDate='';
       this.selectedToDate = '';
+      this.selectedCreatedAt = '';
      this.filteredData = [...this.reportData]; 
   }
 

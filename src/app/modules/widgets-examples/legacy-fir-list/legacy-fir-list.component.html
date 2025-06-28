@@ -160,6 +160,7 @@
 
                 <span *ngSwitchCase="'created_by'">{{ fir.created_by || '' }}</span>
                 <span *ngSwitchCase="'created_at'">{{ fir.created_at | date: 'dd-MM-yyyy' }}</span>
+                <span *ngSwitchCase="'modified_at'">{{ fir.modified_at | date: 'dd-MM-yyyy' }}</span>
                 <span *ngSwitchCase="'status'">
                   <span style="margin-right: 3px;" class="badge" [ngClass]="getStatusBadgeClass(fir.status)">
                     {{ getStatusText(fir.status) }}

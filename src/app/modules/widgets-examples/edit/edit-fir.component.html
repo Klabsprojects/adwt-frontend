@@ -945,6 +945,10 @@
         </div>
       </div>
       <div *ngIf="mainStep === 1 && step === 5" class="form-step">
+      <div class="d-flex justify-content-start align-items-center" style="gap: 1rem;">
+        Has the case been noted as MF
+        <input type="checkbox" (change)="mfChange()" [(ngModel)]="isMf" [ngModelOptions]="{standalone: true}">
+      </div>
 
 <!-- <div formArrayName="victimsRelief">
   <div *ngFor="let victimRelief of victimsRelief.controls; let i = index" [formGroupName]="i">
@@ -972,7 +976,7 @@
             </div>
             <div class="row mb-3">
               <div class="col-8">
-                <label for="reliefAmountScst" class="form-label required">54. Eligible relief amount for the victim as per SC/ST Act</label>
+                <label for="reliefAmountScst" class="form-label required">54. Eligible 1st stage relief amount for the victim as per SC/ST Act</label>
               </div>
               <div class="col-4">
                 <input id="reliefAmountScst" type="text" class="form-control text-end" formControlName="reliefAmountScst" (keypress)="allowOnlyNumbers($event)" />
@@ -980,7 +984,7 @@
             </div>
             <div class="row mb-3">
               <div class="col-8">
-                <label class="form-label required">55. Eligible relief amount for the victim (ex-gratia) by Govt. of Tamil Nadu</label>
+                <label class="form-label required">55. Eligible 1st stage relief amount for the victim (ex-gratia) by Govt. of Tamil Nadu</label>
               </div>
               <div class="col-4">
                 <input type="text" class="form-control text-end" formControlName="reliefAmountExGratia" placeholder="0" (keypress)="allowOnlyNumbers($event)" />
@@ -988,7 +992,7 @@
             </div>
             <div class="row mb-3">
               <div class="col-8">
-                <label class="form-label required">56. Eligible amount for the 1st Stage of Relief</label>
+                <label class="form-label required">56. Victim's Total Eligible amount for the 1st Stage of Relief</label>
               </div>
               <div class="col-4">
                 <input type="text" class="form-control text-end" formControlName="reliefAmountFirstStage" placeholder="0" (keypress)="allowOnlyNumbers($event)"  />
@@ -1042,11 +1046,11 @@
     </form>
       <div class="row mb-4">
           <div class="mb-4 col-6">
-            <label class="form-label required">59. Proceedings File No.</label>
+            <label class="form-label required">59. Proposal File No.</label>
             <input type="text" class="form-control" formControlName="proceedingsFileNo" placeholder="Enter File No." />
           </div>
           <div class="mb-4 col-6">
-            <label class="form-label required">60. Proceedings Date</label>
+            <label class="form-label required">60. Proposal Date</label>
             <input type="date" class="form-control" formControlName="proceedingsDate" />
           </div>
         </div>
@@ -1064,16 +1068,16 @@
         </div> -->
 
         <div class="col-md-6 mb-3">
-          <label class="form-label required">61. Upload Commissionerate / S.P. Office Proceedings</label><span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
+          <label class="form-label required">61. Upload Commissionerate / S.P. Office Proposal</label><span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
           <input type="file" class="form-control" 
-                 (change)="onProceedingsFileUpload($event)" required *ngIf="!proceedingFileName"/>
+                 (change)="onProceedingsFileUpload($event)" required *ngIf="!proceedingFileName" [disabled]="isMf"/>
           <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingFileName">
             <div class="d-flex justify-content-start align-items-center">
               {{proceedingFileName}}
             </div>
             <div class="d-flex justify-content-between align-items-center">
-              <button class="btn btn-primary btn-sm me-2" (click)="viewProceedingsCopy()">View</button>
-              <button class="btn btn-danger btn-sm" (click)="removeProceedingsCopy()"><i class="fas fa-times"></i></button>
+              <button class="btn btn-primary btn-sm me-2" (click)="viewProceedingsCopy()" [disabled]="isMf">View</button>
+              <button class="btn btn-danger btn-sm" (click)="removeProceedingsCopy()" [disabled]="isMf"><i class="fas fa-times"></i></button>
             </div>
           </div>
         
@@ -1101,7 +1105,7 @@
             <div class="d-flex align-items-center">
                <input type="file" class="form-control w-100 mb-2"
                    (change)="onFileChangee($event, j)"
-                   style="max-width: 400px;" *ngIf="!attachment.path"/>
+                   style="max-width: 400px;" *ngIf="!attachment.path" [disabled]="isMf"/>
                    <button class="btn btn-danger btn-sm" (click)="removeAttachment_1(j)"
                     title="Remove Attachment" *ngIf="!attachment.path"><i class="fas fa-times"></i></button>
             </div>
@@ -1110,9 +1114,9 @@
                 {{attachment.path}}
               </div>
               <div class="d-flex justify-content-between align-items-center">
-                <button class="btn btn-primary btn-sm me-2" (click)="view62(attachment.path)">View</button>
+                <button class="btn btn-primary btn-sm me-2" (click)="view62(attachment.path)" [disabled]="isMf">View</button>
                 <button class="btn btn-danger btn-sm" (click)="removeAttachment_1(j)"
-                    title="Remove Attachment"><i class="fas fa-times"></i></button>
+                    title="Remove Attachment" [disabled]="isMf"><i class="fas fa-times"></i></button>
               </div>
             </div>
         
@@ -1129,7 +1133,7 @@
             </button> -->
           </div>
         
-          <button type="button" class="btn btn-primary btn-sm mt-3" (click)="addAttachment_1()">
+          <button type="button" class="btn btn-primary btn-sm mt-3" (click)="addAttachment_1()" [disabled]="isMf">
             Add Attachment
           </button>
         </div>
@@ -1434,11 +1438,11 @@
             </div>
             <div class="row mb-4">
               <div class="mb-4 col-6">
-                <label class="form-label required">76. Proceedings File No.</label>
+                <label class="form-label required">76. Proposal File No.</label>
                 <input type="text" class="form-control" formControlName="proceedingsFileNo_1" placeholder="Enter File No." required />
               </div>
               <div class="mb-4 col-6">
-                <label class="form-label required">77. Proceedings Date</label>
+                <label class="form-label required">77. Proposal Date</label>
                 <input type="date" class="form-control" formControlName="proceedingsDate_1" [max]="today" required/>
               </div>
             </div>
@@ -1451,7 +1455,7 @@
             </div> -->
 
             <div class="mb-4">
-              <label class="form-label required">78. Upload Commissionerate / S.P. Office Proceedings</label><span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
+              <label class="form-label required">78. Upload Commissionerate / S.P. Office Proposal</label><span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
               <!-- <input type="file" class="form-control" formControlName="uploadProceedings_1" required/> -->
               <!-- <input
               type="file"
@@ -2674,16 +2678,16 @@ maxlength="10"
                 
                   <div class="row mb-4">
                       <div class="col-md-6 mb-3">
-                          <label class="form-label required">93. Proceedings File No.</label>
+                          <label class="form-label required">93. Proposal File No.</label>
                           <input type="text" class="form-control" formControlName="proceedingsFileNo_2" placeholder="Enter File No." />
                       </div>
                       <div class="col-md-6 mb-3">
-                          <label class="form-label required">94. Proceedings Date</label>
+                          <label class="form-label required">94. Proposal Date</label>
                           <input type="date" class="form-control" formControlName="proceedingsDate_2" [max]="today" />
                       </div>
                
                       <div class="col-md-12 mb-3">
-                        <label class="form-label required">95. Upload Commissionerate / S.P. Office Proceedings</label> <span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
+                        <label class="form-label required">95. Upload Commissionerate / S.P. Office Proposal</label> <span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
                         <input
                           type="file"
                           (change)="uploadProceedings_2New($event)"

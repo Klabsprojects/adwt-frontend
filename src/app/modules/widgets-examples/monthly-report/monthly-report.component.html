@@ -119,6 +119,11 @@
         <input type="date" class="form-control" [(ngModel)]="selectedToDate" (change)="applyFilters()"/>
         <span class="tooltip-text">Date of Registration To Date</span>
       </div>
+      <!-- creation Date -->
+       <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedCreatedAt" (change)="applyFilters()"/>
+        <span class="tooltip-text">Created At Date Filter</span>
+      </div>
       <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
         <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
       </div>

@@ -40,10 +40,10 @@ export class ReliefComponent implements OnInit {
 
   enabledTabs: boolean[] = [false, false, false]; // Dynamic enabling of tabs
   public isDialogVisible: boolean = false;
-  victimsReliefDetails : any = [];
-  secondFormVictimInformation : any = [];
-  trialReliefDetails : any = [];
-  RemoveFormUpload : any;
+  victimsReliefDetails: any = [];
+  secondFormVictimInformation: any = [];
+  trialReliefDetails: any = [];
+  RemoveFormUpload: any;
 
   constructor(
     private fb: FormBuilder,
@@ -59,16 +59,16 @@ export class ReliefComponent implements OnInit {
     });
   }
   loading = true;
-  userData:any;
-  isDisable:boolean = false;
+  userData: any;
+  isDisable: boolean = false;
   ngOnInit(): void {
     const JsonData = sessionStorage.getItem('user_data');
     this.userData = JsonData ? JSON.parse(JsonData) : {};
     this.isDisable = this.userData.role == 3;
     this.initializeForm();
     if (this.isDisable) {
-    this.disableEntireForm();
-  }
+      this.disableEntireForm();
+    }
     this.firId = this.getFirIdFromRouter();
     if (this.firId) {
       this.fetchFirStatus(this.firId); // Fetch status
@@ -97,15 +97,15 @@ export class ReliefComponent implements OnInit {
   }
 
   disableEntireForm(): void {
-  this.reliefForm.disable();
+    this.reliefForm.disable();
 
-  // // Also explicitly disable any nested FormArrays if needed
-  // const victimArrays = ['victims', 'secondInstallmentVictims', 'thirdInstallmentVictims'];
-  // victimArrays.forEach(arrayName => {
-  //   const formArray = this.reliefForm.get(arrayName) as FormArray;
-  //   formArray.controls.forEach(group => group.disable());
-  // });
-}
+    // // Also explicitly disable any nested FormArrays if needed
+    // const victimArrays = ['victims', 'secondInstallmentVictims', 'thirdInstallmentVictims'];
+    // victimArrays.forEach(arrayName => {
+    //   const formArray = this.reliefForm.get(arrayName) as FormArray;
+    //   formArray.controls.forEach(group => group.disable());
+    // });
+  }
 
 
 
@@ -383,7 +383,7 @@ export class ReliefComponent implements OnInit {
 
     // Add dynamic listeners for calculating totals
     this.addDynamicListeners(group);
-    if(this.isDisable){
+    if (this.isDisable) {
       group.disable()
     }
     return group;
@@ -602,18 +602,37 @@ export class ReliefComponent implements OnInit {
     return invalidFields;
   }
 
+  steps = {
+  step1: false,
+  step2: false,
+  step3: false,
+};
 
+onInstallmentSubmitSave(step: 'step1' | 'step2' | 'step3') {
+  this.steps[step] = true;
+
+  const submitMethods = {
+    step1: () => this.onFirstInstallmentSubmit(),
+    step2: () => this.onSecondInstallmentSubmit(),
+    step3: () => this.onThirdInstallmentSubmit(),
+  };
+
+  submitMethods[step]();
+}
 
   async onFirstInstallmentSubmit(): Promise<void> {
-    const invalidFields = this.getInvalidFields('firstInstallment');
-    if (invalidFields.length > 0) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Incomplete Form',
-        text: `Please fill in all required fields:\n${invalidFields.join(', ')}`,
-      });
-      return;
+    if (!this.steps.step1) {
+      const invalidFields = this.getInvalidFields('firstInstallment');
+      if (invalidFields.length > 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Incomplete Form',
+          text: `Please fill in all required fields:\n${invalidFields.join(', ')}`,
+        });
+        return;
+      }
     }
+    this.steps.step1 = false;
 
     // Enable victimName temporarily
     this.victimsArray.controls.forEach((control) => {
@@ -626,10 +645,10 @@ export class ReliefComponent implements OnInit {
 
     let firstInstallmentUploadDocumentPath: string | undefined;
     const firstInstallmentUploadDocument = this.reliefForm.get('firstInstallmentUploadDocument')?.value;
-      if (firstInstallmentUploadDocument) {
-        const paths = await this.uploadMultipleFiles([firstInstallmentUploadDocument]);
-        firstInstallmentUploadDocumentPath = paths[0];
-      }
+    if (firstInstallmentUploadDocument) {
+      const paths = await this.uploadMultipleFiles([firstInstallmentUploadDocument]);
+      firstInstallmentUploadDocumentPath = paths[0];
+    }
 
     // Prepare the data to send to the backend
     const firstInstallmentData = {
@@ -683,7 +702,8 @@ export class ReliefComponent implements OnInit {
     });
   }
 
-   async onSecondInstallmentSubmit(): Promise<void> {
+  async onSecondInstallmentSubmit(): Promise<void> {
+    if (!this.steps.step2) {
     const invalidFields = this.getInvalidFields('secondInstallment');
     if (invalidFields.length > 0) {
       Swal.fire({
@@ -693,6 +713,8 @@ export class ReliefComponent implements OnInit {
       });
       return;
     }
+  }
+  this.steps.step2 = false;
 
     // Enable victimName temporarily for submission
     this.secondInstallmentVictimsArray.controls.forEach((control) => {
@@ -705,17 +727,17 @@ export class ReliefComponent implements OnInit {
 
     let secondInstallmentUploadDocumentPath: string | undefined;
     const secondInstallmentUploadDocument = this.reliefForm.get('secondInstallmentUploadDocument')?.value;
-      if (secondInstallmentUploadDocument) {
-        const paths = await this.uploadMultipleFiles([secondInstallmentUploadDocument]);
-        secondInstallmentUploadDocumentPath = paths[0];
-      }
+    if (secondInstallmentUploadDocument) {
+      const paths = await this.uploadMultipleFiles([secondInstallmentUploadDocument]);
+      secondInstallmentUploadDocumentPath = paths[0];
+    }
 
     // Prepare the data for the backend
     const secondInstallmentData = {
       firId: this.firId,
       victims: this.secondInstallmentVictimsArray.value.map((victim: any, index: number) => ({
         victimId: victim.victimId || null,
-        victimChargesheetId: this.secondFormVictimInformation?.[index]?.victim_chargesheet_id || null, 
+        victimChargesheetId: this.secondFormVictimInformation?.[index]?.victim_chargesheet_id || null,
         chargesheetId: victim.chargesheetId || null,
         victimName: victim.secondInstallmentVictimName,
         secondInstallmentReliefScst: victim.secondInstallmentReliefScst,
@@ -760,7 +782,8 @@ export class ReliefComponent implements OnInit {
   }
 
   async onThirdInstallmentSubmit(): Promise<void> {
-    const invalidFields = this.getInvalidFields('thirdInstallment');
+    if(!this.steps.step3){
+      const invalidFields = this.getInvalidFields('thirdInstallment');
     if (invalidFields.length > 0) {
       Swal.fire({
         icon: 'error',
@@ -769,6 +792,8 @@ export class ReliefComponent implements OnInit {
       });
       return;
     }
+    }
+    this.steps.step3 = false;
 
     // Enable victimName and totalRelief fields temporarily for submission
     this.thirdInstallmentVictimsArray.controls.forEach((control) => {
@@ -776,12 +801,12 @@ export class ReliefComponent implements OnInit {
       control.get('thirdInstallmentReliefTotal')?.enable();
     });
 
-      let thirdInstallmentUploadDocumentPath: string | undefined;
+    let thirdInstallmentUploadDocumentPath: string | undefined;
     const thirdInstallmentUploadDocument = this.reliefForm.get('thirdInstallmentUploadDocument')?.value;
-      if (thirdInstallmentUploadDocument) {
-        const paths = await this.uploadMultipleFiles([thirdInstallmentUploadDocument]);
-        thirdInstallmentUploadDocumentPath = paths[0];
-      }
+    if (thirdInstallmentUploadDocument) {
+      const paths = await this.uploadMultipleFiles([thirdInstallmentUploadDocument]);
+      thirdInstallmentUploadDocumentPath = paths[0];
+    }
 
     // Prepare the data for the backend
     const thirdInstallmentData = {
@@ -847,10 +872,10 @@ export class ReliefComponent implements OnInit {
         console.log('fetchFirDetails', details);
         this.patchFirDetailsToForm(this.firDetails);
 
-        if(this.firDetails && this.firDetails.data && this.firDetails.data.status){
-        if (this.firDetails.data.status >= 5) this.enabledTabs[0] = true; // Enable First Installment
-        if (this.firDetails.data.status >= 6) this.enabledTabs[1] = true; // Enable Second Installment
-        if (this.firDetails.data.status >= 7) this.enabledTabs[2] = true; 
+        if (this.firDetails && this.firDetails.data && this.firDetails.data.status) {
+          if (this.firDetails.data.status >= 5) this.enabledTabs[0] = true; // Enable First Installment
+          if (this.firDetails.data.status >= 6) this.enabledTabs[1] = true; // Enable Second Installment
+          if (this.firDetails.data.status >= 7) this.enabledTabs[2] = true;
         }
 
 
@@ -885,7 +910,7 @@ export class ReliefComponent implements OnInit {
       tap((response: any) => {
         console.log('Fetched Second Installment Victim Details:', response);
         if (response?.victims && Array.isArray(response.victims)) {
-          this.secondFormVictimInformation = response.victims; 
+          this.secondFormVictimInformation = response.victims;
           this.populateSecondInstallmentVictimFields(response.victims);
         } else {
           console.error('Invalid response structure:', response);
@@ -937,7 +962,7 @@ export class ReliefComponent implements OnInit {
 
   viewFile(): void {
     if (this.existingFilePath) {
-      window.open(this.file_access+this.existingFilePath, '_blank');
+      window.open(this.file_access + this.existingFilePath, '_blank');
     }
   }
 
@@ -947,7 +972,7 @@ export class ReliefComponent implements OnInit {
 
   viewFile_2(): void {
     if (this.existingFilePath_relief_2) {
-      window.open(this.file_access+this.existingFilePath_relief_2, '_blank');
+      window.open(this.file_access + this.existingFilePath_relief_2, '_blank');
     }
   }
 
@@ -957,7 +982,7 @@ export class ReliefComponent implements OnInit {
 
   viewFile_3(): void {
     if (this.existingFilePath_relief_3) {
-      window.open(this.file_access+this.existingFilePath_relief_3, '_blank');
+      window.open(this.file_access + this.existingFilePath_relief_3, '_blank');
     }
   }
 
@@ -999,7 +1024,7 @@ export class ReliefComponent implements OnInit {
     }
   }
 
-  openDialog(form:any): void {
+  openDialog(form: any): void {
     // this.dialogMessage = 'This is a dialog message!';
     this.RemoveFormUpload = form;
     this.isDialogVisible = true;
@@ -1009,92 +1034,92 @@ export class ReliefComponent implements OnInit {
     this.isDialogVisible = false;
   }
 
-  GetInstallmemtList(firid : any) {
+  GetInstallmemtList(firid: any) {
     const Fir_ID = {
       firId: firid,
     };
     this.ReliefService.FetchAllInstallmentDetails(Fir_ID).subscribe(
       (data: any) => {
         console.log(data)
-        if(data && data.firstInstallment && data.firstInstallment[0]){
+        if (data && data.firstInstallment && data.firstInstallment[0]) {
           this.FirstrelifDetails(data.firstInstallment[0])
         }
-        if(data && data.secondInstallment && data.secondInstallment[0]){
+        if (data && data.secondInstallment && data.secondInstallment[0]) {
           this.SecondrelifDetails(data.secondInstallment[0])
         }
-        if(data && data.trialProceedings && data.trialProceedings[0]){
+        if (data && data.trialProceedings && data.trialProceedings[0]) {
           this.ThirdrelifDetails(data.trialProceedings[0])
         }
       },
-      (error :any) => {
+      (error: any) => {
         console.error(error)
       }
     );
   }
 
 
-  FirstrelifDetails(InstallementDetails : any){
-    if(InstallementDetails.proceedings_file_no){
-      this.reliefForm.get('firstInstallmentProceedingsFileNumber')?.setValue(InstallementDetails.proceedings_file_no); 
+  FirstrelifDetails(InstallementDetails: any) {
+    if (InstallementDetails.proceedings_file_no) {
+      this.reliefForm.get('firstInstallmentProceedingsFileNumber')?.setValue(InstallementDetails.proceedings_file_no);
     }
-    if(InstallementDetails.proceedings_date){
-      const formattedDate = InstallementDetails.proceedings_date.split('T')[0]; 
+    if (InstallementDetails.proceedings_date) {
+      const formattedDate = InstallementDetails.proceedings_date.split('T')[0];
       this.reliefForm.get('firstInstallmentProceedingsFileDate')?.setValue(formattedDate);
     }
-    if(InstallementDetails.pfms_portal_uploaded){
-      this.reliefForm.get('firstInstallmentPfmsPortalUploaded')?.setValue(InstallementDetails.pfms_portal_uploaded); 
+    if (InstallementDetails.pfms_portal_uploaded) {
+      this.reliefForm.get('firstInstallmentPfmsPortalUploaded')?.setValue(InstallementDetails.pfms_portal_uploaded);
     }
-    if(InstallementDetails.date_of_disbursement){
-      const formattedDate = InstallementDetails.date_of_disbursement.split('T')[0]; 
+    if (InstallementDetails.date_of_disbursement) {
+      const formattedDate = InstallementDetails.date_of_disbursement.split('T')[0];
       this.reliefForm.get('firstInstallmentDateOfDisbursement')?.setValue(formattedDate);
     }
-    if(InstallementDetails.proceedings_file){
+    if (InstallementDetails.proceedings_file) {
       this.existingFilePath = InstallementDetails.proceedings_file;
       this.showFileInput = false;
       // this.reliefForm.get('firstInstallmentUploadDocument')?.setValue(InstallementDetails.proceedings_file);
     }
   }
 
-  SecondrelifDetails(InstallementDetails : any){
+  SecondrelifDetails(InstallementDetails: any) {
     console.log('function called')
-    if(InstallementDetails.file_number){
-      this.reliefForm.get('secondInstallmentProceedingsFileNumber')?.setValue(InstallementDetails.file_number); 
+    if (InstallementDetails.file_number) {
+      this.reliefForm.get('secondInstallmentProceedingsFileNumber')?.setValue(InstallementDetails.file_number);
     }
-    if(InstallementDetails.file_date){
-      const formattedDate = InstallementDetails.file_date.split('T')[0]; 
+    if (InstallementDetails.file_date) {
+      const formattedDate = InstallementDetails.file_date.split('T')[0];
       this.reliefForm.get('secondInstallmentProceedingsFileDate')?.setValue(formattedDate);
     }
-    if(InstallementDetails.pfms_portal_uploaded){
-      this.reliefForm.get('secondInstallmentPfmsPortalUploaded')?.setValue(InstallementDetails.pfms_portal_uploaded); 
+    if (InstallementDetails.pfms_portal_uploaded) {
+      this.reliefForm.get('secondInstallmentPfmsPortalUploaded')?.setValue(InstallementDetails.pfms_portal_uploaded);
     }
-    if(InstallementDetails.date_of_disbursement){
-      const formattedDate = InstallementDetails.date_of_disbursement.split('T')[0]; 
+    if (InstallementDetails.date_of_disbursement) {
+      const formattedDate = InstallementDetails.date_of_disbursement.split('T')[0];
       this.reliefForm.get('secondInstallmentDateOfDisbursement')?.setValue(formattedDate);
     }
-    if(InstallementDetails.upload_document){
+    if (InstallementDetails.upload_document) {
       this.existingFilePath_relief_2 = InstallementDetails.upload_document;
       this.showFileInput_2 = false;
       this.reliefForm.get('secondInstallmentUploadDocument')?.setValue(InstallementDetails.upload_document);
     }
   }
 
-  ThirdrelifDetails(InstallementDetails : any){
+  ThirdrelifDetails(InstallementDetails: any) {
     console.log('function called')
-    if(InstallementDetails.file_number){
-      this.reliefForm.get('thirdInstallmentProceedingsFileNumber')?.setValue(InstallementDetails.file_number); 
+    if (InstallementDetails.file_number) {
+      this.reliefForm.get('thirdInstallmentProceedingsFileNumber')?.setValue(InstallementDetails.file_number);
     }
-    if(InstallementDetails.file_date){
-      const formattedDate = InstallementDetails.file_date.split('T')[0]; 
+    if (InstallementDetails.file_date) {
+      const formattedDate = InstallementDetails.file_date.split('T')[0];
       this.reliefForm.get('thirdInstallmentProceedingsFileDate')?.setValue(formattedDate);
     }
-    if(InstallementDetails.pfms_portal_uploaded){
-      this.reliefForm.get('thirdInstallmentPfmsPortalUploaded')?.setValue(InstallementDetails.pfms_portal_uploaded); 
+    if (InstallementDetails.pfms_portal_uploaded) {
+      this.reliefForm.get('thirdInstallmentPfmsPortalUploaded')?.setValue(InstallementDetails.pfms_portal_uploaded);
     }
-    if(InstallementDetails.date_of_disbursement){
-      const formattedDate = InstallementDetails.date_of_disbursement.split('T')[0]; 
+    if (InstallementDetails.date_of_disbursement) {
+      const formattedDate = InstallementDetails.date_of_disbursement.split('T')[0];
       this.reliefForm.get('thirdInstallmentDateOfDisbursement')?.setValue(formattedDate);
     }
-    if(InstallementDetails.upload_document){
+    if (InstallementDetails.upload_document) {
       this.existingFilePath_relief_3 = InstallementDetails.upload_document;
       this.showFileInput_3 = false;
       this.reliefForm.get('thirdInstallmentUploadDocument')?.setValue(InstallementDetails.upload_document);
@@ -1104,14 +1129,14 @@ export class ReliefComponent implements OnInit {
 
   uploadfirstInstallmentDocument(event: any): void {
     const file = event.target.files[0];  // Get the first selected file
-  
+
     if (file) {
-   
+
       // Patch the file into the form (this assumes you have the form control set up correctly)
       this.reliefForm.patchValue({
         firstInstallmentUploadDocument: file,  // Storing the file in the form control
       });
-  
+
       // Optionally, display the file name
       console.log('File selected:', file.name);
     } else {
@@ -1122,14 +1147,14 @@ export class ReliefComponent implements OnInit {
 
   uploadSecondInstallmentDocument(event: any): void {
     const file = event.target.files[0];  // Get the first selected file
-  
+
     if (file) {
-   
+
       // Patch the file into the form (this assumes you have the form control set up correctly)
       this.reliefForm.patchValue({
         secondInstallmentUploadDocument: file,  // Storing the file in the form control
       });
-  
+
       // Optionally, display the file name
       console.log('File selected:', file.name);
     } else {
@@ -1139,14 +1164,14 @@ export class ReliefComponent implements OnInit {
 
   uploadThirdInstallmentDocument(event: any): void {
     const file = event.target.files[0];  // Get the first selected file
-  
+
     if (file) {
-   
+
       // Patch the file into the form (this assumes you have the form control set up correctly)
       this.reliefForm.patchValue({
         thirdInstallmentUploadDocument: file,  // Storing the file in the form control
       });
-  
+
       // Optionally, display the file name
       console.log('File selected:', file.name);
     } else {
@@ -1157,19 +1182,19 @@ export class ReliefComponent implements OnInit {
   async uploadMultipleFiles(files: File | File[]): Promise<string[]> {
     // If no file is provided, return an empty array
     if (!files) return [];
-  
+
     // Ensure files is always an array
     const fileArray = Array.isArray(files) ? files : [files];
-  
+
     // Filter out any invalid file values (optional, to prevent processing invalid data)
     const validFiles = fileArray.filter(file => file instanceof File);
-    
+
     // If no valid files remain, stop execution
     if (validFiles.length === 0) return [];
-  
+
     // Upload each valid file
     const uploadPromises = validFiles.map(file => this.uploadFile(file));
-  
+
     return Promise.all(uploadPromises);
   }
 
@@ -1189,8 +1214,8 @@ export class ReliefComponent implements OnInit {
       formData.append('file', file);
 
       this.firService.uploadFile(formData).subscribe({
-        next: (response : any) => resolve(response.filePath),
-        error: (error : any) => reject(error)
+        next: (response: any) => resolve(response.filePath),
+        error: (error: any) => reject(error)
       });
     });
   }

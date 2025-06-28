@@ -2249,7 +2249,8 @@ removeFIRCopy(): void {
 
     if(response && response.data){
       this.loadPoliceStations(response.data.police_city,response.data.police_station);
-
+      this.isMf = response.data.HascaseMF;
+      this.mfChange();
       // step 1 load
     if(response.data.police_city){
       this.firForm.get('policeCity')?.setValue(response.data.police_city);
@@ -3594,6 +3595,7 @@ removeFIRCopy(): void {
     const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
     const firData = {
       firId: this.firId,
+      HascaseMF: this.isMf,
       victimsRelief: this.victimsRelief.value.map((relief: any) => ({
 
         victimId:relief.victimId,
@@ -7727,8 +7729,12 @@ isStep1Valid(): boolean {
     const step3 = this.isStep3Valid();
     const step4 = this.isStep4Valid();
     const step5 = this.isStep5Valid();
-  
-    return step1 && step2 && step3 && step4 && step5;
+    if(this.isMf){
+      return step1 && step2 && step3 && step4
+    }
+    else{
+      return step1 && step2 && step3 && step4 && step5;
+    }
   }
   
 
@@ -8770,4 +8776,22 @@ lebelName(){
       this.firForm.get('upload_court_order')?.setValue(null);
       this.upload_court_order_path = '';
     }
+    isMf:boolean=false;
+    mfChange(){
+      if(this.isMf){
+        this.victimsRelief.disable();
+        this.totalCompensationControl.disable();
+        this.firForm.get('proceedingsFileNo')?.disable();
+        this.firForm.get('proceedingsDate')?.disable();
+        this.firForm.get('proceedingsFile')?.disable();
+      }
+      else{
+        this.victimsRelief.enable();
+        this.totalCompensationControl.enable();
+        this.firForm.get('proceedingsFileNo')?.enable();
+        this.firForm.get('proceedingsDate')?.enable();
+        this.firForm.get('proceedingsFile')?.enable();
+      }
+    }
+
 }

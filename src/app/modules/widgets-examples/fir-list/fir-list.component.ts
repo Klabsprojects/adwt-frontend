@@ -512,6 +512,7 @@ export class FirListComponent implements OnInit {
 
     { label: 'Created By', field: 'created_by', sortable: true, visible: true },
     { label: 'Created At', field: 'created_at', sortable: true, visible: true },
+    { label: 'Last Edited Date', field: 'modified_at', sortable: true, visible: true },
     { label: 'Data Entry Status', field: 'status', sortable: false, visible: true },
     { label: 'Case Status', field: 'Case_Status', sortable: false, visible: true },
     { label: 'Actions', field: 'actions', sortable: false, visible: true },
@@ -1763,7 +1764,10 @@ export class FirListComponent implements OnInit {
 
 
   // Get status text based on status value
-  getStatusText(status: number): string {
+  getStatusText(status: number,HascaseMF:any): string {
+    if (HascaseMF) {
+    status = 9;
+  }
     const statusTextMap = {
       0: 'FIR Draft',
       1: 'Pending | FIR Stage | Step 1 Completed',

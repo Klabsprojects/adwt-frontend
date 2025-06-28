@@ -274,7 +274,8 @@
                   />
                 </div>
                   <!-- Submit Button -->
-          <div class="text-left mt-4">
+          <div class="d-flex justify-content-start align-items-center mt-4">
+            <button type="submit" class="btn btn-secondary me-2" (click)="onInstallmentSubmitSave('step1')" [disabled]="isDisable">Save as Draft</button>
             <button type="submit" class="btn btn-primary" (click)="onFirstInstallmentSubmit()" [disabled]="isDisable">Submit</button>
           </div>
               </div>
@@ -454,7 +455,8 @@
                       formControlName="secondInstallmentDateOfDisbursement"
                     />
                   </div>
-                  <div class="text-left mt-4">
+                  <div class="d-flex justify-content-start align-items-center mt-4">
+                    <button type="submit" class="btn btn-secondary me-2" (click)="onInstallmentSubmitSave('step2')" [disabled]="isDisable">Save as Draft</button>
                     <button type="submit" class="btn btn-primary" (click)="onSecondInstallmentSubmit()">Submit</button>
                   </div>
 
@@ -635,7 +637,8 @@
                 </div>
 
                 <!-- Submit Button -->
-                <div class="text-left mt-4">
+                <div class="d-flex justify-content-start align-items-center mt-4">
+                  <button type="submit" class="btn btn-secondary me-2" (click)="onInstallmentSubmitSave('step3')" [disabled]="isDisable">Save as Draft</button>
                   <button type="submit" class="btn btn-primary"(click)="onThirdInstallmentSubmit()" >Submit</button>
                 </div>
               </div>
