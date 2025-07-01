@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { Md5 } from 'ts-md5';
 
 enum ErrorStates {
   NotSubmitted,
@@ -105,7 +106,7 @@ export class ForgotPasswordComponent implements OnInit {
     }
 
     this.isLoading$ = this.authService.isLoading$;
-    this.authService.verifyOtp(this.forgotPasswordForm.value.email, this.otpForm.value.otp).subscribe(
+    this.authService.verifyOtp(this.forgotPasswordForm.value.email,  this.otpForm.value.otp).subscribe(
       (result: any) => {
         if (result) {
           this.errorState = ErrorStates.NoError;
@@ -135,7 +136,7 @@ export class ForgotPasswordComponent implements OnInit {
     }
 
     this.isLoading$ = this.authService.isLoading$;
-    this.authService.resetPassword(this.forgotPasswordForm.value.email, this.resetPasswordForm.value.password).subscribe(
+    this.authService.resetPassword(this.forgotPasswordForm.value.email, Md5.hashStr(this.resetPasswordForm.value.password) ).subscribe(
       (result: any) => {
         if (result) {
           this.errorState = ErrorStates.NoError;

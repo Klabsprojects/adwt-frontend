@@ -202,4 +202,18 @@ export class CourtComponent implements OnInit{
       event.preventDefault(); // Prevent the character from being entered
     }
   }
+
+    disallowedPattern = /[<>"'*\/\\|()]/g;
+allowOnlyValidCharacters(event: KeyboardEvent) {
+  const char = event.key;
+
+  if (this.disallowedPattern.test(char)) {
+    event.preventDefault(); // Block the keypress
+  }
+}
+// Optional cleanup if some invalid characters still get in (like from paste)
+onInputChange(event: Event) {
+  const input = event.target as HTMLInputElement;
+  input.value = input.value.replace(this.disallowedPattern, '');
+}
 }

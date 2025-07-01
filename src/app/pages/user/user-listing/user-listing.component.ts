@@ -7,6 +7,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { filter } from 'rxjs/operators';
 import { VmcMeetingService } from 'src/app/services/vmc-meeting.service';
+import { Md5 } from 'ts-md5';
 
 @Component({
   selector: 'app-user-listing',
@@ -219,7 +220,9 @@ export class UserListingComponent implements OnInit {
         const newUser = {
           ...this.user,
           user_role_name: this.user.user_role_name,
-          createdBy: this.currentUser.role
+          createdBy: this.currentUser.role,
+          password : Md5.hashStr(this.user.password),
+          confirmPassword :  Md5.hashStr(this.user.confirmPassword)
         };
 
         this.userService.createUser(newUser).subscribe(
@@ -350,4 +353,18 @@ export class UserListingComponent implements OnInit {
       event.preventDefault(); // Prevent the character from being entered
     }
   }
+
+disallowedPattern = /[<>"'*\/\\|()]/g;
+allowOnlyValidCharacters(event: KeyboardEvent) {
+  const char = event.key;
+
+  if (this.disallowedPattern.test(char)) {
+    event.preventDefault(); // Block the keypress
+  }
+}
+// Optional cleanup if some invalid characters still get in (like from paste)
+onInputChange(event: Event) {
+  const input = event.target as HTMLInputElement;
+  input.value = input.value.replace(this.disallowedPattern, '');
+}
 }

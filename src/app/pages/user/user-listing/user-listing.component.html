@@ -124,7 +124,7 @@
         <!-- Other Form Fields -->
         <div class="col-md-12 mt-3">
           <label for="name" class="form-label">Name</label>
-          <input type="text" class="form-control" id="name" name="name" (keypress)="allowOnlyLetters($event)" [(ngModel)]="user.name" placeholder="Enter Name" required>
+          <input type="text" class="form-control" id="name" name="name" (keypress)="allowOnlyLetters($event)"  (input)="onInputChange($event)" [(ngModel)]="user.name" placeholder="Enter Name" required>
         </div>
 
         <div class="col-md-12 mt-3">

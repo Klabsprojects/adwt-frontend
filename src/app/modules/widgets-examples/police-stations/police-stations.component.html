@@ -98,6 +98,7 @@
             required
             #city_or_districtCtrl="ngModel"
              (keypress)="allowOnlyLetters($event)"
+             (input)="onInputChange($event)"
             [ngClass]="{ 'is-invalid': city_or_districtCtrl.invalid && city_or_districtCtrl.touched }"
           />
           <div *ngIf="city_or_districtCtrl.invalid && city_or_districtCtrl.touched" class="invalid-feedback">
@@ -118,6 +119,7 @@
             required
             #station_nameCtrl="ngModel"
              (keypress)="allowOnlyLetters($event)"
+             (input)="onInputChange($event)"
             [ngClass]="{ 'is-invalid': station_nameCtrl.invalid && station_nameCtrl.touched }"
           />
           <div *ngIf="station_nameCtrl.invalid && station_nameCtrl.touched" class="invalid-feedback">
@@ -137,6 +139,7 @@
             required
             #circleCtrl="ngModel"
              (keypress)="allowOnlyLetters($event)"
+             (input)="onInputChange($event)"
             [ngClass]="{ 'is-invalid': circleCtrl.invalid && circleCtrl.touched }"
           />
           <div *ngIf="circleCtrl.invalid && circleCtrl.touched" class="invalid-feedback">

@@ -169,7 +169,7 @@
         <div class="col-md-12 mt-3">
           <label for="name" class="form-label">Name</label><span class="required"></span>
           <input type="text" class="form-control" id="name" name="name" [(ngModel)]="member.name"
-            placeholder="Enter Name" required  (keypress)="allowOnlyLetters($event)" />
+            placeholder="Enter Name" required  (keypress)="allowOnlyLetters($event)" (input)="onInputChange($event)" />
         </div>
 
         <!-- Designation -->
