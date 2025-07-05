@@ -159,6 +159,13 @@ export class MonthlyReportComponent implements OnInit {
       sortDirection: null,
     },
     {
+      label: 'Modified AT',
+      field: 'modified_at',
+      sortable: true,
+      visible: true,
+      sortDirection: null,
+    },
+    {
       field: 'natureOfOffence',
       label: 'Nature of Offence',
       visible: true,
@@ -310,6 +317,9 @@ export class MonthlyReportComponent implements OnInit {
   selectedFromDate:any="";
   selectedToDate:any="";
   selectedCreatedAt:any="";
+  selectedCreatedAtToDate:any="";
+  selectedModifiedAt:any="";
+  selectedModifiedAtToDate:any="";
   constructor(
     private cdr: ChangeDetectorRef,
     private reportsCommonService: ReportsCommonService,
@@ -419,7 +429,7 @@ export class MonthlyReportComponent implements OnInit {
           //console.log('Monthly Reports:', response.data); // Debugging
           // Transform API response to match frontend structure
           this.reportData = response.data.map((item: { police_city: any; police_station: any; fir_number: any; offence_committed: any; scst_sections: any; number_of_victim: any; court_district: any; court_name: any; case_number: any; status: number; under_investigation_case_days: any; pending_trial_case_days: any; previous_month_reason_for_status: any; current_month_reason_for_status: any; fir_id : any;
-            revenue_district : any; police_zone : any; community : any; caste : any; date_of_registration : any; created_by : any; created_at : any;
+            revenue_district : any; police_zone : any; community : any; caste : any; date_of_registration : any; created_by : any; created_at : any; modified_at : any;
            }, index: number) => ({
             sl_no: index + 1,
             policeCity: item.police_city,
@@ -445,6 +455,7 @@ export class MonthlyReportComponent implements OnInit {
             date_of_registration : item.date_of_registration,
             created_by : item.created_by,
             created_at : item.created_at,
+            modified_at : item.modified_at,
             filter_status : item.status
           }));
           // Update filteredData to reflect the API data
@@ -508,14 +519,14 @@ export class MonthlyReportComponent implements OnInit {
     }
 
     //createdAt filter
-    if (this.selectedCreatedAt && this.selectedCreatedAt !== '') {
-      const createdAt = new Date(item.created_at).toDateString();
-      const selectedDate = new Date(this.selectedCreatedAt).toDateString();
+    // if (this.selectedCreatedAt && this.selectedCreatedAt !== '') {
+    //   const createdAt = new Date(item.created_at).toDateString();
+    //   const selectedDate = new Date(this.selectedCreatedAt).toDateString();
       
-      if (createdAt !== selectedDate) {
-        return false;
-      }
-    }
+    //   if (createdAt !== selectedDate) {
+    //     return false;
+    //   }
+    // }
 
     // Date range filter
     if (this.selectedFromDate || this.selectedToDate) {
@@ -539,6 +550,60 @@ export class MonthlyReportComponent implements OnInit {
       const fromDate = new Date(this.selectedFromDate);
       const toDate = new Date(this.selectedToDate);
       if (registrationDate < fromDate || registrationDate > toDate) {
+        return false;
+      }
+    }
+  }
+
+
+     if (this.selectedCreatedAt || this.selectedCreatedAtToDate) {
+    const createdAT = new Date(item.created_at);
+    
+    if (this.selectedCreatedAt && !this.selectedCreatedAtToDate) {
+      const fromDate = new Date(this.selectedCreatedAt);
+      if (createdAT < fromDate) {
+        return false;
+      }
+    }
+    
+    if (this.selectedCreatedAtToDate && !this.selectedCreatedAt) {
+      const toDate = new Date(this.selectedCreatedAtToDate);
+      if (createdAT > toDate) {
+        return false;
+      }
+    }
+
+    if (this.selectedCreatedAtToDate && this.selectedCreatedAt) {
+      const fromDate = new Date(this.selectedCreatedAt);
+      const toDate = new Date(this.selectedCreatedAtToDate);
+      if (createdAT < fromDate || createdAT > toDate) {
+        return false;
+      }
+    }
+  }
+
+
+    if (this.selectedModifiedAt || this.selectedModifiedAtToDate) {
+    const modifiedAT = new Date(item.modified_at);
+    
+    if (this.selectedModifiedAt && !this.selectedModifiedAtToDate) {
+      const fromDate = new Date(this.selectedModifiedAt);
+      if (modifiedAT < fromDate) {
+        return false;
+      }
+    }
+    
+    if (this.selectedModifiedAtToDate && !this.selectedModifiedAt) {
+      const toDate = new Date(this.selectedModifiedAtToDate);
+      if (modifiedAT > toDate) {
+        return false;
+      }
+    }
+
+    if (this.selectedModifiedAtToDate && this.selectedModifiedAt) {
+      const fromDate = new Date(this.selectedModifiedAt);
+      const toDate = new Date(this.selectedModifiedAtToDate);
+      if (modifiedAT < fromDate || modifiedAT > toDate) {
         return false;
       }
     }
@@ -662,6 +727,9 @@ export class MonthlyReportComponent implements OnInit {
       this.selectedFromDate='';
       this.selectedToDate = '';
       this.selectedCreatedAt = '';
+      this.selectedCreatedAtToDate = '';
+      this.selectedModifiedAt = '';
+      this.selectedModifiedAtToDate = '';
      this.filteredData = [...this.reportData]; 
   }
 

@@ -79,7 +79,7 @@ export class VmcmeetingComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeFiscalYears();
-    this.selectedYear = this.availableYears[0]; // Default to the first fiscal year
+    this.selectedYear = this.availableYears[1]; // Default to the first fiscal year
     this.selectedCommittee = this.committees.find(
       (committee) => committee.name === 'DLVMC'
     );
@@ -272,7 +272,7 @@ export class VmcmeetingComponent implements OnInit {
     }
 
   initializeFiscalYears(): void {
-    const currentYear = new Date().getFullYear();
+    const currentYear = new Date().getFullYear() - 1;
     const endYear = currentYear + 5; // Extend to show up to 5 years in the future
     console.log('Initializing fiscal years:');
 

@@ -385,6 +385,10 @@ export class FirListComponent implements OnInit {
   selectedComplaintReceivedType: string = '';
   startDate: string = '';
   endDate: string = '';
+  CreatedATstartDate: string = '';
+  CreatedATendDate: string = '';
+  ModifiedATstartDate: string = '';
+  ModifiedATDate: string = '';
   selectedUIPT: string = '';
 
 
@@ -501,7 +505,7 @@ export class FirListComponent implements OnInit {
     { label: 'Complaint Receiver Name', field: 'complaintReceiverName', sortable: true, visible: false },
     { label: 'Officer Designation', field: 'officer_designation', sortable: true, visible: false },
     { label: 'Place of Occurrence', field: 'place_of_occurrence', sortable: true, visible: false },
-    { label: 'Date of Registration', field: 'date_of_registration', sortable: true, visible: false },
+    { label: 'Date of Registration', field: 'date_of_registration', sortable: true, visible: true },
     { label: 'Time of Registration', field: 'time_of_registration', sortable: true, visible: false },
 
     { label: 'Date of Occurrence', field: 'date_of_occurrence', sortable: true, visible: false },
@@ -1632,6 +1636,22 @@ export class FirListComponent implements OnInit {
       params.end_date = this.endDate;
     }
 
+    if (this.CreatedATstartDate) {
+      params.CreatedATstartDate = this.CreatedATstartDate;
+    }
+
+    if (this.CreatedATendDate) {
+      params.CreatedATendDate = this.CreatedATendDate;
+    }
+
+    if (this.ModifiedATstartDate) {
+      params.ModifiedATstartDate = this.ModifiedATstartDate;
+    }
+
+    if (this.ModifiedATDate) {
+      params.ModifiedATDate = this.ModifiedATDate;
+    }
+
     if (this.selectedUIPT) {
       params.UIPT = this.selectedUIPT;
     }
@@ -1727,6 +1747,10 @@ export class FirListComponent implements OnInit {
     this.RegistredYear = '';
     this.startDate = '';
     this.endDate = '';
+    this.CreatedATstartDate = '';
+    this.CreatedATendDate = '';
+    this.ModifiedATstartDate = '';
+    this.ModifiedATDate = '';
     this.selectedUIPT = '';
     this.applyFilters();
   }

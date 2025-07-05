@@ -122,8 +122,25 @@
       <!-- creation Date -->
        <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
         <input type="date" class="form-control" [(ngModel)]="selectedCreatedAt" (change)="applyFilters()"/>
-        <span class="tooltip-text">Created At Date Filter</span>
+        <span class="tooltip-text">Created At From date</span>
       </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedCreatedAtToDate" (change)="applyFilters()"/>
+        <span class="tooltip-text">Created At to date</span>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedModifiedAt" (change)="applyFilters()"/>
+        <span class="tooltip-text">Modified At From date</span>
+      </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="selectedModifiedAtToDate" (change)="applyFilters()"/>
+        <span class="tooltip-text">Modified At to date</span>
+      </div>
+
+
       <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
         <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
       </div>
