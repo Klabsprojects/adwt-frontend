@@ -7,6 +7,7 @@ import { map } from 'rxjs/operators';
 import * as FileSaver from 'file-saver';
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+import * as ExcelJS from 'exceljs';
 
 @Injectable({
   providedIn: 'root',
@@ -126,6 +127,95 @@ export class ReportsCommonService {
       console.error('Export failed:', error);
     }
   }
+  async exportToExcelStyled(
+  filteredData: any[],
+  displayedColumns: any[],
+  fileName: string
+): Promise<void> {
+  try {
+    if (filteredData.length === 0) {
+      alert('No Data Found');
+      return;
+    }
+
+    const visibleColumns = displayedColumns.filter(column => column.visible);
+    const exportData = filteredData.map((item, index) => {
+      const exportedItem: any = { 'S.No': index + 1 };
+      visibleColumns.forEach((column) => {
+        const key = column.field;
+        const label = column.label;
+        if (key === 'sl_no') return;
+        if (key in item) {
+          if (key === 'uiPendingDays' || key === 'ptPendingDays') {
+            exportedItem[label] = this.formatPendingDays(item[key]);
+          } else {
+            exportedItem[label] = item[key];
+          }
+        }
+      });
+      return exportedItem;
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Styled Export');
+
+    const excelColumns = [{ header: 'S.No', key: 'S.No', width: 10 }];
+    visibleColumns.forEach(col => {
+      excelColumns.push({ header: col.label, key: col.label, width: 20 });
+    });
+    worksheet.columns = excelColumns;
+
+    // Header style
+    const headerStyle = {
+      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '1F497D' } },
+      font: { color: { argb: 'FFFFFF' }, bold: true },
+      alignment: { horizontal: 'center', vertical: 'middle' },
+      border: {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      }
+    };
+
+    // Apply header style
+    worksheet.getRow(1).eachCell((cell: any) => {
+      cell.style = headerStyle;
+    });
+
+    // Add data rows with zebra striping
+    exportData.forEach((data, index) => {
+      const row = worksheet.addRow(data);
+
+      const bgColor = index % 2 === 0 ? 'FFFFFF' : 'F2F2F2'; // White and light gray
+
+      row.eachCell((cell: any) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: bgColor }
+        };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      });
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+    FileSaver.saveAs(blob, `${fileName}.xlsx`);
+  } catch (error) {
+    console.error('Styled export failed:', error);
+  }
+}
+
+
 
   // Converts JSON data into an Excel worksheet and triggers the download.
   private async exportExcel(list: any[],fileName: string): Promise<void> {

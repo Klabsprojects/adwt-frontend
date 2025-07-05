@@ -530,7 +530,8 @@ export class MonthlyReportComponent implements OnInit {
 
     // Date range filter
     if (this.selectedFromDate || this.selectedToDate) {
-    const registrationDate = new Date(item.date_of_registration);
+      const registrationDateRaw = item.is_case_altered === 'Yes' && item.altered_date ? item.altered_date : item.date_of_registration;
+    const registrationDate = new Date(registrationDateRaw);
     
     if (this.selectedFromDate && !this.selectedToDate) {
       const fromDate = new Date(this.selectedFromDate);
@@ -796,7 +797,7 @@ export class MonthlyReportComponent implements OnInit {
 
   // Download Reports
   async onBtnExport(): Promise<void> {
-    await this.reportsCommonService.exportToExcel(
+    await this.reportsCommonService.exportToExcelStyled(
       this.filteredData,
       this.displayedColumns,
       'UI&PT-Reports'
