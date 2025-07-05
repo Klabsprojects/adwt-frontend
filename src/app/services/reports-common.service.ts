@@ -138,34 +138,44 @@ export class ReportsCommonService {
       return;
     }
 
-    const visibleColumns = displayedColumns.filter(column => column.visible);
+    // Filter out hidden columns and remove only 'sl_no'
+    const visibleColumns = displayedColumns.filter(
+      (column) => column.visible && column.field !== 'sl_no' && column.field !== 'action'
+    );
+
+    // Prepare data for export
     const exportData = filteredData.map((item, index) => {
-      const exportedItem: any = { 'S.No': index + 1 };
+      const exportedItem: any = { 'S.No': index + 1 }; // Keep S.No
       visibleColumns.forEach((column) => {
         const key = column.field;
         const label = column.label;
-        if (key === 'sl_no') return;
+
         if (key in item) {
           if (key === 'uiPendingDays' || key === 'ptPendingDays') {
             exportedItem[label] = this.formatPendingDays(item[key]);
           } else {
             exportedItem[label] = item[key];
           }
+        } else {
+          exportedItem[label] = ''; // Handle missing fields
         }
       });
       return exportedItem;
     });
 
+    // Create workbook and worksheet
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Styled Export');
 
-    const excelColumns = [{ header: 'S.No', key: 'S.No', width: 10 }];
-    visibleColumns.forEach(col => {
-      excelColumns.push({ header: col.label, key: col.label, width: 20 });
-    });
+    // Define columns
+    const excelColumns = Object.keys(exportData[0]).map((key) => ({
+      header: key,
+      key,
+      width: 20
+    }));
     worksheet.columns = excelColumns;
 
-    // Header style
+    // Define header style
     const headerStyle = {
       fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '1F497D' } },
       font: { color: { argb: 'FFFFFF' }, bold: true },
@@ -183,13 +193,12 @@ export class ReportsCommonService {
       cell.style = headerStyle;
     });
 
-    // Add data rows with zebra striping
+    // Add data rows with zebra striping and full cell styling
     exportData.forEach((data, index) => {
       const row = worksheet.addRow(data);
+      const bgColor = index % 2 === 0 ? 'FFFFFF' : 'F2F2F2';
 
-      const bgColor = index % 2 === 0 ? 'FFFFFF' : 'F2F2F2'; // White and light gray
-
-      row.eachCell((cell: any) => {
+      row.eachCell({ includeEmpty: true }, (cell: any) => {
         cell.fill = {
           type: 'pattern',
           pattern: 'solid',
@@ -205,6 +214,7 @@ export class ReportsCommonService {
       });
     });
 
+    // Export Excel file
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -214,6 +224,8 @@ export class ReportsCommonService {
     console.error('Styled export failed:', error);
   }
 }
+
+
 
 
 
