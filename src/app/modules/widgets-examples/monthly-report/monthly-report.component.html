@@ -986,16 +986,21 @@
 
 <ng-template #content let-modal>
   <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">{{getCurrentMonthShort()}}</h4>
+    <!-- <h4 class="modal-title" id="modal-basic-title">{{getCurrentMonthShort()}}</h4> -->
+    <h4 class="modal-title" id="modal-basic-title">Fir Number : {{fir_number}}</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
     <div class="modal-body">
       <label class="form-label" for="name">Reason</label>
       <!-- <textarea id="name" class="form-control" name="name"></textarea> -->
-      <textarea class="form-control h-auto p-1 mr-2 float-left"
-        style="min-height: 70px;;border: 1px solid #ccc;width:95%" [(ngModel)]="reason_Update" #text="ngModel"
-        name="text"></textarea>
+      <select [(ngModel)]="selectedReason" class="form-select" [(ngModel)]="reason_Update">
+          <option value="" disabled selected>Select a reason</option>
+          <option *ngFor="let reason of reasons" [value]="reason.name">{{ reason.name }}</option>
+      </select>
+      <textarea class="form-control h-auto p-1 mr-2 float-left mt-3 w-100"
+        style="min-height: 70px;;border: 1px solid #ccc;" [(ngModel)]="remarks" #text="ngModel"
+        name="text" *ngIf="selectedReason=='Others'"></textarea>
     </div>
   </div>
   <div class="modal-footer">

@@ -136,9 +136,9 @@ export class MonthlyReportService {
     return this.http.get(`${this.baseUrl}/GetConvictionTypeRepot`, { params });
   }
 
-  MonnthlyUpdate(fir_id: any, Reason : any): Observable<any[]> {
+  MonnthlyUpdate(fir_id: any, Reason : any, remark:any): Observable<any[]> {
     const allDataUrl = `${this.baseUrl}/MonnthlyUpdate`;
-    const body = {Reason : Reason, fir_id : fir_id}
+    const body = {Reason : Reason, fir_id : fir_id, remarks:remark}
     return this.http.put<any[]>(allDataUrl, body); // 👈 Empty body, headers in 3rd param
   }
 

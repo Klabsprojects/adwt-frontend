@@ -255,7 +255,7 @@ export class MonthlyReportComponent implements OnInit {
   ReportType = 'General';
   currentYear = new Date().getFullYear();
   yearColumns1: number[] = [];
-
+  remarks = '';
   reason_Update = '';
   fir_id = ''
 
@@ -344,6 +344,7 @@ export class MonthlyReportComponent implements OnInit {
     this.selectedColumns = this.displayedColumns.map((column) => column.field);
     // this.getReportData();
     this.getDropdowns();
+    this.get_reasons();
   }
 
   // new
@@ -1777,9 +1778,12 @@ lastRow.eachCell((cell: any) => {
 
 // table 5
 
-
+fir_number:any;
 openMessageBox(report : any) {
+  console.log('report',report);
   this.fir_id = report.fir_id;
+  this.fir_number = report.fir_number;
+  // fir_number
   // const modalElement = document.getElementById('fbmessage');
   // if (modalElement) {
   //   const modal = new bootstrap.Modal(modalElement);
@@ -1813,11 +1817,11 @@ CloseMessageBox() {
 }
 
 
-
 MonnthlyUpdateSubmit() {
   console.log('reason_Update', this.reason_Update, this.fir_id)
+  this.reason_Update = this.selectedReason != 'Others' ? this.selectedReason : this.reason_Update;
   if(this.fir_id && this.reason_Update) {
-    this.monthlyReportService.MonnthlyUpdate(this.fir_id, this.reason_Update).subscribe({
+    this.monthlyReportService.MonnthlyUpdate(this.fir_id, this.reason_Update,this.remarks).subscribe({
       next: (response: any) => {
         // Close using JavaScript/DOM instead of Bootstrap Modal method
         // const modalElement = document.getElementById('fbmessage');
@@ -1848,6 +1852,13 @@ MonnthlyUpdateSubmit() {
     });
   }
 }
+selectedReason:any;
+public reasons:any = [];
+  get_reasons(){
+    this.dashboardService.userGetMethod('monthlyreport/getReasonCategories').subscribe((res:any)=>{
+      this.reasons = res;
+    })
+  }
 
 getCurrentMonthShort(): string {
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
