@@ -856,6 +856,18 @@ loadAccusedCommunities(): void {
     this.firForm.get('caseType')?.valueChanges.subscribe(() => {
       this.handleCaseTypeChange();
    });
+   this.firForm.get('altered_date')?.valueChanges.subscribe((newDate: string) => {
+    if (newDate && this.firForm.get('is_case_altered')?.value === 'Yes') {
+        this.firForm.get('dateOfRegistration')?.setValue(newDate);
+      }
+    });
+
+    this.firForm.get('is_case_altered')?.valueChanges.subscribe((alteredValue: string) => {
+    const alteredDate = this.firForm.get('altered_date')?.value;
+    if (alteredValue === 'Yes' && alteredDate) {
+        this.firForm.get('dateOfRegistration')?.setValue(alteredDate);
+    }
+    });
   }
     updateAntecedentsValidation(value: string): void {
       const antecedentsControl = this.firForm.get('antecedents');
