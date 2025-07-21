@@ -75,126 +75,412 @@ export class MonetaryReliefComponent implements OnInit {
   selectedToDate:any="";
 
   // Visible Columns Management
-  displayedColumns: {
-    label: string;
-    field: string;
-    sortable: boolean;
-    visible: boolean;
-    sortDirection: 'asc' | 'desc' | null;
-  }[] = [
+  // displayedColumns: {
+  //   label: string;
+  //   field: string;
+  //   sortable: boolean;
+  //   visible: boolean;
+  //   sortDirection: 'asc' | 'desc' | null;
+  // }[] = [
+  //   {
+  //     label: 'Sl. No.',
+  //     field: 'sl_no',
+  //     sortable: false,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //   {
+  //     label: 'FIR No.',
+  //     field: 'fir_id',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //    {
+  //     label: 'Revenue District',
+  //     field: 'revenue_district',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //    {
+  //     label: 'Police City',
+  //     field: 'police_city',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //     {
+  //     label: 'Police Zone',
+  //     field: 'police_zone',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //     {
+  //     label: 'Community',
+  //     field: 'community',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //     {
+  //     label: 'Caste',
+  //     field: 'caste',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //   {
+  //     label: 'Police Station Name',
+  //     field: 'police_station',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //     {
+  //     label: 'Reporting Date',
+  //     field: 'date_of_registration',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //   {
+  //     label: 'Nature of Offence',
+  //     field: 'nature_of_offence',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //   {
+  //     label: 'Data Entry Status',
+  //     field: 'status',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //   {
+  //     label: 'Case Status',
+  //     field: 'case_status',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //   {
+  //     label: 'Relief Status',
+  //     field: 'relief_status',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //   {
+  //     label: 'Victim Name',
+  //     field: 'victim_name',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //   {
+  //     label: 'Reason for Status (Previous Month)',
+  //     field: 'reason_previous_month',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  //   {
+  //     label: 'Reason for Status (Current Month)',
+  //     field: 'reason_current_month',
+  //     sortable: true,
+  //     visible: true,
+  //     sortDirection: null,
+  //   },
+  // ];
+
+displayedColumns: DisplayedColumn[] = [
+  // ✅ Ungrouped columns
+  {
+    label: 'Sl. No.',
+    field: 'sl_no',
+    group: null,
+    sortable: false,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'District',
+    field: 'district',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Police Division',
+    field: 'total_cases',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Police Station',
+    field: 'total_cases',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'FIR Number',
+    field: 'total_cases',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'FIR Date',
+    field: 'total_cases',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Nature of Offence',
+    field: 'total_cases',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Victim Name',
+    field: 'total_cases',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Gender',
+    field: 'total_cases',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Caste',
+    field: 'total_cases',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Sub Caste',
+    field: 'total_cases',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Date of proposal',
+    field: 'total_cases',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Relief Stage',
+    field: 'total_cases',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Relief Status',
+    field: 'total_cases',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  
+  // ✅ Group: CHARGESHEET
+  {
+    label: 'Proposal Date',
+    field: 'cs_proposal_sent',
+    group: 'Chargesheet Stage Relief (2nd Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'As per the Act',
+    field: 'cs_relief_given',
+    group: 'Chargesheet Stage Relief (2nd Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Ex-Gratia',
+    field: 'cs_relief_pending',
+    group: 'Chargesheet Stage Relief (2nd Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Total - Chargesheet Stage',
+    field: 'cs_relief_pending',
+    group: 'Chargesheet Stage Relief (2nd Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
     {
-      label: 'Sl. No.',
-      field: 'sl_no',
-      sortable: false,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'FIR No.',
-      field: 'fir_id',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-     {
-      label: 'Revenue District',
-      field: 'revenue_district',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-     {
-      label: 'Police City',
-      field: 'police_city',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-      {
-      label: 'Police Zone',
-      field: 'police_zone',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-      {
-      label: 'Community',
-      field: 'community',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-      {
-      label: 'Caste',
-      field: 'caste',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Police Station Name',
-      field: 'police_station',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-      {
-      label: 'Reporting Date',
-      field: 'date_of_registration',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Nature of Offence',
-      field: 'nature_of_offence',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Data Entry Status',
-      field: 'status',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Case Status',
-      field: 'case_status',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Relief Status',
-      field: 'relief_status',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Victim Name',
-      field: 'victim_name',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Reason for Status (Previous Month)',
-      field: 'reason_previous_month',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Reason for Status (Current Month)',
-      field: 'reason_current_month',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-  ];
+    label: '2nd Stage Disbursement Date',
+    field: 'cs_relief_pending',
+    group: 'Chargesheet Stage Relief (2nd Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  // ✅ Group: FIR
+  {
+    label: 'Proposal Date',
+    field: 'fir_proposal_sent',
+    group: 'FIR Stage Relief (1st Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'As per the Act',
+    field: 'fir_relief_given',
+    group: 'FIR Stage Relief (1st Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Ex-Gratia',
+    field: 'fir_relief_pending',
+    group: 'FIR Stage Relief (1st Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+   {
+    label: 'Total - FIR Stage',
+    field: 'fir_relief_pending',
+    group: 'FIR Stage Relief (1st Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: '1st Stage Disbursement Date',
+    field: 'fir_relief_pending',
+    group: 'FIR Stage Relief (1st Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  // ✅ Group: TRIAL Stage (spelling corrected from "TRAIL")
+  {
+    label: 'Proposal Date',
+    field: 'cs_proposal_sent',
+    group: 'Final Stage Relief (3rd Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'As per the Act',
+    field: 'cs_relief_given',
+    group: 'Final Stage Relief (3rd Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Ex-Gratia',
+    field: 'cs_relief_pending',
+    group: 'Final Stage Relief (3rd Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Total - Final Stage',
+    field: 'cs_relief_pending',
+    group: 'Final Stage Relief (3rd Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: '3rd Stage Disbursement Date',
+    field: 'cs_relief_pending',
+    group: 'Final Stage Relief (3rd Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+// ✅ Ungrouped "No. of Days since" columns
+{
+  label: 'No. of Days since 1st Stage Relief',
+  field: 'days_since_1st',
+  group: null,
+  sortable: true,
+  visible: true,
+  sortDirection: null,
+},
+{
+  label: 'No. of Days since 2nd latest Relief',
+  field: 'days_since_2nd',
+  group: null,
+  sortable: true,
+  visible: true,
+  sortDirection: null,
+},
+{
+  label: 'No. of Days since 3rd latest Relief',
+  field: 'days_since_3rd',
+  group: null,
+  sortable: true,
+  visible: true,
+  sortDirection: null,
+},
+{
+  label: 'Reason for Pending - Previous Month',
+  field: 'days_since_3rd',
+  group: null,
+  sortable: true,
+  visible: true,
+  sortDirection: null,
+},
+{
+  label: 'Reason for Pending - Current Month',
+  field: 'days_since_3rd',
+  group: null,
+  sortable: true,
+  visible: true,
+  sortDirection: null,
+},
+
+ 
+];
+
+
+
   selectedCaseStatus: string = '';
   selectedReliefStatus: string = '';
   currentSortField: string = '';
@@ -211,8 +497,20 @@ export class MonetaryReliefComponent implements OnInit {
     this.loader = true;
   }
 
+  groupedBySection: { [group: string]: DisplayedColumn[] } = {};
+  groupOrder = ['FIR Stage Relief (1st Stage)', 'Chargesheet Stage Relief (2nd Stage)', 'Final Stage Relief (3rd Stage)'];
+
   // Initializes component data and fetches necessary information on component load.
   ngOnInit(): void {
+    this.groupedBySection = this.groupOrder.reduce((acc, groupName) => {
+    const cols = this.displayedColumns.filter(
+      col => col.group === groupName && col.visible
+    );
+  if (cols.length > 0) {
+    acc[groupName] = cols;
+  }
+  return acc;
+}, {} as { [group: string]: DisplayedColumn[] });
     this.reportsCommonService
       .getAllData()
       .subscribe(({ districts, offences }) => {
@@ -507,4 +805,41 @@ export class MonetaryReliefComponent implements OnInit {
     });
   }
 
+  get ungroupedColumns(): DisplayedColumn[] {
+  return this.displayedColumns.filter(col => col.group === null && col.visible);
+}
+
+get preGroupedColumns(): DisplayedColumn[] {
+  return this.displayedColumns.filter(
+    col => col.group === null && col.visible && !this.isPostGroupColumn(col)
+  );
+}
+
+get postGroupedColumns(): DisplayedColumn[] {
+  return this.displayedColumns.filter(
+    col => col.group === null && col.visible && this.isPostGroupColumn(col)
+  );
+}
+
+// Helper function to detect ungrouped columns that come after the grouped sections
+isPostGroupColumn(col: DisplayedColumn): boolean {
+  const finalStageIndex = this.displayedColumns.findIndex(c =>
+    c.group === 'Final Stage Relief (3rd Stage)' &&
+    c.label === '3rd Stage Disbursement Date'
+  );
+
+  const colIndex = this.displayedColumns.indexOf(col);
+  return colIndex > finalStageIndex;
+}
+
+
+}
+
+ interface DisplayedColumn {
+  label: string;
+  field: string;
+  group: any;
+  sortable: boolean;
+  visible: boolean;
+  sortDirection: 'asc' | 'desc' | null;
 }

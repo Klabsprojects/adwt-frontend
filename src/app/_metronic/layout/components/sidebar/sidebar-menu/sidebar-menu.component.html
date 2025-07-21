@@ -303,6 +303,16 @@
             <span class="menu-title">Monetary Relief</span>
           </a>
         </div>
+
+        <div class="menu-item" *ngIf="hasPermission('mrf abstract')">
+          <a routerLink="/widgets-examples/mrf-abstract" class="menu-link without-sub" routerLinkActive="active">
+            <span class="menu-bullet">
+              <span class="bullet bullet-dot"></span>
+            </span>
+            <span class="menu-title">MRF Abstract</span>
+          </a>
+        </div>
+
         <div class="menu-item" *ngIf="hasPermission('additional relief reports')">
           <a routerLink="/widgets-examples/additional-relief-report" class="menu-link without-sub" routerLinkActive="active">
             <span class="menu-bullet">

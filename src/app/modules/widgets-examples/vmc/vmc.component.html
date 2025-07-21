@@ -258,8 +258,8 @@
             (ngModelChange)="onDistrictChange($event)" (change)="onDistrictChange($event)"
             [disabled]="isDistrictDisabled" required>
             <option value="" disabled>Select District</option>
-            <option *ngFor="let district of districts" [value]="district.district">
-              {{ district.district }}
+            <option *ngFor="let district of districts" [value]="district">
+              {{ district }}
             </option>
           </select>
         </div>

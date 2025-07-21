@@ -102,7 +102,7 @@ export class PermissionListingComponent implements OnInit {
       const permissionName = permission.permission_name.toLowerCase();
 
       // Strict matching for Reports
-      if (['reports', 'ui reports', 'monetary relief reports', 'additional relief reports'].some(sub => permissionName.includes(sub))) {
+      if (['reports', 'ui reports', 'monetary relief reports', 'mrf abstract','additional relief reports'].some(sub => permissionName.includes(sub))) {
         this.categorizedPermissions['Reports'].push(permission);
       }
       // Matching for Additional Relief

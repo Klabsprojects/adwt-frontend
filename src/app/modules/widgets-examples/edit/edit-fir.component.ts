@@ -2801,9 +2801,9 @@ removeFIRCopy(): void {
         this.firForm.get('uploadProceedings')?.setValue(response.data6.Commissionerate_file);
       }
 
-      if (response.data6.proceedings_file_no) {
-        this.firForm.get('proceedingsFileNo')?.setValue(response.data6.proceedings_file_no);
-      }
+      // if (response.data6.proceedings_file_no) {
+      //   this.firForm.get('proceedingsFileNo')?.setValue(response.data6.proceedings_file_no);
+      // }
 
       if (response.data6.proceedings_date) {
         const dateObj = new Date(response.data6.proceedings_date);

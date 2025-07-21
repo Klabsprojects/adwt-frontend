@@ -26,7 +26,7 @@ import { AdditionalReliefListComponent } from './additional-relief-list/addition
 import { PoliceStationsComponent } from './police-stations/police-stations.component';
 import { CourtComponent } from './court/court.component';
 import { MonthlyReportComponent } from './monthly-report/monthly-report.component';
-import { MonetaryReliefComponent } from './monetary-relief/monetary-relief.component';
+import { MonetaryReliefComponent } from './Monetary-relief/Monetary-relief.component';
 import { AdditionalReliefReportComponent } from './additional-relief-report/additional-relief-report.component';
 import { EditMonthlyReportComponent } from './edit-monthly-report/edit-monthly-report.component';
 import { EditMonetaryReliefComponent } from './edit-monetary-relief/edit-monetary-relief.component';
@@ -37,6 +37,7 @@ import { VmcmeetingComponent } from './vmcmeeting/vmcmeeting.component';
 import { VmcReportComponent } from './Vmc-Report/Vmc-Report.component';
 import { AlteredCaseListComponent } from './altered-case-list/altered-case-list.component';
 import { LegacyFirListComponent } from './legacy-fir-list/legacy-fir-list.component';
+import { MrfAbstractComponent } from './mrf-abstract/mrf-abstract.component';
 const routes: Routes = [
   {
     path: '',
@@ -69,6 +70,7 @@ const routes: Routes = [
         component: OffenceComponent,
       }, { path: 'mistake-of-fact', component: MistakeOfFactComponent }, { path: 'altered-case', component: AlteredCaseComponent }, { path: 'monthly-report', component: MonthlyReportComponent },
       { path: 'monetary-relief', component: MonetaryReliefComponent },
+      { path: 'mrf-abstract', component: MrfAbstractComponent },
       { path: 'additional-relief-report', component: AdditionalReliefReportComponent },
       { path: 'edit-monthly-report', component: EditMonthlyReportComponent },
       { path: 'edit-monetary-relief', component: EditMonetaryReliefComponent },
