@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { CommonModule } from '@angular/common';
+import { CommonModule,formatDate } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MonetaryReliefService } from 'src/app/services/monetary-relief.service';
 import { ReportsCommonService } from 'src/app/services/reports-common.service';
@@ -208,7 +208,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'District',
-    field: 'district',
+    field: 'revenue_district',
     group: null,
     sortable: true,
     visible: true,
@@ -216,7 +216,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Police Division',
-    field: 'total_cases',
+    field: 'police_city',
     group: null,
     sortable: true,
     visible: true,
@@ -224,7 +224,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Police Station',
-    field: 'total_cases',
+    field: 'police_station',
     group: null,
     sortable: true,
     visible: true,
@@ -232,7 +232,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'FIR Number',
-    field: 'total_cases',
+    field: 'fir_number',
     group: null,
     sortable: true,
     visible: true,
@@ -240,7 +240,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'FIR Date',
-    field: 'total_cases',
+    field: 'FIR_date',
     group: null,
     sortable: true,
     visible: true,
@@ -256,7 +256,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Victim Name',
-    field: 'total_cases',
+    field: 'victimName',
     group: null,
     sortable: true,
     visible: true,
@@ -264,7 +264,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Gender',
-    field: 'total_cases',
+    field: 'gender',
     group: null,
     sortable: true,
     visible: true,
@@ -272,7 +272,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Caste',
-    field: 'total_cases',
+    field: 'caste',
     group: null,
     sortable: true,
     visible: true,
@@ -280,15 +280,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Sub Caste',
-    field: 'total_cases',
-    group: null,
-    sortable: true,
-    visible: true,
-    sortDirection: null,
-  },
-  {
-    label: 'Date of proposal',
-    field: 'total_cases',
+    field: 'community',
     group: null,
     sortable: true,
     visible: true,
@@ -296,7 +288,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Relief Stage',
-    field: 'total_cases',
+    field: 'relief_stage',
     group: null,
     sortable: true,
     visible: true,
@@ -304,8 +296,49 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Relief Status',
-    field: 'total_cases',
+    field: 'relief_status',
     group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  // ✅ Group: FIR
+  {
+    label: 'Proposal Date',
+    field: 'first_proceeding_date',
+    group: 'FIR Stage Relief (1st Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'As per the Act',
+    field: 'first_reliefScst',
+    group: 'FIR Stage Relief (1st Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Ex-Gratia',
+    field: 'first_reliefExGratia',
+    group: 'FIR Stage Relief (1st Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+   {
+    label: 'Total - FIR Stage',
+    field: 'totalFirStageAmount',
+    group: 'FIR Stage Relief (1st Stage)',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: '1st Stage Disbursement Date',
+    field: 'first_disbursement_date',
+    group: 'FIR Stage Relief (1st Stage)',
     sortable: true,
     visible: true,
     sortDirection: null,
@@ -314,7 +347,7 @@ displayedColumns: DisplayedColumn[] = [
   // ✅ Group: CHARGESHEET
   {
     label: 'Proposal Date',
-    field: 'cs_proposal_sent',
+    field: 'second_proceeding_date',
     group: 'Chargesheet Stage Relief (2nd Stage)',
     sortable: true,
     visible: true,
@@ -322,7 +355,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'As per the Act',
-    field: 'cs_relief_given',
+    field: 'second_reliefScst',
     group: 'Chargesheet Stage Relief (2nd Stage)',
     sortable: true,
     visible: true,
@@ -330,7 +363,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Ex-Gratia',
-    field: 'cs_relief_pending',
+    field: 'second_reliefExGratia',
     group: 'Chargesheet Stage Relief (2nd Stage)',
     sortable: true,
     visible: true,
@@ -338,7 +371,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Total - Chargesheet Stage',
-    field: 'cs_relief_pending',
+    field: 'totalChargeSheetAmount',
     group: 'Chargesheet Stage Relief (2nd Stage)',
     sortable: true,
     visible: true,
@@ -346,57 +379,17 @@ displayedColumns: DisplayedColumn[] = [
   },
     {
     label: '2nd Stage Disbursement Date',
-    field: 'cs_relief_pending',
+    field: 'second_disbursement_date',
     group: 'Chargesheet Stage Relief (2nd Stage)',
     sortable: true,
     visible: true,
     sortDirection: null,
   },
-  // ✅ Group: FIR
-  {
-    label: 'Proposal Date',
-    field: 'fir_proposal_sent',
-    group: 'FIR Stage Relief (1st Stage)',
-    sortable: true,
-    visible: true,
-    sortDirection: null,
-  },
-  {
-    label: 'As per the Act',
-    field: 'fir_relief_given',
-    group: 'FIR Stage Relief (1st Stage)',
-    sortable: true,
-    visible: true,
-    sortDirection: null,
-  },
-  {
-    label: 'Ex-Gratia',
-    field: 'fir_relief_pending',
-    group: 'FIR Stage Relief (1st Stage)',
-    sortable: true,
-    visible: true,
-    sortDirection: null,
-  },
-   {
-    label: 'Total - FIR Stage',
-    field: 'fir_relief_pending',
-    group: 'FIR Stage Relief (1st Stage)',
-    sortable: true,
-    visible: true,
-    sortDirection: null,
-  },
-  {
-    label: '1st Stage Disbursement Date',
-    field: 'fir_relief_pending',
-    group: 'FIR Stage Relief (1st Stage)',
-    sortable: true,
-    visible: true,
-    sortDirection: null,
-  },
+  
   // ✅ Group: TRIAL Stage (spelling corrected from "TRAIL")
   {
     label: 'Proposal Date',
-    field: 'cs_proposal_sent',
+    field: 'trial_proceeding_date',
     group: 'Final Stage Relief (3rd Stage)',
     sortable: true,
     visible: true,
@@ -404,7 +397,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'As per the Act',
-    field: 'cs_relief_given',
+    field: 'trial_reliefScst',
     group: 'Final Stage Relief (3rd Stage)',
     sortable: true,
     visible: true,
@@ -412,7 +405,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Ex-Gratia',
-    field: 'cs_relief_pending',
+    field: 'trial_reliefExGratia',
     group: 'Final Stage Relief (3rd Stage)',
     sortable: true,
     visible: true,
@@ -420,7 +413,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Total - Final Stage',
-    field: 'cs_relief_pending',
+    field: 'totalTrialAmount',
     group: 'Final Stage Relief (3rd Stage)',
     sortable: true,
     visible: true,
@@ -428,7 +421,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: '3rd Stage Disbursement Date',
-    field: 'cs_relief_pending',
+    field: 'trial_disbursement_date',
     group: 'Final Stage Relief (3rd Stage)',
     sortable: true,
     visible: true,
@@ -437,7 +430,7 @@ displayedColumns: DisplayedColumn[] = [
 // ✅ Ungrouped "No. of Days since" columns
 {
   label: 'No. of Days since 1st Stage Relief',
-  field: 'days_since_1st',
+  field: 'days_since_first_relief',
   group: null,
   sortable: true,
   visible: true,
@@ -445,7 +438,7 @@ displayedColumns: DisplayedColumn[] = [
 },
 {
   label: 'No. of Days since 2nd latest Relief',
-  field: 'days_since_2nd',
+  field: 'days_since_second_relief',
   group: null,
   sortable: true,
   visible: true,
@@ -453,15 +446,7 @@ displayedColumns: DisplayedColumn[] = [
 },
 {
   label: 'No. of Days since 3rd latest Relief',
-  field: 'days_since_3rd',
-  group: null,
-  sortable: true,
-  visible: true,
-  sortDirection: null,
-},
-{
-  label: 'Reason for Pending - Previous Month',
-  field: 'days_since_3rd',
+  field: 'days_since_trial_relief',
   group: null,
   sortable: true,
   visible: true,
@@ -469,7 +454,7 @@ displayedColumns: DisplayedColumn[] = [
 },
 {
   label: 'Reason for Pending - Current Month',
-  field: 'days_since_3rd',
+  field: 'report_reason',
   group: null,
   sortable: true,
   visible: true,
@@ -766,31 +751,53 @@ displayedColumns: DisplayedColumn[] = [
     this.loader = true;
     this.monetaryReliefService.getMonetaryReliefDetails().subscribe({
       next: (response) => {
-        //console.log('Monetary Reliefs:', response.data); // Debugging
+        console.log('Monetary Reliefs:', response.data); // Debugging
         // Transform API response to match frontend structure
-        this.reportData = response.data.map((item: { 
-          fir_number: any; police_city: any; police_station: any; status: number;
-           offence_committed: any; victim_name: any; previous_month_reason_for_status: any;
-            current_month_reason_for_status: any; relief_status: any;
-            revenue_district : any; police_zone : any; community : any; caste : any; date_of_registration : any;
-          }, index: number) => ({
+        this.reportData = response.data.map((item: any, index: number) => ({
           sl_no: index + 1,
-          fir_id: item.fir_number,
           fir_number: item.fir_number === "NULL" || !item.fir_number ? '' : item.fir_number,
+          FIR_date:formatDate(item.FIR_date, 'yyyy-MM-dd', 'en'),
           police_city:  item.police_city,
           police_station: item.police_station,
-          status: this.reportsCommonService.caseStatusOptions.find(option => option.value === item.status)?.label || '',
-          nature_of_offence: (item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, '')), 
-          case_status: this.getStatusTextUIPT(item.status) || '',
-          relief_status: this.reportsCommonService.reliefStatusOptions.find(option => option.value === item.relief_status)?.label || '',
-          victim_name: (item.victim_name === "NULL" ? '' : (item.victim_name || '')),
-          reason_previous_month: item.previous_month_reason_for_status || '',
-          reason_current_month: item.current_month_reason_for_status || '',
           revenue_district : item.revenue_district,
           police_zone : item.police_zone,
           community : item.community,
           caste : item.caste,
-          date_of_registration : item.date_of_registration,
+          nature_of_offence: (item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, '')), 
+          victimName: (item.victimName === "NULL" ? '' : (item.victimName || '')),
+          gender: (item.victimName === "NULL" ? '' : (item.gender || '')),
+          relief_stage:item.relief_stage,
+          relief_status:item.relief_status,
+          first_proceeding_date:item.first_proceeding_date  ? formatDate(item.first_proceeding_date,'yyyy-MM-dd','en') : '',
+          first_reliefScst:(item.first_reliefScst === "NULL" ? '' : (item.first_reliefScst || '')),
+          first_reliefExGratia:(item.first_reliefExGratia === "NULL" ? '' : (item.first_reliefExGratia || '')),
+        totalFirStageAmount:
+          (item.first_reliefScst && item.first_reliefScst !== "NULL" ? Number(item.first_reliefScst) : 0) +
+          (item.first_reliefExGratia && item.first_reliefExGratia !== "NULL" ? Number(item.first_reliefExGratia) : 0),
+          days_since_first_relief:(item.days_since_first_relief === "NULL" ? '' : (item.days_since_first_relief || '')),
+          first_disbursement_date:item.first_disbursement_date ? formatDate(item.first_disbursement_date,'yyyy-MM-dd','en') : '',
+          
+          second_proceeding_date:item.second_proceeding_date ? formatDate(item.second_proceeding_date,'yyyy-MM-dd','en') :'',
+          second_reliefScst:(item.second_reliefScst === "NULL" ? '' : (item.second_reliefScst || '')),
+          second_reliefExGratia:(item.second_reliefExGratia === "NULL" ? '' : (item.second_reliefExGratia || '')),
+          days_since_second_relief:(item.days_since_second_relief === "NULL" ? '' : (item.days_since_second_relief || '')),
+          second_disbursement_date:item.second_disbursement_date ? formatDate(item.second_disbursement_date,'yyyy-MM-dd','en') : '',
+          totalChargeSheetAmount:
+            (item.second_reliefScst && item.second_reliefScst !== "NULL" ? Number(item.second_reliefScst) : 0) +
+            (item.second_reliefExGratia && item.second_reliefExGratia !== "NULL" ? Number(item.second_reliefExGratia) : 0),
+
+         trial_proceeding_date: item.trial_proceeding_date ? formatDate(item.trial_proceeding_date, 'yyyy-MM-dd', 'en') : '',
+        trial_reliefScst: (item.trial_reliefScst === "NULL" ? '' : (item.trial_reliefScst || '')),
+        trial_reliefExGratia: (item.trial_reliefExGratia === "NULL" ? '' : (item.trial_reliefExGratia || '')),
+        days_since_trial_relief: (item.days_since_trial_relief === "NULL" ? '' : (item.days_since_trial_relief || '')),
+        trial_disbursement_date: item.trial_disbursement_date ? formatDate(item.trial_disbursement_date, 'yyyy-MM-dd', 'en'): '',
+        totalTrialAmount:
+          (item.trial_reliefScst && item.trial_reliefScst !== "NULL" ? Number(item.trial_reliefScst) : 0) +
+          (item.trial_reliefExGratia && item.trial_reliefExGratia !== "NULL" ? Number(item.trial_reliefExGratia) : 0),
+
+          
+          report_reason:(item.report_reason === "NULL" ? '' : (item.report_reason || '')),
+
           filter_status : item.status
         }));
         // Update filteredData to reflect the API data

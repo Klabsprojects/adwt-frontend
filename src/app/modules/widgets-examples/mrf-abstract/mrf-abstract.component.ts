@@ -11,6 +11,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { FirListTestService } from 'src/app/services/fir-list-test.service';
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
+
 @Component({
   selector: 'app-mrf-abstract',
   standalone: true,
@@ -96,7 +99,31 @@ displayedColumns: DisplayedColumn[] = [
     visible: true,
     sortDirection: null,
   },
-
+// ✅ Group: FIR
+  {
+    label: 'Proposal sent to DC',
+    field: 'fir_proposal_sent_to_dc',
+    group: 'FIR',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Relief Given',
+    field: 'fir_relief_given',
+    group: 'FIR',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Relief Pending',
+    field: 'fir_relief_pending',
+    group: 'FIR',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
   
   // ✅ Group: CHARGESHEET
   {
@@ -123,31 +150,7 @@ displayedColumns: DisplayedColumn[] = [
     visible: true,
     sortDirection: null,
   },
-  // ✅ Group: FIR
-  {
-    label: 'Proposal sent to DC',
-    field: 'fir_proposal_sent_to_dc',
-    group: 'FIR',
-    sortable: true,
-    visible: true,
-    sortDirection: null,
-  },
-  {
-    label: 'Relief Given',
-    field: 'fir_relief_given',
-    group: 'FIR',
-    sortable: true,
-    visible: true,
-    sortDirection: null,
-  },
-  {
-    label: 'Relief Pending',
-    field: 'fir_relief_pending',
-    group: 'FIR',
-    sortable: true,
-    visible: true,
-    sortDirection: null,
-  },
+  
   // ✅ Group: TRIAL Stage (spelling corrected from "TRAIL")
   {
     label: 'Proposal sent to DC',
@@ -224,45 +227,6 @@ displayedColumns: DisplayedColumn[] = [
       column.visible = this.selectedColumns.includes(column.field);
     });
   }
-
-//   toggleSort(col: DisplayedColumn): void {
-//   // Clear sort for all other columns
-//   this.displayedColumns.forEach(c => {
-//     if (c !== col) c.sortDirection = null;
-//   });
-
-//   // Toggle current column's sort direction
-//   if (col.sortDirection === 'asc') {
-//     col.sortDirection = 'desc';
-//   } else if (col.sortDirection === 'desc') {
-//     col.sortDirection = null; // remove sort
-//   } else {
-//     col.sortDirection = 'asc';
-//   }
-
-//   // Call your sort handler (if needed)
-//   this.sortData(col);
-// }
-
-// sortData(col: DisplayedColumn): void {
-//   const direction = col.sortDirection;
-//   const field = col.field;
-
-//   if (!direction) {
-//     // Reset to original data if no sort
-//     this.filteredData = [...this.originalData];
-//     return;
-//   }
-
-//   this.filteredData = [...this.filteredData].sort((a, b) => {
-//     const aVal = a[field];
-//     const bVal = b[field];
-    
-//     if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-//     if (aVal > bVal) return direction === 'asc' ? 1 : -1;
-//     return 0;
-//   });
-// }
 
 
     getDropdowns() {
@@ -358,13 +322,64 @@ displayedColumns: DisplayedColumn[] = [
   }
 
   // Download Reports
-  async onBtnExport(): Promise<void> {
-    await this.reportsCommonService.exportToExcel(
-      this.filteredData,
-      this.displayedColumns,
-      'Monetary-Reports'
-    );
-  }
+  // async onBtnExport(): Promise<void> {
+  //   await this.reportsCommonService.exportToExcel(
+  //     this.filteredData,
+  //     this.displayedColumns,
+  //     'MRF-Abstract'
+  //   );
+  // }
+onBtnExport(): void {
+  // Define multi-row headers
+  const headers = [
+    ['Sl. No.', 'District', 'Total Cases', 'FIR', '', '', 'CHARGESHEET', '', '', 'TRIAL', '', ''],
+    ['', '', '', 'Proposal sent to DC', 'Relief Given', 'Relief Pending', 'Proposal sent to DC', 'Relief Given', 'Relief Pending', 'Proposal sent to DC', 'Relief Given', 'Relief Pending']
+  ];
+  const data = this.filteredData.map((item, index) => [
+    index + 1,
+    item.revenue_district,
+    item.total_cases,
+    item.fir_proposal_sent_to_dc,
+    item.fir_relief_given,
+    item.fir_relief_pending,
+    item.chargesheet_proposal_sent_to_dc,
+    item.chargesheet_relief_given,
+    item.chargesheet_relief_pending,
+    item.trial_proposal_sent_to_dc,
+    item.trial_relief_given,
+    item.trial_relief_pending
+  ]);
+
+  const aoa = [...headers, ...data];
+  const worksheet = XLSX.utils.aoa_to_sheet(aoa);
+
+  // Define merged cells
+  worksheet['!merges'] = [
+    { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } }, // Sl. No.
+    { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } }, // District
+    { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } }, // Total Cases
+    { s: { r: 0, c: 3 }, e: { r: 0, c: 5 } }, // FIR
+    { s: { r: 0, c: 6 }, e: { r: 0, c: 8 } }, // CHARGESHEET
+    { s: { r: 0, c: 9 }, e: { r: 0, c: 11 } } // TRIAL
+  ];
+
+  const workbook: XLSX.WorkBook = { Sheets: { 'MRF Abstract': worksheet }, SheetNames: ['MRF Abstract'] };
+  const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+  this.saveAsExcelFile(excelBuffer, 'mrf_abstract');
+}
+
+saveAsExcelFile(buffer: any, filename: string): void {
+  const data: Blob = new Blob([buffer], { type: 'application/octet-stream' });
+  const url = window.URL.createObjectURL(data);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${filename}.xlsx`;
+  link.click();
+  window.URL.revokeObjectURL(url);
+}
+
+
 
     clearfilter(){
       this.searchText = '';

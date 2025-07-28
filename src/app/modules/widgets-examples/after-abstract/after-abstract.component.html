@@ -46,7 +46,7 @@
         </select>
       </div>
 
-        <!-- <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
         <select name="" id="" [(ngModel)]="selectedCommunity" (change)="getCaste()" class="form-select" (change)="applyFilters()">
           <option value="">Community</option>
           <option [value]="community" *ngFor="let community of communities">{{community}}</option>
@@ -59,7 +59,7 @@
             {{ option }}
           </option>
         </select>
-      </div> -->
+      </div>
 
       <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
         <select class="form-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
@@ -110,99 +110,43 @@
     </div> -->
 
     <div class="card-body pt-0 overflow-auto">
-      <!-- <table class="table table-bordered table-responsive">
-        <thead>
-          <tr>
-            <th *ngFor="let column of displayedColumns" [hidden]="!column.visible" (click)="column.sortable ? sortTable(column.field) : null">
-              {{ column.label }}
-              <i *ngIf="column.sortable" class="fas" [ngClass]="getSortIcon(column.field)"></i>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let report of paginatedData()">
-            <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
-              <ng-container [ngSwitch]="column.field">
-                <span *ngSwitchDefault>{{ report[column.field] }}</span>
-              </ng-container>
-            </td>
-          </tr>
-        </tbody>
-      </table> -->
-
-
       <table class="table table-bordered table-responsive">
-  <thead>
+       
+       <thead>
   <tr>
-    <th *ngFor="let col of ungroupedColumns" rowspan="2">{{ col.label }}</th>
-
-    <th *ngFor="let groupName of groupOrder" 
-        [attr.colspan]="groupedBySection[groupName]?.length">
+    <!-- Pre-group columns -->
+    <th *ngFor="let col of preGroupedColumns" rowspan="2">{{ col.label }}</th>
+ 
+    <!-- Grouped headers -->
+    <th *ngFor="let groupName of groupOrder" [attr.colspan]="groupedBySection[groupName]?.length">
       {{ groupName }}
     </th>
+ 
+    <!-- Post-group columns -->
+    <th *ngFor="let col of postGroupedColumns" rowspan="2">{{ col.label }}</th>
   </tr>
-
+ 
   <tr>
+    <!-- Sub-columns inside group -->
     <ng-container *ngFor="let groupName of groupOrder">
       <th *ngFor="let col of groupedBySection[groupName]">{{ col.label }}</th>
     </ng-container>
   </tr>
 </thead>
 
-<!-- <thead>
-  <tr>
-    <th *ngFor="let col of ungroupedColumns" 
-        [attr.rowspan]="2"
-        [class.sortable]="col.sortable"
-        (click)="toggleSort(col)">
-      {{ col.label }}
-      <span *ngIf="col.sortable">
-        <ng-container [ngSwitch]="col.sortDirection">
-          <span *ngSwitchCase="'asc'">↑</span>
-          <span *ngSwitchCase="'desc'">↓</span>
-          <span *ngSwitchDefault>⇅</span>
-        </ng-container>
-      </span>
-    </th>
+        <tbody>
+          <tr *ngFor="let report of paginatedData()">
+            <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
+              <ng-container [ngSwitch]="column.field">
 
-    <th *ngFor="let groupName of groupOrder" 
-        [attr.colspan]="groupedBySection[groupName]?.length">
-      {{ groupName }}
-    </th>
-  </tr>
-
-  <tr>
-    <ng-container *ngFor="let groupName of groupOrder">
-      <th *ngFor="let col of groupedBySection[groupName]" 
-          [class.sortable]="col.sortable"
-          (click)="toggleSort(col)">
-        {{ col.label }}
-        <span *ngIf="col.sortable">
-          <ng-container [ngSwitch]="col.sortDirection">
-            <span *ngSwitchCase="'asc'">↑</span>
-            <span *ngSwitchCase="'desc'">↓</span>
-            <span *ngSwitchDefault>⇅</span>
-          </ng-container>
-        </span>
-      </th>
-    </ng-container>
-  </tr>
-</thead> -->
-
-
-  <tbody>
-    <tr *ngFor="let report of paginatedData()">
-      <td *ngFor="let column of getVisibleColumns()">
-        <ng-container [ngSwitch]="column.field">
-          <span *ngSwitchDefault>{{ report[column.field] }}</span>
-        </ng-container>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-
-
+              
+                <!-- Default Case -->
+                <span *ngSwitchDefault>{{ report[column.field] }}</span>
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <!-- Show message if data is loading -->
       <div *ngIf="loading" class="alert alert-warning">Loading...</div>
       <!-- Show message if filtered data is empty -->

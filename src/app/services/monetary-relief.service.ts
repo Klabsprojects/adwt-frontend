@@ -15,7 +15,18 @@ export class MonetaryReliefService {
 
   // Fetches all monetary report details 
   getMonetaryReliefDetails(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/get-monetary-relief-details`);
+    // return this.http.get(`${this.baseUrl}/get-monetary-relief-details`);
+    const requestBody = {
+    district: '',
+    community: '',
+    caste: '',
+    police_city: '',
+    Status_Of_Case: '',
+    police_zone: '',
+    Filter_From_Date: '',
+    Filter_To_Date: ''
+  };
+    return this.http.post(`${this.baseUrl}/getmonetaryReliefData`,requestBody);
   }
   
   // Update status and reason for current month to given fir report details

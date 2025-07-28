@@ -38,6 +38,8 @@ import { VmcReportComponent } from './Vmc-Report/Vmc-Report.component';
 import { AlteredCaseListComponent } from './altered-case-list/altered-case-list.component';
 import { LegacyFirListComponent } from './legacy-fir-list/legacy-fir-list.component';
 import { MrfAbstractComponent } from './mrf-abstract/mrf-abstract.component';
+import { AfterAbstractComponent } from './after-abstract/after-abstract.component';
+import { BeforeAbstractComponent } from './before-abstract/before-abstract.component';
 const routes: Routes = [
   {
     path: '',
@@ -72,6 +74,8 @@ const routes: Routes = [
       { path: 'monetary-relief', component: MonetaryReliefComponent },
       { path: 'mrf-abstract', component: MrfAbstractComponent },
       { path: 'additional-relief-report', component: AdditionalReliefReportComponent },
+      { path: 'after-abstract', component: AfterAbstractComponent },
+      { path: 'before-abstract', component: BeforeAbstractComponent },
       { path: 'edit-monthly-report', component: EditMonthlyReportComponent },
       { path: 'edit-monetary-relief', component: EditMonetaryReliefComponent },
       { path: 'edit-additional-relief-report', component: EditAdditionalReliefReportComponent },

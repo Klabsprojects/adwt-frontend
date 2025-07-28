@@ -8,12 +8,13 @@ import Swal from 'sweetalert2';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReportsCommonService } from 'src/app/services/reports-common.service';
 import { AdditionalReportService } from 'src/app/services/additional-report.service';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { AdditionalAbstractReportService } from 'src/app/services/additional-abstract-service.module';
 
 @Component({
   selector: 'app-additional-relief-report',
@@ -64,294 +65,207 @@ export class AdditionalReliefReportComponent implements OnInit {
     'House Site patta',
     'Education Concession',
   ];
-  // Displayed Columns
-  displayedColumns: {
-    label: string;
-    field: string;
-    sortable: boolean;
-    visible: boolean;
-    sortDirection: 'asc' | 'desc' | null;
-  }[] = [];
-  // Default Columns
-  defaultColumns: {
-    label: string;
-    field: string;
-    sortable: boolean;
-    visible: boolean;
-    sortDirection: 'asc' | 'desc' | null;
-  }[] = [
-    {
-      label: 'Sl. No.',
-      field: 'sl_no',
-      sortable: false,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Revenue District',
-      field: 'revenue_district',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-      {
-      label: 'Police City',
-      field: 'police_city',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-      {
-      label: 'Police Zone',
-      field: 'police_zone',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-      {
-      label: 'Community',
-      field: 'community',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-      {
-      label: 'Caste',
-      field: 'caste',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-      {
-      label: 'Data Entry Status',
-      field: 'status',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-     {
-      label: 'Case Status',
-      field: 'case_status',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-      {
-      label: 'Reporting Date',
-      field: 'date_of_registration',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Police Station Name',
-      field: 'police_station_name',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'FIR Number',
-      field: 'fir_number',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Victim Name',
-      field: 'victim_name',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Age',
-      field: 'age',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Gender',
-      field: 'gender',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Nature of Offence',
-      field: 'nature_of_offence',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Section of the PoA Act invoked for the offence',
-      field: 'poa_section',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-  ];
-  // Column Configurations for Additional Relief Types
-  columnConfigs = {
-    Employment: [
-      {
-        label: 'Status',
-        field: 'status',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label: 'Reason for Job pending - Previous Month',
-        field: 'reason_job_pending_previous',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label:
-          'If "OTHERS" option is selected enter valid reasons - Previous Month',
-        field: 'others_reason_previous',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label: 'Reason for Job pending - Current Month',
-        field: 'reason_job_pending_current',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label:
-          'If "OTHERS" option is selected enter valid reasons - Current Month',
-        field: 'others_reason_current',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-    ],
-    Pension: [
-      {
-        label: 'Status',
-        field: 'status',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label: 'Reason for Pension pending - Previous Month',
-        field: 'reason_pension_pending_previous',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label:
-          'If "OTHERS" option is selected enter the valid reason - Previous Month',
-        field: 'others_reason_previous',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label: 'Reason for Pension pending - Current Month',
-        field: 'reason_pension_pending_current',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label:
-          'If "OTHERS" option is selected enter the valid reason - Current Month',
-        field: 'others_reason_current',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-    ],
-    HouseSitePatta: [
-      {
-        label: 'Status',
-        field: 'status',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label: 'Reason for Patta pending - Previous Month',
-        field: 'reason_patta_pending_previous',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label:
-          'If "OTHERS" option is selected enter the valid reason - Previous Month',
-        field: 'others_reason_previous',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label: 'Reason for Patta pending - Current Month',
-        field: 'reason_patta_pending_current',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label:
-          'If "OTHERS" option is selected enter the valid reason - Current Month',
-        field: 'others_reason_current',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-    ],
-    EducationConcession: [
-      {
-        label: 'Status of the Current Month',
-        field: 'status',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label: 'Reason for Education concession  pending - Previous Month',
-        field: 'reason_patta_pending_previous',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label:
-          'If "OTHERS" option is selected enter the valid reason - Previous Month',
-        field: 'others_reason_previous',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label: 'Reason for Education Concession pending - Current Month',
-        field: 'reason_patta_pending_current',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-      {
-        label:
-          'If "OTHERS" option is selected enter the valid reason - Current Month',
-        field: 'others_reason_current',
-        sortable: true,
-        visible: true,
-        sortDirection: null,
-      },
-    ],
-  };
+ displayedColumns: DisplayedColumn[] = [
+  // ✅ Ungrouped columns
+  {
+    label: 'Sl. No.',
+    field: 'sl_no',
+    group: null,
+    sortable: false,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'As Per Act (Before 2016 / After 2016)',
+    field: 'asperact',
+    group: null,
+    sortable: false,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Revenue District',
+    field: 'revenue_district',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Police Division',
+    field: 'police_city',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Police Station',
+    field: 'police_station',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+   {
+    label: 'FIR No.',
+    field: 'fir_number',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+   {
+    label: 'FIR Date',
+    field: 'FIR_date',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+   {
+    label: 'Victim Name',
+    field: 'victimName',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+   {
+    label: 'Gender',
+    field: 'gender',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+   {
+    label: 'Community',
+    field: 'community',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+   {
+    label: 'Caste',
+    field: 'caste',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+// ✅ Group: FIR
+  {
+    label: 'Status ',
+    field: 'EmpStatus',
+    group: 'Employment',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Job given date',
+    field: 'JobGivendate',
+    group: 'Employment',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Relationship of beneficiary to the victim',
+    field: 'Employmentrelationship',
+    group: 'Employment',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Name of the Department',
+    field: 'department_name',
+    group: 'Employment',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+   {
+    label: 'Designation',
+    field: 'designation',
+    group: 'Employment',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  
+  // ✅ Group: Pension  
+  {
+    label: 'Pension Status',
+    field: 'PensionStatus',
+    group: 'Pension',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Pension given date',
+    field: 'PensionGivendate',
+    group: 'Pension',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Relationship of beneficiary to the victim',
+    field: 'Pensionrelationship',
+    group: 'Pension',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  
+  // ✅ Group: House Site Patta
+  {
+    label: 'Patta Status ',
+    field: 'PattaStatus',
+    group: 'House Site Patta',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Patta given date ',
+    field: 'PattaGivendate',
+    group: 'House Site Patta',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Education Concession Status',
+    field: 'EducationStatus',
+    group: 'Education Concession',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Number of Children studying in School/ College',
+    field: 'Schoolorcollege',
+    group: 'Education Concession',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Scholarship given date  ',
+    field: 'EducationGivendate',
+    group: 'Education Concession',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+];
+
   currentSortField: string = '';
   isAscending: boolean = true;
 
@@ -377,16 +291,27 @@ export class AdditionalReliefReportComponent implements OnInit {
     // private firService: FirListTestService,
     private cdr: ChangeDetectorRef,
     private reportsCommonService: ReportsCommonService,
-    private additionalReportService: AdditionalReportService,
+    private additionalReportService: AdditionalAbstractReportService,
     private router: Router,
     private dashboardService: DashboardService
   ) {
     this.loader = true;
   }
 
+  groupedBySection: { [group: string]: DisplayedColumn[] } = {};
+  groupOrder = ['Employment', 'Pension', 'House Site Patta','Education Concession'];
+
   // Initializes component data and fetches necessary information on component load.
   ngOnInit(): void {
-    this.displayedColumns = [...this.defaultColumns]; // Initialize default columns
+    this.groupedBySection = this.groupOrder.reduce((acc, groupName) => {
+    const cols = this.displayedColumns.filter(
+      col => col.group === groupName && col.visible
+    );
+  if (cols.length > 0) {
+    acc[groupName] = cols;
+  }
+  return acc;
+}, {} as { [group: string]: DisplayedColumn[] });
     this.reportsCommonService
       .getAllData()
       .subscribe(({ districts, offences }) => {
@@ -422,48 +347,7 @@ export class AdditionalReliefReportComponent implements OnInit {
   }
   
   // Updates the displayed columns based on the selected type of additional relief.
-  updateDisplayedColumns(): void {
-    console.log('Selected Type:', this.selectedtypeOfAdditionalReleif); // Debugging log
-    switch (this.selectedtypeOfAdditionalReleif) {
-      case 'Employment':
-        this.displayedColumns = [
-          ...this.defaultColumns,
-          ...this.columnConfigs.Employment,
-        ];
-        break;
-      case 'Pension':
-        this.displayedColumns = [
-          ...this.defaultColumns,
-          ...this.columnConfigs.Pension,
-        ];
-        break;
-      case 'House Site patta':
-        this.displayedColumns = [
-          ...this.defaultColumns,
-          ...this.columnConfigs.HouseSitePatta,
-        ];
-        break;
-      case 'Education Concession':
-        this.displayedColumns = [
-          ...this.defaultColumns,
-          ...this.columnConfigs.EducationConcession,
-        ];
-        break;
-      default:
-        this.displayedColumns = [...this.defaultColumns]; // Fallback to default columns
-        break;
-    }
-    // Set all columns to visible
-    this.displayedColumns.forEach((column) => {
-      column.visible = true; // Set each column's visible property to true
-    });
-    // Update selectedColumns based on displayedColumns
-    this.selectedColumns = this.displayedColumns
-      .filter((column) => column.visible)
-      .map((column) => column.field);
-    console.log('Updated Columns:', this.displayedColumns); // Debugging log
-  }
-
+  
   // Updates the visibility of columns based on user-selected columns.
   updateColumnVisibility(): void {
     this.displayedColumns.forEach((column) => {
@@ -569,7 +453,7 @@ export class AdditionalReliefReportComponent implements OnInit {
     await this.reportsCommonService.exportToExcel(
       this.filteredData,
       this.displayedColumns,
-      'Additional-Reports'
+      'Additional-Relief-Reports'
     );
   }
 
@@ -687,34 +571,40 @@ export class AdditionalReliefReportComponent implements OnInit {
 
  fetchAdditionalReports(): void {
     this.loader = true;
-    this.additionalReportService.getAdditionalReportDetails().subscribe({
+    this.additionalReportService.getAdditionalRelief().subscribe({
       next: (response) => {
         //console.log('Additional Reports:', response.data); // Debugging
         // Transform API response to match frontend structure
-        this.reportData = response.data.map((item: { 
-          revenue_district: any; police_station: any; fir_number: any; victim_name: any; 
-          victim_age: any; victim_gender: any; status: number; 
-          offence_committed: string; scst_sections: any; 
-           police_zone : any; community : any; caste : any; date_of_registration : any; police_city : any;
-        }, index: number) => ({
+        this.reportData = response.data.map((item:any,index: number) => ({
           sl_no: index + 1,
+          asperact: item.asperact,
           revenue_district: item.revenue_district,
-          police_station_name: item.police_station,
-          fir_number: item.fir_number === "NULL" || !item.fir_number ? '' : item.fir_number, // Fix this line
-          victim_name: item.victim_name === "NULL" ? '' : item.victim_name,
-          age: item.victim_age === "NULL" ? '' : item.victim_age,
-          gender: item.victim_gender === "NULL" ? '' : item.victim_gender,
-          status: this.reportsCommonService.caseStatusOptions.find(option => option.value === item.status)?.label || '',
-          nature_of_offence: (item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, '')), 
-          poa_section: (item.scst_sections || '').replace(/"/g, ''), // Remove double quotes
-          police_zone : item.police_zone,
-          community : item.community,
-          caste : item.caste,
-          date_of_registration : item.date_of_registration,
-          filter_status : item.status,
-          police_city:  item.police_city,
-          case_status: this.getStatusTextUIPT(item.status) || '',
-        }));
+          police_city: item.police_city,
+          police_station:item.police_station,
+          fir_number: item.fir_number === "NULL" || !item.fir_number ? '' : item.fir_number,
+          FIR_date:formatDate(item.FIR_date, 'yyyy-MM-dd', 'en'),
+          victimName: item.victimName === "NULL" ? '' : item.victimName,
+          gender: item.gender === "NULL" ? '' : item.gender,
+          community: item.community === "NULL" ? '' : item.community,
+          caste: item.caste === "NULL" ? '' : item.caste,
+         
+          EmpStatus:item.EmpStatus,
+          JobGivendate:item.JobGivendate ? formatDate(item.JobGivendate,'yyyy-MM-dd','en') : '',
+          Employmentrelationship:item.Employmentrelationship,
+          department_name:item.department_name,
+          designation:item.designation,
+
+          PensionStatus:item.PensionStatus,
+          PensionGivendate:item.PensionGivendate ? formatDate(item.PensionGivendate,'yyyy-MM-dd', 'en') : '',
+          Pensionrelationship: JSON.parse(item.Pensionrelationship)[0],
+
+          PattaStatus:item.PattaStatus,
+          PattaGivendate:item.PattaGivendate ? formatDate(item.PattaGivendate,'yyyy-MM-dd','en') : '',
+
+          EducationStatus:item.EducationStatus,
+          Schoolorcollege:item.Schoolorcollege,
+          EducationGivendate:item.EducationGivendate ? formatDate(item.EducationGivendate,'yyyy-MM-dd','en') : '',
+}));
         // Update filteredData to reflect the API data
         this.filteredData = [...this.reportData]; 
         this.loader = false;
@@ -727,5 +617,16 @@ export class AdditionalReliefReportComponent implements OnInit {
     });
   }
 
+ get ungroupedColumns(): DisplayedColumn[] {
+  return this.displayedColumns.filter(col => col.group === null && col.visible);
+}
+}
 
+interface DisplayedColumn {
+  label: string;
+  field: string;
+  group: any;
+  sortable: boolean;
+  visible: boolean;
+  sortDirection: 'asc' | 'desc' | null;
 }

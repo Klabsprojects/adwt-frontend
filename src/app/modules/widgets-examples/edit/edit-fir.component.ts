@@ -142,7 +142,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   showCaseFitForAppeal_two: boolean = false;
 
   hideCompensationSection: boolean = false;
-
+  isMf:boolean=false;
 
   showDuplicateSection = false; // To show/hide the duplicate form section
   showLegalOpinionObtained_one = false;
@@ -2261,8 +2261,11 @@ removeFIRCopy(): void {
 
     if(response && response.data){
       this.loadPoliceStations(response.data.police_city,response.data.police_station);
-      this.isMf = response.data.HascaseMF;
+      // this.isMf = response.data.HascaseMF;
+      this.isMf = response.data.HascaseMF === '1' || response.data.HascaseMF === 1;
+      console.log(this.isMf);
       this.mfChange();
+      console.log(this.mfChange());
       // step 1 load
     if(response.data.police_city){
       this.firForm.get('policeCity')?.setValue(response.data.police_city);
@@ -3626,7 +3629,7 @@ removeFIRCopy(): void {
       // proceedingsFile: this.multipleFilesForproceeding || '',
       proceedingsFile : this.firForm.get('proceedingsFile')?.value || '',
       attachments: this.attachmentss_1 ? this.attachmentss_1.map((item: any) => item.path) : [],
-      status: isSubmit ? 5 : undefined,
+      // status: isSubmit ? 5 : undefined,
     };
   // console.log(firData,"firDatafirDatafirData")
 
@@ -3788,7 +3791,7 @@ removeFIRCopy(): void {
                   station.replace(/\s+/g, '-'));
                   // console.log("before station",station_name);
                 if(station_name) {
-                  const station = this.policeStations.find(ele => console.log(ele === station_name));
+                  const station = this.policeStations.find(ele => ele === station_name);
                   this.firForm.get('stationName')?.setValue(station_name);
                 }
                 
@@ -7205,6 +7208,7 @@ async UpdateAsDraft_7() {
 
   submitStepFive(): void {
     this.saveStepFiveAsDraft(true); // Calls Step 5 save with submission flag
+    this.updateFirStatus(5);
   }
 
 
@@ -7735,20 +7739,21 @@ isStep1Valid(): boolean {
   }
 
   firstageValid(): boolean {
+  const step1 = this.isStep1Valid();
+  const step2 = this.isStep2Valid();
+  const step3 = this.isStep3Valid();
+  const step4 = this.isStep4Valid();
 
-    const step1 = this.isStep1Valid();
-    const step2 = this.isStep2Valid();
-    const step3 = this.isStep3Valid();
-    const step4 = this.isStep4Valid();
+  console.log("isMf =", this.isMf); // debugging
+
+  if (this.isMf === true) {
+    return step1 && step2 && step3 && step4;
+  } else {
     const step5 = this.isStep5Valid();
-    if(this.isMf){
-      return step1 && step2 && step3 && step4
-    }
-    else{
-      return step1 && step2 && step3 && step4 && step5;
-    }
+    return step1 && step2 && step3 && step4 && step5;
   }
-  
+}
+
 
 
   isSubmitButtonEnabled(): boolean {
@@ -7976,7 +7981,7 @@ validateStepOne(mode: 'next' | 'draft'): boolean {
     if(stepNumber == 5){
       this.firService.GetVictimInformationDetails(this.firId).subscribe(
         (response: any) => {
-          // console.log(response)
+          this.mfChange();
           if(response.datacount.id == 0){
             Swal.fire('Warning', "Kindly Fill In The Victim's Information First!", 'warning');
           } else {
@@ -8788,21 +8793,24 @@ lebelName(){
       this.firForm.get('upload_court_order')?.setValue(null);
       this.upload_court_order_path = '';
     }
-    isMf:boolean=false;
+    
     mfChange(){
+      console.log(this.isMf);
       if(this.isMf){
-        this.victimsRelief.disable();
+       this.victimsRelief.disable();
         this.totalCompensationControl.disable();
         this.firForm.get('proceedingsFileNo')?.disable();
         this.firForm.get('proceedingsDate')?.disable();
         this.firForm.get('proceedingsFile')?.disable();
       }
       else{
-        this.victimsRelief.enable();
+         this.victimsRelief.enable();
         this.totalCompensationControl.enable();
         this.firForm.get('proceedingsFileNo')?.enable();
         this.firForm.get('proceedingsDate')?.enable();
         this.firForm.get('proceedingsFile')?.enable();
+
+        
       }
     }
 

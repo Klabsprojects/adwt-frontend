@@ -107,14 +107,22 @@
   
       <div class="card-body pt-0 overflow-auto">
         <table class="table table-bordered table-responsive">
-          <thead>
-            <tr>
-                <th *ngFor="let column of displayedColumns" [hidden]="!column.visible" (click)="column.sortable ? sortTable(column.field) : null">
-                  {{ column.label }}
-                  <i *ngIf="column.sortable" class="fas" [ngClass]="getSortIcon(column.field)"></i>
-                </th>
-            </tr>
-          </thead>
+         <thead>
+  <tr>
+    <th *ngFor="let col of ungroupedColumns" rowspan="2">{{ col.label }}</th>
+
+    <th *ngFor="let groupName of groupOrder" 
+        [attr.colspan]="groupedBySection[groupName]?.length">
+      {{ groupName }}
+    </th>
+  </tr>
+
+  <tr>
+    <ng-container *ngFor="let groupName of groupOrder">
+      <th *ngFor="let col of groupedBySection[groupName]">{{ col.label }}</th>
+    </ng-container>
+  </tr>
+</thead>
           <tbody>
             <tr *ngFor="let report of paginatedData()">
               <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">

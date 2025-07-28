@@ -1467,6 +1467,7 @@ export class FirListComponent implements OnInit {
     this.firService.getPaginatedFirList(page, pageSize, this.getFilterParams()).subscribe(
       (response: any) => {
         this.firList = response.data;
+        console.log(response.data,response.data.status);
         this.totalRecords = response.total;
         this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
         this.filteredList = [...this.firList];

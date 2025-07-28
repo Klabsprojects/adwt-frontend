@@ -187,9 +187,16 @@
                 <span *ngSwitchCase="'created_at'">{{ fir.created_at }}</span>
                 <span *ngSwitchCase="'modified_at'">{{ fir.modified_at }}</span>
                 <span *ngSwitchCase="'status'">
-                  <span style="margin-right: 3px;" class="badge" [ngClass]="getStatusBadgeClass(fir.status)">
+                  <!-- <span style="margin-right: 3px;" class="badge" [ngClass]="getStatusBadgeClass(fir.status)">
                     {{ getStatusText(fir.status,fir.HascaseMF) }}
-                  </span>
+                  </span> -->
+                  <span *ngIf="fir.HascaseMF == 1" class="badge badge-danger" style="margin-right: 3px;">
+  Mistake Of Fact
+</span>
+<span *ngIf="fir.HascaseMF != 1" style="margin-right: 3px;" class="badge" [ngClass]="getStatusBadgeClass(fir.status)">
+  {{ getStatusText(fir.status, 0) }}
+</span>
+
                 <span *ngIf="fir.case_altered_status == 1" class="badge" [ngClass]="alteredBadgeClass(fir.case_altered_status)"> {{ isaltered(fir.case_altered_status) }}</span>
 
                 </span>
