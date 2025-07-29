@@ -510,7 +510,7 @@ loader : boolean = false;
     { label: 'Time of Occurrence To', field: 'time_of_occurrence_to', sortable: true, visible: false },
     { label: 'Name of Nomplainant', field: 'name_of_complainant', sortable: true, visible: false },
 
-    { label: 'Created By', field: 'created_by', sortable: true, visible: true },
+    // { label: 'Created By', field: 'created_by', sortable: true, visible: true },
     { label: 'Created At', field: 'created_at', sortable: true, visible: true },
     { label: 'Last Edited Date', field: 'modified_at', sortable: true, visible: true },
     { label: 'Data Entry Status', field: 'status', sortable: false, visible: true },

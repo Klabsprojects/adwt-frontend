@@ -52,17 +52,35 @@ export class ReliefListComponent implements OnInit {
 
   ngOnInit(): void {
 
+    const savedFilters = localStorage.getItem('firFilters');
+  if (savedFilters) {
+    const filters = JSON.parse(savedFilters);
+    this.selectedDistrict = filters.selectedDistrict || '';
+    this.policeStationName = filters.policeStationName || '';
+    this.dorf = filters.dorf || '';
+    this.dort = filters.dort || '';
+
+    if (this.selectedDistrict) {
+      this.loadPoliceStations(this.selectedDistrict); // Ensure station list loads
+    }
+
+    this.applyFilters(); // Apply saved filters to list
+  }
+
     this.updateSelectedColumns();
     this.fetchFIRList();
     this.loadPolicecity();
   }
+
+  
 
   // Fetch FIR data from the service
   fetchFIRList(): void {
     this.isLoading = true;
     this.reliefService.getFIRReliefList(this.getFilterParams()).subscribe(
       (data) => {
-        this.firList = (data || []).filter((fir) => [4 ,5, 6, 7, 11, 12,13].includes(fir.status)); // Filter data
+        // this.firList = (data || []).filter((fir) => [4 ,5, 6, 7, 11, 12,13].includes(fir.status)); // Filter data
+        this.firList = (data || []).filter((fir) => [1,2,3,4 ,5, 6, 7].includes(fir.status));
         this.updatePagination();
         this.isLoading = false;
         this.cdr.detectChanges(); // Ensure the UI is updated immediately
@@ -216,12 +234,29 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
 }
 
 
-  navigateToRelief(firId: string): void {
-    this.router.navigate(['widgets-examples/relief'], {
-      queryParams: { fir_id: firId },
+  // navigateToRelief(firId: string): void {
+  //   this.router.navigate(['widgets-examples/relief'], {
+  //     queryParams: { fir_id: firId },
 
-    });
-  }
+  //   });
+  // }
+
+  navigateToRelief(firId: string): void {
+  // Store current filters in localStorage
+  const filters = {
+    selectedDistrict: this.selectedDistrict,
+    policeStationName: this.policeStationName,
+    dorf: this.dorf,
+    dort: this.dort
+  };
+  localStorage.setItem('firFilters', JSON.stringify(filters));
+
+  // Navigate with query param
+  this.router.navigate(['widgets-examples/relief'], {
+    queryParams: { fir_id: firId }
+  });
+}
+
 
 
 
@@ -271,7 +306,7 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
     { label: 'Police City', field: 'police_city', sortable: true, visible: true },
     { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
     { label: 'Created By', field: 'created_by', sortable: true, visible: true },
-    { label: 'Date Of Reporting', field : 'date_of_repost', sortable: true, visible: true},
+    { label: 'Date Of Reporting', field : 'date_of_reporting', sortable: true, visible: true},
     { label: 'Created At', field: 'created_at', sortable: true, visible: true },
     { label: 'Status', field: 'status', sortable: false, visible: true },
     { label: 'Actions', field: 'actions', sortable: false, visible: true },
@@ -436,6 +471,8 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
     this.dorf = '';
     this.dort = '';
     this.applyFilters();
+    localStorage.removeItem('firFilters');
+
   }
   
 

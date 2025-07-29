@@ -415,10 +415,12 @@ export class BeforeAbstractComponent {
           .map((item: any, index: number) => ({
             sl_no: index + 1,
             revenue_district: item.revenue_district,
+            total_cases: item.total_cases,
             job_Given: item.job_Given,
             Pension_Given: item.Pension_Given,
             Patta_Given: item.Patta_Given,
-            Education_Given: item.Education_Given
+            Education_Given: item.Education_Given,
+            relief_pending:item.relief_pending,
           }));
 
           // Update filteredData to reflect the API data
