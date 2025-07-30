@@ -11,22 +11,9 @@ export class mrfAbstractService {
 
   constructor(private http: HttpClient) {}
 
-  // Fetches all monetary report details 
- getMrfAbstractDetails(): Observable<any> {
-  const requestBody = {
-    district: '',
-    community: '',
-    caste: '',
-    police_city: '',
-    Status_Of_Case: '',
-    police_zone: '',
-    Filter_From_Date: '',
-    Filter_To_Date: ''
-  };
-
+getMrfAbstractDetails(requestBody: any): Observable<any> {
   return this.http.post(`${this.baseUrl}/getMRFAbstract`, requestBody);
 }
-
   
   // Update status and reason for current month to given fir report details
   updateMonetaryReliefDetails(data: any): Observable<any> {

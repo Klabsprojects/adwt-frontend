@@ -71,6 +71,14 @@ export class MrfAbstractComponent {
   selectedPoliceCity:string=''
   selectedFromDate:any="";
   selectedToDate:any="";
+  payload = {
+    district: this.selectedDistrict || "",
+    police_city: this.selectedPoliceCity || "",
+    Status_Of_Case: "", // Add if needed
+    police_zone: this.selectedZone || "",
+    Filter_From_Date: this.selectedFromDate || "",
+    Filter_To_Date: this.selectedToDate || ""
+  };
 
   
 displayedColumns: DisplayedColumn[] = [
@@ -414,90 +422,107 @@ saveAsExcelFile(buffer: any, filename: string): void {
   }
 
 
-  applyFilters() {
-  this.filteredData = this.reportData.filter(item => {
+//   applyFilters() {
+//   this.filteredData = this.reportData.filter(item => {
 
-    if (this.searchText && this.searchText.trim() !== '' && 
-    item.fir_number.toLowerCase() !== this.searchText.toLowerCase().trim()) {
-    return false;
-    }
+//     if (this.searchText && this.searchText.trim() !== '' && 
+//     item.fir_number.toLowerCase() !== this.searchText.toLowerCase().trim()) {
+//     return false;
+//     }
 
-    // District filter
-    if (this.selectedDistrict && this.selectedDistrict !== '' && 
-        item.revenue_district !== this.selectedDistrict) {
-      return false;
-    }
+//     // District filter
+//     if (this.selectedDistrict && this.selectedDistrict !== '' && 
+//         item.revenue_district !== this.selectedDistrict) {
+//       return false;
+//     }
 
-    // Police City filter
-    if (this.selectedPoliceCity && this.selectedPoliceCity !== '' && 
-        item.police_city !== this.selectedPoliceCity) {
-      return false;
-    }
+//     // Police City filter
+//     if (this.selectedPoliceCity && this.selectedPoliceCity !== '' && 
+//         item.police_city !== this.selectedPoliceCity) {
+//       return false;
+//     }
 
-    // Police Zone filter
-    if (this.selectedZone && this.selectedZone !== '' && 
-        item.police_zone !== this.selectedZone) {
-      return false;
-    }
+//     // Police Zone filter
+//     if (this.selectedZone && this.selectedZone !== '' && 
+//         item.police_zone !== this.selectedZone) {
+//       return false;
+//     }
 
-    // Community filter
-    if (this.selectedCommunity && this.selectedCommunity !== '' && 
-        item.community !== this.selectedCommunity) {
-      return false;
-    }
-
-    // Caste filter
-    if (this.selectedCaste && this.selectedCaste !== '' && 
-        item.caste !== this.selectedCaste) {
-      return false;
-    }
-
-    // Status filter (UI: status <= 5, PT: status > 5)
-    if (this.selectedStatus && this.selectedStatus !== '') {
-      if (this.selectedStatus === 'UI' && item.filter_status > 5) {
-        return false;
-      }
-      if (this.selectedStatus === 'PT' && item.filter_status <= 5) {
-        return false;
-      }
-    }
-
-    // Date range filter
-    if (this.selectedFromDate || this.selectedToDate) {
-    const registrationDate = new Date(item.date_of_registration);
+   
+//     // Date range filter
+//     if (this.selectedFromDate || this.selectedToDate) {
+//     const registrationDate = new Date(item.date_of_registration);
     
-    if (this.selectedFromDate && !this.selectedToDate) {
-      const fromDate = new Date(this.selectedFromDate);
-      if (registrationDate < fromDate) {
-        return false;
-      }
-    }
+//     if (this.selectedFromDate && !this.selectedToDate) {
+//       const fromDate = new Date(this.selectedFromDate);
+//       if (registrationDate < fromDate) {
+//         return false;
+//       }
+//     }
     
-    if (this.selectedToDate && !this.selectedFromDate) {
-      const toDate = new Date(this.selectedToDate);
-      if (registrationDate > toDate) {
-        return false;
-      }
-    }
+//     if (this.selectedToDate && !this.selectedFromDate) {
+//       const toDate = new Date(this.selectedToDate);
+//       if (registrationDate > toDate) {
+//         return false;
+//       }
+//     }
 
-    if (this.selectedToDate && this.selectedFromDate) {
-      const fromDate = new Date(this.selectedFromDate);
-      const toDate = new Date(this.selectedToDate);
-      if (registrationDate < fromDate || registrationDate > toDate) {
-        return false;
-      }
-    }
-  }
+//     if (this.selectedToDate && this.selectedFromDate) {
+//       const fromDate = new Date(this.selectedFromDate);
+//       const toDate = new Date(this.selectedToDate);
+//       if (registrationDate < fromDate || registrationDate > toDate) {
+//         return false;
+//       }
+//     }
+//   }
 
-    return true;
+//     return true;
+//   });
+// }
+
+
+applyFilters() {
+  const payload = {
+    district: this.selectedDistrict || "",
+    police_city: this.selectedPoliceCity || "",
+    police_zone: this.selectedZone || "",
+    Filter_From_Date: this.selectedFromDate || "",
+    Filter_To_Date: this.selectedToDate || ""
+  };
+  this.mrfAbstractService.getMrfAbstractDetails(payload).subscribe({
+    next: (response: any) => {
+     this.reportData = (response.data || [])
+        .filter((item: any) => item.revenue_district && item.revenue_district.trim() !== '') // 🔍 Filter non-empty district
+        .map((item: any, index: number) => ({
+          sl_no: index + 1,
+          revenue_district: item.revenue_district,
+          total_cases: item.total_cases,
+          fir_proposal_sent_to_dc: item.fir_proposal_sent_to_dc,
+          fir_relief_given: item.fir_relief_given,
+          fir_relief_pending: item.fir_relief_pending,
+          chargesheet_proposal_sent_to_dc: item.chargesheet_proposal_sent_to_dc,
+          chargesheet_relief_given: item.chargesheet_relief_given,
+          chargesheet_relief_pending: item.chargesheet_relief_pending,
+          trial_proposal_sent_to_dc: item.trial_proposal_sent_to_dc,
+          trial_relief_given: item.trial_relief_given,
+          trial_relief_pending: item.trial_relief_pending
+        }));
+
+      this.filteredData = [...this.reportData];
+      this.loader = false;
+      this.cdr.detectChanges(); // Trigger change detection
+    },
+    error: (error) => {
+      console.error('Error fetching data', error);
+    }
   });
 }
 
-
   fetchMonetaryReliefDetails(): void {
   this.loader = true;
-  this.mrfAbstractService.getMrfAbstractDetails().subscribe({
+  this.mrfAbstractService.getMrfAbstractDetails(this.payload).subscribe({
     next: (response: any) => {
+      // console.log(response.data);
       this.reportData = (response.data || [])
         .filter((item: any) => item.revenue_district && item.revenue_district.trim() !== '') // 🔍 Filter non-empty district
         .map((item: any, index: number) => ({

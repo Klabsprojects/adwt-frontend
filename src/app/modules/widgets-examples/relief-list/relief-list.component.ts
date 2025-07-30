@@ -80,7 +80,8 @@ export class ReliefListComponent implements OnInit {
     this.reliefService.getFIRReliefList(this.getFilterParams()).subscribe(
       (data) => {
         // this.firList = (data || []).filter((fir) => [4 ,5, 6, 7, 11, 12,13].includes(fir.status)); // Filter data
-        this.firList = (data || []).filter((fir) => [1,2,3,4 ,5, 6, 7].includes(fir.status));
+        // this.firList = (data || []).filter((fir) => [1,2,3,4 ,5, 6, 7].includes(fir.status));
+        this.firList = data;
         this.updatePagination();
         this.isLoading = false;
         this.cdr.detectChanges(); // Ensure the UI is updated immediately
@@ -436,7 +437,8 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
     this.reliefService.getFIRReliefList(this.getFilterParams()).subscribe(
       (data) => {
         this.firList = [];
-        this.firList = (data || []).filter((fir) => [4 ,5, 6, 7, 11, 12,13].includes(fir.status)); // Filter data
+        // this.firList = (data || []).filter((fir) => [4 ,5, 6, 7, 11, 12,13].includes(fir.status)); // Filter data
+        this.firList  = data;
         this.updatePagination();
         this.isLoading = false;
         this.cdr.detectChanges(); // Ensure the UI is updated immediately
