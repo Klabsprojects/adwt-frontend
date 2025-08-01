@@ -25,6 +25,7 @@ export class ReliefListComponent implements OnInit {
   firList: any[] = []; // Complete FIR list
   displayedFirList: any[] = []; // FIRs to show on current page
   page = 1; // Current page
+  currentPage: number = 1;
   itemsPerPage = 10; // Items per page
   totalPages = 1; // Total number of pages
   isLoading = true; // Loading indicator
@@ -74,13 +75,56 @@ export class ReliefListComponent implements OnInit {
 
   
 
+get totalRecords(): number {
+    return this.firList.length;
+  }
+
+  
+
+  paginatedData(): any[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.firList.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+
+  
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
+  goToPage(page: number): void {
+  if (page >= 1 && page <= this.totalPages) {
+    this.currentPage = page;
+    this.cdr.detectChanges();  // optional, only if view not updating
+  }
+}
+
+nextPage(): void {
+  if (this.currentPage < this.totalPages) {
+    this.currentPage++;
+    this.cdr.detectChanges();
+  }
+}
+  goToFirstPage(): void {
+    this.currentPage = 1;
+  }
+
+  goToLastPage(): void {
+    this.currentPage = this.totalPages;
+  }
+
+  hasNextPage(): boolean {
+    return this.currentPage < this.totalPages;
+  }
+
+
   // Fetch FIR data from the service
   fetchFIRList(): void {
     this.isLoading = true;
     this.reliefService.getFIRReliefList(this.getFilterParams()).subscribe(
       (data) => {
-        // this.firList = (data || []).filter((fir) => [4 ,5, 6, 7, 11, 12,13].includes(fir.status)); // Filter data
-        // this.firList = (data || []).filter((fir) => [1,2,3,4 ,5, 6, 7].includes(fir.status));
         this.firList = data;
         this.updatePagination();
         this.isLoading = false;
@@ -105,25 +149,6 @@ export class ReliefListComponent implements OnInit {
     this.displayedFirList = this.firList.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
-  // Pagination controls
-  previousPage(): void {
-    if (this.page > 1) {
-      this.page--;
-      this.updateDisplayedList();
-    }
-  }
-
-  nextPage(): void {
-    if (this.page < this.totalPages) {
-      this.page++;
-      this.updateDisplayedList();
-    }
-  }
-
-  goToPage(pageNum: number): void {
-    this.page = pageNum;
-    this.updateDisplayedList();
-  }
 
   // totalPagesArray(): number[] {
   //   return Array(this.totalPages)
@@ -519,15 +544,14 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
 
 
 
-  // Paginated FIR list
-  paginatedFirList() {
-    const startIndex = (this.page - 1) * this.itemsPerPage;
-    return this.firList.slice(startIndex, startIndex + this.itemsPerPage);
-  }
+  paginatedFirList(): any[] {
+  const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+  const endIndex = startIndex + this.itemsPerPage;
+  const result = this.firList.slice(startIndex, endIndex);
+  console.log(`Page ${this.currentPage}: Showing ${result.length} items`);
+  return result;
+}
 
-  hasNextPage(): boolean {
-    return this.page * this.itemsPerPage < this.firList.length;
-  }
 
 
   totalPagesArray(): number[] {

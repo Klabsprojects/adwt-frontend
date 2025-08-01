@@ -108,29 +108,10 @@
       </thead>
       <tbody>
         <tr *ngFor="let fir of paginatedFirList(); let i = index">
-          <!-- <td>{{ (page - 1) * itemsPerPage + i + 1 }}</td>
-          <td>{{ fir.fir_id }}</td>
-          <td>{{ fir.police_city }}</td>
-          <td>{{ fir.police_station }}</td>
-          <td>{{ fir.created_by || 'Super User' }}</td>
-          <td>{{ fir.created_at | date: 'dd-MM-yyyy' }}</td>
-          <td>
-            <span class="badge" [ngClass]="getStatusBadgeClass(fir.status)">
-              {{ getStatusText(fir.status, fir.relief_status, fir.nature_of_judgement) }}
-            </span>
-          </td>
-          <td>
-            <button
-            class="btn btn-primary btn-sm"
-            (click)="navigateToRelief(fir.fir_id)"
-          >
-            Relief Process
-          </button>
-          </td> -->
-
+         
           <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
             <ng-container [ngSwitch]="column.field">
-              <span *ngSwitchCase="'sl_no'">{{ (page - 1) * itemsPerPage + i + 1 }}</span>
+              <span *ngSwitchCase="'sl_no'">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</span>
               <span *ngSwitchCase="'fir_number'">{{ fir.fir_number }}</span>
               <span *ngSwitchCase="'police_city'">{{ fir.police_city }}</span>
               <span *ngSwitchCase="'police_station'">{{ fir.police_station }}</span>
@@ -160,19 +141,37 @@
 
     <!-- Pagination Controls -->
     <nav *ngIf="totalPages > 1" aria-label="Page navigation" class="d-flex justify-content-end mt-3">
-      <ul class="pagination">
-        <li class="page-item" [class.disabled]="page === 1">
-          <button class="page-link" (click)="previousPage()">Previous</button>
-        </li>
-        <li class="page-item" *ngFor="let pageNum of totalPagesArray()">
-          <button class="page-link" (click)="goToPage(pageNum)" [class.active]="page === pageNum">
-            {{ pageNum }}
-          </button>
-        </li>
-        <li class="page-item" [class.disabled]="page === totalPages">
-          <button class="page-link" (click)="nextPage()">Next</button>
-        </li>
-      </ul>
+      <ul class="pagination mt-3">
+  <li class="page-item" [class.disabled]="currentPage === 1">
+    <button class="page-link" (click)="goToFirstPage()">Start</button>
+  </li>
+
+  <li class="page-item" [class.disabled]="currentPage === 1">
+    <button class="page-link" (click)="previousPage()">Previous</button>
+  </li>
+
+  <li
+    class="page-item"
+    *ngFor="let pageNum of totalPagesArray()"
+    [class.active]="currentPage === pageNum"
+  >
+    <button class="page-link" (click)="goToPage(pageNum)">
+      {{ pageNum }}
+    </button>
+  </li>
+
+  <li class="page-item" [class.disabled]="!hasNextPage()">
+    <button class="page-link" (click)="nextPage()">Next</button>
+  </li>
+
+  <li class="page-item" [class.disabled]="!hasNextPage()">
+    <button class="page-link" (click)="goToLastPage()">End</button>
+  </li>
+
+  <span class="ms-3 mt-2">
+    Page {{ currentPage }} of {{ totalPages }} ({{ totalRecords }} records)
+  </span>
+</ul>
     </nav>
   </div>
 </div>

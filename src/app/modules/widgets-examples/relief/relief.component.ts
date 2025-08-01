@@ -608,20 +608,20 @@ export class ReliefComponent implements OnInit {
   step3: false,
 };
 
-onInstallmentSubmitSave(step: 'step1' | 'step2' | 'step3') {
-  this.steps[step] = true;
+// onInstallmentSubmitSave(step: 'step1' | 'step2' | 'step3') {
+//   this.steps[step] = true;
+//   console.log(this.steps);
+//   const submitMethods = {
+//     step1: () => this.onFirstInstallmentSubmit(),
+//     step2: () => this.onSecondInstallmentSubmit(),
+//     step3: () => this.onThirdInstallmentSubmit(),
+//   };
 
-  const submitMethods = {
-    step1: () => this.onFirstInstallmentSubmit(),
-    step2: () => this.onSecondInstallmentSubmit(),
-    step3: () => this.onThirdInstallmentSubmit(),
-  };
+//   submitMethods[step]();
+// }
 
-  submitMethods[step]();
-}
-
-  async onFirstInstallmentSubmit(): Promise<void> {
-    if (!this.steps.step1) {
+  async onFirstInstallmentSubmit(saveDraft: boolean): Promise<void> {
+    if (!saveDraft && !this.steps.step1) {
       const invalidFields = this.getInvalidFields('firstInstallment');
       if (invalidFields.length > 0) {
         Swal.fire({
@@ -653,6 +653,7 @@ onInstallmentSubmitSave(step: 'step1' | 'step2' | 'step3') {
     // Prepare the data to send to the backend
     const firstInstallmentData = {
       firId: this.firId,
+      saveDraft,
       victims: this.victimsArray.value.map((victim: any, index: number) => ({
         victimReliefId: this.victimsReliefDetails?.[index]?.victim_relif_id || null, // Ensure index exists before accessing
         victimId: victim.victimId || null,
@@ -702,8 +703,8 @@ onInstallmentSubmitSave(step: 'step1' | 'step2' | 'step3') {
     });
   }
 
-  async onSecondInstallmentSubmit(): Promise<void> {
-    if (!this.steps.step2) {
+  async onSecondInstallmentSubmit(saveDraft:boolean): Promise<void> {
+    if (!saveDraft && !this.steps.step2) {
     const invalidFields = this.getInvalidFields('secondInstallment');
     if (invalidFields.length > 0) {
       Swal.fire({
@@ -735,6 +736,7 @@ onInstallmentSubmitSave(step: 'step1' | 'step2' | 'step3') {
     // Prepare the data for the backend
     const secondInstallmentData = {
       firId: this.firId,
+      saveDraft,
       victims: this.secondInstallmentVictimsArray.value.map((victim: any, index: number) => ({
         victimId: victim.victimId || null,
         victimChargesheetId: this.secondFormVictimInformation?.[index]?.victim_chargesheet_id || null,
@@ -781,8 +783,8 @@ onInstallmentSubmitSave(step: 'step1' | 'step2' | 'step3') {
     });
   }
 
-  async onThirdInstallmentSubmit(): Promise<void> {
-    if(!this.steps.step3){
+  async onThirdInstallmentSubmit(saveDraft:boolean): Promise<void> {
+    if(!saveDraft && !this.steps.step3){
       const invalidFields = this.getInvalidFields('thirdInstallment');
     if (invalidFields.length > 0) {
       Swal.fire({
@@ -811,6 +813,7 @@ onInstallmentSubmitSave(step: 'step1' | 'step2' | 'step3') {
     // Prepare the data for the backend
     const thirdInstallmentData = {
       firId: this.firId,
+      saveDraft,
       victims: this.thirdInstallmentVictimsArray.value.map((victim: any, index: number) => ({
         trialId: victim.trialId, // Use existing trial_id
         victimId: victim.victimId, // Use victim_id

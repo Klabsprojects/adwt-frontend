@@ -275,9 +275,14 @@
                 </div>
                   <!-- Submit Button -->
           <div class="d-flex justify-content-start align-items-center mt-4">
-            <button type="submit" class="btn btn-secondary me-2" (click)="onInstallmentSubmitSave('step1')" [disabled]="isDisable">Save as Draft</button>
-            <button type="submit" class="btn btn-primary" (click)="onFirstInstallmentSubmit()" [disabled]="isDisable">Submit</button>
-          </div>
+  <button type="button" class="btn btn-secondary me-2" (click)="onFirstInstallmentSubmit(true)" [disabled]="isDisable">
+    Save as Draft
+  </button>
+  <button type="button" class="btn btn-primary" (click)="onFirstInstallmentSubmit(false)" [disabled]="isDisable">
+    Submit
+  </button>
+</div>
+
               </div>
             </div>
           </div>
@@ -456,8 +461,9 @@
                     />
                   </div>
                   <div class="d-flex justify-content-start align-items-center mt-4">
-                    <button type="submit" class="btn btn-secondary me-2" (click)="onInstallmentSubmitSave('step2')" [disabled]="isDisable">Save as Draft</button>
-                    <button type="submit" class="btn btn-primary" (click)="onSecondInstallmentSubmit()">Submit</button>
+                    <button type="submit" class="btn btn-secondary me-2" (click)="onSecondInstallmentSubmit(true)" [disabled]="isDisable">Save as Draft</button>
+                    <button type="submit" class="btn btn-primary" (click)="onSecondInstallmentSubmit(false)">Submit</button>
+                  
                   </div>
 
                 </div>
@@ -638,8 +644,9 @@
 
                 <!-- Submit Button -->
                 <div class="d-flex justify-content-start align-items-center mt-4">
-                  <button type="submit" class="btn btn-secondary me-2" (click)="onInstallmentSubmitSave('step3')" [disabled]="isDisable">Save as Draft</button>
-                  <button type="submit" class="btn btn-primary"(click)="onThirdInstallmentSubmit()" >Submit</button>
+                  <button type="submit" class="btn btn-secondary me-2" (click)="onThirdInstallmentSubmit(true)" [disabled]="isDisable">Save as Draft</button>
+                  <button type="submit" class="btn btn-primary"(click)="onThirdInstallmentSubmit(false)" >Submit</button>
+                
                 </div>
               </div>
             </div>

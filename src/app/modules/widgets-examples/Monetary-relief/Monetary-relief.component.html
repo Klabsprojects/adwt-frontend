@@ -161,19 +161,39 @@
       <div *ngIf="filteredData.length === 0 && !loading" class="alert alert-warning">No FIR data available.</div>
       <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button>
       <nav *ngIf="filteredData.length > itemsPerPage" class="d-flex justify-content-end mt-3">
-        <ul class="pagination">
-          <li class="page-item" [class.disabled]="page === 1">
-            <button class="page-link" (click)="previousPage()">Previous</button>
-          </li>
-          <li class="page-item" *ngFor="let pageNum of totalPagesArray()">
-            <button class="page-link" (click)="goToPage(pageNum)" [class.active]="page === pageNum">
-              {{ pageNum }}
-            </button>
-          </li>
-          <li class="page-item" [class.disabled]="page === totalPages()">
-            <button class="page-link" (click)="nextPage()">Next</button>
-          </li>
-        </ul>
+       <ul class="pagination mt-3">
+  <li class="page-item" [class.disabled]="currentPage === 1">
+    <button class="page-link" (click)="goToFirstPage()">Start</button>
+  </li>
+
+  <li class="page-item" [class.disabled]="currentPage === 1">
+    <button class="page-link" (click)="previousPage()">Previous</button>
+  </li>
+
+  <li
+    class="page-item"
+    *ngFor="let pageNum of totalPagesArray()"
+    [class.active]="currentPage === pageNum"
+  >
+    <button class="page-link" (click)="goToPage(pageNum)">
+      {{ pageNum }}
+    </button>
+  </li>
+
+  <li class="page-item" [class.disabled]="!hasNextPage()">
+    <button class="page-link" (click)="nextPage()">Next</button>
+  </li>
+
+  <li class="page-item" [class.disabled]="!hasNextPage()">
+    <button class="page-link" (click)="goToLastPage()">End</button>
+  </li>
+
+  <span class="ms-3 mt-2">
+    Page {{ currentPage }} of {{ totalPages }} ({{ totalRecords }} records)
+  </span>
+</ul>
+
+
       </nav>
     </div>
 

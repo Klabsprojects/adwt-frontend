@@ -36,7 +36,7 @@ export class MrfAbstractComponent {
   reportData: Array<any> = [];
   filteredData: Array<any> = [];
   page: number = 1;
-  itemsPerPage: number = 10;
+  itemsPerPage: number = 40;
   isReliefLoading: boolean = true;
   loading: boolean = false;
   // Filters
@@ -222,7 +222,7 @@ displayedColumns: DisplayedColumn[] = [
       .subscribe(({ districts, offences }) => {
         this.districts = districts;
         this.naturesOfOffence = offences;
-        this.fetchMonetaryReliefDetails();
+        this.fetchMrfAbstract();
       });
       this.getDropdowns();
     this.filteredData = [...this.reportData];
@@ -343,6 +343,7 @@ onBtnExport(): void {
     ['Sl. No.', 'District', 'Total Cases', 'FIR', '', '', 'CHARGESHEET', '', '', 'TRIAL', '', ''],
     ['', '', '', 'Proposal sent to DC', 'Relief Given', 'Relief Pending', 'Proposal sent to DC', 'Relief Given', 'Relief Pending', 'Proposal sent to DC', 'Relief Given', 'Relief Pending']
   ];
+
   const data = this.filteredData.map((item, index) => [
     index + 1,
     item.revenue_district,
@@ -358,7 +359,23 @@ onBtnExport(): void {
     item.trial_relief_pending
   ]);
 
-  const aoa = [...headers, ...data];
+  // Compute totals for numeric columns
+  const totalRow = [
+    '', // Sl. No.
+    'Total', // District column
+    this.sumByKey('total_cases'),
+    this.sumByKey('fir_proposal_sent_to_dc'),
+    this.sumByKey('fir_relief_given'),
+    this.sumByKey('fir_relief_pending'),
+    this.sumByKey('chargesheet_proposal_sent_to_dc'),
+    this.sumByKey('chargesheet_relief_given'),
+    this.sumByKey('chargesheet_relief_pending'),
+    this.sumByKey('trial_proposal_sent_to_dc'),
+    this.sumByKey('trial_relief_given'),
+    this.sumByKey('trial_relief_pending')
+  ];
+
+  const aoa = [...headers, ...data, totalRow];
   const worksheet = XLSX.utils.aoa_to_sheet(aoa);
 
   // Define merged cells
@@ -371,11 +388,20 @@ onBtnExport(): void {
     { s: { r: 0, c: 9 }, e: { r: 0, c: 11 } } // TRIAL
   ];
 
-  const workbook: XLSX.WorkBook = { Sheets: { 'MRF Abstract': worksheet }, SheetNames: ['MRF Abstract'] };
-  const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const workbook: XLSX.WorkBook = {
+    Sheets: { 'MRF Abstract': worksheet },
+    SheetNames: ['MRF Abstract']
+  };
 
+  const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
   this.saveAsExcelFile(excelBuffer, 'mrf_abstract');
 }
+
+// Helper method to sum column values
+sumByKey(key: string): number {
+  return this.filteredData.reduce((sum, item) => sum + (Number(item[key]) || 0), 0);
+}
+
 
 saveAsExcelFile(buffer: any, filename: string): void {
   const data: Blob = new Blob([buffer], { type: 'application/octet-stream' });
@@ -400,7 +426,8 @@ saveAsExcelFile(buffer: any, filename: string): void {
       this.selectedPoliceCity='';
       this.selectedFromDate='';
       this.selectedToDate = '';
-      this.filteredData = [...this.reportData]; 
+      this.fetchMrfAbstract();
+      // this.filteredData = [...this.reportData]; 
   }
 
     getStatusTextUIPT(status: number): string {
@@ -518,31 +545,69 @@ applyFilters() {
   });
 }
 
-  fetchMonetaryReliefDetails(): void {
+totalRow: any = {}; // Already declared
+
+fetchMrfAbstract(): void {
   this.loader = true;
+
   this.mrfAbstractService.getMrfAbstractDetails(this.payload).subscribe({
     next: (response: any) => {
-      // console.log(response.data);
-      this.reportData = (response.data || [])
-        .filter((item: any) => item.revenue_district && item.revenue_district.trim() !== '') // 🔍 Filter non-empty district
-        .map((item: any, index: number) => ({
+      const data = (response.data || []).filter(
+        (item: any) => item.revenue_district && item.revenue_district.trim() !== ''
+      );
+
+      const totals: { [key: string]: any } = {
+        sl_no: '',
+        revenue_district: 'Total',
+        total_cases: 0,
+        fir_proposal_sent_to_dc: 0,
+        fir_relief_given: 0,
+        fir_relief_pending: 0,
+        chargesheet_proposal_sent_to_dc: 0,
+        chargesheet_relief_given: 0,
+        chargesheet_relief_pending: 0,
+        trial_proposal_sent_to_dc: 0,
+        trial_relief_given: 0,
+        trial_relief_pending: 0
+      };
+
+      this.reportData = data.map((item: any, index: number) => {
+        const row: { [key: string]: any } = {
           sl_no: index + 1,
           revenue_district: item.revenue_district,
-          total_cases: item.total_cases,
-          fir_proposal_sent_to_dc: item.fir_proposal_sent_to_dc,
-          fir_relief_given: item.fir_relief_given,
-          fir_relief_pending: item.fir_relief_pending,
-          chargesheet_proposal_sent_to_dc: item.chargesheet_proposal_sent_to_dc,
-          chargesheet_relief_given: item.chargesheet_relief_given,
-          chargesheet_relief_pending: item.chargesheet_relief_pending,
-          trial_proposal_sent_to_dc: item.trial_proposal_sent_to_dc,
-          trial_relief_given: item.trial_relief_given,
-          trial_relief_pending: item.trial_relief_pending
-        }));
+          total_cases: +item.total_cases || 0,
+          fir_proposal_sent_to_dc: +item.fir_proposal_sent_to_dc || 0,
+          fir_relief_given: +item.fir_relief_given || 0,
+          fir_relief_pending: +item.fir_relief_pending || 0,
+          chargesheet_proposal_sent_to_dc: +item.chargesheet_proposal_sent_to_dc || 0,
+          chargesheet_relief_given: +item.chargesheet_relief_given || 0,
+          chargesheet_relief_pending: +item.chargesheet_relief_pending || 0,
+          trial_proposal_sent_to_dc: +item.trial_proposal_sent_to_dc || 0,
+          trial_relief_given: +item.trial_relief_given || 0,
+          trial_relief_pending: +item.trial_relief_pending || 0
+        };
 
+        // Add to totals
+        Object.keys(totals).forEach((key) => {
+          if (typeof totals[key] === 'number') {
+            totals[key] += row[key] || 0;
+          }
+        });
+
+        return row;
+      });
+
+      // Store total row for external use if needed
+      this.totalRow = totals;
+
+      // Append total row at the bottom
+      // this.reportData.push(totals);
+
+      // Set filtered data for table
       this.filteredData = [...this.reportData];
+
       this.loader = false;
-      this.cdr.detectChanges(); // Trigger change detection
+      this.cdr.detectChanges();
     },
     error: (error: any) => {
       this.loader = false;
@@ -550,6 +615,16 @@ applyFilters() {
     }
   });
 }
+
+
+
+getColumnTotal(field: string): number {
+  return this.reportData.reduce((total, row) => {
+    const val = parseFloat(row[field]);
+    return total + (isNaN(val) ? 0 : val);
+  }, 0);
+}
+
 
   getVisibleColumns() {
   return this.displayedColumns.filter(col => col.visible);
