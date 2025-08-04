@@ -9,6 +9,17 @@
     </div>
     <div class="card-toolbar d-flex align-items-center gap-3">
       <!-- Visible Columns with Drag-and-Drop -->
+
+     <mat-form-field appearance="outline" class="w-250px">
+  <mat-label>Select Filters</mat-label>
+  <mat-select [multiple]="true" [(value)]="activeFilters" (selectionChange)="updateFilterVisibility()">
+     <mat-option *ngFor="let filter of filterFields" [value]="filter.key">
+      {{ filter.label }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+
+
       <mat-form-field appearance="outline" class="w-250px">
         <mat-label>Selected Columns</mat-label>
         <mat-select>
@@ -34,105 +45,188 @@
     </div>
     <!-- Filters -->
 
+   
     <div class="d-flex gap-3 mb-3">
-      <select *ngIf="Parsed_UserInfo.access_type != 'District'" class="form-select" [(ngModel)]="selectedDistrict"
+      <select *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('city')" class="form-select" (change)="onCityChange($event)" [(ngModel)]="selectedDistrict"
         >
         <option value="" selected hidden disabled>Police City</option>
         <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
       </select>
 
-      <select *ngIf="Parsed_UserInfo.access_type != 'District'" class="form-select" [(ngModel)]="selectedPoliceZone"
+      <select *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('zone')" class="form-select" [(ngModel)]="selectedPoliceZone"
         >
         <option value="" selected hidden disabled>Police Zone</option>
         <option *ngFor="let item of policeZones" [value]="item">{{ item }}</option>
       </select>
 
 
-      <select *ngIf="Parsed_UserInfo.access_type != 'District'" class="form-select" [(ngModel)]="selectedPoliceRange"
+      <select *ngIf="Parsed_UserInfo.access_type != 'District'  && isVisible('range')" class="form-select" [(ngModel)]="selectedPoliceRange"
         >
         <option value="" selected hidden disabled>Police Range</option>
         <option *ngFor="let item of policeRanges" [value]="item.police_range">{{ item.police_range }}</option>
       </select>
 
-      <select *ngIf="Parsed_UserInfo.access_type != 'District'" class="form-select"
+      <select *ngIf="Parsed_UserInfo.access_type != 'District'  && isVisible('revenueDistrict')" class="form-select"
         [(ngModel)]="selectedRevenue_district" >
         <option value="" selected hidden disabled>Revenue District</option>
         <option *ngFor="let item of revenueDistricts" [value]="item.revenue_district">{{ item.revenue_district }}
         </option>
       </select>
 
-      <!-- <select class="form-select" [(ngModel)]="selectedComplaintReceivedType" >
-        <option value="" selected hidden disabled>Complaint Received Type</option>
-        <option value="written" >written</option>
-        <option value="oral" >oral</option>
-      </select> -->
+       <select *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('station')" class="form-select"
+       [(ngModel)]="selectedPoliceStation">
+          <option value="" disabled>Police Station</option>
+          <option *ngFor="let station of policeStations" [value]="station">{{ station }}</option>
+       </select>
 
-   
     </div>
 
     <div class="d-flex gap-3 mb-3">
 
-         <select class="form-select" [(ngModel)]="selectedOffenceGroup" >
-        <option value="" selected hidden disabled>Offence</option>
-        <option *ngFor="let item of offenceGroupsList" [value]="item">
-          {{ item }}
-        </option>
+       <select *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('community')" class="form-select"
+       [(ngModel)]="selectedCommunity" (change)="onCommunityChange($event)"  >
+          <option value="" disabled>Community</option>
+          <option *ngFor="let community of communitiesOptions" [value]="community">{{ community }}</option>
+
+       </select>
+
+       <select *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('caste')" class="form-select"
+       [(ngModel)]="selectedCaste">
+          <option value="" disabled>Caste</option>
+          <option *ngFor="let caste of casteOptions" [value]="caste">{{ caste }}</option>
       </select>
 
-      <select class="form-select" [(ngModel)]="RegistredYear" >
+       <select *ngIf="isVisible('registeredYear')" class="form-select" [(ngModel)]="RegistredYear">
         <option value="" selected hidden disabled>Year of Registration</option>
         <option *ngFor="let item of years" [value]="item">
           {{ item }}
         </option>
       </select>
 
-      <div class="tooltip-container">
+      <div class="tooltip-container" *ngIf="isVisible('regDate')">
         <input type="date" [(ngModel)]="startDate"  class="form-control"
           placeholder="Start Date">
         <span class="tooltip-text">Date of Registration From Date</span>
       </div>
 
-      <div class="tooltip-container">
+      <div class="tooltip-container" *ngIf="isVisible('regDate')">
         <input type="date" [(ngModel)]="endDate"  class="form-control" placeholder="End Date">
         <span class="tooltip-text">Date of Registration To Date</span>
       </div>
-
-      <select class="form-select" [(ngModel)]="selectedUIPT" >
-        <option value="" selected hidden disabled>UI/PT</option>
-        <option value="UI">UI</option>
-        <option value="PT">PT</option>
-      </select>
-    </div>
+</div>
 
     <div class="d-flex gap-3 mb-3">
 
-      <div class="tooltip-container">
+      <div class="tooltip-container" *ngIf="isVisible('createdAt')">
         <input type="date" [(ngModel)]="CreatedATstartDate"  class="form-control"
           placeholder="Start Date">
         <span class="tooltip-text">Created AT From Date</span>
       </div>
 
-      <div class="tooltip-container">
+      <div class="tooltip-container" *ngIf="isVisible('createdAt')">
         <input type="date" [(ngModel)]="CreatedATendDate"  class="form-control" placeholder="End Date">
         <span class="tooltip-text">Created AT To Date</span>
       </div>
 
-      <div class="tooltip-container">
+       <div class="tooltip-container" *ngIf="isVisible('modifiedAt')">
         <input type="date" [(ngModel)]="ModifiedATstartDate"  class="form-control"
           placeholder="Start Date">
         <span class="tooltip-text">Modified AT From Date</span>
       </div>
 
-      <div class="tooltip-container">
+      <div class="tooltip-container" *ngIf="isVisible('modifiedAt')">
         <input type="date" [(ngModel)]="ModifiedATDate"  class="form-control" placeholder="End Date">
         <span class="tooltip-text">Modified AT To Date</span>
       </div>
-      
+    
+      <select class="form-select" [(ngModel)]="selectedUIPT" *ngIf="isVisible('status')">
+        <option value="" selected hidden disabled>Status of Case</option>
+        <option value="UI">UI</option>
+        <option value="PT">PT</option>
+        <option value="Conviction">Conviction</option>
+        <option value="Acquitted">Acquitted</option>
+        <option value="FIR Quashed">FIR Quashed</option>
+        <option value="MF">MF</option>
+        <option value="Section Deleted">Section Deleted</option>
+        <option value="Charge Abated"> Charge Abated</option>
+        <option value=" Quashed"> Quashed</option>
+      </select>
+    </div>
 
-      <button style="width: 8% !important;" (click)="SearchList()" class="btn btn-primary btn-sm">Search</button>
+
+
+    <div class="d-flex gap-3 mb-3">  
+      <select class="form-select" [(ngModel)]="selectedOffenceGroup" *ngIf="isVisible('offenceGroup')">
+        <option value="" selected hidden disabled>Nature of Case</option>
+        <option *ngFor="let item of offenceGroupsList" [value]="item">
+          {{ item }}
+        </option>
+      </select>
+
+      <select class="form-select" [(ngModel)]="selectedSectionOfLaw" *ngIf="isVisible('sectionOfLaw')">
+        <option value="" selected hidden disabled>Section of Law</option>
+        <option *ngFor="let section of sectionOfLaw" [value]="section.offence_act_name">{{ section.offence_act_name }}</option>
+
+      </select>
+
+      <select class="form-select" [(ngModel)]="selectedCourt" *ngIf="isVisible('court')">
+        <option value="" selected hidden disabled>Court</option>
+        <!-- <option *ngFor="let item of offenceGroupsList" [value]="item">
+          {{ item }}
+        </option> -->
+      </select>
+
+      <select class="form-select" [(ngModel)]="selectedConvictionType" *ngIf="isVisible('convictionType')">
+        <option value="" selected hidden disabled>Conviction Type</option>
+        <option value="Life Sentence">Life Sentence</option>
+        <option value="Below 5 years imprisonment">Below 5 years imprisonment</option>
+        <option value="Others">Others</option>
+        <option value="Below 1 year imprisonment">Below 1 year imprisonment</option>
+        <option value="Above 20 Years imprisonment">Above 20 Years imprisonment</option>
+        <option value="Double Life Sentence">Double Life Sentence</option>
+        <option value="Above 10 Years imprisonment">Above 10 Years imprisonment</option>
+        <option value="Above 5 Years imprisonment">Above 5 Years imprisonment</option>
+      </select>
+
+      <div class="tooltip-container" *ngIf="isVisible('chargeSheetDate')">
+        <input type="date" [(ngModel)]="selectedChargeSheetDate"  class="form-control" placeholder="End Date">
+        <span class="tooltip-text">Chargesheet Date</span>
+      </div>
+  </div>
+
+  <div class="d-flex gap-3 mb-3">
+
+   <select class="form-select" [(ngModel)]="selectedLegal" *ngIf="isVisible('legal')">
+        <option value="" selected hidden disabled>Has Legal Opnion Obtained</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+
+      <select class="form-select" [(ngModel)]="selectedCase" *ngIf="isVisible('fitCase')">
+        <option value="" selected hidden disabled>Is the Case fit for Appeal</option>
+        <option value="yes">Yes</option>
+         <option value="no">No</option>
+      </select>
+
+      <select class="form-select" [(ngModel)]="selectedFiled" *ngIf="isVisible('filedBy')">
+        <option value="" selected hidden disabled>Who has filed the appeal</option>
+        <option value="victim">Victim</option>
+        <option value="government">Government</option>
+      </select>
+
+      <select class="form-select" [(ngModel)]="selectedAppeal" *ngIf="isVisible('appealCourt')">
+        <option value="" selected hidden disabled>Appeal Court</option>
+        <option value="High Court">High Court</option>
+        <option value="Supreme Court">Supreme Court</option>
+      </select>
+
+    
+
+       <button style="width: 8% !important;" (click)="SearchList()" class="btn btn-primary btn-sm">Search</button>
       <button style="width: 8% !important;" (click)="clearfilter()" class="btn btn-primary btn-sm">Clear
         Filters</button>
-    </div>
+</div>
+
 
     <!-- Show message if FIR list is empty -->
     <div *ngIf="filteredFirList().length === 0" class="alert alert-warning">
@@ -157,7 +251,7 @@
           <tr *ngFor="let fir of paginatedFirList(); let i = index">
             <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
               <ng-container [ngSwitch]="column.field">
-                <span *ngSwitchCase="'sl_no'">{{ fir.row_num }}</span>
+                <span *ngSwitchCase="'sl_no'">{{ (currentPage - 1) * pageSize + i + 1 }}</span>
                 <span *ngSwitchCase="'fir_number'">{{ fir.fir_number }}</span>
                 <span *ngSwitchCase="'fir_id'">{{ fir.fir_id }}</span>
                 <span *ngSwitchCase="'police_city'">{{ fir.police_city }}</span>

@@ -307,8 +307,10 @@ export class FirListComponent implements OnInit {
   filedAppeal_3rdAccquitted: string = ''; // Default: Who has filed the appeal
 
   filteredList: any[] = [];
-
-
+  policeStations: string[] = [];
+  communitiesOptions: string[] = [];
+  casteOptions:string[]=[];
+  sectionOfLaw: any[] = [];
 
 
   // nextHearingDate: string = ''; // Default: Next Hearing Date
@@ -378,10 +380,16 @@ export class FirListComponent implements OnInit {
   selectedStatusOfCase: string = '';
   selectedStatusOfRelief: string = '';
   selectedOffenceGroup: string = '';
+  selectedSectionOfLaw:string='';
+  selectedCourt:string='';
+  selectedConvictionType:string='';
   RegistredYear: string = '';
   selectedPoliceZone: string = '';
   selectedPoliceRange: string = '';
   selectedRevenue_district: string = '';
+  selectedPoliceStation:string='';
+  selectedCommunity:string='';
+  selectedCaste:string='';
   selectedComplaintReceivedType: string = '';
   startDate: string = '';
   endDate: string = '';
@@ -390,6 +398,11 @@ export class FirListComponent implements OnInit {
   ModifiedATstartDate: string = '';
   ModifiedATDate: string = '';
   selectedUIPT: string = '';
+  selectedChargeSheetDate:string='';
+  selectedLegal:string='';
+  selectedCase:string='';
+  selectedFiled:string='';
+  selectedAppeal:string='';
 
 
 
@@ -522,6 +535,37 @@ export class FirListComponent implements OnInit {
     { label: 'Actions', field: 'actions', sortable: false, visible: true },
   ];
 
+
+  filterFields = [
+  { key: 'city', label: 'Police City', visible: true },
+  { key: 'zone', label: 'Police Zone', visible: true },
+  { key: 'range', label: 'Police Range', visible: true },
+  { key: 'revenueDistrict', label: 'Revenue District', visible: true },
+  { key: 'station', label: 'Police Station', visible: true },
+  { key: 'community', label: 'Community', visible: false },
+  { key: 'caste', label: 'Caste', visible: false },
+  { key: 'registeredYear', label: 'Year of Registration', visible: false },
+  { key: 'regDate', label: 'Reg. Date From - To', visible: false },
+  // { key: 'regDate', label: 'Reg. Date To', visible: false },
+  { key: 'createdAt', label: 'Created At From - To', visible: false },
+  // { key: 'createdAt', label: 'Created At To', visible: false },
+  { key: 'modifiedAt', label: 'Modified At From - To', visible: false },
+  // { key: 'modifiedAt', label: 'Modified At To', visible: false },
+  { key: 'status', label: 'Status of Case', visible: false },
+  { key: 'offenceGroup', label: 'Nature of Case', visible: false },
+  { key: 'sectionOfLaw', label: 'Section of Law', visible: false },
+  { key: 'court', label: 'Court', visible: false },
+  { key: 'convictionType', label: 'Conviction Type', visible: false },
+  { key: 'chargeSheetDate', label: 'Chargesheet Date', visible: false },
+  { key: 'legal', label: 'Legal Opinion', visible: false },
+  { key: 'fitCase', label: 'Fit for Appeal', visible: false },
+  { key: 'filedBy', label: 'Filed By', visible: false },
+  { key: 'appealCourt', label: 'Appeal Court', visible: false }
+];
+
+activeFilters: string[] = ['city', 'zone', 'range', 'revenueDistrict', 'station'];
+
+
   years: number[] = [];
 
   selectedColumns: any[] = [...this.displayedColumns];
@@ -562,6 +606,10 @@ export class FirListComponent implements OnInit {
     this.loadPoliceRanges();
     this.loadRevenue_district();
     this.generateYearOptions();
+    this.loadCommunities();
+    this.loadOptions();
+    this.updateFilterVisibility();
+
 
     setTimeout(() => {
       this.route.queryParams.subscribe(params => {
@@ -589,6 +637,73 @@ export class FirListComponent implements OnInit {
       this.years.push(year);
     }
   }
+
+ updateFilterVisibility() {
+  this.filterFields.forEach(f => {
+    f.visible = this.activeFilters.includes(f.key);
+  });
+}
+
+
+isVisible(key: string): boolean {
+  const field = this.filterFields.find(f => f.key === key);
+  return field ? field.visible : false;
+}
+
+  loadCommunities(): void {
+    this.firGetService.getAllCommunities().subscribe(
+      (communities: any) => {
+        this.communitiesOptions = communities; // Populate community options
+      },
+      (error) => {
+        console.error('Error loading communities:', error);
+        Swal.fire('Error', 'Failed to load communities.', 'error');
+      }
+    );
+  }
+
+
+onCommunityChange(event: any): void {
+  const selectedCommunity = event.target.value;
+  console.log('Selected community:', selectedCommunity);
+
+  if (selectedCommunity) {
+    this.firGetService.getCastesByCommunity(selectedCommunity).subscribe(
+      (res: string[]) => {
+        console.log('API caste list:', res);
+        this.casteOptions = [];
+        res.forEach(caste => {
+          this.casteOptions.push(caste);
+        });
+
+        // Optional: trigger change detection
+        this.cdr.detectChanges();
+      },
+      (error) => {
+        console.error('Error fetching castes:', error);
+        Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+      }
+    );
+  } 
+}
+
+loadOptions() {
+    this.firGetService.getOffences().subscribe(
+      (offences: any) => {
+        console.log(offences);
+        this.sectionOfLaw = offences
+          .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
+          this.sectionOfLaw.push(
+              { offence_act_name: '3(2)(va)', offence_name: '3(2)(va)', id : 24 },
+              { offence_act_name: '3(2)(v), 3(2)(va)', offence_name: '3(2)(v), 3(2)(va)', id: 25 }
+          );
+      },
+      (error: any) => {
+        Swal.fire('Error', 'Failed to load offence options.', 'error');
+      }
+    );
+  }
+
 
 
   loadFirDetails(firId: any) {
@@ -1467,7 +1582,7 @@ export class FirListComponent implements OnInit {
     this.firService.getPaginatedFirList(page, pageSize, this.getFilterParams()).subscribe(
       (response: any) => {
         this.firList = response.data;
-        console.log(response.data,response.data.status);
+        // console.log(response.data,response.data.status);
         this.totalRecords = response.total;
         this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
         this.filteredList = [...this.firList];
@@ -1603,87 +1718,47 @@ export class FirListComponent implements OnInit {
 
 
   getFilterParams() {
-    const params: any = {};
+  const params: any = {};
 
-    if (this.searchText) {
-      params.search = this.searchText;
-    }
+  const addParam = (key: string, value: any) => {
+    if (value) params[key] = value;
+  };
 
-    if (this.selectedDistrict) {
-      params.district = this.selectedDistrict;
-    }
+  addParam('search', this.searchText);
+  addParam('district', this.selectedDistrict);
+  addParam('police_zone', this.selectedPoliceZone);
+  addParam('police_range', this.selectedPoliceRange);
+  addParam('revenue_district', this.selectedRevenue_district);
+  addParam('policeStation', this.selectedPoliceStation);
+  addParam('community', this.selectedCommunity);
+  addParam('caste', this.selectedCaste);
+  addParam('year', this.RegistredYear);
+  addParam('CreatedATstartDate', this.CreatedATstartDate);
+  addParam('CreatedATendDate', this.CreatedATendDate);
+  addParam('ModifiedATstartDate', this.ModifiedATstartDate);
+  addParam('ModifiedATDate', this.ModifiedATDate);
+  addParam('start_date', this.startDate);
+  addParam('end_date', this.endDate);
+  addParam('statusOfCase', this.selectedStatusOfCase);
+  addParam('sectionOfLaw', this.selectedSectionOfLaw);
+  addParam('court', this.selectedCourt);
+  addParam('convictionType', this.selectedConvictionType);
+  addParam('chargesheetDate', this.selectedChargeSheetDate);
+  addParam('hasLegalObtained', this.selectedLegal);
+  addParam('caseFitForAppeal', this.selectedCase);
+  addParam('filedBy', this.selectedFiled);
+  addParam('appealCourt', this.selectedAppeal);
+ 
 
-    if (this.selectedPoliceZone) {
-      params.police_zone = this.selectedPoliceZone;
-    }
-
-    if (this.selectedPoliceRange) {
-      params.police_range = this.selectedPoliceRange;
-    }
-
-    if (this.selectedRevenue_district) {
-      params.revenue_district = this.selectedRevenue_district;
-    }
-
-    if (this.selectedComplaintReceivedType) {
-      params.complaintReceivedType = this.selectedComplaintReceivedType;
-    }
-
-    if (this.startDate) {
-      params.start_date = this.startDate;
-    }
-
-    if (this.endDate) {
-      params.end_date = this.endDate;
-    }
-
-    if (this.CreatedATstartDate) {
-      params.CreatedATstartDate = this.CreatedATstartDate;
-    }
-
-    if (this.CreatedATendDate) {
-      params.CreatedATendDate = this.CreatedATendDate;
-    }
-
-    if (this.ModifiedATstartDate) {
-      params.ModifiedATstartDate = this.ModifiedATstartDate;
-    }
-
-    if (this.ModifiedATDate) {
-      params.ModifiedATDate = this.ModifiedATDate;
-    }
-
-    if (this.selectedUIPT) {
-      params.UIPT = this.selectedUIPT;
-    }
-
-    if (this.selectedStatusOfRelief) {
-      params.status = this.selectedStatusOfRelief;
-    }
-
-    if (this.selectedOffenceGroup) {
-      params.Offence_group = this.selectedOffenceGroup;
-    }
-
-    if (this.RegistredYear) {
-      params.year = this.RegistredYear;
-    }
-
-    if (this.Parsed_UserInfo.role == '3') {
-      params.district = this.Parsed_UserInfo.police_city
-    }
-    else {
-      if (this.Parsed_UserInfo.access_type == 'District') {
-        params.revenue_district = this.Parsed_UserInfo.district;
-      }
-    }
-
-
-
-    // Add other filters as needed
-
-    return params;
+  // Override based on user role/access_type
+  if (this.Parsed_UserInfo.role === '3') {
+    params.district = this.Parsed_UserInfo.police_city;
+  } else if (this.Parsed_UserInfo.access_type === 'District') {
+    params.revenue_district = this.Parsed_UserInfo.district;
   }
+
+  return params;
+}
 
   // Apply filters to the FIR list
   // applyFilters() {
@@ -1740,6 +1815,7 @@ export class FirListComponent implements OnInit {
     this.selectedPoliceZone = '';
     this.selectedPoliceRange = '';
     this.selectedRevenue_district = '';
+    this.selectedPoliceStation = '';
     this.selectedComplaintReceivedType = '';
     this.selectedNatureOfOffence = '';
     this.selectedStatusOfCase = '';
@@ -1798,7 +1874,7 @@ export class FirListComponent implements OnInit {
       1: 'Pending | FIR Stage | Step 1 Completed',
       2: 'Pending | FIR Stage | Step 2 Completed',
       3: 'Pending | FIR Stage | Step 3 Completed',
-      4: 'Completed | FIR Stage',
+      4: 'Pending | FIR Stage | Step 4 Completed',
       5: 'Completed | FIR Stage',
       6: 'Charge Sheet Completed',
       7: 'Trial Stage Completed',
@@ -1842,7 +1918,7 @@ export class FirListComponent implements OnInit {
       1: 'badge bg-warning text-dark',
       2: 'badge bg-warning text-dark',
       3: 'badge bg-warning text-dark',
-      4: 'badge bg-success text-white',
+      4: 'badge bg-warning text-dark',
       5: 'badge bg-success text-white',
       6: 'badge bg-success text-white',
       7: 'badge bg-success text-white',
@@ -2058,5 +2134,26 @@ export class FirListComponent implements OnInit {
       console.error('Navigation Error:', err);
     });
   }
+
+  onCityChange(event: any)
+{
+
+  const district = event.target.value;
+   if (district) {
+      this.firGetService.getPoliceStations(district).subscribe(
+        (stations: string[]) => {
+          this.policeStations = stations.map(station =>
+            station.replace(/\s+/g, '-')); // Replace spaces with "-"
+          this.cdr.detectChanges(); // Trigger UI update
+        },
+        (error) => {
+          console.error('Error fetching police stations:', error);
+        }
+      );
+    }
+      // this.loadPoliceStations(district);
+   
+}
+
 
 }
