@@ -47,8 +47,7 @@
 
    
     <div class="d-flex gap-3 mb-3">
-      <select *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('city')" class="form-select" (change)="onCityChange($event)" [(ngModel)]="selectedDistrict"
-        >
+      <select *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('city')" class="form-select" (change)="onCityChange($event)" [(ngModel)]="selectedDistrict">
         <option value="" selected hidden disabled>Police City</option>
         <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
       </select>
@@ -67,7 +66,7 @@
       </select>
 
       <select *ngIf="Parsed_UserInfo.access_type != 'District'  && isVisible('revenueDistrict')" class="form-select"
-        [(ngModel)]="selectedRevenue_district" >
+        [(ngModel)]="selectedRevenue_district" (change)="onDistrictChange($event)">
         <option value="" selected hidden disabled>Revenue District</option>
         <option *ngFor="let item of revenueDistricts" [value]="item.revenue_district">{{ item.revenue_district }}
         </option>
@@ -138,18 +137,32 @@
         <input type="date" [(ngModel)]="ModifiedATDate"  class="form-control" placeholder="End Date">
         <span class="tooltip-text">Modified AT To Date</span>
       </div>
+
+
+      <select class="form-select" [(ngModel)]="selectedDataEntryStatus" *ngIf="isVisible('dataEntryStatus')">
+        <option value="" selected  disabled>Data Entry Status</option>
+        <option value="0">FIR Draft</option>
+        <option value="1">Step 1 Completed</option>
+        <option value="2">Step 2 Completed</option>
+        <option value="3">Step 3 Completed</option>
+        <option value="4">Step 4 Completed</option>
+        <option value="5">Completed | FIR Stage</option>
+        <option value="6">Charge Sheet Completed</option>
+        <option value="7">Trial Stage Completed</option>
+      </select>
+
     
-      <select class="form-select" [(ngModel)]="selectedUIPT" *ngIf="isVisible('status')">
+      <select class="form-select" [(ngModel)]="selectedStatusOfCase" *ngIf="isVisible('status')">
         <option value="" selected hidden disabled>Status of Case</option>
         <option value="UI">UI</option>
         <option value="PT">PT</option>
-        <option value="Conviction">Conviction</option>
+        <option value="Convicted">Conviction</option>
         <option value="Acquitted">Acquitted</option>
-        <option value="FIR Quashed">FIR Quashed</option>
+        <option value="FirQuashed">FIR Quashed</option>
         <option value="MF">MF</option>
-        <option value="Section Deleted">Section Deleted</option>
-        <option value="Charge Abated"> Charge Abated</option>
-        <option value=" Quashed"> Quashed</option>
+        <option value="SectionDeleted">Section Deleted</option>
+        <option value="Charge_Abated"> Charge Abated</option>
+        <option value="Quashed"> Quashed</option>
       </select>
     </div>
 
@@ -171,9 +184,9 @@
 
       <select class="form-select" [(ngModel)]="selectedCourt" *ngIf="isVisible('court')">
         <option value="" selected hidden disabled>Court</option>
-        <!-- <option *ngFor="let item of offenceGroupsList" [value]="item">
+        <option *ngFor="let item of courtList" [value]="item">
           {{ item }}
-        </option> -->
+        </option>
       </select>
 
       <select class="form-select" [(ngModel)]="selectedConvictionType" *ngIf="isVisible('convictionType')">

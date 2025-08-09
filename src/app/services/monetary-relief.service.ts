@@ -18,17 +18,15 @@ export class MonetaryReliefService {
     return this.http.get(`${this.baseUrl}/get-monetary-relief-details`);
   }
 
-  getMonetaryReliefData(payload: {
-  district: string;
-  community: string;
-  caste: string;
-  police_city: string;
-  Status_Of_Case: string;
-  police_zone: string;
-  Filter_From_Date: string;
-  Filter_To_Date: string;
-}): Observable<any> {
-  return this.http.post(`${this.baseUrl}/getmonetaryReliefData`, payload);
+ getMonetaryReliefData(page: number, pageSize: number,filters: any = {}): Observable<any> {
+  let params = new HttpParams()
+    .set('page', page.toString())
+    .set('pageSize', pageSize.toString());
+    Object.keys(filters).forEach(key => {
+        params = params.set(key, filters[key]);
+      });
+
+  return this.http.get(`${this.baseUrl}/getmonetaryReliefDatav1`, { params });
 }
 
   

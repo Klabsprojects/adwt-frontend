@@ -66,9 +66,16 @@ export class AdditionalReliefComponent {
   ];
 
   uploadProceedingsExisitingPath : string | null;
+  uploadEmployeeProceedingsExisitingPath : string | null;
+  uploadHouseProceedingsExisitingPath : string | null;
+  uploadEducationProceedingsExisitingPath : string | null;
   uploadcompensationProceedingsExisitingPath : string | null;
   uploadDocumentExisitingPath : string | null;
+  uploadedEducationFiles: any[] = [];
   showFileInput = true;
+  showEmployeeInput = true;
+  showHouseInput = true;
+  showEducationInput = true;
   showFileInput1 = true;
   file_access = environment.file_access;
 
@@ -111,6 +118,9 @@ export class AdditionalReliefComponent {
       officeDistrict: [''],
       appointmentOrderDate: [''],
       providingOrderDate: [''],
+      employmentProceedingsFileNumber:[''],
+      employmentProceedingsDate:[''],
+      employmentProceedingsDocument:[''],
 
       // House Site Patta Details
       houseSitePattaStatus: [''],
@@ -122,6 +132,9 @@ export class AdditionalReliefComponent {
       districtName: [''],
       pinCode: [''],
       houseSitePattaIssueDate: [''],
+      houseSitePattaProceedingsFileNumber:[''],
+      houseSitePattaProceedingsDate:[''],
+      houseSitePattaProceedingsDocument:[''],
 
       // Education Concession
       educationConcessionStatus: [''],
@@ -129,6 +142,7 @@ export class AdditionalReliefComponent {
       otherReasonEducation: [''],
       numberOfChildren: [''],
       children: this.fb.array([]),
+
       
 
       // Provisions Given
@@ -156,7 +170,7 @@ export class AdditionalReliefComponent {
       (data) => {
         
         this.districts = data; // Assign the fetched districts to the dropdown
-        console.log(this.districts)
+        // console.log(this.districts)
       },
       (error) => {
         console.error('error on retrive district')
@@ -206,9 +220,10 @@ export class AdditionalReliefComponent {
       amountDisbursed: ['', Validators.required],
       proceedingsFileNumber: ['', Validators.required],
       dateOfProceedings: ['', Validators.required],
-      uploadProceedings: ['', Validators.required],
+      educationConcessionDocument: ['', Validators.required],
     });
     this.children.push(childFormGroup);
+    this.uploadedEducationFiles.push(null); // Reserve slot for file
   }
 
   
@@ -218,8 +233,9 @@ export class AdditionalReliefComponent {
 
 
   getChildrenJson() {
-    const childrenValue = this.children.getRawValue(); // Get raw value without any form status
-    return JSON.stringify(childrenValue); // Return as JSON string
+    const childrenValue = this.children.getRawValue(); 
+    console.log(childrenValue);
+    return JSON.stringify(childrenValue);
   }
   
 
@@ -311,62 +327,93 @@ export class AdditionalReliefComponent {
     }
     
   async onSubmit() {
-    if (this.additionalReliefForm) {
-      const formData = this.additionalReliefForm.value; // Capture form data
-  
-      formData.children = this.getChildrenJson();
+  if (this.additionalReliefForm) {
+    const formData = this.additionalReliefForm.value; 
 
-      let uploadProceedingsDocumentPath: string | undefined;
-      const uploadProceedings = this.additionalReliefForm.get('uploadProceedings')?.value;
-        if (uploadProceedings) {
-          const paths = await this.uploadMultipleFiles([uploadProceedings]);
-          uploadProceedingsDocumentPath = paths[0];
+    // Get children array
+    const childrenValue = this.children.getRawValue(); 
+
+    // Loop through each child and upload education document if it's a File
+    if (childrenValue && Array.isArray(childrenValue)) {
+      for (let i = 0; i < childrenValue.length; i++) {
+        const child = childrenValue[i];
+        const educationFile = child.educationConcessionDocument;
+
+        if (educationFile && educationFile instanceof File) {
+          const paths = await this.uploadMultipleFiles([educationFile]);
+          child.educationConcessionDocument = paths[0]; // Replace file with uploaded path
         }
-        formData.uploadProceedings = uploadProceedingsDocumentPath || this.uploadProceedingsExisitingPath || null;
+      }
+    }
 
+    // Convert children array to JSON string
+    formData.children = JSON.stringify(childrenValue);
 
-      let uploadcompensationProceedingsDocumentPath: string | undefined;
-      const uploadcompensationProceedings = this.additionalReliefForm.get('compensationuploadProceedings')?.value;
-        if (uploadcompensationProceedings) {
-          const paths = await this.uploadMultipleFiles([uploadcompensationProceedings]);
-          uploadcompensationProceedingsDocumentPath = paths[0];
-        }
-        formData.compensationuploadProceedings = uploadcompensationProceedingsDocumentPath || this.uploadcompensationProceedingsExisitingPath || null;
+    // ---------------------- Other file uploads ----------------------
+    let uploadProceedingsDocumentPath: string | undefined;
+    const uploadProceedings = this.additionalReliefForm.get('uploadProceedings')?.value;
+    if (uploadProceedings) {
+      const paths = await this.uploadMultipleFiles([uploadProceedings]);
+      uploadProceedingsDocumentPath = paths[0];
+    }
+    formData.uploadProceedings = uploadProceedingsDocumentPath || this.uploadProceedingsExisitingPath || null;
 
+    let uploadEmployeeProceedingsDocumentPath: string | undefined;
+    const uploadEmployeeProceedings = this.additionalReliefForm.get('employmentProceedingsDocument')?.value;
+    if (uploadEmployeeProceedings) {
+      const paths = await this.uploadMultipleFiles([uploadEmployeeProceedings]);
+      uploadEmployeeProceedingsDocumentPath = paths[0];
+    }
+    formData.employmentProceedingsDocument = uploadEmployeeProceedingsDocumentPath || this.uploadEmployeeProceedingsExisitingPath || null;
 
-        let uploadDocumentPath: string | undefined;
-        const uploadFile = this.additionalReliefForm.get('uploadFile')?.value;
-          if (uploadFile) {
-            const paths = await this.uploadMultipleFiles([uploadFile]);
-            uploadDocumentPath = paths[0];
-          }
-          formData.uploadFile = uploadDocumentPath || this.uploadDocumentExisitingPath || null;
-  
+    let uploadHouseProceedingsDocumentPath: string | undefined;
+    const uploadHouseProceedings = this.additionalReliefForm.get('houseSitePattaProceedingsDocument')?.value;
+    if (uploadHouseProceedings) {
+      const paths = await this.uploadMultipleFiles([uploadHouseProceedings]);
+      uploadHouseProceedingsDocumentPath = paths[0];
+    }
+    formData.houseSitePattaProceedingsDocument = uploadHouseProceedingsDocumentPath || this.uploadHouseProceedingsExisitingPath || null;  
 
+    let uploadcompensationProceedingsDocumentPath: string | undefined;
+    const uploadcompensationProceedings = this.additionalReliefForm.get('compensationuploadProceedings')?.value;
+    if (uploadcompensationProceedings) {
+      const paths = await this.uploadMultipleFiles([uploadcompensationProceedings]);
+      uploadcompensationProceedingsDocumentPath = paths[0];
+    }
+    formData.compensationuploadProceedings = uploadcompensationProceedingsDocumentPath || this.uploadcompensationProceedingsExisitingPath || null;
 
-  
-      this.additionalReliefService.saveAdditionalRelief(formData).subscribe({
-        next: (response) => {
-          console.log('Data saved successfully:', response);
-          Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: 'Data saved successfully!',
-          });
-        },
-        error: (err) => {
-          console.error('Error saving data:', err);
-          Swal.fire({
+    let uploadDocumentPath: string | undefined;
+    const uploadFile = this.additionalReliefForm.get('uploadFile')?.value;
+    if (uploadFile) {
+      const paths = await this.uploadMultipleFiles([uploadFile]);
+      uploadDocumentPath = paths[0];
+    }
+    formData.uploadFile = uploadDocumentPath || this.uploadDocumentExisitingPath || null;
+
+    // ---------------------- API Call ----------------------
+    this.additionalReliefService.saveAdditionalRelief(formData).subscribe({
+      next: (response) => {
+        console.log('Data saved successfully:', response);
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Data saved successfully!',
+        });
+      },
+      error: (err) => {
+        console.error('Error saving data:', err);
+        Swal.fire({
           icon: 'error',
           title: 'Error',
           text: 'Error saving data',
         });
-        }
-      });
-    } else {
-      console.log('Form is invalid');
-    }
+      }
+    });
+
+  } else {
+    console.log('Form is invalid');
   }
+}
 
   editAdditionalRelief(firId: string,victimId: string) {
     this.additionalReliefService.getAdditionalReliefByFirId(firId,victimId).subscribe({
@@ -418,6 +465,9 @@ export class AdditionalReliefComponent {
       office_district: 'officeDistrict',
       appointment_order_date: 'appointmentOrderDate',
       providing_order_date: 'providingOrderDate',
+      employment_proceedings_file_number:'employmentProceedingsFileNumber',
+      employment_proceedings_date:'employmentProceedingsDate',
+      
 
       // House site fields
       house_site_patta_status: 'houseSitePattaStatus',
@@ -429,6 +479,9 @@ export class AdditionalReliefComponent {
       district_name: 'districtName',
       pin_code: 'pinCode',
       house_site_patta_issue_date: 'houseSitePattaIssueDate',
+      house_patta_proceedings_file_number:'houseSitePattaProceedingsFileNumber',
+      house_patta_proceedings_date:'houseSitePattaProceedingsDate',
+
 
       // Education fields
       education_concession_status: 'educationConcessionStatus',
@@ -502,10 +555,15 @@ export class AdditionalReliefComponent {
             courseYear: [child.courseYear || ''],
             amountDisbursed: [child.amountDisbursed || ''],
             proceedingsFileNumber: [child.proceedingsFileNumber || ''],
+            educationConcessionDocument: [child.educationConcessionDocument || ''],
             dateOfProceedings: [child.dateOfProceedings || ''],
             uploadProceedings: [''] // File inputs can't be pre-populated
           });
           this.children.push(childFormGroup);
+          console.log(childrenData);
+          this.uploadedEducationFiles = childrenData.map((child: { educationConcessionDocument: any; }) => {
+      return child.educationConcessionDocument ? child.educationConcessionDocument : null;
+    });
         });
       } catch (error) {
         console.error('Error parsing child details:', error);
@@ -540,6 +598,24 @@ export class AdditionalReliefComponent {
       this.uploadProceedingsExisitingPath = formData.upload_proceedings;
       this.showFileInput = false;
     }
+
+    if(formData.upload_proceedings){
+      this.uploadProceedingsExisitingPath = formData.upload_proceedings;
+      this.showFileInput = false;
+    }
+
+    if(formData.employment_proceedings_document){
+      this.uploadEmployeeProceedingsExisitingPath = formData.employment_proceedings_document;
+      this.showEmployeeInput = false;
+    }
+
+    if(formData.house_patta_proceedings_document){
+      this.uploadHouseProceedingsExisitingPath = formData.house_patta_proceedings_document;
+      this.showHouseInput = false;
+    }
+
+    
+    
 
 
     // Trigger calculations and UI updates
@@ -617,6 +693,40 @@ export class AdditionalReliefComponent {
     }
   }
 
+  uploadEmployeeProceedingsDocument(event: any): void {
+    const file = event.target.files[0];  // Get the first selected file
+    if (file) {
+   
+      // Patch the file into the form (this assumes you have the form control set up correctly)
+      this.additionalReliefForm.patchValue({
+        employmentProceedingsDocument: file,  // Storing the file in the form control
+      });
+  
+      // Optionally, display the file name
+      console.log('File selected:', file.name);
+    } else {
+      console.log('No file selected');
+    }
+  }
+
+   uploadHouseProceedingsDocument(event: any): void {
+    const file = event.target.files[0];  // Get the first selected file
+    if (file) {
+   
+      // Patch the file into the form (this assumes you have the form control set up correctly)
+      this.additionalReliefForm.patchValue({
+        houseSitePattaProceedingsDocument: file,  // Storing the file in the form control
+      });
+  
+      // Optionally, display the file name
+      console.log('File selected:', file.name);
+    } else {
+      console.log('No file selected');
+    }
+  }
+
+
+
 
 
   uploadProceedingsDocumentcompensation(event: any): void {
@@ -660,6 +770,56 @@ export class AdditionalReliefComponent {
     return this.uploadProceedingsExisitingPath ? this.uploadProceedingsExisitingPath.split('/').pop() || '' : '';
   }
 
+  getEmployeeFileName(): string {
+    return this.uploadEmployeeProceedingsExisitingPath ? this.uploadEmployeeProceedingsExisitingPath.split('/').pop() || '' : '';
+  }
+  viewEmployeeFile(): void {
+    if (this.uploadEmployeeProceedingsExisitingPath) {
+      window.open(this.file_access+this.uploadEmployeeProceedingsExisitingPath, '_blank');
+    }
+  }
+  getHouseFileName():string{
+      return this.uploadHouseProceedingsExisitingPath ? this.uploadHouseProceedingsExisitingPath.split('/').pop() || '' : '';
+  }
+  viewHouseFile(): void {
+    if (this.uploadHouseProceedingsExisitingPath) {
+      window.open(this.file_access+this.uploadHouseProceedingsExisitingPath, '_blank');
+    }
+  }
+
+getEducationFileName(index: number): string {
+  const file = this.uploadedEducationFiles[index];
+  console.log(file);
+  if (!file) return '';
+
+  if (file instanceof File) {
+    return file.name; // Local file
+  } else if (typeof file === 'string') {
+    // Extract filename from a stored URL/path
+    return file.substring(file.lastIndexOf('/') + 1);
+  }
+
+  return '';
+}
+
+  viewEducationFile(index: number) {
+  const file = this.uploadedEducationFiles[index];
+  if (!file) return;
+  console.log(file,this.file_access);
+  window.open(this.file_access+file, '_blank');
+
+  // if (file instanceof File) {
+  //   const fileURL = URL.createObjectURL(file);
+  //   window.open(this.file_access+fileURL, '_blank');
+  // } else {
+  //   window.open(file, '_blank');
+  // }
+}
+
+clearEducationFile(index: number) {
+  this.uploadedEducationFiles[index] = null;
+  this.children.at(index).get('educationConcessionDocument')?.reset();
+}
 
 
   viewFile(): void {
@@ -680,6 +840,23 @@ export class AdditionalReliefComponent {
     // }
   }
 
+  clearEmployeeFile(): void {
+    this.uploadEmployeeProceedingsExisitingPath = null;
+    this.showEmployeeInput = true;
+    const fileInput = document.getElementById('employmentProceedingsDocument') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';  // Correct way to reset a file input
+    } 
+  }
+
+  clearHouseFile():void{
+    this.uploadHouseProceedingsExisitingPath = null;
+    this.showHouseInput = true;
+    const fileInput = document.getElementById('houseSitePattaProceedingsDocument') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';  // Correct way to reset a file input
+    } 
+  }
 
 
   getFileName1(): string {
@@ -704,6 +881,32 @@ export class AdditionalReliefComponent {
     // if(this.selectedFile){
     //   this.selectedFile = null;
     // }
+  }
+
+  onEducationFileChange(event: Event, index: number): void {
+    const fileInput = event.target as HTMLInputElement;
+    const file = fileInput.files?.[0];
+
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        alert('Only PDF files are allowed.');
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size should be less than 5MB.');
+        return;
+      }
+
+      this.uploadedEducationFiles[index] = file;
+
+      // Optional: save to FormControl
+      this.children.at(index).get('educationConcessionDocument')?.setValue(file);
+    }
+  }
+
+  removeEducationFile(index: number): void {
+    this.uploadedEducationFiles[index] = null;
   }
 }
 

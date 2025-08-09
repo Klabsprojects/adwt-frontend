@@ -151,6 +151,10 @@
       <!-- Show message if filtered data is empty -->
       <div *ngIf="filteredData.length === 0 && !loading" class="alert alert-warning">No FIR data available.</div>
       <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button>
+      <button style="margin-left: 5px;" class="btn btn-danger mt-3" (click)="onBtnExportPDF()">
+  Download as PDF
+</button>
+
       <nav *ngIf="filteredData.length > itemsPerPage" class="d-flex justify-content-end mt-3">
         <ul class="pagination">
           <li class="page-item" [class.disabled]="page === 1">

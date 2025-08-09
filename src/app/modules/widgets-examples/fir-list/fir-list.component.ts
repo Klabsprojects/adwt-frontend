@@ -1,4 +1,3 @@
-
 import Swal from 'sweetalert2';
 import { FirListTestService } from 'src/app/services/fir-list-test.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -12,6 +11,7 @@ import { environment as env } from 'src/environments/environment.prod';
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
 import { FirService } from 'src/app/services/fir.service';
 import { formatDate } from '@angular/common';
+import { event } from 'jquery';
 @Component({
   selector: 'app-fir-list',
   templateUrl: './fir-list.component.html',
@@ -311,6 +311,7 @@ export class FirListComponent implements OnInit {
   communitiesOptions: string[] = [];
   casteOptions:string[]=[];
   sectionOfLaw: any[] = [];
+  courtList:any[]=[];
 
 
   // nextHearingDate: string = ''; // Default: Next Hearing Date
@@ -378,6 +379,7 @@ export class FirListComponent implements OnInit {
   selectedDistrict: string = '';
   selectedNatureOfOffence: string = '';
   selectedStatusOfCase: string = '';
+  selectedDataEntryStatus:string='';
   selectedStatusOfRelief: string = '';
   selectedOffenceGroup: string = '';
   selectedSectionOfLaw:string='';
@@ -552,6 +554,7 @@ export class FirListComponent implements OnInit {
   { key: 'modifiedAt', label: 'Modified At From - To', visible: false },
   // { key: 'modifiedAt', label: 'Modified At To', visible: false },
   { key: 'status', label: 'Status of Case', visible: false },
+  { key: 'dataEntryStatus', label: 'Data Entry Status', visible: false },
   { key: 'offenceGroup', label: 'Nature of Case', visible: false },
   { key: 'sectionOfLaw', label: 'Section of Law', visible: false },
   { key: 'court', label: 'Court', visible: false },
@@ -1740,6 +1743,7 @@ loadOptions() {
   addParam('start_date', this.startDate);
   addParam('end_date', this.endDate);
   addParam('statusOfCase', this.selectedStatusOfCase);
+  addParam('dataEntryStatus', this.selectedDataEntryStatus);
   addParam('sectionOfLaw', this.selectedSectionOfLaw);
   addParam('court', this.selectedCourt);
   addParam('convictionType', this.selectedConvictionType);
@@ -1748,13 +1752,14 @@ loadOptions() {
   addParam('caseFitForAppeal', this.selectedCase);
   addParam('filedBy', this.selectedFiled);
   addParam('appealCourt', this.selectedAppeal);
- 
+  addParam('OffenceGroup', this.selectedOffenceGroup);
 
   // Override based on user role/access_type
   if (this.Parsed_UserInfo.role === '3') {
     params.district = this.Parsed_UserInfo.police_city;
   } else if (this.Parsed_UserInfo.access_type === 'District') {
     params.revenue_district = this.Parsed_UserInfo.district;
+    params.district = this.Parsed_UserInfo.police_city;
   }
 
   return params;
@@ -1810,25 +1815,32 @@ loadOptions() {
   }
 
   clearfilter() {
-    this.searchText = '';
-    this.selectedDistrict = '';
-    this.selectedPoliceZone = '';
-    this.selectedPoliceRange = '';
-    this.selectedRevenue_district = '';
-    this.selectedPoliceStation = '';
-    this.selectedComplaintReceivedType = '';
-    this.selectedNatureOfOffence = '';
-    this.selectedStatusOfCase = '';
-    this.selectedStatusOfRelief = '';
-    this.selectedOffenceGroup = '';
-    this.RegistredYear = '';
-    this.startDate = '';
-    this.endDate = '';
-    this.CreatedATstartDate = '';
-    this.CreatedATendDate = '';
-    this.ModifiedATstartDate = '';
-    this.ModifiedATDate = '';
-    this.selectedUIPT = '';
+   this.searchText='';
+ this.selectedDistrict='';
+ this.selectedPoliceZone='';
+  this.selectedPoliceRange='';
+ this.selectedRevenue_district='';
+ this.selectedPoliceStation='';
+  this.selectedCommunity='';
+  this.selectedCaste='';
+  this.RegistredYear='';
+  this.CreatedATstartDate='';
+  this.CreatedATendDate='';
+  this.ModifiedATstartDate='';
+  this.ModifiedATDate='';
+  this.startDate='';
+  this.endDate='';
+  this.selectedStatusOfCase='';
+  this.selectedSectionOfLaw='';
+  this.selectedCourt='';
+  this.selectedConvictionType='';
+  this.selectedChargeSheetDate='';
+  this.selectedLegal='';
+  this.selectedCase='';
+  this.selectedFiled='';
+  this.selectedAppeal='';
+  this.selectedDataEntryStatus='';
+ 
     this.applyFilters();
   }
 
@@ -2152,8 +2164,21 @@ loadOptions() {
       );
     }
       // this.loadPoliceStations(district);
-   
+}
+onDistrictChange(event:any){
+ const selectedDivision = event.target.value;
+ 
+     if (selectedDivision) {
+       this.firGetService.getCourtRangesByDivision(selectedDivision).subscribe(
+         (ranges: string[]) => {
+           this.courtList = ranges; // Populate court range options based on division
+         },
+         (error) => {
+           console.error('Error fetching court ranges:', error);
+           Swal.fire('Error', 'Failed to load court ranges for the selected division.', 'error');
+         }
+       );
+     }
+}
 }
 
-
-}

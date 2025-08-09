@@ -13,6 +13,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { FirListTestService } from 'src/app/services/fir-list-test.service';
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-mrf-abstract',
@@ -413,7 +415,92 @@ saveAsExcelFile(buffer: any, filename: string): void {
   window.URL.revokeObjectURL(url);
 }
 
+onBtnExportPDF(): void {
+  const doc = new jsPDF('l', 'mm', 'a4'); // Landscape
 
+  // Define multi-level headers
+  const headRows = [
+    [
+      { content: 'Sl. No.', rowSpan: 2 },
+      { content: 'District', rowSpan: 2 },
+      { content: 'Total Cases', rowSpan: 2 },
+      { content: 'FIR', colSpan: 3 },
+      { content: 'CHARGESHEET', colSpan: 3 },
+      { content: 'TRIAL', colSpan: 3 }
+    ],
+    [
+      { content: 'Proposal sent to DC' },
+      { content: 'Relief Given' },
+      { content: 'Relief Pending' },
+      { content: 'Proposal sent to DC' },
+      { content: 'Relief Given' },
+      { content: 'Relief Pending' },
+      { content: 'Proposal sent to DC' },
+      { content: 'Relief Given' },
+      { content: 'Relief Pending' }
+    ]
+  ];
+
+  // Table body data
+  const body = this.filteredData.map((item: any, index: number) => [
+    index + 1,
+    item.revenue_district,
+    item.total_cases,
+    item.fir_proposal_sent_to_dc,
+    item.fir_relief_given,
+    item.fir_relief_pending,
+    item.chargesheet_proposal_sent_to_dc,
+    item.chargesheet_relief_given,
+    item.chargesheet_relief_pending,
+    item.trial_proposal_sent_to_dc,
+    item.trial_relief_given,
+    item.trial_relief_pending
+  ]);
+
+  // Total row
+  const totalRow = [
+    '', // Sl. No.
+    'Total',
+    this.sumByKey('total_cases'),
+    this.sumByKey('fir_proposal_sent_to_dc'),
+    this.sumByKey('fir_relief_given'),
+    this.sumByKey('fir_relief_pending'),
+    this.sumByKey('chargesheet_proposal_sent_to_dc'),
+    this.sumByKey('chargesheet_relief_given'),
+    this.sumByKey('chargesheet_relief_pending'),
+    this.sumByKey('trial_proposal_sent_to_dc'),
+    this.sumByKey('trial_relief_given'),
+    this.sumByKey('trial_relief_pending')
+  ];
+  body.push(totalRow);
+
+  // AutoTable render
+  autoTable(doc, {
+    head: headRows,
+    body: body,
+    startY: 20,
+    theme: 'grid',
+    headStyles: { fillColor: [22, 160, 133] }, // optional styling
+    styles: { fontSize: 8 },
+   didDrawPage: function (data) {
+  // Get current page number
+  const currentPage = (doc as any).internal.getCurrentPageInfo().pageNumber;
+  
+  if (currentPage === 1) {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const text = 'MRF Abstract';
+    const textWidth = doc.getTextWidth(text);
+    const x = (pageWidth - textWidth) / 2;
+
+    doc.setFontSize(13);
+    doc.text(text, x, 10); // Top center of first page
+  }
+}
+
+  });
+
+  doc.save('mrf_abstract.pdf');
+}
 
     clearfilter(){
       this.searchText = '';

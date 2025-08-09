@@ -14,6 +14,8 @@ import { MonetaryReliefService } from 'src/app/services/monetary-relief.service'
 import { ReportsCommonService } from 'src/app/services/reports-common.service';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { FirService } from 'src/app/services/fir.service';
+import { PoliceDivisionService } from 'src/app/services/police-division.service';
 
 
 @Component({
@@ -49,6 +51,9 @@ itemsPerPage: number = 10;
   selectedNatureOfOffence: string = '';
   selectedStatusOfCase: string = '';
   selectedStatusOfRelief: string = '';
+  selectedOffenceGroup:string = '';
+  selectedPoliceRange:string='';
+  policeZones:any;
   districts: string[] = [];
   naturesOfOffence: string[] = [];
   statusesOfCase: string[] = ['Just Starting', 'Pending', 'Completed'];
@@ -67,6 +72,22 @@ itemsPerPage: number = 10;
     { key: 'PT', value: 'PT Stage' },
   ]
 
+  offenceGroupsList: string[] = [
+    "Non GCR",
+    "Murder",
+    "Rape",
+    "POCSO",
+    "Other POCSO",
+    "Gang Rape",
+    "Rape by Cheating",
+    "Arson",
+    "Death",
+    "GCR",
+    "Attempt Murder",
+    "Rape POCSO"
+  ];
+
+  selectedUIPT:string='';
   selectedStatus:string='';
   selectedDistricts:string='';
   selectedCommunity:string='';
@@ -87,128 +108,19 @@ itemsPerPage: number = 10;
   Filter_To_Date: this.selectedToDate || ''
 };
 
-  // Visible Columns Management
-  // displayedColumns: {
-  //   label: string;
-  //   field: string;
-  //   sortable: boolean;
-  //   visible: boolean;
-  //   sortDirection: 'asc' | 'desc' | null;
-  // }[] = [
-  //   {
-  //     label: 'Sl. No.',
-  //     field: 'sl_no',
-  //     sortable: false,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //   {
-  //     label: 'FIR No.',
-  //     field: 'fir_id',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //    {
-  //     label: 'Revenue District',
-  //     field: 'revenue_district',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //    {
-  //     label: 'Police City',
-  //     field: 'police_city',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //     {
-  //     label: 'Police Zone',
-  //     field: 'police_zone',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //     {
-  //     label: 'Community',
-  //     field: 'community',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //     {
-  //     label: 'Caste',
-  //     field: 'caste',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //   {
-  //     label: 'Police Station Name',
-  //     field: 'police_station',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //     {
-  //     label: 'Reporting Date',
-  //     field: 'date_of_registration',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //   {
-  //     label: 'Nature of Offence',
-  //     field: 'nature_of_offence',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //   {
-  //     label: 'Data Entry Status',
-  //     field: 'status',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //   {
-  //     label: 'Case Status',
-  //     field: 'case_status',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //   {
-  //     label: 'Relief Status',
-  //     field: 'relief_status',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //   {
-  //     label: 'Victim Name',
-  //     field: 'victim_name',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //   {
-  //     label: 'Reason for Status (Previous Month)',
-  //     field: 'reason_previous_month',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  //   {
-  //     label: 'Reason for Status (Current Month)',
-  //     field: 'reason_current_month',
-  //     sortable: true,
-  //     visible: true,
-  //     sortDirection: null,
-  //   },
-  // ];
-
+policeStations: string[] = [];
+selectedPoliceStation:string='';
+selectedProposal:string='';
+selectedStage:string='';
+selectedReliefStatus:string='';
+selectedPoliceZone: string = '';
+revenueDistricts:any;
+policeRanges: any;
+selectedRevenue_district:string='';
+startDate: string = '';
+endDate: string = '';
+selectedSectionOfLaw:string='';
+ 
 displayedColumns: DisplayedColumn[] = [
   // ✅ Ungrouped columns
   {
@@ -261,7 +173,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Nature of Offence',
-    field: 'total_cases',
+    field: 'nature_of_offence',
     group: null,
     sortable: true,
     visible: true,
@@ -480,13 +392,23 @@ displayedColumns: DisplayedColumn[] = [
 
 
   selectedCaseStatus: string = '';
-  selectedReliefStatus: string = '';
   currentSortField: string = '';
   isAscending: boolean = true;
+  communitiesOptions: string[] = [];
+  casteOptions:string[]=[];
+  sectionOfLaw: any[] = [];
+  pageSize: number = 10;
+  totalRecords: number = 0; // Total number of records
+  totalPages: number = 0;
+  isLoading: boolean = true;
+  monetaryList:any[]=[];
 
   constructor(
     // private firService: FirListTestService,
+    private policeDivisionService: PoliceDivisionService,
     private cdr: ChangeDetectorRef,
+    private firGetService: FirService,
+    private firService: FirListTestService,
     private reportsCommonService: ReportsCommonService,
     private monetaryReliefService: MonetaryReliefService,
     private router: Router,
@@ -514,11 +436,16 @@ displayedColumns: DisplayedColumn[] = [
       .subscribe(({ districts, offences }) => {
         this.districts = districts;
         this.naturesOfOffence = offences;
-        this.fetchMonetaryReliefDetails();
+        this.fetchMonetaryReliefDetails(1,this.pageSize);
       });
       this.getDropdowns();
     this.filteredData = [...this.reportData];
     this.selectedColumns = this.displayedColumns.map((column) => column.field);
+    this.loadPoliceDivision();
+    this.loadPoliceRanges();
+    this.loadRevenue_district();
+    this.loadCommunities();
+    this.loadOptions();
   }
 
   // Updates the visibility of columns based on user-selected columns.
@@ -599,9 +526,7 @@ displayedColumns: DisplayedColumn[] = [
       this.isAscending
     );
   }
-get totalPages(): number {
-  return Math.ceil(this.totalRecords / this.itemsPerPage);
-}
+
 totalPagesArray(): number[] {
   const pages: number[] = [];
   const maxVisiblePages = 5;
@@ -618,25 +543,40 @@ totalPagesArray(): number[] {
 
 
   // Download Reports
+  // async onBtnExport(): Promise<void> {
+  //   await this.reportsCommonService.exportToExcel(
+  //     this.filteredData,
+  //     this.displayedColumns,
+  //     'Monetary-Reports'
+  //   );
+  // }
+
   async onBtnExport(): Promise<void> {
-    await this.reportsCommonService.exportToExcel(
-      this.filteredData,
-      this.displayedColumns,
-      'Monetary-Reports'
-    );
-  }
+  const allData = await this.fetchMonetaryReliefDetails(); // no pagination or big size
+  await this.reportsCommonService.exportToExcel(
+    allData,
+    this.displayedColumns,
+    'Monetary-Reports'
+  );
+}
+
+
+
 
     clearfilter(){
       this.searchText = '';
       this.selectedDistrict = '';
-      this.selectedStatus='';
-      this.selectedDistricts='';
+      this.selectedPoliceZone='';
+      this.selectedRevenue_district='';
       this.selectedCommunity='';
       this.selectedCaste='';
-      this.selectedZone=''; 
-      this.selectedPoliceCity='';
-      this.selectedFromDate='';
-      this.selectedToDate = '';
+      this.selectedSectionOfLaw=''; 
+      this.selectedOffenceGroup='';
+      this.startDate='';
+      this.endDate = '';
+      this.selectedStatusOfCase = '';
+      this.selectedStage = '';
+      this.selectedReliefStatus = '';
       // this.filteredData = [...this.reportData]; 
       this.fetchMonetaryReliefDetails();
   }
@@ -740,129 +680,20 @@ totalPagesArray(): number[] {
 //   });
 // }
 
-applyFilters(){
-const payload = {
-  district: this.selectedDistrict || '',
-  community: this.selectedCommunity || '',
-  caste: this.selectedCaste || '',
-  police_city: this.selectedPoliceCity || '',
-  Status_Of_Case: this.selectedStatus || '',
-  police_zone: this.selectedZone || '',
-  Filter_From_Date: this.selectedFromDate || '',
-  Filter_To_Date: this.selectedToDate || ''
-};
-
- this.monetaryReliefService.getMonetaryReliefData(payload).subscribe({
-      next: (response:any) => {
-        console.log('Monetary Reliefs:', response.data); // Debugging
-        // Transform API response to match frontend structure
-        this.reportData = response.data.map((item: any, index: number) => ({
-          sl_no: index + 1,
-          fir_number: item.fir_number === "NULL" || !item.fir_number ? '' : item.fir_number,
-          FIR_date:formatDate(item.FIR_date, 'yyyy-MM-dd', 'en'),
-          police_city:  item.police_city,
-          police_station: item.police_station,
-          revenue_district : item.revenue_district,
-          police_zone : item.police_zone,
-          community : item.community,
-          caste : item.caste,
-          nature_of_offence: (item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, '')), 
-          victimName: (item.victimName === "NULL" ? '' : (item.victimName || '')),
-          gender: (item.victimName === "NULL" ? '' : (item.gender || '')),
-          relief_stage:item.relief_stage,
-          relief_status:item.relief_status,
-          first_proceeding_date:item.first_proceeding_date  ? formatDate(item.first_proceeding_date,'yyyy-MM-dd','en') : '',
-          first_reliefScst:(item.first_reliefScst === "NULL" ? '' : (item.first_reliefScst || '')),
-          first_reliefExGratia:(item.first_reliefExGratia === "NULL" ? '' : (item.first_reliefExGratia || '')),
-        totalFirStageAmount:
-          (item.first_reliefScst && item.first_reliefScst !== "NULL" ? Number(item.first_reliefScst) : 0) +
-          (item.first_reliefExGratia && item.first_reliefExGratia !== "NULL" ? Number(item.first_reliefExGratia) : 0),
-          days_since_first_relief:(item.days_since_first_relief === "NULL" ? '' : (item.days_since_first_relief || '')),
-          first_disbursement_date:item.first_disbursement_date ? formatDate(item.first_disbursement_date,'yyyy-MM-dd','en') : '',
-          
-          second_proceeding_date:item.second_proceeding_date ? formatDate(item.second_proceeding_date,'yyyy-MM-dd','en') :'',
-          second_reliefScst:(item.second_reliefScst === "NULL" ? '' : (item.second_reliefScst || '')),
-          second_reliefExGratia:(item.second_reliefExGratia === "NULL" ? '' : (item.second_reliefExGratia || '')),
-          days_since_second_relief:(item.days_since_second_relief === "NULL" ? '' : (item.days_since_second_relief || '')),
-          second_disbursement_date:item.second_disbursement_date ? formatDate(item.second_disbursement_date,'yyyy-MM-dd','en') : '',
-          totalChargeSheetAmount:
-            (item.second_reliefScst && item.second_reliefScst !== "NULL" ? Number(item.second_reliefScst) : 0) +
-            (item.second_reliefExGratia && item.second_reliefExGratia !== "NULL" ? Number(item.second_reliefExGratia) : 0),
-
-         trial_proceeding_date: item.trial_proceeding_date ? formatDate(item.trial_proceeding_date, 'yyyy-MM-dd', 'en') : '',
-        trial_reliefScst: (item.trial_reliefScst === "NULL" ? '' : (item.trial_reliefScst || '')),
-        trial_reliefExGratia: (item.trial_reliefExGratia === "NULL" ? '' : (item.trial_reliefExGratia || '')),
-        days_since_trial_relief: (item.days_since_trial_relief === "NULL" ? '' : (item.days_since_trial_relief || '')),
-        trial_disbursement_date: item.trial_disbursement_date ? formatDate(item.trial_disbursement_date, 'yyyy-MM-dd', 'en'): '',
-        totalTrialAmount:
-          (item.trial_reliefScst && item.trial_reliefScst !== "NULL" ? Number(item.trial_reliefScst) : 0) +
-          (item.trial_reliefExGratia && item.trial_reliefExGratia !== "NULL" ? Number(item.trial_reliefExGratia) : 0),
-
-          
-          report_reason:(item.report_reason === "NULL" ? '' : (item.report_reason || '')),
-
-          filter_status : item.status
-        }));
-        // Update filteredData to reflect the API data
-        this.filteredData = [...this.reportData]; 
-        this.loader = false;
-        this.cdr.detectChanges(); // Trigger change detection
-      },
-      error: (error:any) => {
-        this.loader = false;
-        console.error('Error fetching reports:', error);
-      }
-    });
-}
-
-
-get totalRecords(): number {
-    return this.filteredData.length;
-  }
-
-  
-
-  paginatedData(): any[] {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.filteredData.slice(startIndex, startIndex + this.itemsPerPage);
-  }
-
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-    }
-  }
-
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-    }
-  }
-
-  goToFirstPage(): void {
-    this.currentPage = 1;
-  }
-
-  goToLastPage(): void {
-    this.currentPage = this.totalPages;
-  }
-
-  hasNextPage(): boolean {
-    return this.currentPage < this.totalPages;
-  }
-
-  fetchMonetaryReliefDetails(): void {
+fetchMonetaryReliefDetails(page: number = 1, pageSize: number = this.pageSize):any {
+    this.isLoading = true;
+    this.currentPage = page;
+    this.pageSize = pageSize;
     this.loader = true;
-    this.monetaryReliefService.getMonetaryReliefData(this.payload).subscribe({
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+
+    this.monetaryReliefService.getMonetaryReliefData(page, pageSize,this.getFilterParams()).subscribe({
       next: (response: any) => {
+        this.reportData = response.data;
+         this.totalRecords = response.total;
+        this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
         this.reportData = response.data.map((item: any, index: number) => ({
-          sl_no: index + 1,
+          sl_no: startIndex + index + 1,
           fir_number: item.fir_number === "NULL" || !item.fir_number ? '' : item.fir_number,
           FIR_date: formatDate(item.FIR_date, 'yyyy-MM-dd', 'en'),
           police_city: item.police_city,
@@ -871,9 +702,9 @@ get totalRecords(): number {
           police_zone: item.police_zone,
           community: item.community,
           caste: item.caste,
-          nature_of_offence: item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, ''),
-          victimName: item.victimName === "NULL" ? '' : (item.victimName || ''),
-          gender: item.victimName === "NULL" ? '' : (item.gender || ''),
+          nature_of_offence: item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/["\[\]]/g, ''),
+          victimName: item.victim_name === "NULL" ? '' : (item.victim_name || ''),
+          gender: item.victim_gender === "NULL" ? '' : (item.victim_gender || ''),
           relief_stage: item.relief_stage,
           relief_status: item.relief_status,
           first_proceeding_date: item.first_proceeding_date ? formatDate(item.first_proceeding_date, 'yyyy-MM-dd', 'en') : '',
@@ -906,7 +737,7 @@ get totalRecords(): number {
           report_reason: item.report_reason === "NULL" ? '' : item.report_reason,
           filter_status: item.status
         }));
-
+       
         this.filteredData = [...this.reportData];
         this.loader = false;
         this.cdr.detectChanges();
@@ -918,6 +749,52 @@ get totalRecords(): number {
     });
   }
 
+
+
+paginatedData(): any[] {
+  return this.filteredData;
+}
+
+
+  goToPage(page: number): void {
+  if (page >= 1 && page <= this.totalPages) {
+    this.fetchMonetaryReliefDetails(page); // ADD THIS
+  }
+}
+
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.fetchMonetaryReliefDetails(this.currentPage - 1);
+    }
+  }
+
+  nextPage(): void {
+  if (this.currentPage < this.totalPages) {
+    this.fetchMonetaryReliefDetails(this.currentPage + 1); // FIXED
+  }
+}
+
+
+  goToFirstPage() {
+    if (this.currentPage !== 1) {
+      this.fetchMonetaryReliefDetails(1);
+    }
+  }
+  goToLastPage(): void {
+    if (this.currentPage !== this.totalPages) {
+      this.fetchMonetaryReliefDetails(this.totalPages);
+    }
+  }
+
+
+  
+
+  hasNextPage(): boolean {
+    return this.currentPage < this.totalPages;
+  }
+
+  
 
   get ungroupedColumns(): DisplayedColumn[] {
   return this.displayedColumns.filter(col => col.group === null && col.visible);
@@ -946,6 +823,149 @@ isPostGroupColumn(col: DisplayedColumn): boolean {
   return colIndex > finalStageIndex;
 }
 
+onCityChange(event: any)
+{
+
+  const district = event.target.value;
+   if (district) {
+      this.firGetService.getPoliceStations(district).subscribe(
+        (stations: string[]) => {
+          this.policeStations = stations.map(station =>
+            station.replace(/\s+/g, '-')); // Replace spaces with "-"
+          this.cdr.detectChanges(); // Trigger UI update
+        },
+        (error) => {
+          console.error('Error fetching police stations:', error);
+        }
+      );
+    }
+      // this.loadPoliceStations(district);
+}
+
+
+loadOptions() {
+    this.firGetService.getOffences().subscribe(
+      (offences: any) => {
+        this.sectionOfLaw = offences
+          .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
+          this.sectionOfLaw.push(
+              { offence_act_name: '3(2)(va)', offence_name: '3(2)(va)', id : 24 },
+              { offence_act_name: '3(2)(v), 3(2)(va)', offence_name: '3(2)(v), 3(2)(va)', id: 25 }
+          );
+      },
+      (error: any) => {
+        Swal.fire('Error', 'Failed to load offence options.', 'error');
+      }
+    );
+  }
+
+
+
+loadPoliceRanges() {
+    this.firService.getPoliceRanges().subscribe(
+      (response: any) => {
+        this.policeRanges = response;
+      },
+      (error: any) => {
+        console.error('Error', 'Failed to load FIR data', 'error', error);
+      }
+    );
+  }
+
+loadPoliceDivision() {
+    this.policeDivisionService.getAllPoliceDivisions().subscribe(
+      (data: any) => {
+
+        this.districts = data.map((item: any) => item.district_division_name);
+        this.policeZones = data.map((item: any) => item.police_zone_name);
+        this.policeZones = [...new Set(this.policeZones)];
+      },
+      (error: any) => {
+        console.error(error)
+      }
+    );
+  }
+
+
+ loadRevenue_district() {
+    this.firService.getRevenue_district().subscribe(
+      (response: any) => {
+        this.revenueDistricts = response;
+      },
+      (error: any) => {
+        console.error('Error', 'Failed to load FIR data', 'error', error);
+      }
+    );
+  }
+
+  onCommunityChange(event: any): void {
+    const selectedCommunity = event.target.value;
+    console.log('Selected community:', selectedCommunity);
+  
+    if (selectedCommunity) {
+      this.firGetService.getCastesByCommunity(selectedCommunity).subscribe(
+        (res: string[]) => {
+          console.log('API caste list:', res);
+          this.casteOptions = [];
+          res.forEach(caste => {
+            this.casteOptions.push(caste);
+          });
+  
+          // Optional: trigger change detection
+          this.cdr.detectChanges();
+        },
+        (error) => {
+          console.error('Error fetching castes:', error);
+          Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+        }
+      );
+    } 
+  }
+  
+
+  loadCommunities(): void {
+      this.firGetService.getAllCommunities().subscribe(
+        (communities: any) => {
+          this.communitiesOptions = communities; // Populate community options
+        },
+        (error) => {
+          console.error('Error loading communities:', error);
+          Swal.fire('Error', 'Failed to load communities.', 'error');
+        }
+      );
+    }
+  
+  SearchList() {
+      this.applyFilters();
+  }
+
+  getFilterParams() {
+  const params: any = {};
+
+  const addParam = (key: string, value: any) => {
+    if (value) params[key] = value;
+  };
+
+  addParam('search', this.searchText);
+  addParam('district', this.selectedDistrict);
+  addParam('police_zone', this.selectedPoliceZone);
+  addParam('revenueDistrict', this.selectedRevenue_district);
+  addParam('community', this.selectedCommunity);
+  addParam('caste', this.selectedCaste);
+  addParam('sectionOfLaw', this.selectedSectionOfLaw);
+  addParam('start_date', this.startDate);
+  addParam('end_date', this.endDate);
+  addParam('statusOfCase', this.selectedStatusOfCase);
+  addParam('reliefStage', this.selectedStage);
+  addParam('reliefStatus', this.selectedReliefStatus);
+  addParam('OffenceGroup', this.selectedOffenceGroup);
+  return params;
+}
+
+
+  applyFilters() {
+    this.fetchMonetaryReliefDetails(1);
+  }
 
 }
 

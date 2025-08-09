@@ -22,67 +22,147 @@
       </mat-form-field>
     </div>
 
-  </div>
-
-  <div class="row d-flex mb-3 p-4 align-items-center">
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
-          <option value="" selected>District</option>
-          <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
-        </select>
+    <div class="col-md-12 mb-3">
+      <div class="col-md-2" style="float: left; padding-right: 10px;">
+      <select  class="form-select" (change)="onCityChange($event)" [(ngModel)]="selectedDistrict">
+        <option value="" selected hidden disabled>Police City</option>
+        <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
+      </select>
       </div>
 
-        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <select name="" id="" [(ngModel)]="selectedPoliceCity" class="form-select" (change)="applyFilters()">
-          <option value="">Police City</option>
-          <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
-        </select>
+      <div class="col-md-2" style="float: left;  padding-right: 10px;">
+      <select  class="form-select" [(ngModel)]="selectedPoliceZone">
+        <option value="" selected hidden disabled>Police Zone</option>
+        <option *ngFor="let item of policeZones" [value]="item">{{ item }}</option>
+      </select>
       </div>
 
-        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <select name="" id="" [(ngModel)]="selectedZone" class="form-select" (change)="applyFilters()">
-          <option value="">Police Zone</option>
-          <option [value]="zone.police_zone" *ngFor="let zone of zones">{{zone.police_zone}}</option>
-        </select>
+
+      <!-- <div class="col-md-3">
+      <select class="form-select" [(ngModel)]="selectedPoliceRange">
+        <option value="" selected hidden disabled>Police Range</option>
+        <option *ngFor="let item of policeRanges" [value]="item.police_range">{{ item.police_range }}</option>
+      </select>
+      </div> -->
+
+      <div class="col-md-2"  style="float: left;  padding-right: 10px;">
+      <select  class="form-select"
+        [(ngModel)]="selectedRevenue_district">
+        <option value="" selected hidden disabled>Revenue District</option>
+        <option *ngFor="let item of revenueDistricts" [value]="item.revenue_district">{{ item.revenue_district }}
+        </option>
+      </select>
       </div>
 
-        <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <select name="" id="" [(ngModel)]="selectedCommunity" (change)="getCaste()" class="form-select" (change)="applyFilters()">
-          <option value="">Community</option>
-          <option [value]="community" *ngFor="let community of communities">{{community}}</option>
-        </select>
-      </div>
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <select class="form-select" [(ngModel)]="selectedCaste" (change)="applyFilters()">
-          <option value="" selected>Caste</option>
-          <option *ngFor="let option of castes" [value]="option">
-            {{ option }}
-          </option>
-        </select>
-      </div>
+       <!-- <select  class="form-select"
+       [(ngModel)]="selectedPoliceStation">
+          <option value="" disabled>Police Station</option>
+          <option *ngFor="let station of policeStations" [value]="station">{{ station }}</option>
+       </select> -->
 
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <select class="form-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
-          <option value="" selected>Status Of Case</option>
-          <option *ngFor="let option of status" [value]="option.key">
-            {{ option.value }}
-          </option>
-        </select>
-      </div>
+       <!-- <div class="col-md-3"  style="float: left;  padding-right: 10px;">
+        <select  class="form-select"
+       [(ngModel)]="selectedProposal">
+          <option value="" disabled>Proposal Sent to DC</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+       </select>
+       </div> -->
 
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
-        <input type="date" class="form-control" [(ngModel)]="selectedFromDate" (change)="applyFilters()"/>
+       <div class="col-md-2 "  style="float: left;  padding-right: 10px;">
+        <select class="form-select"
+       [(ngModel)]="selectedCommunity" (change)="onCommunityChange($event)"  >
+          <option value="" disabled>Community</option>
+          <option *ngFor="let community of communitiesOptions" [value]="community">{{ community }}</option>
+        </select>
+       </div>
+
+       <div class="col-md-2" style="float: left; padding-right: 10px;">
+        <select  class="form-select"  [(ngModel)]="selectedCaste">
+          <option value="" disabled>Caste</option>
+          <option *ngFor="let caste of casteOptions" [value]="caste">{{ caste }}</option>
+      </select>
+       </div>
+
+        <div class="col-md-2" style="float: left; padding-right: 10px;">
+        <select  class="form-select"  [(ngModel)]="selectedSectionOfLaw">
+          <option value="" disabled>Section of Law</option>
+        <option *ngFor="let section of sectionOfLaw" [value]="section.offence_act_name">{{ section.offence_act_name }}</option>
+      </select>
+       </div>
+
+       <div class="col-md-2 mt-2" style="float: left; padding-right: 10px;">
+        <select class="form-select" [(ngModel)]="selectedOffenceGroup">
+        <option value=""  disabled>Nature of Case</option>
+        <option *ngFor="let item of offenceGroupsList" [value]="item">
+          {{ item }}
+        </option>
+      </select>
+       </div>
+
+       <div class="col-md-2 mt-2" style="float: left; padding-right: 10px;">
+        <div class="tooltip-container" style="display: block;">
+        <input type="date" [(ngModel)]="startDate"  class="form-control"
+          placeholder="Start Date">
         <span class="tooltip-text">Date of Registration From Date</span>
       </div>
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
-        <input type="date" class="form-control" [(ngModel)]="selectedToDate" (change)="applyFilters()"/>
+      </div>
+
+      <div class="col-md-2 mt-2" style="float: left; padding-right: 10px;">
+      <div class="tooltip-container" style="display: block;">
+        <input type="date" [(ngModel)]="endDate"  class="form-control" placeholder="End Date">
         <span class="tooltip-text">Date of Registration To Date</span>
       </div>
-      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      </div>
+      
+      <div class="col-md-2 mt-2" style="float: left; padding-right: 10px;">
+        <select class="form-select" [(ngModel)]="selectedStatusOfCase">
+        <option value="" selected>Status of Case</option>
+        <option value="UI">UI</option>
+        <option value="PT">PT</option>
+        <option value="Convicted">Conviction</option>
+        <option value="Acquitted">Acquitted</option>
+        <option value="FirQuashed">FIR Quashed</option>
+        <option value="MF">MF</option>
+        <option value="SectionDeleted">Section Deleted</option>
+        <option value="Charge_Abated"> Charge Abated</option>
+        <option value="Quashed"> Quashed</option>
+      </select>
+       </div>
+
+       <div class="col-md-2 mt-2" style="float: left; padding-right: 10px;">
+        <select  class="form-select"
+       [(ngModel)]="selectedStage">
+          <option value="" disabled>Relief Stage</option>
+          <option value="FIR">FIR</option>
+          <option value="Chargesheet">Chargesheet</option>
+          <option value="TrialStage">Trial</option>
+       </select>
+       </div>
+
+
+       <div class="col-md-2 mt-2" style="float: left; padding-right: 10px;">
+       <select  class="form-select"
+       [(ngModel)]="selectedReliefStatus">
+          <option value="" disabled>Relief Status</option>
+          <option value="notyetreceived">Proposal not yet Received from SP Office</option>
+          <option value="pending">Relief Pending</option>
+          <option value="given">Relief Given</option>
+          <option value="FirQuashed,MF,SectionDeleted,Charge_Abated,Quashed">MF, FIR Quashed, Section Deleted, Charge Abated, Quashed</option>
+       </select>
+       </div>
+
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mt-2" style="float: left;">
+        <button (click)="SearchList()" class="btn btn-primary btn-sm" style="margin-right:10px;">Search</button>
         <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
       </div>
     </div>
 
+
+  </div>
+
+  
   <div class="card-body pt-0">
     <!-- Filters -->
     <!-- <div class="d-flex gap-3 mb-3">
@@ -160,41 +240,35 @@
       <!-- Show message if filtered data is empty -->
       <div *ngIf="filteredData.length === 0 && !loading" class="alert alert-warning">No FIR data available.</div>
       <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button>
-      <nav *ngIf="filteredData.length > itemsPerPage" class="d-flex justify-content-end mt-3">
-       <ul class="pagination mt-3">
-  <li class="page-item" [class.disabled]="currentPage === 1">
-    <button class="page-link" (click)="goToFirstPage()">Start</button>
-  </li>
+      <ul class="pagination">
 
-  <li class="page-item" [class.disabled]="currentPage === 1">
-    <button class="page-link" (click)="previousPage()">Previous</button>
-  </li>
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="goToFirstPage()">Start</button>
+      </li>
 
-  <li
-    class="page-item"
-    *ngFor="let pageNum of totalPagesArray()"
-    [class.active]="currentPage === pageNum"
-  >
-    <button class="page-link" (click)="goToPage(pageNum)">
-      {{ pageNum }}
-    </button>
-  </li>
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="previousPage()">Previous</button>
+      </li>
 
-  <li class="page-item" [class.disabled]="!hasNextPage()">
-    <button class="page-link" (click)="nextPage()">Next</button>
-  </li>
+      <li class="page-item" *ngFor="let pageNum of totalPagesArray()">
+        <button class="page-link" (click)="goToPage(pageNum)" [class.active]="currentPage === pageNum">
+          {{ pageNum }}
+        </button>
+      </li>
 
-  <li class="page-item" [class.disabled]="!hasNextPage()">
-    <button class="page-link" (click)="goToLastPage()">End</button>
-  </li>
+      <li class="page-item" [class.disabled]="!hasNextPage()">
+        <button class="page-link" (click)="nextPage()">Next</button>
+      </li>
 
-  <span class="ms-3 mt-2">
-    Page {{ currentPage }} of {{ totalPages }} ({{ totalRecords }} records)
-  </span>
-</ul>
+      <li class="page-item" [class.disabled]="!hasNextPage()">
+        <button class="page-link" (click)="goToLastPage()">End</button>
+      </li>
 
+      <span class="ms-3 mt-2">
+        Page {{ currentPage }} of {{ totalPages }} ({{ totalRecords }} records)
+      </span>
+    </ul>
 
-      </nav>
     </div>
 
   </div>

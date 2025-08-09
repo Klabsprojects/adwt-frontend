@@ -83,12 +83,7 @@
             <label for="proceedingsDate">Date of Proceedings Document *</label>
             <input id="proceedingsDate" type="date" class="form-control" formControlName="proceedingsDate" required>
           </div>
-          <!-- Upload Proceedings Document -->
-          <!-- <div class="col-md-4 mb-3">
-            <label for="uploadProceedings">Upload Proceedings Document *</label>
-            <input id="uploadProceedings" type="file" class="form-control" formControlName="uploadProceedings" (change)="uploadProceedingsDocument($event)" required>
-          </div> -->
-
+        
           <div class="col-md-4 mb-3">                
             <div *ngIf="uploadProceedingsExisitingPath && !showFileInput">
             <div class="col-12 mb-3">
@@ -270,6 +265,46 @@
               formControlName="providingOrderDate"
               required />
           </div>
+
+          
+          <div class="col-md-4 mb-3">
+            <label for="employmentFileNo">Proceedings File Number *</label>
+            <input id="employmentFileNo" type="text" class="form-control" formControlName="employmentProceedingsFileNumber" placeholder="Enter file number" required title="Alphanumeric with optional hyphens">
+          </div>
+        
+          <div class="col-md-4 mb-3">
+            <label for="eproceedingsDate">Date of Proceedings Document *</label>
+            <input id="eproceedingsDate" type="date" class="form-control" formControlName="employmentProceedingsDate" required>
+          </div>
+
+          <div class="col-md-4 mb-3">                
+            <div *ngIf="uploadEmployeeProceedingsExisitingPath && !showEmployeeInput">
+            <div class="col-12 mb-3">
+              <div style="padding: 7px;" class="card">
+                <div style="padding: 7px;" class="card-body d-flex justify-content-between align-items-center">
+                  <span class="text-truncate me-2">{{ getEmployeeFileName() }}</span>
+                  <div>
+                    <button type="button" class="btn btn-primary btn-sm me-2" (click)="viewEmployeeFile()">
+                      View
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="clearEmployeeFile()">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <label *ngIf="showEmployeeInput" for="employmentProceedingsDocument" class="form-label">Upload Proceedings Document *</label><span *ngIf="showEmployeeInput" style="color: red;font-size: 9px;margin-left: 10px;" >(Only PDF file less than 5 MB will be allowed)</span>
+              <input *ngIf="showEmployeeInput"
+                type="file" 
+                class="form-control" 
+                id="employmentProceedingsDocument"
+                (change)="uploadEmployeeProceedingsDocument($event)" 
+                accept="application/pdf"
+                [disabled] = "isDisable"
+              />
+          </div> 
         </div>
 
         <div *ngIf="victim.additional_relief && victim.additional_relief.includes('House site Patta')" class="row m-4">
@@ -374,6 +409,45 @@
               required
             />
           </div>
+
+          
+          <div class="col-md-4 mb-3">
+            <label for="hfileNumber">Proceedings File Number *</label>
+            <input id="hfileNumber" type="text" class="form-control" formControlName="houseSitePattaProceedingsFileNumber" placeholder="Enter file number" required title="Alphanumeric with optional hyphens">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="hproceedingsDate">Date of Proceedings Document *</label>
+            <input id="hproceedingsDate" type="date" class="form-control" formControlName="houseSitePattaProceedingsDate" required>
+          </div>
+
+          <div class="col-md-4 mb-3">                
+            <div *ngIf="uploadHouseProceedingsExisitingPath && !showHouseInput">
+            <div class="col-12 mb-3">
+              <div style="padding: 7px;" class="card">
+                <div style="padding: 7px;" class="card-body d-flex justify-content-between align-items-center">
+                  <span class="text-truncate me-2">{{ getHouseFileName() }}</span>
+                  <div>
+                    <button type="button" class="btn btn-primary btn-sm me-2" (click)="viewHouseFile()">
+                      View
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="clearHouseFile()">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <label *ngIf="showHouseInput" for="huploadProceedings" class="form-label">Upload Proceedings Document *</label><span *ngIf="showHouseInput" style="color: red;font-size: 9px;margin-left: 10px;" >(Only PDF file less than 5 MB will be allowed)</span>
+              <input *ngIf="showHouseInput"
+                type="file" 
+                class="form-control" 
+                id="huploadProceedings"
+                (change)="uploadHouseProceedingsDocument($event)" 
+                accept="application/pdf"
+                [disabled] = "isDisable"
+              />
+          </div> 
         </div>
 
         <div *ngIf="victim.additional_relief && victim.additional_relief.includes('Education concession')" class="row m-4">
@@ -537,16 +611,46 @@
                       required
                     />
                   </div>
-                  <!-- Upload Proceedings Document -->
-                  <!-- <div class="col-md-4 mb-3">
-                    <label for="uploadProceedings{{i}}">Upload Proceedings Document *</label>
-                    <input
-                      type="file"
-                      class="form-control"
-                      formControlName="uploadProceedings"
-                      required
-                    />
-                  </div> -->
+                  
+                  <!-- Inside ngFor, within .card-body -->
+                  <div class="col-md-4 mb-3">
+  
+  <!-- If file exists, show card -->
+  <div *ngIf="uploadedEducationFiles[i]" class="col-12 mb-3">
+    <div class="card" style="padding: 7px;">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <span class="text-truncate me-2">{{ getEducationFileName(i) }}</span>
+        <div>
+          <button type="button" class="btn btn-primary btn-sm me-2" (click)="viewEducationFile(i)">
+            View
+          </button>
+          <button type="button" class="btn btn-danger btn-sm" (click)="clearEducationFile(i)">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- If no file, show upload input -->
+  <div *ngIf="!uploadedEducationFiles[i]">
+    <label for="uploadProceedings{{i}}" class="form-label">
+      Upload Proceedings Document *
+    </label>
+    <span style="color: red; font-size: 9px; margin-left: 10px;">
+      (Only PDF file less than 5 MB will be allowed)
+    </span>
+    <input
+      type="file"
+      class="form-control"
+      id="uploadProceedings{{i}}"
+      (change)="onEducationFileChange($event, i)"
+      accept="application/pdf"
+    />
+  </div>
+
+</div>
+
                 </div>
               </div>
             </div>
