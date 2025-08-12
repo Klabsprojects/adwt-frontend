@@ -267,17 +267,17 @@
           </div>
 
           
-          <div class="col-md-4 mb-3">
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('employmentStatus')?.value === 'Yes'">
             <label for="employmentFileNo">Proceedings File Number *</label>
             <input id="employmentFileNo" type="text" class="form-control" formControlName="employmentProceedingsFileNumber" placeholder="Enter file number" required title="Alphanumeric with optional hyphens">
           </div>
         
-          <div class="col-md-4 mb-3">
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('employmentStatus')?.value === 'Yes'">
             <label for="eproceedingsDate">Date of Proceedings Document *</label>
             <input id="eproceedingsDate" type="date" class="form-control" formControlName="employmentProceedingsDate" required>
           </div>
 
-          <div class="col-md-4 mb-3">                
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('employmentStatus')?.value === 'Yes'">                
             <div *ngIf="uploadEmployeeProceedingsExisitingPath && !showEmployeeInput">
             <div class="col-12 mb-3">
               <div style="padding: 7px;" class="card">
@@ -411,16 +411,16 @@
           </div>
 
           
-          <div class="col-md-4 mb-3">
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('houseSitePattaStatus')?.value === 'Yes'">
             <label for="hfileNumber">Proceedings File Number *</label>
             <input id="hfileNumber" type="text" class="form-control" formControlName="houseSitePattaProceedingsFileNumber" placeholder="Enter file number" required title="Alphanumeric with optional hyphens">
           </div>
-          <div class="col-md-4 mb-3">
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('houseSitePattaStatus')?.value === 'Yes'">
             <label for="hproceedingsDate">Date of Proceedings Document *</label>
             <input id="hproceedingsDate" type="date" class="form-control" formControlName="houseSitePattaProceedingsDate" required>
           </div>
 
-          <div class="col-md-4 mb-3">                
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('houseSitePattaStatus')?.value === 'Yes'">                
             <div *ngIf="uploadHouseProceedingsExisitingPath && !showHouseInput">
             <div class="col-12 mb-3">
               <div style="padding: 7px;" class="card">

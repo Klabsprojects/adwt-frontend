@@ -16,7 +16,8 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { FirService } from 'src/app/services/fir.service';
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
-
+import { firstValueFrom } from 'rxjs';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-monetary-relief',
@@ -173,7 +174,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Nature of Offence',
-    field: 'nature_of_offence',
+    field: 'offence_committed',
     group: null,
     sortable: true,
     visible: true,
@@ -181,7 +182,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Victim Name',
-    field: 'victimName',
+    field: 'victim_name',
     group: null,
     sortable: true,
     visible: true,
@@ -189,7 +190,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Gender',
-    field: 'gender',
+    field: 'victim_gender',
     group: null,
     sortable: true,
     visible: true,
@@ -238,7 +239,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'As per the Act',
-    field: 'first_reliefScst',
+    field: 'relief_amount_scst',
     group: 'FIR Stage Relief (1st Stage)',
     sortable: true,
     visible: true,
@@ -246,7 +247,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Ex-Gratia',
-    field: 'first_reliefExGratia',
+    field: 'relief_amount_exgratia',
     group: 'FIR Stage Relief (1st Stage)',
     sortable: true,
     visible: true,
@@ -280,7 +281,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'As per the Act',
-    field: 'second_reliefScst',
+    field: 'secondInstallmentReliefScst',
     group: 'Chargesheet Stage Relief (2nd Stage)',
     sortable: true,
     visible: true,
@@ -288,7 +289,7 @@ displayedColumns: DisplayedColumn[] = [
   },
   {
     label: 'Ex-Gratia',
-    field: 'second_reliefExGratia',
+    field: 'secondInstallmentReliefExGratia',
     group: 'Chargesheet Stage Relief (2nd Stage)',
     sortable: true,
     visible: true,
@@ -542,27 +543,6 @@ totalPagesArray(): number[] {
  
 
 
-  // Download Reports
-  // async onBtnExport(): Promise<void> {
-  //   await this.reportsCommonService.exportToExcel(
-  //     this.filteredData,
-  //     this.displayedColumns,
-  //     'Monetary-Reports'
-  //   );
-  // }
-
-  async onBtnExport(): Promise<void> {
-  const allData = await this.fetchMonetaryReliefDetails(); // no pagination or big size
-  await this.reportsCommonService.exportToExcel(
-    allData,
-    this.displayedColumns,
-    'Monetary-Reports'
-  );
-}
-
-
-
-
     clearfilter(){
       this.searchText = '';
       this.selectedDistrict = '';
@@ -702,28 +682,28 @@ fetchMonetaryReliefDetails(page: number = 1, pageSize: number = this.pageSize):a
           police_zone: item.police_zone,
           community: item.community,
           caste: item.caste,
-          nature_of_offence: item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/["\[\]]/g, ''),
-          victimName: item.victim_name === "NULL" ? '' : (item.victim_name || ''),
-          gender: item.victim_gender === "NULL" ? '' : (item.victim_gender || ''),
+          offence_committed: item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/["\[\]]/g, ''),
+          victim_name: item.victim_name === "NULL" ? '' : (item.victim_name || ''),
+          victim_gender: item.victim_gender === "NULL" ? '' : (item.victim_gender || ''),
           relief_stage: item.relief_stage,
           relief_status: item.relief_status,
           first_proceeding_date: item.first_proceeding_date ? formatDate(item.first_proceeding_date, 'yyyy-MM-dd', 'en') : '',
-          first_reliefScst: item.first_reliefScst === "NULL" ? '' : item.first_reliefScst,
-          first_reliefExGratia: item.first_reliefExGratia === "NULL" ? '' : item.first_reliefExGratia,
+          relief_amount_scst: item.relief_amount_scst === "NULL" ? '' : item.relief_amount_scst,
+          relief_amount_exgratia: item.relief_amount_exgratia === "NULL" ? '' : item.relief_amount_exgratia,
           totalFirStageAmount:
-            (item.first_reliefScst && item.first_reliefScst !== "NULL" ? Number(item.first_reliefScst) : 0) +
-            (item.first_reliefExGratia && item.first_reliefExGratia !== "NULL" ? Number(item.first_reliefExGratia) : 0),
+            (item.relief_amount_scst && item.relief_amount_scst !== "NULL" ? Number(item.relief_amount_scst) : 0) +
+            (item.relief_amount_exgratia && item.relief_amount_exgratia !== "NULL" ? Number(item.relief_amount_exgratia) : 0),
           days_since_first_relief: item.days_since_first_relief === "NULL" ? '' : item.days_since_first_relief,
           first_disbursement_date: item.first_disbursement_date ? formatDate(item.first_disbursement_date, 'yyyy-MM-dd', 'en') : '',
 
           second_proceeding_date: item.second_proceeding_date ? formatDate(item.second_proceeding_date, 'yyyy-MM-dd', 'en') : '',
-          second_reliefScst: item.second_reliefScst === "NULL" ? '' : item.second_reliefScst,
-          second_reliefExGratia: item.second_reliefExGratia === "NULL" ? '' : item.second_reliefExGratia,
+          secondInstallmentReliefScst: item.secondInstallmentReliefScst === "NULL" ? '' : item.secondInstallmentReliefScst,
+          secondInstallmentReliefExGratia: item.secondInstallmentReliefExGratia === "NULL" ? '' : item.secondInstallmentReliefExGratia,
           days_since_second_relief: item.days_since_second_relief === "NULL" ? '' : item.days_since_second_relief,
           second_disbursement_date: item.second_disbursement_date ? formatDate(item.second_disbursement_date, 'yyyy-MM-dd', 'en') : '',
           totalChargeSheetAmount:
-            (item.second_reliefScst && item.second_reliefScst !== "NULL" ? Number(item.second_reliefScst) : 0) +
-            (item.second_reliefExGratia && item.second_reliefExGratia !== "NULL" ? Number(item.second_reliefExGratia) : 0),
+            (item.secondInstallmentReliefScst && item.secondInstallmentReliefScst !== "NULL" ? Number(item.secondInstallmentReliefScst) : 0) +
+            (item.secondInstallmentReliefExGratia && item.secondInstallmentReliefExGratia !== "NULL" ? Number(item.secondInstallmentReliefExGratia) : 0),
 
           trial_proceeding_date: item.trial_proceeding_date ? formatDate(item.trial_proceeding_date, 'yyyy-MM-dd', 'en') : '',
           trial_reliefScst: item.trial_reliefScst === "NULL" ? '' : item.trial_reliefScst,
@@ -947,14 +927,14 @@ loadPoliceDivision() {
   };
 
   addParam('search', this.searchText);
-  addParam('district', this.selectedDistrict);
-  addParam('police_zone', this.selectedPoliceZone);
+  addParam('policeCity', this.selectedDistrict);
+  addParam('policeZone', this.selectedPoliceZone);
   addParam('revenueDistrict', this.selectedRevenue_district);
   addParam('community', this.selectedCommunity);
   addParam('caste', this.selectedCaste);
   addParam('sectionOfLaw', this.selectedSectionOfLaw);
-  addParam('start_date', this.startDate);
-  addParam('end_date', this.endDate);
+  addParam('startDate', this.startDate);
+  addParam('endDate', this.endDate);
   addParam('statusOfCase', this.selectedStatusOfCase);
   addParam('reliefStage', this.selectedStage);
   addParam('reliefStatus', this.selectedReliefStatus);
@@ -966,6 +946,97 @@ loadPoliceDivision() {
   applyFilters() {
     this.fetchMonetaryReliefDetails(1);
   }
+
+ 
+
+async onBtnExport(): Promise<void> {
+  this.loader = true;
+  try {
+    const res: any = await firstValueFrom(
+      this.monetaryReliefService.getMonetaryReliefDownload()
+    );
+
+    const cleanValue = (value: any) =>
+      value === null || value === undefined ? '' : value;
+
+    const numberValue = (value: any) =>
+      value === null || value === undefined || value === '' || value === 'NULL'
+        ? 0
+        : Number(value);
+
+    // ✅ Exact headers from your sample file
+    const exportHeaders = [
+      'Sl No','Revenue District', 'Police City', 'Police Station','FIR Number', 'FIR Date', 
+      'Offence Committed', 'Victim Name', 'Victim Gender','Caste', 'Sub Caste', 'Relief Stage',
+      'Relief Status', 'FIR Proposal Date', 'FIR As per the Act',
+      'FIR  Ex - Gratia', 'Total FIR Stage',
+      '1st Stage Disbursement Date','Chargesheet Proposal Date', 'Chargesheet As per the Act',
+      'Chargesheet Ex - Gratia', 'Total Chargesheet Amount','2nd Disbursement Date', 
+      'Trial Proposal Date', 'Trial As per the Act', 'Trial  Ex - Gratia','Total Trial Amount',
+      '3rd Disbursement Date', 'Days Since First Relief','Days Since Second Relief','Days Since Trial Relief',
+      'Report Reason'
+    ];
+    // console.log(res.data);
+    // ✅ Map API response to row array (order matches headers)
+    const exportData = res.data.map((item: any, index: number) => ([
+      index + 1,
+      item.revenue_district,
+      item.police_city,
+      item.police_station,
+      cleanValue(item.fir_number),
+      item.FIR_date ? formatDate(item.FIR_date, 'yyyy-MM-dd', 'en') : '',
+      cleanValue(item.offence_committed || '').replace(/["\[\]]/g, ''),
+      cleanValue(item.victim_name || ''),
+      cleanValue(item.victim_gender || ''),
+      item.community,
+      item.caste,
+      item.relief_stage,
+      item.relief_status,
+      item.first_proceeding_date ? formatDate(item.first_proceeding_date, 'yyyy-MM-dd', 'en') : '',
+      numberValue(item.relief_amount_scst),
+      numberValue(item.relief_amount_exgratia),
+      numberValue(item.relief_amount_scst) + numberValue(item.relief_amount_exgratia),
+      item.first_disbursement_date ? formatDate(item.first_disbursement_date, 'yyyy-MM-dd', 'en') : '',
+      
+      item.second_proceeding_date ? formatDate(item.second_proceeding_date, 'yyyy-MM-dd', 'en') : '',
+      numberValue(item.secondInstallmentReliefScst),
+      numberValue(item.secondInstallmentReliefExGratia),
+      item.second_disbursement_date ? formatDate(item.second_disbursement_date, 'yyyy-MM-dd', 'en') : '',
+      numberValue(item.secondInstallmentReliefScst) + numberValue(item.secondInstallmentReliefExGratia),
+     
+      item.trial_proceeding_date ? formatDate(item.trial_proceeding_date, 'yyyy-MM-dd', 'en') : '',
+      numberValue(item.trial_reliefScst),
+      numberValue(item.trial_reliefExGratia),
+      item.trial_disbursement_date ? formatDate(item.trial_disbursement_date, 'yyyy-MM-dd', 'en') : '',
+      numberValue(item.trial_reliefScst) + numberValue(item.trial_reliefExGratia),
+
+      
+      cleanValue(item.days_since_first_relief),
+      cleanValue(item.days_since_second_relief),
+      cleanValue(item.days_since_trial_relief),
+
+      cleanValue(item.report_reason)
+    ]));
+    // console.log(exportData);
+    // ✅ Combine header + data
+    const worksheetData = [exportHeaders, ...exportData];
+
+    // ✅ Create worksheet & workbook
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(worksheetData);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Monetary Reports');
+
+    // ✅ Download file
+    XLSX.writeFile(wb, 'Monetary-Reports.xlsx');
+
+  } catch (error) {
+    console.error('Error exporting report', error);
+  } finally {
+    this.loader = false;
+  }
+}
+
+
 
 }
 

@@ -29,6 +29,10 @@ export class MonetaryReliefService {
   return this.http.get(`${this.baseUrl}/getmonetaryReliefDatav1`, { params });
 }
 
+getMonetaryReliefDownload(): Observable<any> {
+  return this.http.get(`${this.baseUrl}/getmonetaryReliefDatav1?download=yes`);
+}
+
   
   // Update status and reason for current month to given fir report details
   updateMonetaryReliefDetails(data: any): Observable<any> {
