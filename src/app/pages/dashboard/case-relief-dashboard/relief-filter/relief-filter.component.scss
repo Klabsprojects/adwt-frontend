@@ -3,12 +3,15 @@
     padding: 0;
     box-sizing: border-box;
 }
-.filter{
+.filter-nav{
     background-color: rgb(24, 108, 189);
     padding: 1.5rem;
 }
-.title-box{
-    margin-bottom: 2.5rem;
+.title-box h3{
+    font-size: 2rem;
+    text-align: center;
+    color: #fff;
+    margin-bottom: 1rem;
 }
 select{
     width: 80%;
@@ -20,8 +23,33 @@ h1, p{
     color: #fff;
     font-weight: 600;
 }
-
+.img-container{
+    align-items: flex-start;
+}
 img{
     cursor: pointer;
 }
+.filters{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    column-gap: 0.5rem;
+    row-gap: 1rem;
+    padding: 2rem;
+}
+.filter{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+}
+.filter select,input{
+    width: 100%;
+    padding:8px;
+    border-radius: 0.3rem;
+}
 
+.filter div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

@@ -40,6 +40,8 @@ import { LegacyFirListComponent } from './legacy-fir-list/legacy-fir-list.compon
 import { MrfAbstractComponent } from './mrf-abstract/mrf-abstract.component';
 import { AfterAbstractComponent } from './after-abstract/after-abstract.component';
 import { BeforeAbstractComponent } from './before-abstract/before-abstract.component';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+
 const routes: Routes = [
   {
     path: '',
@@ -130,7 +132,9 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [RouterModule.forChild(routes),
+    NgMultiSelectDropDownModule.forRoot()
+  ],
   exports: [RouterModule],
 })
 export class WidgetsExamplesRoutingModule { }

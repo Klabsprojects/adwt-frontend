@@ -28,6 +28,7 @@
         
     .app-sidebar-logo {
         height: calc(var(--#{$prefix}app-header-height) + 1px); 
+        // height: 45px;
         display: flex;
         align-items: center;
         justify-content: space-between;        
@@ -44,7 +45,8 @@
                 > .menu-link {
                     > .menu-title {
                         font-weight: $font-weight-bold;
-                        font-size: 1.1rem;
+                        // font-size: 1.1rem;
+                        font-size: 15px;
                     }
                 }    
             }

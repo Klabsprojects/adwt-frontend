@@ -40,6 +40,9 @@ import { VmcComponent  } from './vmc/vmc.component';
 import { LayoutModule } from 'src/app/_metronic/layout/layout.module';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { LegacyFirListComponent } from './legacy-fir-list/legacy-fir-list.component';
+import { ReliefListComponent } from './relief-list/relief-list.component';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+
 @NgModule({
   declarations: [
     WidgetsExamplesComponent,
@@ -59,6 +62,7 @@ import { LegacyFirListComponent } from './legacy-fir-list/legacy-fir-list.compon
     CityComponent,
     CasteAndCommunityComponent,
     FirListComponent,
+    // ReliefListComponent,
     VmcComponent,
     VmcmeetingComponent,
     LegacyFirListComponent
@@ -79,7 +83,8 @@ import { LegacyFirListComponent } from './legacy-fir-list/legacy-fir-list.compon
     MatOptionModule,
     SweetAlert2Module,
     LayoutModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    NgMultiSelectDropDownModule.forRoot()
   ],
 })
 export class WidgetsExamplesModule {}

@@ -141,7 +141,8 @@
 		color: $title-color;
 
 		.menu-title {
-			color: $title-color;
+			// color: $title-color;
+			color:#fff;
 		}
 	}
 
@@ -150,7 +151,8 @@
 			&,
 			.svg-icon,
 			i {
-				color: $icon-color;
+				// color: $icon-color;
+				color: #fff;
 			}
 		}
 	}
@@ -158,7 +160,8 @@
 	@if ( $bullet-color != null ) {
 		.menu-bullet {
 			.bullet {
-				background-color: $bullet-color;
+				// background-color: $bullet-color;
+				background-color: #fff;
 			}
 		}
 	}

@@ -24,7 +24,9 @@ export class SidebarMenuComponent implements OnInit, OnDestroy {
   ) {}
   roleId:any;
   ngOnInit(): void {
+    // console.log(sessionStorage.getItem('user_data'));
     const userData = JSON.parse(sessionStorage.getItem('user_data') || '{}');
+    // console.log(userData);
     const roleId = userData.role;
     this.roleId = roleId;
     if (roleId) {

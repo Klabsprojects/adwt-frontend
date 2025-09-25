@@ -17,7 +17,8 @@ export class CourtComponent implements OnInit{
   court: any[] = [];
   page: number = 1;
   editIndex: number | null = null;
-
+  itemsPerPage: number = 10;
+  totalRecords: number = 0;
   constructor(
     private modalService: NgbModal,
     private cdr: ChangeDetectorRef,
@@ -33,6 +34,7 @@ export class CourtComponent implements OnInit{
     this.courtService.getAllCourt().subscribe(
       (data: any) => {
         this.court = data;
+        this.totalRecords = this.court.length;
         this.refreshTable();
       },
       (error: any) => {
@@ -215,5 +217,9 @@ allowOnlyValidCharacters(event: KeyboardEvent) {
 onInputChange(event: Event) {
   const input = event.target as HTMLInputElement;
   input.value = input.value.replace(this.disallowedPattern, '');
+}
+
+  get totalPages(): number {
+  return Math.ceil(this.totalRecords / this.itemsPerPage);
 }
 }

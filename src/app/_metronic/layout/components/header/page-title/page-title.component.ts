@@ -20,6 +20,7 @@ export class PageTitleComponent implements OnInit, OnDestroy {
   constructor(private pageInfo: PageInfoService) {}
 
   ngOnInit(): void {
+    // console.log(this.pageInfo.title, this.pageInfo);
     this.title$ = this.pageInfo.title.asObservable();
     this.description$ = this.pageInfo.description.asObservable();
     this.bc$ = this.pageInfo.breadcrumbs.asObservable();

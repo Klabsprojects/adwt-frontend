@@ -14,35 +14,54 @@
     </div>
   </div>
 
-  <div style="margin: 0 10px;" class="d-flex gap-3 mb-3">
-    
-    <select class="form-select" [(ngModel)]="filter_year" (change)="loadMeeting()">
+  <div style="margin: 0 10px;" class="row d-flex mb-3 align-items-center outer pt-4 pb-2 px-3 m-0 mx-8">
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+    <select class="form-select" [(ngModel)]="filter_year">
       <option value="" selected hidden disabled>Year</option>
       <option *ngFor="let item of year" [value]="item">{{ item }}</option>
     </select>
+    </div>
 
-     <select class="form-select" [(ngModel)]="filter_meeting_type" (change)="loadMeeting();meeting_Quarter_Change()">
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+     <select class="form-select" [(ngModel)]="filter_meeting_type" (change)="meeting_Quarter_Change()">
       <option value="" selected hidden disabled>Meeting Type</option>
       <option *ngFor="let item of meeting_type_list" [value]="item">{{ item }}</option>
       <option *ngIf="Parsed_UserInfo.role != 4" value="SLVMC">SLVMC</option>
     </select>
+    </div>
 
-    <select class="form-select" [(ngModel)]="filter_meeting_quarter" (change)="loadMeeting()">
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+    <select class="form-select" [(ngModel)]="filter_meeting_quarter">
       <option value="" selected hidden disabled>Meeting Quarter </option>
       <option *ngFor="let item of meeting_quater_list" [value]="item">{{ item }}</option>
     </select>
+    </div>
 
-    <select *ngIf="Parsed_UserInfo.role != 4" class="form-select" [(ngModel)]="filter_District" (change)="loadMeeting()">
+   <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+    <select *ngIf="Parsed_UserInfo.role != 4" class="form-select" [(ngModel)]="filter_District">
       <option value="" selected hidden disabled>District</option>
       <option *ngFor="let item of districts" [value]="item">{{ item }}</option>
     </select>
+    </div>
 
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+    <select *ngIf="Parsed_UserInfo.role != 4" class="form-select" [(ngModel)]="filter_meeting_status">
+      <option value="" selected hidden disabled>Meeting Status</option>
+      <option value="Completed">Completed</option>
+      <option value="Pending">Pending</option>
+    </select>
+    </div>
 
-    <button style="width: 40% !important;" (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
+<div class="col-xl-5 col-lg-3 col-md-4 mb-3">
+        <button (click)="loadMeeting()" class="btn btn-primary btn-sm">Apply Filters</button>
+        <button (click)="clearfilter()" class="btn btn-secondary btn-sm" style="margin-left: 5px;">Clear</button>
+      
+    <!-- <button style="width: 40% !important;" (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button> -->
     <button *ngIf="filter_District != ''" style="width: 40% !important;" class="btn btn-success btn-sm">Total Member {{TotalMember}}</button>
   </div>
+  </div>
 
-  <div class="card-body pt-0">
+  <div class="card-body pt-0 pt-0 overflow-auto">
     <table class="table table-striped table-bordered table-hover">
       <thead>
         <tr>
@@ -54,6 +73,7 @@
           <th>Sub Division</th>
           <th *ngIf="filter_District == ''" >Total Member</th>
           <th>present</th>
+          <th>Status</th>
           <th>Actions</th>
          
         </tr>
@@ -71,25 +91,29 @@
           <td>{{ meeting.subdivision || 'N/A' }}</td>
           <td *ngIf="filter_District == ''" >{{ meeting.total_member || 'N/A' }}</td>
           <td>{{ meeting.present || 'N/A' }}</td>
-
+          <td>{{ meeting.meeting_status }} </td>
           <td>
-            <div ngbDropdown class="d-inline-block">
-              <button ngbDropdownToggle class="btn btn-sm btn-circle btn-icon btn-bg-light btn-active-color-primary">
-                <i class="bi bi-three-dots-vertical fs-3"></i>
-              </button>
-              <div ngbDropdownMenu>
-                <button ngbDropdownItem (click)="Edit(meeting,'Edit')">Edit</button>
-                <button ngbDropdownItem (click)="Edit(meeting,'View')">View</button>
-                <button *ngIf="Parsed_UserInfo.role == '1'" ngbDropdownItem (click)="deleteMeeting(meeting.id)">Delete</button>
-              </div>
-            </div>
+            <div ngbDropdown class="d-inline-block" container="body">
+  <button ngbDropdownToggle class="btn btn-sm btn-circle btn-icon btn-bg-light btn-active-color-primary">
+    <i class="bi bi-three-dots-vertical fs-3"></i>
+  </button>
+  <div ngbDropdownMenu>
+    <button ngbDropdownItem (click)="Edit(meeting,'Edit')">Edit</button>
+    <button ngbDropdownItem (click)="Edit(meeting,'View')">View</button>
+    <button *ngIf="Parsed_UserInfo.role == '1'" ngbDropdownItem (click)="deleteMeeting(meeting.id)">Delete</button>
+  </div>
+</div>
+
           </td>
         </tr>
 
       </tbody>
     </table>
-
-    <pagination-controls class="d-flex justify-content-end" (pageChange)="page = $event"></pagination-controls>
+    <div class="float-left w-100 text-center">
+      <pagination-controls (pageChange)="page = $event"></pagination-controls>
+      <span>Page {{ page }} of {{ totalPages }} ({{ totalRecords }} records)</span>
+    </div>
+    <!-- <pagination-controls class="d-flex justify-content-end" (pageChange)="page = $event"></pagination-controls> -->
   </div>
 </div>
 

@@ -11,6 +11,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
 import { VmcMeetingService } from 'src/app/services/vmc-meeting.service';
 import { FirService } from 'src/app/services/fir.service';
+import { FilterStateService } from 'src/app/services/filter-state-service';
 
 @Component({
   selector: 'app-additional-relief-list',
@@ -24,10 +25,11 @@ export class AdditionalReliefListComponent implements OnInit {
   firList: any[] = []; // Complete FIR list
   displayedFirList: any[] = []; // Paginated FIRs
   page = 1; // Current page
-  itemsPerPage = 10; // Items per page
-  totalPages = 1; // Total number of pages
+  totalRecords = 0;
+  totalPages = 0; // Total number of pages
   isLoading = true; // Loading indicator
   Parsed_UserInfo : any;
+  
 
   constructor(
     private additionalreliefService: AdditionalReliefService,
@@ -36,6 +38,7 @@ export class AdditionalReliefListComponent implements OnInit {
     private policeDivisionService :PoliceDivisionService,
     private vmcMeeting: VmcMeetingService,
     private firService: FirService,
+    private filterState: FilterStateService
   ) {
     const UserInfo : any = sessionStorage.getItem('user_data');
     this.Parsed_UserInfo = JSON.parse(UserInfo)
@@ -45,12 +48,6 @@ export class AdditionalReliefListComponent implements OnInit {
   });
   }
 
-  ngOnInit(): void {
-    this.fetchFIRList();
-    this.updateSelectedColumns();
-    // this.loadPoliceDivision();
-    this.loadPolicecity();
-  }
 
   // Filters
   selectedDistrict: string = '';
@@ -59,11 +56,16 @@ export class AdditionalReliefListComponent implements OnInit {
   selectedNatureOfOffence: string = '';
   selectedStatusOfCase: string = '';
   selectedStatusOfRelief: string = '';
+  start_date:string = '';
+  end_date:string = '';
+  selectedType:any = '';
+  selectedStatus:string = '';
 
   // Filter options
   districts: any;
   policeCities:any;
   policestations:any;
+  pageSize = 10;
 
   naturesOfOffence: string[] = [
     'Theft',
@@ -90,21 +92,34 @@ export class AdditionalReliefListComponent implements OnInit {
 
   statusesOfCase: string[] = ['Just Starting', 'Pending', 'Completed'];
   statusesOfRelief: string[] = ['FIR Stage', 'ChargeSheet Stage', 'Trial Stage'];
+  reliefType = [
+    { value: 'pension', label: 'Pension' },
+    { value: 'employment', label: 'Employment / Job' },
+    { value: 'patta', label: 'House site Patta' },
+    { value: 'education', label: 'Education concession' },
+    { value: 'provision', label: 'Provisions' },
+    
+  ];
+  reliefStatus: any[] = [
+    { value:'given' , label:'Given' } ,
+    { value:'pending' , label:'Pending' } ,
+    { value:'notApplicable' , label:'Not Applicable' } ,
+   ];
 
   // Visible Columns Management
 
   displayedColumns: { label: string; field: string; sortable: boolean; visible: boolean }[] = [
     { label: 'Sl.No', field: 'sl_no', sortable: false, visible: true },
     { label: 'FIR ID', field: 'fir_id', sortable: true, visible: true },
-    { label: 'Victim ID', field: 'victim_id', sortable: true, visible: true },
+    // { label: 'Victim ID', field: 'victim_id', sortable: true, visible: true },
+    { label: 'Register Date', field: 'date_of_registration', sortable: true, visible: true },
     { label: 'Victim Name', field: 'victim_name', sortable: true, visible: true },
     { label: 'Disctrict', field: 'revenue_district', sortable: true, visible: true },
     { label: 'Police City', field: 'police_city', sortable: true, visible: true },
     { label: 'Police Station Name', field: 'police_station', sortable: true, visible: true },
-     { label: 'Actions', field: 'actions', sortable: false, visible: true },
-    // { label: 'Actions', field: 'created_by', sortable: true, visible: true },
-    // { label: 'Created At', field: 'created_at', sortable: true, visible: true },
-    // { label: 'Status', field: 'status', sortable: false, visible: true },
+    // { label: 'Data Entry Status', field: 'status', sortable: true, visible: true },
+    { label: 'Status', field: 'statusGroup', sortable: false, visible: true },
+    { label: 'Actions', field: 'actions', sortable: false, visible: true }
   ];
 
   selectedColumns: any[] = [...this.displayedColumns];
@@ -113,17 +128,97 @@ export class AdditionalReliefListComponent implements OnInit {
   currentSortField: string = '';
   isAscending: boolean = true;
 
+
+  ngOnInit(): void {
+  this.updateSelectedColumns();
+  this.loadPolicecity();
+
+  // Restore saved filters first
+  const savedFilters = this.filterState.getFilters();
+  if (savedFilters) {
+    this.selectedDistrict = savedFilters.revenue_district;
+    this.selectedPoliceCity = savedFilters.district;
+    this.selectedPoliceStation = savedFilters.policeStationName;
+    this.start_date = savedFilters.start_date;
+    this.end_date = savedFilters.end_date;
+    this.selectedType = savedFilters.additionalReliefType;
+    this.selectedStatus = savedFilters.reliefStatus;
+
+    // ✅ Now call API with filters
+    this.applyFilters();
+  } else {
+    // ✅ If no filters saved, call normally (all data)
+    this.fetchFIRList();
+  }
+}
+
+
+  getStatusText(status: number,HascaseMF:any): string {
+    if (HascaseMF) {
+    status = 9;
+  }
+    const statusTextMap = {
+      0: 'FIR Draft',
+      1: 'Pending | FIR Stage | Step 1 Completed',
+      2: 'Pending | FIR Stage | Step 2 Completed',
+      3: 'Pending | FIR Stage | Step 3 Completed',
+      4: 'Pending | FIR Stage | Step 4 Completed',
+      5: 'Completed | FIR Stage',
+      6: 'Charge Sheet Completed',
+      7: 'Trial Stage Completed',
+      8: 'This Case is Altered Case',
+      9: 'Mistake Of Fact',
+    } as { [key: number]: string };
+
+    return statusTextMap[status] || 'Unknown';
+  }
+
+  getStatusBadgeClass(status: number): string {
+    const badgeClassMap = {
+      0: 'badge bg-info text-white',
+      1: 'badge bg-warning text-dark',
+      2: 'badge bg-warning text-dark',
+      3: 'badge bg-warning text-dark',
+      4: 'badge bg-warning text-dark',
+      5: 'badge bg-success text-white',
+      6: 'badge bg-success text-white',
+      7: 'badge bg-success text-white',
+      8: 'badge bg-danger text-white',
+      9: 'badge bg-danger text-white',
+      10: 'badge bg-danger text-white', // Add this entry for status 12
+    } as { [key: number]: string };
+
+    return badgeClassMap[status] || 'badge bg-secondary text-white';
+  }
+
+  isaltered(status: number): string {
+      if(status == 1){
+        return 'Section Altered'
+      } else {
+         return ''
+      }
+  }
+
+  alteredBadgeClass(status: number): string {
+       if(status == 1){
+        return 'badge bg-danger text-white'
+      } else {
+         return ''
+      }
+  }
+
+
+
   // Fetch FIR data from the service
   fetchFIRList(): void {
     this.isLoading = true;
+    
     this.additionalreliefService.getFIRAdditionalReliefList_By_Victim(this.getFilterParams()).subscribe(
       (data) => {
-        console.log('Raw API Response:', data);
-        // Filter FIRs with at least one victim with relief
-        // this.firList = (data || []).filter((fir) => fir.victims_with_relief > 0);
         this.firList = data;
-        console.log('Filtered FIR List:', this.firList);
-        this.updatePagination();
+        this.totalRecords = data.length;
+        this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
+         this.updateDisplayedList();
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -136,36 +231,49 @@ export class AdditionalReliefListComponent implements OnInit {
 
   // Update pagination data
   updatePagination(): void {
-    this.totalPages = Math.ceil(this.firList.length / this.itemsPerPage);
+    this.totalPages = Math.ceil(this.firList.length / this.pageSize);
     this.updateDisplayedList();
   }
 
   // Update the list of FIRs for the current page
   updateDisplayedList(): void {
-    const startIndex = (this.page - 1) * this.itemsPerPage;
-    this.displayedFirList = this.firList.slice(startIndex, startIndex + this.itemsPerPage);
+    const startIndex = (this.page - 1) * this.pageSize;
+    this.displayedFirList = this.firList.slice(startIndex, startIndex + this.pageSize);
     console.log('Displayed FIR List:', this.displayedFirList);
   }
 
-  // Pagination controls
-  previousPage(): void {
-    if (this.page > 1) {
-      this.page--;
-      this.updateDisplayedList();
-    }
-  }
+  
 
-  nextPage(): void {
-    if (this.page < this.totalPages) {
-      this.page++;
-      this.updateDisplayedList();
-    }
+  nextPage() {
+  if (this.page < this.totalPages) {
+    this.goToPage(this.page + 1);
   }
+}
 
-  goToPage(pageNum: number): void {
+/** Show max 5 page numbers around current */
+getVisiblePages(): number[] {
+  const visiblePages: number[] = [];
+  const start = Math.max(1, this.page - 2);
+  const end = Math.min(this.totalPages, start + 4);
+
+  for (let i = start; i <= end; i++) {
+    visiblePages.push(i);
+  }
+  return visiblePages;
+}
+
+  goToPage(pageNum: number) {
+  if (pageNum >= 1 && pageNum <= this.totalPages) {
     this.page = pageNum;
-    this.updateDisplayedList();
+    this.fetchFIRList(); // call API or update table
   }
+}
+
+previousPage() {
+  if (this.page > 1) {
+    this.goToPage(this.page - 1);
+  }
+}
 
   totalPagesArray(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
@@ -218,37 +326,28 @@ export class AdditionalReliefListComponent implements OnInit {
 
   // Apply filters to the FIR list
   applyFilters() {
-    this.page = 1; // Reset to the first page
+    this.filterState.setFilters({
+    revenue_district: this.selectedDistrict,
+    district: this.selectedPoliceCity,
+    policeStationName: this.selectedPoliceStation,
+    start_date: this.start_date,
+    end_date: this.end_date,
+    additionalReliefType: this.selectedType,
+    reliefStatus: this.selectedStatus
+  });
+    this.page = 1;
     this.cdr.detectChanges();
-    this.filteredFirList();
+    this.fetchFIRList();
   }
+  
+  showColumn(type: string): boolean {
+  return !this.selectedType || this.selectedType === type;
+}
 
-  // // Filtered FIR list based on search and filter criteria
-  // filteredFirList() {
-  //   const searchLower = this.searchText.toLowerCase();
-
-  //   return this.displayedFirList = this.firList.filter((fir) => {
-  //     // Apply search filter
-  //     const matchesSearch =
-  //       fir.fir_id.toString().toLowerCase().includes(searchLower) ||
-  //       (fir.victim_id || '').toLowerCase().includes(searchLower) ||
-  //       (fir.fir_number || '').toLowerCase().includes(searchLower) ||
-  //       (fir.victim_name || '').toLowerCase().includes(searchLower);
-
-  //     // Apply dropdown filters
-  //     const matchesDistrict = this.selectedDistrict ? fir.fir_id === this.selectedDistrict : true;
-  //     const matchesNatureOfOffence = this.selectedNatureOfOffence ? fir.victim_id === this.selectedNatureOfOffence : true;
-  //     const matchesStatusOfCase = this.selectedStatusOfCase ? fir.victim_name === this.selectedStatusOfCase : true;
-  //     // const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status_of_relief === this.selectedStatusOfRelief : true;
-
-  //     return (
-  //       matchesSearch &&
-  //       matchesDistrict &&
-  //       matchesNatureOfOffence &&
-  //       matchesStatusOfCase 
-  //     );
-  //   });
-  // }
+// For dynamic colspan
+getStatusColSpan(): number {
+  return !this.selectedType ? 5 : 1;
+}
 
     // Filtered FIR list based on search and filter criteria
   filteredFirList() {
@@ -258,7 +357,7 @@ export class AdditionalReliefListComponent implements OnInit {
         console.log('Raw API Response:', data);
         // Filter FIRs with at least one victim with relief
         // this.firList = (data || []).filter((fir) => fir.victims_with_relief > 0);
-        this.firList = data;
+        this.displayedFirList = data;
         console.log('Filtered FIR List:', this.firList);
         this.updatePagination();
         this.isLoading = false;
@@ -276,6 +375,10 @@ export class AdditionalReliefListComponent implements OnInit {
     this.selectedPoliceCity = '';
     this.selectedDistrict = '';
     this.selectedPoliceStation = '';
+    this.start_date = '';
+    this.end_date = '';
+    this.selectedType = '';
+    this.selectedStatus = '';
     this.applyFilters();
   }
   
@@ -297,6 +400,22 @@ getFilterParams() {
 
   if (this.selectedDistrict) {
     params.revenue_district = this.selectedDistrict;
+  }
+
+  if (this.start_date) {
+    params.start_date = this.start_date;
+  }
+
+  if(this.end_date){
+    params.end_date = this.end_date;
+  }
+
+  if(this.selectedType){
+    params.additionalReliefType = this.selectedType;
+  }
+
+  if(this.selectedStatus){
+    params.reliefStatus = this.selectedStatus;
   }
   
   if(this.Parsed_UserInfo.role == '3'){
@@ -340,8 +459,8 @@ getFilterParams() {
 
   // Paginated FIR list
   paginatedFirList() {
-    const startIndex = (this.page - 1) * this.itemsPerPage;
-    return this.firList.slice(startIndex, startIndex + this.itemsPerPage);
+    const startIndex = (this.page - 1) * this.pageSize;
+    return this.firList.slice(startIndex, startIndex + this.pageSize);
   }
 
   loadPoliceDivision() {

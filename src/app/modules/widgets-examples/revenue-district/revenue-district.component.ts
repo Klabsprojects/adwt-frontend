@@ -16,6 +16,8 @@ export class RevenueDistrictComponent implements OnInit {
   revenueDistricts: any[] = []; // List of revenue districts
   districts: any[] = []; // List of districts for the dropdown
   page: number = 1;
+  itemsPerPage: number = 10;
+  totalRecords: number = 0;
 
   constructor(
     private modalService: NgbModal,
@@ -32,6 +34,7 @@ export class RevenueDistrictComponent implements OnInit {
     this.revenueDistrictService.getAllRevenueDistricts().subscribe(
       (data) => {
         this.revenueDistricts = data;
+        this.totalRecords = this.revenueDistricts.length;
         this.refreshTable();
       },
       (error) => {
@@ -44,6 +47,7 @@ export class RevenueDistrictComponent implements OnInit {
     this.revenueDistrictService.getAllDistricts().subscribe(
       (data) => {
         this.districts = data;
+        this.totalRecords = this.districts.length;
       },
       (error) => {
         Swal.fire('Error', 'Failed to load districts. Please try again later.', 'error');
@@ -196,4 +200,7 @@ export class RevenueDistrictComponent implements OnInit {
       confirmButtonColor: '#3085d6',
     });
   }
+    get totalPages(): number {
+  return Math.ceil(this.totalRecords / this.itemsPerPage);
+}
 }

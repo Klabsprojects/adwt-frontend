@@ -16,6 +16,8 @@ export class MeetingFilterComponent implements OnInit {
   selectedSubDivision:string = '';
   selectedQuarter:string = '';
   selectedyear:string = '';
+  selectedMeetingType:string='';
+  selectedStatus:string='';
   isDistrictDisabled:boolean=false;
   private userData:any;
   ngOnInit(): void {
@@ -62,9 +64,12 @@ export class MeetingFilterComponent implements OnInit {
   }
 
   clear(){
+    this.selectedyear = '';
     this.selectedDistrict = '';
     this.selectedSubDivision = '';
     this.selectedQuarter = '';
+    this.selectedMeetingType = '';
+    this.selectedStatus = '';
     this.subdivs=[];
     this.get_other_values();
     this.cdr.detectChanges()

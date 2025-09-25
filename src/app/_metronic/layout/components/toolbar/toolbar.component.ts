@@ -65,7 +65,7 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     this.appToolbarContainerCSSClass =
       this.appToolbarContainer === 'fixed'
         ? 'container-xxl'
-        : 'container-fluid';
+        : 'container';
     const containerClass = this.layout.getProp(
       'app.toolbar.containerClass',
       config

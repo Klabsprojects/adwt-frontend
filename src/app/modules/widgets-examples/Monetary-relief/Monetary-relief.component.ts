@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FirListTestService } from 'src/app/services/fir-list-test.service';
@@ -16,8 +16,9 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { FirService } from 'src/app/services/fir.service';
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import * as XLSX from 'xlsx';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 
 @Component({
   selector: 'app-monetary-relief',
@@ -28,6 +29,7 @@ import * as XLSX from 'xlsx';
     MatSelectModule,
     MatCheckboxModule,
     FormsModule,
+    NgMultiSelectDropDownModule,
     DragDropModule,
     MatProgressSpinnerModule
   ],
@@ -43,6 +45,34 @@ export class MonetaryReliefComponent implements OnInit {
   page: number = 1;
   currentPage: number = 1;
 itemsPerPage: number = 10;
+  dropdownSettings = {
+    singleSelection: false,
+    idField: 'value',   // matches your object key
+    textField: 'label', // matches your object key
+    selectAllText: 'Select All',
+    unSelectAllText: 'Unselect All',
+    itemsShowLimit: 2,
+    allowSearchFilter: true
+  };
+
+isOpen = false;
+selectedStages: string[] = [];
+displayText = 'Select Status';
+allStageOptions = [
+  { value: 'firProposalNotYetReceived', label: 'FIR Proposal Not Yet Received' },
+  { value: 'firReliefStageGiven', label: 'FIR Relief Stage Given' },
+  { value: 'firReliefStagePending', label: 'FIR Relief Stage Pending' },
+  { value: 'chargesheetReliefStageGiven', label: 'Chargesheet Relief Stage Given' },
+  { value: 'chargesheetReliefStagePending', label: 'Chargesheet Relief Stage Pending' },
+  { value: 'trialReliefStageGiven', label: 'Trial Relief Stage Given' },
+  { value: 'trialReliefStagePending', label: 'Trial Relief Stage Pending' },
+  { value: 'mistakeOfFact', label: 'Mistake of Fact' },
+  { value: 'sectionDeleted', label: 'Section Deleted' },
+  { value: 'firQuashed', label: 'FIR Quashed' },
+  { value: 'acquitted', label: 'Acquitted' },
+  { value: 'chargeAbated', label: 'Charge Abated' },
+  { value: 'quashed', label: 'Quashed' }
+];
   
   isReliefLoading: boolean = true;
   loading: boolean = false;
@@ -57,6 +87,7 @@ itemsPerPage: number = 10;
   policeZones:any;
   districts: string[] = [];
   naturesOfOffence: string[] = [];
+  Parsed_UserInfo: any;
   statusesOfCase: string[] = ['Just Starting', 'Pending', 'Completed'];
    loader: boolean = false;
   statusesOfRelief: string[] = [
@@ -89,7 +120,7 @@ itemsPerPage: number = 10;
   ];
 
   selectedUIPT:string='';
-  selectedStatus:string='';
+  selectedStatus:string[]=[];
   selectedDistricts:string='';
   selectedCommunity:string='';
   selectedCaste:string='';
@@ -97,17 +128,6 @@ itemsPerPage: number = 10;
   selectedPoliceCity:string=''
   selectedFromDate:any="";
   selectedToDate:any="";
-
-  payload = {
-  district: this.selectedDistrict || '',
-  community: this.selectedCommunity || '',
-  caste: this.selectedCaste || '',
-  police_city: this.selectedPoliceCity || '',
-  Status_Of_Case: this.selectedStatus || '',
-  police_zone: this.selectedZone || '',
-  Filter_From_Date: this.selectedFromDate || '',
-  Filter_To_Date: this.selectedToDate || ''
-};
 
 policeStations: string[] = [];
 selectedPoliceStation:string='';
@@ -165,7 +185,7 @@ displayedColumns: DisplayedColumn[] = [
     sortDirection: null,
   },
   {
-    label: 'FIR Date',
+    label: 'Register Date',
     field: 'FIR_date',
     group: null,
     sortable: true,
@@ -177,7 +197,7 @@ displayedColumns: DisplayedColumn[] = [
     field: 'offence_committed',
     group: null,
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   {
@@ -185,7 +205,7 @@ displayedColumns: DisplayedColumn[] = [
     field: 'victim_name',
     group: null,
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   {
@@ -193,7 +213,7 @@ displayedColumns: DisplayedColumn[] = [
     field: 'victim_gender',
     group: null,
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   {
@@ -201,7 +221,7 @@ displayedColumns: DisplayedColumn[] = [
     field: 'caste',
     group: null,
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   {
@@ -209,7 +229,7 @@ displayedColumns: DisplayedColumn[] = [
     field: 'community',
     group: null,
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   {
@@ -217,7 +237,7 @@ displayedColumns: DisplayedColumn[] = [
     field: 'relief_stage',
     group: null,
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   {
@@ -225,172 +245,240 @@ displayedColumns: DisplayedColumn[] = [
     field: 'relief_status',
     group: null,
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   // ✅ Group: FIR
   {
-    label: 'Proposal Date',
-    field: 'first_proceeding_date',
-    group: 'FIR Stage Relief (1st Stage)',
+    label: 'Proposal Sent to DC',
+    field: 'fir_proposal_status',
+    group: 'FIR',
     sortable: true,
     visible: true,
     sortDirection: null,
   },
   {
-    label: 'As per the Act',
-    field: 'relief_amount_scst',
-    group: 'FIR Stage Relief (1st Stage)',
-    sortable: true,
-    visible: true,
-    sortDirection: null,
-  },
-  {
-    label: 'Ex-Gratia',
-    field: 'relief_amount_exgratia',
-    group: 'FIR Stage Relief (1st Stage)',
+    label: 'Status',
+    field: 'fir_status',
+    group: 'FIR',
     sortable: true,
     visible: true,
     sortDirection: null,
   },
    {
-    label: 'Total - FIR Stage',
-    field: 'totalFirStageAmount',
-    group: 'FIR Stage Relief (1st Stage)',
+    label: 'Pending Days',
+    field: 'fir_pending_days',
+    group: 'FIR',
     sortable: true,
     visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Proposal Date',
+    field: 'first_proceeding_date',
+    group: 'FIR',
+    sortable: true,
+    visible: false,
+    sortDirection: null,
+  },
+  {
+    label: 'As per the Act',
+    field: 'relief_amount_scst',
+    group: 'FIR',
+    sortable: true,
+    visible: false,
+    sortDirection: null,
+  },
+  {
+    label: 'Ex-Gratia',
+    field: 'relief_amount_exgratia',
+    group: 'FIR',
+    sortable: true,
+    visible: false,
+    sortDirection: null,
+  },
+  {
+    label: 'Total - FIR Stage',
+    field: 'totalFirStageAmount',
+    group: 'FIR',
+    sortable: true,
+    visible: false,
     sortDirection: null,
   },
   {
     label: '1st Stage Disbursement Date',
     field: 'first_disbursement_date',
-    group: 'FIR Stage Relief (1st Stage)',
+    group: 'FIR',
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   
   // ✅ Group: CHARGESHEET
   {
-    label: 'Proposal Date',
-    field: 'second_proceeding_date',
-    group: 'Chargesheet Stage Relief (2nd Stage)',
+    label: 'Proposal Sent to DC',
+    field: 'chargesheet_proposal_status',
+    group: 'Chargesheet',
     sortable: true,
     visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Status',
+    field: 'chargesheet_status',
+    group: 'Chargesheet',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+   {
+    label: 'Pending Days',
+    field: 'chargesheet_pending_days',
+    group: 'Chargesheet',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Proposal Date',
+    field: 'second_proceeding_date',
+    group: 'Chargesheet',
+    sortable: true,
+    visible: false,
     sortDirection: null,
   },
   {
     label: 'As per the Act',
     field: 'secondInstallmentReliefScst',
-    group: 'Chargesheet Stage Relief (2nd Stage)',
+    group: 'Chargesheet',
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   {
     label: 'Ex-Gratia',
     field: 'secondInstallmentReliefExGratia',
-    group: 'Chargesheet Stage Relief (2nd Stage)',
+    group: 'Chargesheet',
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   {
     label: 'Total - Chargesheet Stage',
     field: 'totalChargeSheetAmount',
-    group: 'Chargesheet Stage Relief (2nd Stage)',
+    group: 'Chargesheet',
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
-    {
+  {
     label: '2nd Stage Disbursement Date',
     field: 'second_disbursement_date',
-    group: 'Chargesheet Stage Relief (2nd Stage)',
+    group: 'Chargesheet',
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   
   // ✅ Group: TRIAL Stage (spelling corrected from "TRAIL")
   {
-    label: 'Proposal Date',
-    field: 'trial_proceeding_date',
-    group: 'Final Stage Relief (3rd Stage)',
+    label: 'Proposal Sent to DC',
+    field: 'trail_proposal_status',
+    group: 'Trial',
     sortable: true,
     visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Status',
+    field: 'trial_status',
+    group: 'Trial',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+   {
+    label: 'Pending Days',
+    field: 'trial_pending_days',
+    group: 'Trial',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Proposal Date',
+    field: 'trial_proceeding_date',
+    group: 'Trial',
+    sortable: true,
+    visible: false,
     sortDirection: null,
   },
   {
     label: 'As per the Act',
     field: 'trial_reliefScst',
-    group: 'Final Stage Relief (3rd Stage)',
+    group: 'Trial',
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   {
     label: 'Ex-Gratia',
     field: 'trial_reliefExGratia',
-    group: 'Final Stage Relief (3rd Stage)',
+    group: 'Trial',
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   {
     label: 'Total - Final Stage',
     field: 'totalTrialAmount',
-    group: 'Final Stage Relief (3rd Stage)',
+    group: 'Trial',
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
   {
     label: '3rd Stage Disbursement Date',
     field: 'trial_disbursement_date',
-    group: 'Final Stage Relief (3rd Stage)',
+    group: 'Trial',
     sortable: true,
-    visible: true,
+    visible: false,
     sortDirection: null,
   },
 // ✅ Ungrouped "No. of Days since" columns
-{
-  label: 'No. of Days since 1st Stage Relief',
-  field: 'days_since_first_relief',
-  group: null,
-  sortable: true,
-  visible: true,
-  sortDirection: null,
-},
-{
-  label: 'No. of Days since 2nd latest Relief',
-  field: 'days_since_second_relief',
-  group: null,
-  sortable: true,
-  visible: true,
-  sortDirection: null,
-},
-{
-  label: 'No. of Days since 3rd latest Relief',
-  field: 'days_since_trial_relief',
-  group: null,
-  sortable: true,
-  visible: true,
-  sortDirection: null,
-},
+// {
+//   label: 'No. of Days since 1st Stage Relief',
+//   field: 'days_since_first_relief',
+//   group: null,
+//   sortable: true,
+//   visible: true,
+//   sortDirection: null,
+// },
+// {
+//   label: 'No. of Days since 2nd latest Relief',
+//   field: 'days_since_second_relief',
+//   group: null,
+//   sortable: true,
+//   visible: true,
+//   sortDirection: null,
+// },
+// {
+//   label: 'No. of Days since 3rd latest Relief',
+//   field: 'days_since_trial_relief',
+//   group: null,
+//   sortable: true,
+//   visible: true,
+//   sortDirection: null,
+// },
 {
   label: 'Reason for Pending - Current Month',
   field: 'report_reason',
   group: null,
   sortable: true,
-  visible: true,
+  visible: false,
   sortDirection: null,
 },
-
- 
 ];
-
-
 
   selectedCaseStatus: string = '';
   currentSortField: string = '';
@@ -419,36 +507,111 @@ displayedColumns: DisplayedColumn[] = [
   }
 
   groupedBySection: { [group: string]: DisplayedColumn[] } = {};
-  groupOrder = ['FIR Stage Relief (1st Stage)', 'Chargesheet Stage Relief (2nd Stage)', 'Final Stage Relief (3rd Stage)'];
+  groupOrder = ['FIR', 'Chargesheet', 'Trial'];
 
   // Initializes component data and fetches necessary information on component load.
-  ngOnInit(): void {
-    this.groupedBySection = this.groupOrder.reduce((acc, groupName) => {
+ ngOnInit(): void {
+  const UserInfo: any = sessionStorage.getItem('user_data');
+  this.Parsed_UserInfo = JSON.parse(UserInfo);
+
+  this.groupedBySection = this.groupOrder.reduce((acc, groupName) => {
     const cols = this.displayedColumns.filter(
       col => col.group === groupName && col.visible
     );
-  if (cols.length > 0) {
-    acc[groupName] = cols;
-  }
-  return acc;
-}, {} as { [group: string]: DisplayedColumn[] });
-    this.reportsCommonService
-      .getAllData()
-      .subscribe(({ districts, offences }) => {
-        this.districts = districts;
-        this.naturesOfOffence = offences;
-        this.fetchMonetaryReliefDetails(1,this.pageSize);
-      });
-      this.getDropdowns();
-    this.filteredData = [...this.reportData];
-    this.selectedColumns = this.displayedColumns.map((column) => column.field);
-    this.loadPoliceDivision();
-    this.loadPoliceRanges();
-    this.loadRevenue_district();
-    this.loadCommunities();
-    this.loadOptions();
-  }
+    if (cols.length > 0) {
+      acc[groupName] = cols;
+    }
+    return acc;
+  }, {} as { [group: string]: DisplayedColumn[] });
 
+  this.reportsCommonService.getAllData().subscribe(({ districts, offences }) => {
+    this.districts = districts;
+    this.naturesOfOffence = offences;
+    this.fetchMonetaryReliefDetails(1, this.pageSize);
+  });
+
+  this.getDropdowns();
+  this.filteredData = [...this.reportData];
+
+  // ✅ only visible:true columns selected by default
+  this.selectedColumns = this.displayedColumns
+    .filter(column => column.visible)
+    .map(column => column.field);
+
+  this.loadPoliceDivision();
+  this.loadPoliceRanges();
+  this.loadRevenue_district();
+  this.loadCommunities();
+  this.loadOptions();
+}
+
+
+// define two groups
+firstGroup = this.allStageOptions.slice(0, 7).map(opt => opt.value);
+lastGroup = this.allStageOptions.slice(7).map(opt => opt.value);
+
+toggleDropdown() {
+  this.isOpen = !this.isOpen;
+}
+
+isSelected(value: string): boolean {
+  return this.selectedStages.includes(value);
+}
+
+isDisabled(value: string): boolean {
+  // if any first group option selected -> disable last group
+  if (this.selectedStages.some(v => this.firstGroup.includes(v))) {
+    return this.lastGroup.includes(value);
+  }
+  // if any last group option selected -> disable first group
+  if (this.selectedStages.some(v => this.lastGroup.includes(v))) {
+    return this.firstGroup.includes(value);
+  }
+  return false;
+}
+
+toggleSelection(value: string) {
+  const index = this.selectedStages.indexOf(value);
+  if (index > -1) {
+    this.selectedStages.splice(index, 1);
+  } else {
+    this.selectedStages.push(value);
+  }
+  this.selectedStatus = [...this.selectedStages];
+
+  this.updateDisplayText();
+}
+
+updateDisplayText() {
+  this.displayText =
+    this.selectedStages.length > 0
+      ? this.allStageOptions
+          .filter(opt => this.selectedStages.includes(opt.value))
+          .map(opt => opt.label)
+          .join(', ')
+      : 'Select Status';
+}
+
+//   get displayText(): string {
+//   if (!this.selectedStatus.length) {
+//     return 'Select Status';
+//   }
+
+//   const selectedLabels = this.allStageOptions
+//     .filter(opt => this.selectedStages.includes(opt.value))
+//     .map(opt => opt.label);
+
+//   return selectedLabels.join(', ');
+// }
+
+  // Detect click outside to close dropdown
+  @HostListener('document:click', ['$event'])
+  clickOutside(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.custom-multiselect')) {
+      this.isOpen = false;
+    }
+  }
   // Updates the visibility of columns based on user-selected columns.
   updateColumnVisibility(): void {
     this.displayedColumns.forEach((column) => {
@@ -479,10 +642,23 @@ displayedColumns: DisplayedColumn[] = [
   }
 
   // Handles changes in column selection and updates column visibility.
-  onColumnSelectionChange(): void {
-    this.updateColumnVisibility();
-  }
+onColumnSelectionChange(): void {
+  // Update visible flags
+  this.displayedColumns.forEach(col => {
+    col.visible = this.selectedColumns.includes(col.field);
+  });
 
+  // Rebuild group headers based on visibility
+  this.groupedBySection = this.groupOrder.reduce((acc, groupName) => {
+    const cols = this.displayedColumns.filter(
+      col => col.group === groupName && col.visible
+    );
+    if (cols.length > 0) {
+      acc[groupName] = cols;
+    }
+    return acc;
+  }, {} as { [group: string]: DisplayedColumn[] });
+}
   // Load all monetaty relief reports details into UI
 
 
@@ -557,8 +733,10 @@ totalPagesArray(): number[] {
       this.selectedStatusOfCase = '';
       this.selectedStage = '';
       this.selectedReliefStatus = '';
-      // this.filteredData = [...this.reportData]; 
-      this.fetchMonetaryReliefDetails();
+      this.selectedStatus = [];
+      this.selectedStages=[];
+      this.displayText = 'Select Status';
+        this.fetchMonetaryReliefDetails();
   }
 
   
@@ -715,7 +893,16 @@ fetchMonetaryReliefDetails(page: number = 1, pageSize: number = this.pageSize):a
             (item.trial_reliefExGratia && item.trial_reliefExGratia !== "NULL" ? Number(item.trial_reliefExGratia) : 0),
 
           report_reason: item.report_reason === "NULL" ? '' : item.report_reason,
-          filter_status: item.status
+          filter_status: item.status,
+          fir_status : item.fir_status,
+          fir_pending_days: item.fir_status === 'Relief Given' ? '-' : item.fir_pending_days,
+          chargesheet_status:item.chargesheet_status,
+          chargesheet_pending_days:item.chargesheet_status === 'Relief Given' ? '-' : item.chargesheet_pending_days,
+          trial_status:item.trial_status,
+          trial_pending_days:item.chargesheet_status === 'Relief Given' ? '-' : item.trial_pending_days,
+          fir_proposal_status:item.fir_proposal_status,
+          chargesheet_proposal_status:item.chargesheet_proposal_status,
+          trail_proposal_status:item.trail_proposal_status 
         }));
        
         this.filteredData = [...this.reportData];
@@ -795,7 +982,7 @@ get postGroupedColumns(): DisplayedColumn[] {
 // Helper function to detect ungrouped columns that come after the grouped sections
 isPostGroupColumn(col: DisplayedColumn): boolean {
   const finalStageIndex = this.displayedColumns.findIndex(c =>
-    c.group === 'Final Stage Relief (3rd Stage)' &&
+    c.group === 'Trial' &&
     c.label === '3rd Stage Disbursement Date'
   );
 
@@ -935,10 +1122,15 @@ loadPoliceDivision() {
   addParam('sectionOfLaw', this.selectedSectionOfLaw);
   addParam('startDate', this.startDate);
   addParam('endDate', this.endDate);
-  addParam('statusOfCase', this.selectedStatusOfCase);
-  addParam('reliefStage', this.selectedStage);
-  addParam('reliefStatus', this.selectedReliefStatus);
+  addParam('selectedStatus',this.selectedStatus.join(','));
+  // addParam('statusOfCase', this.selectedStatusOfCase);
+  // addParam('reliefStage', this.selectedStage);
+  // addParam('reliefStatus', this.selectedReliefStatus);
   addParam('OffenceGroup', this.selectedOffenceGroup);
+   if ((this.Parsed_UserInfo.access_type === 'District' && this.Parsed_UserInfo.role === 4)||(this.Parsed_UserInfo.role === 3)) {
+    params.revenueDistrict = this.Parsed_UserInfo.district;
+    console.log(" if");
+  }
   return params;
 }
 
@@ -947,13 +1139,14 @@ loadPoliceDivision() {
     this.fetchMonetaryReliefDetails(1);
   }
 
+  
  
 
 async onBtnExport(): Promise<void> {
   this.loader = true;
   try {
     const res: any = await firstValueFrom(
-      this.monetaryReliefService.getMonetaryReliefDownload()
+      this.monetaryReliefService.getMonetaryReliefDownload(this.getFilterParams())
     );
 
     const cleanValue = (value: any) =>
@@ -966,15 +1159,14 @@ async onBtnExport(): Promise<void> {
 
     // ✅ Exact headers from your sample file
     const exportHeaders = [
-      'Sl No','Revenue District', 'Police City', 'Police Station','FIR Number', 'FIR Date', 
-      'Offence Committed', 'Victim Name', 'Victim Gender','Caste', 'Sub Caste', 'Relief Stage',
-      'Relief Status', 'FIR Proposal Date', 'FIR As per the Act',
+      'Sl No','Revenue District', 'Police City', 'Police Station','FIR Number', 'Register Date', 
+      'Offence Committed', 'Victim Name', 'Victim Gender','Caste', 'Sub Caste', 
+       'FIR Proposal Sent to DC','FIR Status', 'FIR Pending Days' ,'FIR Proposal Date', 'FIR As per the Act',
       'FIR  Ex - Gratia', 'Total FIR Stage',
-      '1st Stage Disbursement Date','Chargesheet Proposal Date', 'Chargesheet As per the Act',
+      '1st Stage Disbursement Date','Chargesheet Proposal Sent to DC','Chargesheet Status', 'Chargesheet Pending Days','Chargesheet Proposal Date', 'Chargesheet As per the Act',
       'Chargesheet Ex - Gratia', 'Total Chargesheet Amount','2nd Disbursement Date', 
-      'Trial Proposal Date', 'Trial As per the Act', 'Trial  Ex - Gratia','Total Trial Amount',
-      '3rd Disbursement Date', 'Days Since First Relief','Days Since Second Relief','Days Since Trial Relief',
-      'Report Reason'
+      'Trial Proposal Sent to DC','Trial Status', 'Trial Pending Days','Trial Proposal Date', 'Trial As per the Act', 'Trial  Ex - Gratia','Total Trial Amount',
+      '3rd Disbursement Date','Report Reason'
     ];
     // console.log(res.data);
     // ✅ Map API response to row array (order matches headers)
@@ -990,20 +1182,28 @@ async onBtnExport(): Promise<void> {
       cleanValue(item.victim_gender || ''),
       item.community,
       item.caste,
-      item.relief_stage,
-      item.relief_status,
+      item.fir_proposal_status,
+      item.fir_status,
+      item.fir_pending_days,
       item.first_proceeding_date ? formatDate(item.first_proceeding_date, 'yyyy-MM-dd', 'en') : '',
       numberValue(item.relief_amount_scst),
       numberValue(item.relief_amount_exgratia),
       numberValue(item.relief_amount_scst) + numberValue(item.relief_amount_exgratia),
       item.first_disbursement_date ? formatDate(item.first_disbursement_date, 'yyyy-MM-dd', 'en') : '',
-      
+      item.chargesheet_proposal_status,
+      item.chargesheet_status,
+      item.chargesheet_pending_days,
+
       item.second_proceeding_date ? formatDate(item.second_proceeding_date, 'yyyy-MM-dd', 'en') : '',
       numberValue(item.secondInstallmentReliefScst),
       numberValue(item.secondInstallmentReliefExGratia),
       item.second_disbursement_date ? formatDate(item.second_disbursement_date, 'yyyy-MM-dd', 'en') : '',
       numberValue(item.secondInstallmentReliefScst) + numberValue(item.secondInstallmentReliefExGratia),
-     
+      
+      item.trail_proposal_status,
+      item.trial_status,
+      item.trial_pending_days,
+      
       item.trial_proceeding_date ? formatDate(item.trial_proceeding_date, 'yyyy-MM-dd', 'en') : '',
       numberValue(item.trial_reliefScst),
       numberValue(item.trial_reliefExGratia),
@@ -1011,9 +1211,9 @@ async onBtnExport(): Promise<void> {
       numberValue(item.trial_reliefScst) + numberValue(item.trial_reliefExGratia),
 
       
-      cleanValue(item.days_since_first_relief),
-      cleanValue(item.days_since_second_relief),
-      cleanValue(item.days_since_trial_relief),
+      // cleanValue(item.days_since_first_relief),
+      // cleanValue(item.days_since_second_relief),
+      // cleanValue(item.days_since_trial_relief),
 
       cleanValue(item.report_reason)
     ]));
@@ -1033,6 +1233,15 @@ async onBtnExport(): Promise<void> {
     console.error('Error exporting report', error);
   } finally {
     this.loader = false;
+  }
+}
+
+reliefStage(event: any) {
+  this.selectedStage = event.target.value;
+
+  // If user selects "FirQuashed,MF,SectionDeleted,Charge_Abated,Quashed"
+  if (this.selectedStage === 'FirQuashed,MF,SectionDeleted,Charge_Abated,Quashed') {
+    this.selectedReliefStatus = ''; // clear status
   }
 }
 

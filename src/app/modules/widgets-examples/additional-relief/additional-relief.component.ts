@@ -138,8 +138,8 @@ export class AdditionalReliefComponent {
 
       // Education Concession
       educationConcessionStatus: [''],
-      notApplicableReasonEducation: [''],
-      otherReasonEducation: [''],
+      educationConcessionReason: [''],
+      educationOtherReason: [''],
       numberOfChildren: [''],
       children: this.fb.array([]),
 
@@ -326,94 +326,336 @@ export class AdditionalReliefComponent {
       });
     }
     
-  async onSubmit() {
-  if (this.additionalReliefForm) {
-    const formData = this.additionalReliefForm.value; 
+//   async onSubmit() {
+//   if (this.additionalReliefForm) {
+//     const formData = this.additionalReliefForm.value; 
 
-    // Get children array
-    const childrenValue = this.children.getRawValue(); 
+//     // Get children array
+//     const childrenValue = this.children.getRawValue(); 
 
-    // Loop through each child and upload education document if it's a File
-    if (childrenValue && Array.isArray(childrenValue)) {
-      for (let i = 0; i < childrenValue.length; i++) {
-        const child = childrenValue[i];
-        const educationFile = child.educationConcessionDocument;
+//     // Loop through each child and upload education document if it's a File
+//     if (childrenValue && Array.isArray(childrenValue)) {
+//       for (let i = 0; i < childrenValue.length; i++) {
+//         const child = childrenValue[i];
+//         const educationFile = child.educationConcessionDocument;
 
-        if (educationFile && educationFile instanceof File) {
-          const paths = await this.uploadMultipleFiles([educationFile]);
-          child.educationConcessionDocument = paths[0]; // Replace file with uploaded path
-        }
-      }
-    }
+//         if (educationFile && educationFile instanceof File) {
+//           const paths = await this.uploadMultipleFiles([educationFile]);
+//           child.educationConcessionDocument = paths[0]; // Replace file with uploaded path
+//         }
+//       }
+//     }
 
-    // Convert children array to JSON string
-    formData.children = JSON.stringify(childrenValue);
+//     // Convert children array to JSON string
+//     formData.children = JSON.stringify(childrenValue);
 
-    // ---------------------- Other file uploads ----------------------
-    let uploadProceedingsDocumentPath: string | undefined;
-    const uploadProceedings = this.additionalReliefForm.get('uploadProceedings')?.value;
-    if (uploadProceedings) {
-      const paths = await this.uploadMultipleFiles([uploadProceedings]);
-      uploadProceedingsDocumentPath = paths[0];
-    }
-    formData.uploadProceedings = uploadProceedingsDocumentPath || this.uploadProceedingsExisitingPath || null;
+//     // ---------------------- Other file uploads ----------------------
+//     let uploadProceedingsDocumentPath: string | undefined;
+//     const uploadProceedings = this.additionalReliefForm.get('uploadProceedings')?.value;
+//     if (uploadProceedings) {
+//       const paths = await this.uploadMultipleFiles([uploadProceedings]);
+//       uploadProceedingsDocumentPath = paths[0];
+//     }
+//     formData.uploadProceedings = uploadProceedingsDocumentPath || this.uploadProceedingsExisitingPath || null;
 
-    let uploadEmployeeProceedingsDocumentPath: string | undefined;
-    const uploadEmployeeProceedings = this.additionalReliefForm.get('employmentProceedingsDocument')?.value;
-    if (uploadEmployeeProceedings) {
-      const paths = await this.uploadMultipleFiles([uploadEmployeeProceedings]);
-      uploadEmployeeProceedingsDocumentPath = paths[0];
-    }
-    formData.employmentProceedingsDocument = uploadEmployeeProceedingsDocumentPath || this.uploadEmployeeProceedingsExisitingPath || null;
+//     let uploadEmployeeProceedingsDocumentPath: string | undefined;
+//     const uploadEmployeeProceedings = this.additionalReliefForm.get('employmentProceedingsDocument')?.value;
+//     if (uploadEmployeeProceedings) {
+//       const paths = await this.uploadMultipleFiles([uploadEmployeeProceedings]);
+//       uploadEmployeeProceedingsDocumentPath = paths[0];
+//     }
+//     formData.employmentProceedingsDocument = uploadEmployeeProceedingsDocumentPath || this.uploadEmployeeProceedingsExisitingPath || null;
 
-    let uploadHouseProceedingsDocumentPath: string | undefined;
-    const uploadHouseProceedings = this.additionalReliefForm.get('houseSitePattaProceedingsDocument')?.value;
-    if (uploadHouseProceedings) {
-      const paths = await this.uploadMultipleFiles([uploadHouseProceedings]);
-      uploadHouseProceedingsDocumentPath = paths[0];
-    }
-    formData.houseSitePattaProceedingsDocument = uploadHouseProceedingsDocumentPath || this.uploadHouseProceedingsExisitingPath || null;  
+//     let uploadHouseProceedingsDocumentPath: string | undefined;
+//     const uploadHouseProceedings = this.additionalReliefForm.get('houseSitePattaProceedingsDocument')?.value;
+//     if (uploadHouseProceedings) {
+//       const paths = await this.uploadMultipleFiles([uploadHouseProceedings]);
+//       uploadHouseProceedingsDocumentPath = paths[0];
+//     }
+//     formData.houseSitePattaProceedingsDocument = uploadHouseProceedingsDocumentPath || this.uploadHouseProceedingsExisitingPath || null;  
 
-    let uploadcompensationProceedingsDocumentPath: string | undefined;
-    const uploadcompensationProceedings = this.additionalReliefForm.get('compensationuploadProceedings')?.value;
-    if (uploadcompensationProceedings) {
-      const paths = await this.uploadMultipleFiles([uploadcompensationProceedings]);
-      uploadcompensationProceedingsDocumentPath = paths[0];
-    }
-    formData.compensationuploadProceedings = uploadcompensationProceedingsDocumentPath || this.uploadcompensationProceedingsExisitingPath || null;
+//     let uploadcompensationProceedingsDocumentPath: string | undefined;
+//     const uploadcompensationProceedings = this.additionalReliefForm.get('compensationuploadProceedings')?.value;
+//     if (uploadcompensationProceedings) {
+//       const paths = await this.uploadMultipleFiles([uploadcompensationProceedings]);
+//       uploadcompensationProceedingsDocumentPath = paths[0];
+//     }
+//     formData.compensationuploadProceedings = uploadcompensationProceedingsDocumentPath || this.uploadcompensationProceedingsExisitingPath || null;
 
-    let uploadDocumentPath: string | undefined;
-    const uploadFile = this.additionalReliefForm.get('uploadFile')?.value;
-    if (uploadFile) {
-      const paths = await this.uploadMultipleFiles([uploadFile]);
-      uploadDocumentPath = paths[0];
-    }
-    formData.uploadFile = uploadDocumentPath || this.uploadDocumentExisitingPath || null;
+//     let uploadDocumentPath: string | undefined;
+//     const uploadFile = this.additionalReliefForm.get('uploadFile')?.value;
+//     if (uploadFile) {
+//       const paths = await this.uploadMultipleFiles([uploadFile]);
+//       uploadDocumentPath = paths[0];
+//     }
+//     formData.uploadFile = uploadDocumentPath || this.uploadDocumentExisitingPath || null;
 
-    // ---------------------- API Call ----------------------
-    this.additionalReliefService.saveAdditionalRelief(formData).subscribe({
-      next: (response) => {
-        console.log('Data saved successfully:', response);
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: 'Data saved successfully!',
-        });
-      },
-      error: (err) => {
-        console.error('Error saving data:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Error saving data',
-        });
-      }
-    });
+//     console.log("Form Data",formData);
+//     // ---------------------- API Call ----------------------
+//     this.additionalReliefService.saveAdditionalRelief(formData).subscribe({
+//       next: (response) => {
+//         console.log('Data saved successfully:', response);
+//         Swal.fire({
+//           icon: 'success',
+//           title: 'Success',
+//           text: 'Data saved successfully!',
+//         });
+//       },
+//       error: (err) => {
+//         console.error('Error saving data:', err);
+//         Swal.fire({
+//           icon: 'error',
+//           title: 'Error',
+//           text: 'Error saving data',
+//         });
+//       }
+//     });
 
-  } else {
+//   } else {
+//     console.log('Form is invalid');
+//   }
+// }
+
+async onSubmit() {
+  if (!this.additionalReliefForm) {
     console.log('Form is invalid');
+    return;
   }
+
+  // start with current form values
+  const formData: any = { ...this.additionalReliefForm.value };
+
+  // ---------------- Children array (only when Education Concession === 'Yes') ----------------
+  let childrenValue = this.children?.getRawValue?.() || [];
+  if (formData.educationConcessionStatus === 'Yes' && Array.isArray(childrenValue)) {
+    for (let i = 0; i < childrenValue.length; i++) {
+      const child = childrenValue[i] || {};
+      const educationFile = child.educationConcessionDocument;
+
+      // upload education doc if it's a File, else normalize to ''
+      if (educationFile && educationFile instanceof File) {
+        const paths = await this.uploadMultipleFiles([educationFile]);
+        child.educationConcessionDocument = paths?.[0] || '';
+      } else if (typeof educationFile === 'string') {
+        child.educationConcessionDocument = educationFile || '';
+      } else {
+        child.educationConcessionDocument = '';
+      }
+
+      // clear non-relevant school/college fields per child
+      if (child.studyStatus === 'School') {
+        child.course = '';
+        child.courseYear = '';
+      } else if (child.studyStatus === 'College') {
+        child.institution = '';
+        child.standard = '';
+      } else {
+        child.institution = '';
+        child.standard = '';
+        child.course = '';
+        child.courseYear = '';
+      }
+
+      // ensure all expected keys exist (empty if missing)
+      [
+        'gender','age','studyStatus','institution','standard',
+        'course','courseYear','amountDisbursed',
+        'proceedingsFileNumber','dateOfProceedings','educationConcessionDocument'
+      ].forEach(k => {
+        if (child[k] === undefined || child[k] === null) child[k] = '';
+      });
+    }
+  } else {
+    // not visible: blank related fields
+    childrenValue = [];
+    formData.numberOfChildren = '';
+    formData.educationConcessionReason = formData.educationConcessionReason || '';
+    if (formData.educationConcessionReason !== 'Others') {
+      formData.educationOtherReason = '';
+    }
+    else{
+      formData.educationOtherReason;
+    }
+  }
+  formData.children = JSON.stringify(childrenValue);
+
+  // ---------------------- File uploads ----------------------
+  // Pension proceedings doc
+  let uploadProceedingsDocumentPath: string | undefined;
+  const uploadProceedings = this.additionalReliefForm.get('uploadProceedings')?.value;
+  if (uploadProceedings) {
+    const paths = await this.uploadMultipleFiles([uploadProceedings]);
+    uploadProceedingsDocumentPath = paths?.[0];
+  }
+  formData.uploadProceedings =
+    uploadProceedingsDocumentPath || this.uploadProceedingsExisitingPath || '';
+
+  // Employment proceedings doc
+  let uploadEmployeeProceedingsDocumentPath: string | undefined;
+  const uploadEmployeeProceedings = this.additionalReliefForm.get('employmentProceedingsDocument')?.value;
+  if (uploadEmployeeProceedings) {
+    const paths = await this.uploadMultipleFiles([uploadEmployeeProceedings]);
+    uploadEmployeeProceedingsDocumentPath = paths?.[0];
+  }
+  formData.employmentProceedingsDocument =
+    uploadEmployeeProceedingsDocumentPath || this.uploadEmployeeProceedingsExisitingPath || '';
+
+  // House site patta proceedings doc
+  let uploadHouseProceedingsDocumentPath: string | undefined;
+  const uploadHouseProceedings = this.additionalReliefForm.get('houseSitePattaProceedingsDocument')?.value;
+  if (uploadHouseProceedings) {
+    const paths = await this.uploadMultipleFiles([uploadHouseProceedings]);
+    uploadHouseProceedingsDocumentPath = paths?.[0];
+  }
+  formData.houseSitePattaProceedingsDocument =
+    uploadHouseProceedingsDocumentPath || this.uploadHouseProceedingsExisitingPath || '';
+
+  // Compensation proceedings doc
+  let uploadcompensationProceedingsDocumentPath: string | undefined;
+  const uploadcompensationProceedings = this.additionalReliefForm.get('compensationuploadProceedings')?.value;
+  if (uploadcompensationProceedings) {
+    const paths = await this.uploadMultipleFiles([uploadcompensationProceedings]);
+    uploadcompensationProceedingsDocumentPath = paths?.[0];
+  }
+  formData.compensationuploadProceedings =
+    uploadcompensationProceedingsDocumentPath || this.uploadcompensationProceedingsExisitingPath || '';
+
+  // Provisions upload file
+  let uploadDocumentPath: string | undefined;
+  const uploadFile = this.additionalReliefForm.get('uploadFile')?.value;
+  if (uploadFile) {
+    const paths = await this.uploadMultipleFiles([uploadFile]);
+    uploadDocumentPath = paths?.[0];
+  }
+  formData.uploadFile = uploadDocumentPath || this.uploadDocumentExisitingPath || '';
+
+  // ---------------------- CLEANUP: send '' for fields hidden by *ngIf ----------------------
+  const clear = (keys: string[]) => keys.forEach(k => (formData[k] = ''));
+
+  // 1) Pension
+  if (formData.pensionStatus === 'Yes') {
+    formData.notApplicableReason = '';
+    formData.otherReason = '';
+  } else if (formData.pensionStatus === 'Not Applicable') {
+    clear([
+      'relationship','pensionAmount','dearnessAllowance','totalPensionAmount',
+      'fileNumber','proceedingsDate','uploadProceedings'
+    ]);
+    if (formData.notApplicableReason !== 'Others') formData.otherReason = '';
+  } else {
+    // not chosen/empty: clear all related
+    clear([
+      'notApplicableReason','otherReason','relationship','pensionAmount',
+      'dearnessAllowance','totalPensionAmount','fileNumber','proceedingsDate','uploadProceedings'
+    ]);
+  }
+
+  // 2) Employment / Job
+  if (formData.employmentStatus === 'Yes') {
+    formData.notApplicableEmploymentReason = '';
+    formData.employmentOtherReason = '';
+  } else if (formData.employmentStatus === 'Not Applicable') {
+    clear([
+      'relationshipToVictim','educationalQualification','departmentName','officeName',
+      'designation','officeAddress','officeDistrict','appointmentOrderDate',
+      'providingOrderDate','employmentProceedingsFileNumber','employmentProceedingsDate',
+      'employmentProceedingsDocument'
+    ]);
+    if (formData.notApplicableEmploymentReason !== 'Others') formData.employmentOtherReason = '';
+  } else {
+    clear([
+      'notApplicableEmploymentReason','employmentOtherReason','relationshipToVictim',
+      'educationalQualification','departmentName','officeName','designation','officeAddress',
+      'officeDistrict','appointmentOrderDate','providingOrderDate',
+      'employmentProceedingsFileNumber','employmentProceedingsDate','employmentProceedingsDocument'
+    ]);
+  }
+
+  // 3) House Site Patta
+  if (formData.houseSitePattaStatus === 'Yes') {
+    formData.notApplicableHouseSitePattaReason = '';
+    formData.houseSitePattaOtherReason = '';
+  } else if (formData.houseSitePattaStatus === 'Not Applicable') {
+    clear([
+      'houseSitePattaRelationship','houseSitePattaAddress','talukName','districtName','pinCode',
+      'houseSitePattaIssueDate','houseSitePattaProceedingsFileNumber',
+      'houseSitePattaProceedingsDate','houseSitePattaProceedingsDocument'
+    ]);
+    if (formData.notApplicableHouseSitePattaReason !== 'Others') formData.houseSitePattaOtherReason = '';
+  } else {
+    clear([
+      'notApplicableHouseSitePattaReason','houseSitePattaOtherReason','houseSitePattaRelationship',
+      'houseSitePattaAddress','talukName','districtName','pinCode','houseSitePattaIssueDate',
+      'houseSitePattaProceedingsFileNumber','houseSitePattaProceedingsDate',
+      'houseSitePattaProceedingsDocument'
+    ]);
+  }
+
+  // 4) Education Concession
+  if (formData.educationConcessionStatus === 'Yes') {
+    formData.educationConcessionReason = '';
+    formData.educationOtherReason = '';
+  } else if (formData.educationConcessionStatus === 'Not Applicable') {
+    formData.numberOfChildren = '';
+    formData.children = JSON.stringify([]);
+    if (formData.educationConcessionReason !== 'Others') formData.educationOtherReason = '';
+  } else {
+    clear(['educationConcessionReason','educationOtherReason','numberOfChildren']);
+    formData.children = JSON.stringify([]);
+  }
+
+  // 5) Provisions
+  if (formData.provisionsGivenStatus === 'Yes') {
+    formData.reasonNotApplicable = '';
+    formData.othersReason = '';
+  } else if (formData.provisionsGivenStatus === 'Not Applicable') {
+    clear(['beneficiaryRelationship','provisionsfileNumber','dateOfProceedings','uploadFile']);
+    if (formData.reasonNotApplicable !== 'Others') formData.othersReason = '';
+  } else {
+    clear(['reasonNotApplicable','othersReason','beneficiaryRelationship','provisionsfileNumber','dateOfProceedings','uploadFile']);
+  }
+
+  // 6) Burnt House / Compensation
+  if (formData.compensationGivenStatus === 'Yes') {
+    formData.compensationnotApplicableReason = '';
+    formData.compensationotherReason = '';
+  } else if (formData.compensationGivenStatus === 'Not Applicable') {
+    clear(['compensationestimatedAmount','proceedingsFileNumber','compensationdateOfProceedings','compensationuploadProceedings']);
+    if (formData.compensationnotApplicableReason !== 'Others') formData.compensationotherReason = '';
+  } else {
+    clear(['compensationnotApplicableReason','compensationotherReason','compensationestimatedAmount','proceedingsFileNumber','compensationdateOfProceedings','compensationuploadProceedings']);
+  }
+
+  // Final normalization: send '' for any undefined/null remaining top-level controls
+  Object.keys(this.additionalReliefForm.controls).forEach(key => {
+    if (formData[key] === undefined || formData[key] === null) {
+      formData[key] = '';
+    }
+  });
+
+  console.log('Form Data', formData);
+
+  // ---------------------- API Call ----------------------
+  this.additionalReliefService.saveAdditionalRelief(formData).subscribe({
+    next: (response) => {
+      console.log('Data saved successfully:', response);
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: response.message,
+      });
+    },
+    error: (err) => {
+      console.error('Error saving data:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error saving data',
+      });
+    }
+  });
 }
+
 
   editAdditionalRelief(firId: string,victimId: string) {
     this.additionalReliefService.getAdditionalReliefByFirId(firId,victimId).subscribe({
@@ -485,8 +727,8 @@ export class AdditionalReliefComponent {
 
       // Education fields
       education_concession_status: 'educationConcessionStatus',
-      education_concession_reason: 'notApplicableReasonEducation',
-      education_other_reason: 'otherReasonEducation',
+      education_concession_reason: 'educationConcessionReason',
+      education_other_reason: 'educationOtherReason',
       number_of_children: 'numberOfChildren',
 
       // Provisions fields

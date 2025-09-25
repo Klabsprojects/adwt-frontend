@@ -30,6 +30,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
 
+
 @NgModule({
   declarations: [
     WidgetsExamplesComponent,
@@ -62,7 +63,7 @@ import { MatOptionModule } from '@angular/material/core';
     MatSelectModule,
     MatCheckboxModule,
     MatOptionModule,
-    LayoutModule,
+    LayoutModule
   ],
 })
 export class WidgetsExamplesModule {}

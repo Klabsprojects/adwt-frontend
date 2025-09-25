@@ -47,6 +47,8 @@
     <!--end::Logo-->
   </ng-container>
 
+  
+
   <!--begin::Header wrapper-->
   <div class="d-flex align-items-stretch justify-content-between flex-lg-grow-1" id="kt_app_header_wrapper">
     <ng-container *ngIf="appHeaderDefaultContent === 'menu' && appHeaderDefaulMenuDisplay">
@@ -79,6 +81,11 @@
     <!-- <ng-container *ngIf="appHeaderDefaultContent === 'page-title' && appPageTitleDisplay">
       <app-page-title #ktPageTitle class="page-title d-flex"></app-page-title>
     </ng-container> -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+  <!-- <img alt="Logo" src="./assets/images/image.png" class="app-sidebar-logo-default" style="height: 60px;"> -->
+  <h2 style="margin: 0; color: #043c6c;">Adi Dravidar and Tribal Welfare Department <br>
+    <h4 class="pt-2 float-left w-100 text-center title sk teko">Samaththuvam Kaanbom</h4></h2>
+</div>
     <app-navbar class="app-navbar flex-shrink-0" [appHeaderDefaulMenuDisplay]="appHeaderDefaulMenuDisplay"
       [isRtl]="false"></app-navbar>
   </div>

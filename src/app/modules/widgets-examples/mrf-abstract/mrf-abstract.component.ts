@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { ReportsCommonService } from 'src/app/services/reports-common.service';
@@ -15,6 +15,7 @@ import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { FirListComponent } from '../fir-list/fir-list.component';
 
 @Component({
   selector: 'app-mrf-abstract',
@@ -38,9 +39,15 @@ export class MrfAbstractComponent {
   reportData: Array<any> = [];
   filteredData: Array<any> = [];
   page: number = 1;
-  itemsPerPage: number = 40;
+  itemsPerPage: number = 50;
   isReliefLoading: boolean = true;
   loading: boolean = false;
+
+  showFIR: boolean = false;
+  showChargesheet: boolean = false;
+  showTrial: boolean = false;
+
+
   // Filters
   selectedDistrict: string = '';
   selectedColumns: string[] = [];
@@ -56,13 +63,22 @@ export class MrfAbstractComponent {
     'ChargeSheet Stage',
     'Trial Stage',
   ];
+  tableSearchText: string = "";
+  currentPage: number = 1;
+  tableItemsPerPage: number = 10;
   communities:any[]=[];
   castes:any[]=[];
   zones:any[]=[];
   policeCities:any[]=[];
+  Parsed_UserInfo: any;
+
+selectedStage: string = '';
+showAllStages:boolean = false;
+popupData: any[] = [];
+
    status: any[]=[
-    { key: 'UI', value: 'UI Stage' },
-    { key: 'PT', value: 'PT Stage' },
+    { key: 'UI', value: 'UI' },
+    { key: 'PT', value: 'PT' },
   ]
 
   selectedStatus:string='';
@@ -76,12 +92,12 @@ export class MrfAbstractComponent {
   payload = {
     district: this.selectedDistrict || "",
     police_city: this.selectedPoliceCity || "",
-    Status_Of_Case: "", // Add if needed
+    Status_Of_Case: this.selectedCaste || "", 
     police_zone: this.selectedZone || "",
     Filter_From_Date: this.selectedFromDate || "",
     Filter_To_Date: this.selectedToDate || ""
   };
-
+@ViewChild(FirListComponent) firList!: FirListComponent;
   
 displayedColumns: DisplayedColumn[] = [
   // ✅ Ungrouped columns
@@ -109,79 +125,103 @@ displayedColumns: DisplayedColumn[] = [
     visible: true,
     sortDirection: null,
   },
+  {
+    label: 'MF Cases',
+    field: 'mf_cases',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+    {
+    label: 'Non MF Cases',
+    field: 'nonmf_case',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'Proposal Not Yet Received',
+    field: 'notyetreceived',
+    group: null,
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
 // ✅ Group: FIR
   {
     label: 'Proposal sent to DC',
     field: 'fir_proposal_sent_to_dc',
-    group: 'FIR',
+    group: 'FIR Relief',
     sortable: true,
     visible: true,
     sortDirection: null,
   },
   {
-    label: 'Relief Given',
+    label: 'Given',
     field: 'fir_relief_given',
-    group: 'FIR',
+    group: 'FIR Relief',
     sortable: true,
     visible: true,
     sortDirection: null,
   },
   {
-    label: 'Relief Pending',
+    label: ' Pending',
     field: 'fir_relief_pending',
-    group: 'FIR',
+    group: 'FIR Relief',
     sortable: true,
     visible: true,
     sortDirection: null,
   },
   
-  // ✅ Group: CHARGESHEET
+  // ✅ Group: Chargesheet
   {
     label: 'Proposal sent to DC',
     field: 'chargesheet_proposal_sent_to_dc',
-    group: 'CHARGESHEET',
+    group: 'Chargesheet Relief',
     sortable: true,
     visible: true,
     sortDirection: null,
   },
   {
-    label: 'Relief Given',
+    label: ' Given',
     field: 'chargesheet_relief_given',
-    group: 'CHARGESHEET',
+    group: 'Chargesheet Relief',
     sortable: true,
     visible: true,
     sortDirection: null,
   },
   {
-    label: 'Relief Pending',
+    label: ' Pending',
     field: 'chargesheet_relief_pending',
-    group: 'CHARGESHEET',
+    group: 'Chargesheet Relief',
     sortable: true,
     visible: true,
     sortDirection: null,
   },
   
-  // ✅ Group: TRIAL Stage (spelling corrected from "TRAIL")
+  // ✅ Group: Trail Stage (spelling corrected from "TRAIL")
   {
     label: 'Proposal sent to DC',
     field: 'trial_proposal_sent_to_dc',
-    group: 'TRIAL',
+    group: 'Trail Relief',
     sortable: true,
     visible: true,
     sortDirection: null,
   },
   {
-    label: 'Relief Given',
+    label: ' Given',
     field: 'trial_relief_given',
-    group: 'TRIAL',
+    group: 'Trail Relief',
     sortable: true,
     visible: true,
     sortDirection: null,
   },
   {
-    label: 'Relief Pending',
+    label: ' Pending',
     field: 'trial_relief_pending',
-    group: 'TRIAL',
+    group: 'Trail Relief',
     sortable: true,
     visible: true,
     sortDirection: null,
@@ -194,9 +234,10 @@ displayedColumns: DisplayedColumn[] = [
   currentSortField: string = '';
   isAscending: boolean = true;
   originalData: any;
-
+  
   constructor(
     // private firService: FirListTestService,
+    private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private reportsCommonService: ReportsCommonService,
     private mrfAbstractService: mrfAbstractService,
@@ -207,30 +248,92 @@ displayedColumns: DisplayedColumn[] = [
   }
 
   groupedBySection: { [group: string]: DisplayedColumn[] } = {};
-  groupOrder = ['FIR', 'CHARGESHEET', 'TRIAL'];
+  groupOrder = ['FIR Relief', 'Chargesheet Relief', 'Trail Relief'];
 
-  ngOnInit(): void {
-    this.groupedBySection = this.groupOrder.reduce((acc, groupName) => {
+ngOnInit(): void {
+  // 🔹 Load user info
+  const UserInfo: any = sessionStorage.getItem('user_data');
+  this.Parsed_UserInfo = UserInfo ? JSON.parse(UserInfo) : null;
+
+  // 🔹 Group displayed columns
+  this.groupedBySection = this.groupOrder.reduce((acc, groupName) => {
     const cols = this.displayedColumns.filter(
       col => col.group === groupName && col.visible
     );
-  if (cols.length > 0) {
-    acc[groupName] = cols;
-  }
-  return acc;
-}, {} as { [group: string]: DisplayedColumn[] });
-    this.reportsCommonService
-      .getAllData()
-      .subscribe(({ districts, offences }) => {
-        this.districts = districts;
-        this.naturesOfOffence = offences;
-        this.fetchMrfAbstract();
-      });
-      this.getDropdowns();
-    this.filteredData = [...this.reportData];
-    this.selectedColumns = this.displayedColumns.map((column) => column.field);
-  }
+    if (cols.length > 0) {
+      acc[groupName] = cols;
+    }
+    return acc;
+  }, {} as { [group: string]: DisplayedColumn[] });
 
+  // 🔹 Fetch dropdown values (districts, offences, etc.)
+  this.reportsCommonService.getAllData().subscribe(({ districts, offences }) => {
+    this.districts = districts;
+    this.naturesOfOffence = offences;
+  });
+
+  this.getDropdowns();
+  // 🔹 Init table state
+  this.filteredData = [...this.reportData];
+  this.selectedColumns = this.displayedColumns.map((column) => column.field);
+
+  // 🔹 Restore saved filters from sessionStorage
+  const savedFilters = sessionStorage.getItem('mrfFilters');
+console.log(savedFilters);
+
+if (savedFilters) {
+  const filters = JSON.parse(savedFilters);
+  console.log("Filter", filters);
+
+  // Extract values
+  this.selectedDistrict   = filters.district   || '';
+  this.selectedPoliceCity = filters.police_city || '';
+  this.selectedZone       = filters.police_zone || '';
+  this.selectedStatus     = filters.Status_Of_Case || '';
+  this.selectedFromDate   = filters.Filter_From_Date || '';
+  this.selectedToDate     = filters.Filter_To_Date || '';
+
+  // Check if all filter values are empty
+  const allEmpty = !this.selectedDistrict &&
+                   !this.selectedPoliceCity &&
+                   !this.selectedZone &&
+                   !this.selectedStatus &&
+                   !this.selectedFromDate &&
+                   !this.selectedToDate;
+
+  if (allEmpty) {
+    // No filters set → fetch all data
+    this.fetchMrfAbstract();
+  } else {
+    // Some filters present → apply them
+    this.applyFilters();
+  }
+} else {
+  // No saved filters → fetch all data
+  this.fetchMrfAbstract();
+}
+
+}
+
+  getFilterParams() {
+  const params: any = {};
+
+  const addParam = (key: string, value: any) => {
+    if (value) params[key] = value;
+  };
+   addParam('district', this.selectedDistrict);
+   addParam('police_city',this.selectedPoliceCity);
+   addParam('police_zone', this.selectedZone);
+   addParam('Filter_From_Date',this.selectedFromDate);
+   addParam('Filter_To_Date',this.selectedToDate);
+   addParam('Status_Of_Case',this.selectedStatus);
+  //  console.log(this.Parsed_UserInfo);
+   if ((this.Parsed_UserInfo.access_type === 'District' && this.Parsed_UserInfo.role === 4)||(this.Parsed_UserInfo.role === 3)) {
+    params.district = this.Parsed_UserInfo.district;
+  }
+  // console.log(params);
+  return params;
+}
   // Updates the visibility of columns based on user-selected columns.
   updateColumnVisibility(): void {
     this.displayedColumns.forEach((column) => {
@@ -339,17 +442,158 @@ displayedColumns: DisplayedColumn[] = [
   //     'MRF-Abstract'
   //   );
   // }
+
+caseDetailsExport() {
+  const dataToExport = this.tableFilteredData();
+
+  let headerRow1: string[] = ["S.No", "FIR Number","Police Station", "Register Date"];
+  let headerRow2: string[] = ["", "", "",""];
+  let dataRows: any[][] = [];
+
+  if (this.showFIR && !this.showChargesheet && !this.showTrial) {
+    // 🔹 FIR only
+    headerRow1.push("FIR", "", "");
+    headerRow2.push("Proposal Sent to DC", "Status", "Pending Days");
+
+    dataRows = dataToExport.map((d: any, i: number) => [
+      i + 1,
+      d.fir_number_full,
+      d.police_station,
+      new Date(d.register_date).toLocaleDateString('en-GB'),
+      d.fir_proposal_status,
+      d.fir_status,
+      d.fir_status === 'Relief Given' ? '-' : d.fir_pending_days
+    ]);
+  } 
+  else if (this.showChargesheet && !this.showFIR && !this.showTrial) {
+    // 🔹 Chargesheet only
+    headerRow1.push("Chargesheet", "", "");
+    headerRow2.push("Proposal Sent to DC", "Status", "Pending Days");
+
+    dataRows = dataToExport.map((d: any, i: number) => [
+      i + 1,
+      d.fir_number_full,
+      d.police_station,
+      new Date(d.register_date).toLocaleDateString('en-GB'),
+      d.chargesheet_proposal_status,
+      d.chargesheet_status,
+      d.chargesheet_status === 'Relief Given' ? '-' : d.chargesheet_pending_days
+    ]);
+  } 
+  else if (this.showTrial && !this.showFIR && !this.showChargesheet) {
+    // 🔹 Trial only
+    headerRow1.push("Trial", "", "");
+    headerRow2.push("Proposal Sent to DC", "Status", "Pending Days");
+
+    dataRows = dataToExport.map((d: any, i: number) => [
+      i + 1,
+      d.fir_number_full,
+      d.police_station,
+      new Date(d.register_date).toLocaleDateString('en-GB'),
+      d.trial_proposal_status,
+      d.trial_status,
+      d.trial_status === 'Relief Given' ? '-' : d.trial_pending_days
+    ]);
+  }
+  else if (!this.showTrial && !this.showFIR && !this.showChargesheet) {
+    dataRows = dataToExport.map((d: any, i: number) => [
+      i + 1,
+      d.fir_number_full,
+      d.police_station,
+      new Date(d.register_date).toLocaleDateString('en-GB'),
+    ]);
+  } 
+  else {
+    // 🔹 District / All → include everything
+    headerRow1.push("FIR","","","Chargesheet","","","Trial","","");
+    headerRow2.push(
+      "Proposal Sent to DC","Status","Pending Days",
+      "Proposal Sent to DC","Status","Pending Days",
+      "Proposal Sent to DC","Status","Pending Days"
+    );
+
+    dataRows = dataToExport.map((d: any, i: number) => [
+      i + 1,
+      d.fir_number_full,
+      d.police_station,
+      new Date(d.register_date).toLocaleDateString('en-GB'),
+      d.fir_proposal_status,
+      d.fir_status,
+      d.fir_status === 'Relief Given' ? '-' : d.fir_pending_days,
+      d.chargesheet_proposal_status,
+      d.chargesheet_status,
+      d.chargesheet_status === 'Relief Given' ? '-' : d.chargesheet_pending_days,
+      d.trial_proposal_status,
+      d.trial_status,
+      d.trial_status === 'Relief Given' ? '-' : d.trial_pending_days
+    ]);
+  }
+
+const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet([headerRow1, headerRow2, ...dataRows]);
+
+ws['!merges'] = [];
+
+// 🔹 Rowspan for first 4 headers (S.No, FIR Number, Police Station, Register Date)
+ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 1, c: 0 } }); // S.No
+ws['!merges'].push({ s: { r: 0, c: 1 }, e: { r: 1, c: 1 } }); // FIR Number
+ws['!merges'].push({ s: { r: 0, c: 2 }, e: { r: 1, c: 2 } }); // Police Station
+ws['!merges'].push({ s: { r: 0, c: 3 }, e: { r: 1, c: 3 } }); // Register Date
+
+// 🔹 Stage headers (merge horizontally)
+if (this.showFIR && !this.showChargesheet && !this.showTrial) {
+  ws['!merges'].push({ s: { r: 0, c: 4 }, e: { r: 0, c: 6 } }); // FIR
+} else if (this.showChargesheet && !this.showFIR && !this.showTrial) {
+  ws['!merges'].push({ s: { r: 0, c: 4 }, e: { r: 0, c: 6 } }); // Chargesheet
+} else if (this.showTrial && !this.showFIR && !this.showChargesheet) {
+  ws['!merges'].push({ s: { r: 0, c: 4 }, e: { r: 0, c: 6 } }); // Trial
+} else {
+  ws['!merges'].push({ s: { r: 0, c: 4 }, e: { r: 0, c: 6 } });  // FIR
+  ws['!merges'].push({ s: { r: 0, c: 7 }, e: { r: 0, c: 9 } });  // Chargesheet
+  ws['!merges'].push({ s: { r: 0, c: 10 }, e: { r: 0, c: 12 } }); // Trial
+}
+
+  // 🔹 Create workbook & export
+  const wb: XLSX.WorkBook = XLSX.utils.book_new();
+
+  // Use popup title (selectedStage) as sheet name (max 31 chars for Excel)
+  const sheetName = this.selectedStage.length > 31 
+    ? this.selectedStage.substring(0, 31) 
+    : this.selectedStage;
+
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+  // Use popup title as file name too
+  const fileName = this.selectedStage.replace(/\s+/g, '_').toLowerCase();
+
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  this.saveAsExcelFile(wbout, fileName);
+}
+
+
 onBtnExport(): void {
   // Define multi-row headers
   const headers = [
-    ['Sl. No.', 'District', 'Total Cases', 'FIR', '', '', 'CHARGESHEET', '', '', 'TRIAL', '', ''],
-    ['', '', '', 'Proposal sent to DC', 'Relief Given', 'Relief Pending', 'Proposal sent to DC', 'Relief Given', 'Relief Pending', 'Proposal sent to DC', 'Relief Given', 'Relief Pending']
+    [
+      'Sl. No.', 'District', 'Total Cases', 'MF Case', 'Non MF Cases', 'Proposal Not Yet Received',
+      'FIR Relief', '', '',
+      'Chargesheet Relief', '', '',
+      'Trial Relief', '', ''
+    ],
+    [
+      '', '', '', '', '', '',
+      'Proposal sent to DC', 'Given', 'Pending',
+      'Proposal sent to DC', 'Given', 'Pending',
+      'Proposal sent to DC', 'Given', 'Pending'
+    ]
   ];
 
   const data = this.filteredData.map((item, index) => [
     index + 1,
     item.revenue_district,
     item.total_cases,
+    item.mf_cases,
+    item.nonmf_case,
+    item.notyetreceived,
     item.fir_proposal_sent_to_dc,
     item.fir_relief_given,
     item.fir_relief_pending,
@@ -363,9 +607,12 @@ onBtnExport(): void {
 
   // Compute totals for numeric columns
   const totalRow = [
-    '', // Sl. No.
-    'Total', // District column
+    '',
+    'Total',
     this.sumByKey('total_cases'),
+    this.sumByKey('mf_cases'),
+    this.sumByKey('nonmf_case'),
+    this.sumByKey('notyetreceived'),
     this.sumByKey('fir_proposal_sent_to_dc'),
     this.sumByKey('fir_relief_given'),
     this.sumByKey('fir_relief_pending'),
@@ -380,14 +627,17 @@ onBtnExport(): void {
   const aoa = [...headers, ...data, totalRow];
   const worksheet = XLSX.utils.aoa_to_sheet(aoa);
 
-  // Define merged cells
+  // Define merged cells correctly
   worksheet['!merges'] = [
     { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } }, // Sl. No.
     { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } }, // District
     { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } }, // Total Cases
-    { s: { r: 0, c: 3 }, e: { r: 0, c: 5 } }, // FIR
-    { s: { r: 0, c: 6 }, e: { r: 0, c: 8 } }, // CHARGESHEET
-    { s: { r: 0, c: 9 }, e: { r: 0, c: 11 } } // TRIAL
+    { s: { r: 0, c: 3 }, e: { r: 1, c: 3 } }, // MF Case
+    { s: { r: 0, c: 4 }, e: { r: 1, c: 4 } }, // Non MF Case
+    { s: { r: 0, c: 5 }, e: { r: 1, c: 5 } }, // Proposal Not Yet Received
+    { s: { r: 0, c: 6 }, e: { r: 0, c: 8 } }, // FIR Relief (3 cols)
+    { s: { r: 0, c: 9 }, e: { r: 0, c: 11 } }, // Chargesheet Relief (3 cols)
+    { s: { r: 0, c: 12 }, e: { r: 0, c: 14 } } // Trial Relief (3 cols)
   ];
 
   const workbook: XLSX.WorkBook = {
@@ -424,20 +674,23 @@ onBtnExportPDF(): void {
       { content: 'Sl. No.', rowSpan: 2 },
       { content: 'District', rowSpan: 2 },
       { content: 'Total Cases', rowSpan: 2 },
-      { content: 'FIR', colSpan: 3 },
-      { content: 'CHARGESHEET', colSpan: 3 },
-      { content: 'TRIAL', colSpan: 3 }
+      { content: 'MF Case', rowSpan: 2 },
+      { content: 'Non MF Case', rowSpan: 2 },
+      { content: 'Proposal Not Yet Received', rowSpan: 2 },
+      { content: 'FIR Relief', colSpan: 3 },
+      { content: 'Chargesheet Relief', colSpan: 3 },
+      { content: 'Trial Relief', colSpan: 3 }
     ],
     [
       { content: 'Proposal sent to DC' },
-      { content: 'Relief Given' },
-      { content: 'Relief Pending' },
+      { content: 'Given' },
+      { content: 'Pending' },
       { content: 'Proposal sent to DC' },
-      { content: 'Relief Given' },
-      { content: 'Relief Pending' },
+      { content: 'Given' },
+      { content: 'Pending' },
       { content: 'Proposal sent to DC' },
-      { content: 'Relief Given' },
-      { content: 'Relief Pending' }
+      { content: 'Given' },
+      { content: 'Pending' }
     ]
   ];
 
@@ -446,6 +699,9 @@ onBtnExportPDF(): void {
     index + 1,
     item.revenue_district,
     item.total_cases,
+    item.mf_cases,
+    item.nonmf_case,
+    item.notyetreceived,
     item.fir_proposal_sent_to_dc,
     item.fir_relief_given,
     item.fir_relief_pending,
@@ -462,6 +718,9 @@ onBtnExportPDF(): void {
     '', // Sl. No.
     'Total',
     this.sumByKey('total_cases'),
+    this.sumByKey('mf_cases'),
+    this.sumByKey('nonmf_case'),
+    this.sumByKey('notyetreceived'),
     this.sumByKey('fir_proposal_sent_to_dc'),
     this.sumByKey('fir_relief_given'),
     this.sumByKey('fir_relief_pending'),
@@ -514,6 +773,8 @@ onBtnExportPDF(): void {
       this.selectedFromDate='';
       this.selectedToDate = '';
       this.fetchMrfAbstract();
+      sessionStorage.removeItem('mrfFilters');
+
       // this.filteredData = [...this.reportData]; 
   }
 
@@ -536,117 +797,30 @@ onBtnExportPDF(): void {
   }
 
 
-//   applyFilters() {
-//   this.filteredData = this.reportData.filter(item => {
-
-//     if (this.searchText && this.searchText.trim() !== '' && 
-//     item.fir_number.toLowerCase() !== this.searchText.toLowerCase().trim()) {
-//     return false;
-//     }
-
-//     // District filter
-//     if (this.selectedDistrict && this.selectedDistrict !== '' && 
-//         item.revenue_district !== this.selectedDistrict) {
-//       return false;
-//     }
-
-//     // Police City filter
-//     if (this.selectedPoliceCity && this.selectedPoliceCity !== '' && 
-//         item.police_city !== this.selectedPoliceCity) {
-//       return false;
-//     }
-
-//     // Police Zone filter
-//     if (this.selectedZone && this.selectedZone !== '' && 
-//         item.police_zone !== this.selectedZone) {
-//       return false;
-//     }
-
-   
-//     // Date range filter
-//     if (this.selectedFromDate || this.selectedToDate) {
-//     const registrationDate = new Date(item.date_of_registration);
-    
-//     if (this.selectedFromDate && !this.selectedToDate) {
-//       const fromDate = new Date(this.selectedFromDate);
-//       if (registrationDate < fromDate) {
-//         return false;
-//       }
-//     }
-    
-//     if (this.selectedToDate && !this.selectedFromDate) {
-//       const toDate = new Date(this.selectedToDate);
-//       if (registrationDate > toDate) {
-//         return false;
-//       }
-//     }
-
-//     if (this.selectedToDate && this.selectedFromDate) {
-//       const fromDate = new Date(this.selectedFromDate);
-//       const toDate = new Date(this.selectedToDate);
-//       if (registrationDate < fromDate || registrationDate > toDate) {
-//         return false;
-//       }
-//     }
-//   }
-
-//     return true;
-//   });
-// }
-
-
 applyFilters() {
   const payload = {
     district: this.selectedDistrict || "",
     police_city: this.selectedPoliceCity || "",
     police_zone: this.selectedZone || "",
     Filter_From_Date: this.selectedFromDate || "",
-    Filter_To_Date: this.selectedToDate || ""
+    Filter_To_Date: this.selectedToDate || "",
+    Status_Of_Case:this.selectedStatus
   };
-  this.mrfAbstractService.getMrfAbstractDetails(payload).subscribe({
+    this.loader = true;
+
+    sessionStorage.setItem('mrfFilters', JSON.stringify(payload));
+
+  this.mrfAbstractService.getMrfAbstractDetails(this.getFilterParams()).subscribe({
     next: (response: any) => {
-     this.reportData = (response.data || [])
-        .filter((item: any) => item.revenue_district && item.revenue_district.trim() !== '') // 🔍 Filter non-empty district
-        .map((item: any, index: number) => ({
-          sl_no: index + 1,
-          revenue_district: item.revenue_district,
-          total_cases: item.total_cases,
-          fir_proposal_sent_to_dc: item.fir_proposal_sent_to_dc,
-          fir_relief_given: item.fir_relief_given,
-          fir_relief_pending: item.fir_relief_pending,
-          chargesheet_proposal_sent_to_dc: item.chargesheet_proposal_sent_to_dc,
-          chargesheet_relief_given: item.chargesheet_relief_given,
-          chargesheet_relief_pending: item.chargesheet_relief_pending,
-          trial_proposal_sent_to_dc: item.trial_proposal_sent_to_dc,
-          trial_relief_given: item.trial_relief_given,
-          trial_relief_pending: item.trial_relief_pending
-        }));
-
-      this.filteredData = [...this.reportData];
-      this.loader = false;
-      this.cdr.detectChanges(); // Trigger change detection
-    },
-    error: (error) => {
-      console.error('Error fetching data', error);
-    }
-  });
-}
-
-totalRow: any = {}; // Already declared
-
-fetchMrfAbstract(): void {
-  this.loader = true;
-
-  this.mrfAbstractService.getMrfAbstractDetails(this.payload).subscribe({
-    next: (response: any) => {
-      const data = (response.data || []).filter(
-        (item: any) => item.revenue_district && item.revenue_district.trim() !== ''
-      );
-
+      // console.log(response.data);
+      const data = response.data;
       const totals: { [key: string]: any } = {
         sl_no: '',
         revenue_district: 'Total',
         total_cases: 0,
+        mf_cases:0,
+        nonmf_case:0,
+        notyetreceived:0,
         fir_proposal_sent_to_dc: 0,
         fir_relief_given: 0,
         fir_relief_pending: 0,
@@ -663,6 +837,9 @@ fetchMrfAbstract(): void {
           sl_no: index + 1,
           revenue_district: item.revenue_district,
           total_cases: +item.total_cases || 0,
+          mf_cases: +item.mf_cases || 0,
+          nonmf_case: +item.nonmf_case || 0,
+          notyetreceived: +item.notyetreceived || 0,
           fir_proposal_sent_to_dc: +item.fir_proposal_sent_to_dc || 0,
           fir_relief_given: +item.fir_relief_given || 0,
           fir_relief_pending: +item.fir_relief_pending || 0,
@@ -683,16 +860,79 @@ fetchMrfAbstract(): void {
 
         return row;
       });
-
-      // Store total row for external use if needed
       this.totalRow = totals;
-
-      // Append total row at the bottom
-      // this.reportData.push(totals);
-
-      // Set filtered data for table
       this.filteredData = [...this.reportData];
+      this.loader = false;
+      this.cdr.detectChanges();
+    },
+    error: (error: any) => {
+      this.loader = false;
+      console.error('Error fetching reports:', error);
+    }
+  });
+}
 
+totalRow: any = {}; // Already declared
+
+fetchMrfAbstract(): void {
+  this.loader = true;
+
+  this.mrfAbstractService.getMrfAbstractDetails(this.getFilterParams()).subscribe({
+    next: (response: any) => {
+      // console.log(response.data);
+      const data = response.data;
+      const totals: { [key: string]: any } = {
+        sl_no: '',
+        revenue_district: 'Total',
+        total_cases: 0,
+        mf_cases:0,
+        nonmf_case:0,
+        notyetreceived:0,
+        fir_proposal_sent_to_dc: 0,
+        fir_relief_given: 0,
+        fir_relief_pending: 0,
+        chargesheet_proposal_sent_to_dc: 0,
+        chargesheet_relief_given: 0,
+        chargesheet_relief_pending: 0,
+        trial_proposal_sent_to_dc: 0,
+        trial_relief_given: 0,
+        trial_relief_pending: 0
+      };
+
+      const validData = data.filter(
+        (item: any) => item.revenue_district && item.revenue_district.trim() !== ''
+      );
+
+      this.reportData = validData.map((item: any, index: number) => {
+        const row: { [key: string]: any } = {
+          sl_no: index + 1,
+          revenue_district: item.revenue_district,
+          total_cases: +item.total_cases || 0,
+          mf_cases: +item.mf_cases || 0,
+          nonmf_case: +item.nonmf_case || 0,
+          notyetreceived: +item.notyetreceived || 0,
+          fir_proposal_sent_to_dc: +item.fir_proposal_sent_to_dc || 0,
+          fir_relief_given: +item.fir_relief_given || 0,
+          fir_relief_pending: +item.fir_relief_pending || 0,
+          chargesheet_proposal_sent_to_dc: +item.chargesheet_proposal_sent_to_dc || 0,
+          chargesheet_relief_given: +item.chargesheet_relief_given || 0,
+          chargesheet_relief_pending: +item.chargesheet_relief_pending || 0,
+          trial_proposal_sent_to_dc: +item.trial_proposal_sent_to_dc || 0,
+          trial_relief_given: +item.trial_relief_given || 0,
+          trial_relief_pending: +item.trial_relief_pending || 0
+        };
+
+        // Add to totals
+        Object.keys(totals).forEach((key) => {
+          if (typeof totals[key] === 'number') {
+            totals[key] += row[key] || 0;
+          }
+        });
+
+        return row;
+      });
+      this.totalRow = totals;
+      this.filteredData = [...this.reportData];
       this.loader = false;
       this.cdr.detectChanges();
     },
@@ -715,6 +955,368 @@ getColumnTotal(field: string): number {
 
   getVisibleColumns() {
   return this.displayedColumns.filter(col => col.visible);
+}
+
+openReliefPopup(report: any, status: string): void {
+  this.selectedDistrict = report.revenue_district;
+  this.tableSearchText = '';
+  this.popupData = [];
+  this.loader = true;
+  this.currentPage = 1;
+
+  // 👇 Reset defaults first
+  this.showAllStages = true;
+  this.showFIR = true;
+  this.showChargesheet = true;
+  this.showTrial = true;
+
+  // 👇 If "mf", hide FIR/Chargesheet/Trial sections
+  if (status === 'mf') {
+    this.showFIR = false;
+    this.showChargesheet = false;
+    this.showTrial = false;
+    this.showAllStages = false;
+    this.selectedStage = `MF Case Details`;
+  }
+  else if(status === 'totalcase'){
+    this.selectedStage = `Total Case Details`;
+  }
+  else if(status === 'nonmf'){
+    this.selectedStage = `Non MF Case Details`;
+  }
+  else if(status === 'notyetreceived'){
+    this.selectedStage = `Proposal Not Yet Received	`;
+  }
+  // ✅ Show modal immediately with spinner
+  this.ngZone.run(() => {
+    const modalEl: any = document.getElementById('reliefModal');
+    if (modalEl) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalEl);
+      modalInstance.show();
+    }
+  });
+
+  const params = {
+    ...this.getFilterParams(),
+    status: status  
+  };
+
+  // API call
+  this.mrfAbstractService
+    .getMrfAbstractDetailedData(params)
+    .subscribe((res: any) => {
+      const flatData = Array.isArray(res.data[0]) ? res.data[0] : res.data;
+
+      if (flatData?.length > 0) {
+        this.popupData = flatData.map((item: any, index: number) => ({
+          sno: index + 1,
+          firId:item.firId,
+          fir_number_full: item.fir_number_full,
+          register_date: item.register_date,
+          police_station:item.police_station,
+          fir_proposal_status: item.fir_proposal_status || '-',
+          fir_status: item.fir_status || '-',
+          fir_pending_days: item.fir_pending_days ?? '-',
+          chargesheet_proposal_status: item.chargesheet_proposal_status || '-',
+          chargesheet_status: item.chargesheet_status || '-',
+          chargesheet_pending_days: item.chargesheet_pending_days ?? '-',
+          trial_proposal_status: item.trial_proposal_status || '-',
+          trial_status: item.trial_status || '-',
+          trial_pending_days: item.trial_pending_days ?? '-',
+        }));
+      }
+
+      this.loader = false;
+      this.cdr.detectChanges();
+    });
+}
+
+
+openPendingPopup(report: any, type: 'fir' | 'charge' | 'trial'): void {
+  this.selectedDistrict = report.revenue_district;
+
+  // Configure popup based on type
+  const config: any = {
+    fir: {
+      stage: 'FIR Relief Pending Details',
+      status: 'firpending',
+      showFIR: true,
+      showChargesheet: false,
+      showTrial: false,
+      mapFields: (item: any, index: number) => ({
+        sno: index + 1,
+        firId:item.firId,
+        fir_number_full: item.fir_number_full,
+        police_station:item.police_station,
+        register_date: item.register_date,
+        fir_proposal_status: item.fir_proposal_status || '-',
+        fir_status: item.fir_status || '-',
+        fir_pending_days: item.fir_pending_days ?? '-'
+      })
+    },
+    charge: {
+      stage: 'Chargesheet Relief Pending Details',
+      status: 'chargepending',
+      showFIR: false,
+      showChargesheet: true,
+      showTrial: false,
+      mapFields: (item: any, index: number) => ({
+        sno: index + 1,
+        firId:item.firId,
+        fir_number_full: item.fir_number_full,
+        police_station:item.police_station,
+        register_date: item.register_date,
+        chargesheet_proposal_status: item.chargesheet_proposal_status || '-',
+        chargesheet_status: item.chargesheet_status || '-',
+        chargesheet_pending_days: item.chargesheet_pending_days ?? '-'
+      })
+    },
+    trial: {
+      stage: 'Trial Relief Pending Details',
+      status: 'trialpending',
+      showFIR: false,
+      showChargesheet: false,
+      showTrial: true,
+      mapFields: (item: any, index: number) => ({
+        sno: index + 1,
+        firId:item.firId,
+        fir_number_full: item.fir_number_full,
+        police_station:item.police_station,
+        register_date: item.register_date,
+        trial_proposal_status: item.trial_proposal_status || '-',
+        trial_status: item.trial_status || '-',
+        trial_pending_days: item.trial_pending_days ?? '-'
+      })
+    }
+  };
+
+  const cfg = config[type];
+  this.selectedStage = cfg.stage;
+  this.showFIR = cfg.showFIR;
+  this.showChargesheet = cfg.showChargesheet;
+  this.showTrial = cfg.showTrial;
+
+  this.popupData = [];
+  this.loader = true;
+  this.currentPage = 1;
+
+  this.showModal();
+
+  const params = {
+    ...this.getFilterParams(),
+    status: cfg.status
+  };
+
+  this.mrfAbstractService.getMrfAbstractDetailedData(params).subscribe((res: any) => {
+    const flatData = Array.isArray(res.data[0]) ? res.data[0] : res.data;
+    this.popupData = flatData.map(cfg.mapFields);
+
+    this.loader = false;
+    this.cdr.detectChanges();
+  });
+}
+
+openGivenPopup(report: any, type: 'fir' | 'charge' | 'trial'): void {
+  this.selectedDistrict = report.revenue_district;
+
+  // Configuration for each type
+  const config: any = {
+    fir: {
+      stage: 'FIR Relief Given Details',
+      status: 'firgiven',
+      showFIR: true,
+      showChargesheet: false,
+      showTrial: false,
+      mapFields: (item: any, index: number) => ({
+        sno: index + 1,
+        firId:item.firId,
+        fir_number_full: item.fir_number_full,
+        police_station:item.police_station,
+        register_date: item.register_date,
+        fir_proposal_status: item.fir_proposal_status || '-',
+        fir_status: item.fir_status || '-',
+        fir_pending_days: item.fir_pending_days ?? '-'
+      })
+    },
+    charge: {
+      stage: 'Chargesheet Relief Given Details',
+      status: 'chargegiven',
+      showFIR: false,
+      showChargesheet: true,
+      showTrial: false,
+      mapFields: (item: any, index: number) => ({
+        sno: index + 1,
+        firId:item.firId,
+        fir_number_full: item.fir_number_full,
+        police_station:item.police_station,
+        register_date: item.register_date,
+        chargesheet_proposal_status: item.chargesheet_proposal_status || '-',
+        chargesheet_status: item.chargesheet_status || '-',
+        chargesheet_pending_days: item.chargesheet_pending_days ?? '-'
+      })
+    },
+    trial: {
+      stage: 'Trial Relief Given Details',
+      status: 'trialgiven',
+      showFIR: false,
+      showChargesheet: false,
+      showTrial: true,
+      mapFields: (item: any, index: number) => ({
+        sno: index + 1,
+        firId:item.firId,
+        fir_number_full: item.fir_number_full,
+        police_station:item.police_station,
+        register_date: item.register_date,
+        trial_proposal_status: item.trial_proposal_status || '-',
+        trial_status: item.trial_status || '-',
+        trial_pending_days: item.trial_pending_days ?? '-'
+      })
+    }
+  };
+
+  const cfg = config[type];
+  this.selectedStage = cfg.stage;
+  this.showFIR = cfg.showFIR;
+  this.showChargesheet = cfg.showChargesheet;
+  this.showTrial = cfg.showTrial;
+
+  this.popupData = [];
+  this.loader = true;
+  this.currentPage = 1;
+
+  this.showModal();
+
+  const params = {
+    ...this.getFilterParams(),
+    status: cfg.status
+  };
+
+  this.mrfAbstractService.getMrfAbstractDetailedData(params).subscribe((res: any) => {
+    const flatData = Array.isArray(res.data[0]) ? res.data[0] : res.data;
+    this.popupData = flatData.map(cfg.mapFields);
+
+    this.loader = false;
+    this.cdr.detectChanges();
+  });
+}
+
+
+private showModal() {
+  this.ngZone.run(() => {
+    const modalEl: any = document.getElementById('reliefModal');
+    if (modalEl) {
+      const modalInstance = new (window as any).bootstrap.Modal(modalEl);
+      modalInstance.show();
+    }
+  });
+}
+
+
+
+closePopup() {
+  const modalEl: any = document.getElementById('reliefModal');
+  console.log("close");
+  if (modalEl) {
+    const modalInstance = (window as any).bootstrap.Modal.getInstance(modalEl);
+    if (modalInstance) {
+      modalInstance.hide();
+    }
+  }
+  this.popupData = [];
+  this.tableSearchText = '';
+  this.currentPage = 1;
+}
+
+Math = Math;
+
+getPageNumbers(): number[] {
+  const total = this.tableTotalPages().length;
+  const maxPagesToShow = 5; // show 5 pages at a time
+  let start = Math.max(1, this.currentPage - Math.floor(maxPagesToShow / 2));
+  let end = start + maxPagesToShow - 1;
+
+  if (end > total) {
+    end = total;
+    start = Math.max(1, end - maxPagesToShow + 1);
+  }
+
+  const pages: number[] = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  return pages;
+}
+
+
+// tableFilteredData() {
+//   if (!this.tableSearchText) {
+//     return this.popupData;
+//   }
+//   const lower = this.tableSearchText.toLowerCase();
+//   return this.popupData.filter(d =>
+//     d.fir_number_full?.toLowerCase().includes(lower) ||
+//     d.fir_status?.toLowerCase().includes(lower) ||
+//     d.chargesheet_status?.toLowerCase().includes(lower) ||
+//     d.trial_status?.toLowerCase().includes(lower) ||
+//     d.fir_pending_days?.toLowerCase().includes(lower) ||
+//     d.chargesheet_pending_days?.toLowerCase().includes(lower) ||
+//     d.trial_pending_days?.toLowerCase().includes(lower) 
+//     );
+// }
+
+tableFilteredData() {
+  if (!this.tableSearchText) {
+    return this.popupData;
+  }
+
+  const lower = this.tableSearchText.toLowerCase();
+
+  return this.popupData.filter(d => {
+    // Always search in FIR fields
+    const fields = [
+      d.fir_number_full,
+      d.fir_proposal_status,
+      d.fir_status,
+      d.fir_pending_days,
+      d.police_station
+    ];
+
+    // If all stages are shown, include chargesheet + trial fields
+    if (this.showAllStages) {
+      fields.push(
+        d.chargesheet_proposal_status,
+        d.chargesheet_status,
+        d.chargesheet_pending_days,
+        d.trial_proposal_status,
+        d.trial_status,
+        d.trial_pending_days
+      );
+    }
+
+    return fields
+      .map(val => (val !== null && val !== undefined ? String(val).toLowerCase() : ''))
+      .some(val => val.includes(lower));
+  });
+}
+
+
+
+tableTotalPages() {
+  return Array(Math.ceil(this.tableFilteredData().length / this.itemsPerPage))
+    .fill(0)
+    .map((x, i) => i + 1);
+}
+
+changePage(page: number) {
+  if (page >= 1 && page <= this.tableTotalPages().length) {
+    this.currentPage = page;
+  }
+}
+
+openModalFromAbstract(data: any): void {
+  this.router.navigate(['/widgets-examples/fir-list'], { 
+    state: { firData: data , from: 'mrf-abstract' }
+  });
 }
 
 }

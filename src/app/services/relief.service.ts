@@ -11,18 +11,21 @@ export class ReliefService {
   constructor(private http: HttpClient) {}
 
   // Fetch FIR Relief List
-  getFIRReliefList(filters: any = {}): Observable<any[]> {
+  getFIRReliefList(page: number, pageSize: number,filters: any = {}): Observable<any[]> {
   let params = new HttpParams()
-    
-      Object.keys(filters).forEach(key => {
+    .set('page', page.toString())
+    .set('pageSize', pageSize.toString());
+    Object.keys(filters).forEach(key => {
         params = params.set(key, filters[key]);
       });
         // Add other filters as needed
     return this.http.get<any[]>(this.apiUrl, { params });
   }
 
-  getAlteredList(filters: any = {}): Observable<any[]> {
+  getAlteredList(page: number, pageSize: number ,filters: any = {}): Observable<any[]> {
   let params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString());
     
       Object.keys(filters).forEach(key => {
         params = params.set(key, filters[key]);

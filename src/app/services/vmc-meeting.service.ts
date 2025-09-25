@@ -106,7 +106,7 @@ export class VmcMeetingService {
     Object.keys(filters).forEach(key => {
       params = params.set(key, filters[key]);
     });
-    return this.http.get(`${this.baseUrl}/GetVmcMeetings`, { params });
+     return this.http.get(`${this.baseUrl}/GetVmcMeetings`, { params });
   }
 
   uploadFile(formData: any): Observable<any> {

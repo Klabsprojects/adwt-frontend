@@ -14,6 +14,10 @@ export class mrfAbstractService {
 getMrfAbstractDetails(requestBody: any): Observable<any> {
   return this.http.post(`${this.baseUrl}/getMRFAbstract`, requestBody);
 }
+
+getMrfAbstractDetailedData(requestBody: any): Observable<any> {
+  return this.http.post(`${this.baseUrl}/getMRFAbstractDetails`, requestBody);
+}
   
   // Update status and reason for current month to given fir report details
   updateMonetaryReliefDetails(data: any): Observable<any> {

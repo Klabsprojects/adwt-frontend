@@ -17,9 +17,6 @@ import { ModalDismissReasons, NgbDatepickerModule, NgbModal } from '@ng-bootstra
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { FirListTestService } from 'src/app/services/fir-list-test.service';
-import { FirService } from 'src/app/services/fir.service';
-import Swal from 'sweetalert2';
 
 
 
@@ -77,9 +74,6 @@ export class MonthlyReportComponent implements OnInit {
   selectedCaseStatus: string = '';
   loading: boolean = false;
   loader: boolean = false;
-  policeRanges: any;
-
-
   displayedColumns: {
     field: string;
     label: string;
@@ -167,13 +161,6 @@ export class MonthlyReportComponent implements OnInit {
     {
       label: 'Modified AT',
       field: 'modified_at',
-      sortable: true,
-      visible: true,
-      sortDirection: null,
-    },
-    {
-      label: 'Data Entry Status',
-      field: 'status',
       sortable: true,
       visible: true,
       sortDirection: null,
@@ -315,13 +302,10 @@ export class MonthlyReportComponent implements OnInit {
   ]
   // districts:any=[];
   communities:any[]=[];
-  policeStations: string[] = [];
   castes:any[]=[];
   zones:any[]=[];
   offences:any[]=[];
   policeCities:any[]=[];
-  sectionOfLaw: any[] = [];
-  courtList:any[]=[];
 
   selectedStatus:string='';
   selectedDistricts:string='';
@@ -330,11 +314,6 @@ export class MonthlyReportComponent implements OnInit {
   selectedZone:string='';
   selectedOffence:string='';
   selectedPoliceCity:string=''
-  selectedPoliceRange:string='';
-  selectedPoliceStation:string='';
-  selectedConvictionType:string='';
-  selectedCourt:string='';
-  RegistredYear: string = '';
   selectedFromDate:any="";
   selectedToDate:any="";
   selectedCreatedAt:any="";
@@ -342,35 +321,6 @@ export class MonthlyReportComponent implements OnInit {
   selectedModifiedAt:any="";
   selectedModifiedAtToDate:any="";
 
-  CreatedATstartDate: string = '';
-  CreatedATendDate: string = '';
-  ModifiedATstartDate: string = '';
-  ModifiedATDate: string = '';
-  selectedUIPT: string = '';
-  selectedChargeSheetFromDate:string='';
-  selectedChargeSheetToDate:string='';
-  selectedLegal:string='';
-  selectedCase:string='';
-  selectedFiled:string='';
-  selectedAppeal:string='';
-  selectedDataEntryStatus:string='';
-  selectedOffenceGroup: string = '';
-  selectedSectionOfLaw:string='';
-
-  offenceGroupsList: string[] = [
-    "Non GCR",
-    "Murder",
-    "Rape",
-    "POCSO",
-    "Other POCSO",
-    "Gang Rape",
-    "Rape by Cheating",
-    "Arson",
-    "Death",
-    "GCR",
-    "Attempt Murder",
-    "Rape POCSO"
-  ];
 
 
 
@@ -395,7 +345,7 @@ export class MonthlyReportComponent implements OnInit {
   { key: 'sectionOfLaw', label: 'Section of Law', visible: false },
   { key: 'court', label: 'Court', visible: false },
   { key: 'convictionType', label: 'Conviction Type', visible: false },
-  { key: 'chargeSheetDate', label: 'Chargesheet Date From - To', visible: false },
+  { key: 'chargeSheetDate', label: 'Chargesheet Date', visible: false },
   { key: 'legal', label: 'Legal Opinion', visible: false },
   { key: 'fitCase', label: 'Fit for Appeal', visible: false },
   { key: 'filedBy', label: 'Filed By', visible: false },
@@ -403,19 +353,12 @@ export class MonthlyReportComponent implements OnInit {
 ];
 
 activeFilters: string[] = ['city', 'zone', 'range', 'revenueDistrict', 'station'];
-years: number[] = [];
-Parsed_UserInfo:any;
-pageSize: number = 10; 
-isLoading: boolean = true;
-currentPage: number = 1; 
 
   constructor(
     private cdr: ChangeDetectorRef,
     private reportsCommonService: ReportsCommonService,
     private monthlyReportService: MonthlyReportService,
-    private dashboardService: DashboardService,
-    private firService:FirListTestService,
-     private firGetService:FirService,
+    private dashboardService: DashboardService
   ) {
     this.loader = true;
     const currentYear = new Date().getFullYear();
@@ -424,8 +367,6 @@ currentPage: number = 1;
 
   // Lifecycle hook that initializes component data and fetches monthly reports.
   ngOnInit(): void {
-    const UserInfo: any = sessionStorage.getItem('user_data');
-      this.Parsed_UserInfo = JSON.parse(UserInfo);
     this.reportsCommonService
       .getAllData()
       .subscribe(({ districts, offences }) => {
@@ -439,9 +380,6 @@ currentPage: number = 1;
     this.getDropdowns();
     this.get_reasons();
     this.updateFilterVisibility();
-    this.loadPoliceRanges();
-    this.generateYearOptions();
-    this.loadOptions();
   }
 
   updateFilterVisibility() {
@@ -450,21 +388,11 @@ currentPage: number = 1;
   });
 }
 
+
 isVisible(key: string): boolean {
   const field = this.filterFields.find(f => f.key === key);
   return field ? field.visible : false;
 }
-
-loadPoliceRanges() {
-    this.firService.getPoliceRanges().subscribe(
-      (response: any) => {
-        this.policeRanges = response;
-      },
-      (error: any) => {
-        console.error('Error', 'Failed to load FIR data', 'error', error);
-      }
-    );
-  }
   // new
   getDropdowns() {
     // this.dashboardService.userGetMethod('districts').subscribe((res:any)=>{
@@ -489,8 +417,25 @@ loadPoliceRanges() {
         this.castes = res;
       })
     }
-  } 
+  }
 
+  getStatusBadgeClass(status: number): string {
+    const badgeClassMap = {
+      0: 'badge bg-info text-white',
+      1: 'badge bg-warning text-dark',
+      2: 'badge bg-warning text-dark',
+      3: 'badge bg-warning text-dark',
+      4: 'badge bg-success text-white',
+      5: 'badge bg-success text-white',
+      6: 'badge bg-success text-white',
+      7: 'badge bg-success text-white',
+      8: 'badge bg-danger text-white',
+      9: 'badge bg-danger text-white',
+      10: 'badge bg-danger text-white', // Add this entry for status 12
+    } as { [key: number]: string };
+
+    return badgeClassMap[status] || 'badge bg-secondary text-white';
+  }
 
   getStatusTextUIPT(status: number): string {
     // console.log(status,'statussssssss')
@@ -523,29 +468,20 @@ loadPoliceRanges() {
 
   // Load all fir reports details into UI
   fetchMonthlyReports(): void {
-
-    this.isLoading = true;
-    this.loader = true;
-
-    let districtParam = '';
-      if ((this.Parsed_UserInfo.access_type === 'District' && this.Parsed_UserInfo.role === 4) || this.Parsed_UserInfo.role === 3) {
-        districtParam = this.Parsed_UserInfo.district;
-        this.selectedDistrict = districtParam;
-      }
       this.loader = true;
-      this.monthlyReportService.getMonthlyReportDetail(this.getFilterParams()).subscribe({
+      this.monthlyReportService.getMonthlyReportDetail().subscribe({
         next: (response) => {
           console.log(response,'response')
            this.loader = false;
-          this.reportData = response.data.map((item: any, index: number) => {  
-            const alteredDate = item.altered_date;
-            console.log(alteredDate); 
-            return { 
+          //console.log('Monthly Reports:', response.data); // Debugging
+          // Transform API response to match frontend structure
+          this.reportData = response.data.map((item: { police_city: any; police_station: any; fir_number: any; offence_committed: any; scst_sections: any; number_of_victim: any; court_district: any; court_name: any; case_number: any; status: number; under_investigation_case_days: any; pending_trial_case_days: any; previous_month_reason_for_status: any; current_month_reason_for_status: any; fir_id : any;
+            revenue_district : any; police_zone : any; community : any; caste : any; date_of_registration : any; created_by : any; created_at : any; modified_at : any;
+           }, index: number) => ({
             sl_no: index + 1,
             policeCity: item.police_city,
             stationName: item.police_station,
             // firNumber: item.fir_number,
-            altered_date: item.altered_date ? new Date(item.altered_date) : null,
             fir_number: item.fir_number === "NULL" || !item.fir_number ? '' : item.fir_number,
             natureOfOffence: (item.offence_committed === "NULL" ? '' : (item.offence_committed || '').replace(/"/g, '')), 
             poaSection: (item.scst_sections || '').replace(/"/g, ''), // Remove double quotes
@@ -553,7 +489,6 @@ loadPoliceRanges() {
             courtDistrict: item.court_district || '',
             courtName: item.court_name || '',
             caseNumber: item.case_number || '',
-            status:item.status,
             caseStatus: this.getStatusTextUIPT(item.status) || '',
             uiPendingDays: item.under_investigation_case_days || '',
             ptPendingDays: item.pending_trial_case_days || '',
@@ -569,13 +504,9 @@ loadPoliceRanges() {
             created_at : item.created_at,
             modified_at : item.modified_at,
             filter_status : item.status
-          }
-        }
-        );
-        
+          }));
           // Update filteredData to reflect the API data
           this.filteredData = [...this.reportData]; 
-          console.log(this.filteredData);
           this.cdr.detectChanges(); // Trigger change detection
         },
         error: (error) => {
@@ -585,315 +516,149 @@ loadPoliceRanges() {
       });
   }
 
-    getStatusBadgeClass(status: number): string {
-    const badgeClassMap = {
-      0: 'badge bg-info text-white',
-      1: 'badge bg-warning text-dark',
-      2: 'badge bg-warning text-dark',
-      3: 'badge bg-warning text-dark',
-      4: 'badge bg-warning text-dark',
-      5: 'badge bg-success text-white',
-      6: 'badge bg-success text-white',
-      7: 'badge bg-success text-white',
-      8: 'badge bg-danger text-white',
-      9: 'badge bg-danger text-white',
-      10: 'badge bg-danger text-white', // Add this entry for status 12
-    } as { [key: number]: string };
-
-    return badgeClassMap[status] || 'badge bg-secondary text-white';
-  }
-
-    getCaseStatusBadgeClass(statusOfCase: string): string {
-  switch (statusOfCase) {
-    case 'Convicted':
-      return 'badge bg-success text-white';
-    case 'Acquitted':
-      return 'badge bg-primary text-white';
-    case 'Quashed':
-    case 'FirQuashed':
-      return 'badge bg-warning text-dark';
-    case 'MF':
-      return 'badge bg-danger text-white';
-    case 'SectionDeleted':
-      return 'badge bg-dark text-white';
-    case 'Charge_Abated':
-      return 'badge bg-info text-dark';
-    case 'Appeal':
-      return 'badge bg-info text-white';
-    case 'UI':
-      return 'badge bg-purple text-white';
-    case 'PT':
-      return 'badge bg-dark text-white';
-    default:
-      return 'badge bg-secondary text-white';
-  }
-}
-formatStatusOfCase(statusOfCase: string): string {
-  const map: { [key: string]: string } = {
-    'UI': 'UI',
-    'PT': 'PT',
-    'Convicted': 'Conviction',
-    'Acquitted': 'Acquitted',
-    'FirQuashed': 'FIR Quashed',
-    'MF': 'Mistake of Fact',
-    'SectionDeleted': 'Section Deleted',
-    'Charge_Abated': 'Charge Abated',
-    'Quashed': 'Quashed',
-    'Appeal': 'Appeal'
-  };
-  return map[statusOfCase] || statusOfCase;
-}
-
-getStatusText(status: number,HascaseMF:any): string {
-    if (HascaseMF) {
-    status = 9;
-  }
-    const statusTextMap = {
-      0: 'FIR Draft',
-      1: 'Pending | FIR Stage | Step 1 Completed',
-      2: 'Pending | FIR Stage | Step 2 Completed',
-      3: 'Pending | FIR Stage | Step 3 Completed',
-      4: 'Pending | FIR Stage | Step 4 Completed',
-      5: 'Completed | FIR Stage',
-      6: 'Charge Sheet Completed',
-      7: 'Trial Stage Completed',
-      8: 'This Case is Altered Case',
-      9: 'Mistake Of Fact',
-    } as { [key: number]: string };
-
-    return statusTextMap[status] || 'Unknown';
-  }
-
-
   
-//   applyFilters() {
-//     console.log("filter apply",this.filteredData);
-//   this.filteredData = this.reportData.filter(item => {
+  applyFilters() {
+  this.filteredData = this.reportData.filter(item => {
 
-//     if (this.searchText && this.searchText.trim() !== '' && 
-//     item.fir_number.toLowerCase() !== this.searchText.toLowerCase().trim()) {
-//     return false;
-//     }
+    if (this.searchText && this.searchText.trim() !== '' && 
+    item.fir_number.toLowerCase() !== this.searchText.toLowerCase().trim()) {
+    return false;
+    }
 
-//     // District filter
-//     if (this.selectedDistrict && this.selectedDistrict !== '' && 
-//         item.revenue_district !== this.selectedDistrict) {
-//       return false;
-//     }
+    // District filter
+    if (this.selectedDistrict && this.selectedDistrict !== '' && 
+        item.revenue_district !== this.selectedDistrict) {
+      return false;
+    }
 
-//     // Police City filter
-//     if (this.selectedPoliceCity && this.selectedPoliceCity !== '' && 
-//         item.policeCity !== this.selectedPoliceCity) {
-//       return false;
-//     }
+    // Police City filter
+    if (this.selectedPoliceCity && this.selectedPoliceCity !== '' && 
+        item.policeCity !== this.selectedPoliceCity) {
+      return false;
+    }
 
-//     // Police Zone filter
-//     if (this.selectedZone && this.selectedZone !== '' && 
-//         item.police_zone !== this.selectedZone) {
-//       return false;
-//     }
+    // Police Zone filter
+    if (this.selectedZone && this.selectedZone !== '' && 
+        item.police_zone !== this.selectedZone) {
+      return false;
+    }
 
-//     // Community filter
-//     if (this.selectedCommunity && this.selectedCommunity !== '' && 
-//         item.community !== this.selectedCommunity) {
-//       return false;
-//     }
+    // Community filter
+    if (this.selectedCommunity && this.selectedCommunity !== '' && 
+        item.community !== this.selectedCommunity) {
+      return false;
+    }
 
-//     // Caste filter
-//     if (this.selectedCaste && this.selectedCaste !== '' && 
-//         item.caste !== this.selectedCaste) {
-//       return false;
-//     }
+    // Caste filter
+    if (this.selectedCaste && this.selectedCaste !== '' && 
+        item.caste !== this.selectedCaste) {
+      return false;
+    }
 
-//     // Status filter (UI: status <= 5, PT: status > 5)
-//     if (this.selectedStatus && this.selectedStatus !== '') {
-//       if (this.selectedStatus === 'UI' && item.filter_status > 5) {
-//         return false;
-//       }
-//       if (this.selectedStatus === 'PT' && item.filter_status <= 5) {
-//         return false;
-//       }
-//     }
+    // Status filter (UI: status <= 5, PT: status > 5)
+    if (this.selectedStatus && this.selectedStatus !== '') {
+      if (this.selectedStatus === 'UI' && item.filter_status > 5) {
+        return false;
+      }
+      if (this.selectedStatus === 'PT' && item.filter_status <= 5) {
+        return false;
+      }
+    }
 
-//     //createdAt filter
-//     // if (this.selectedCreatedAt && this.selectedCreatedAt !== '') {
-//     //   const createdAt = new Date(item.created_at).toDateString();
-//     //   const selectedDate = new Date(this.selectedCreatedAt).toDateString();
+    //createdAt filter
+    // if (this.selectedCreatedAt && this.selectedCreatedAt !== '') {
+    //   const createdAt = new Date(item.created_at).toDateString();
+    //   const selectedDate = new Date(this.selectedCreatedAt).toDateString();
       
-//     //   if (createdAt !== selectedDate) {
-//     //     return false;
-//     //   }
-//     // }
+    //   if (createdAt !== selectedDate) {
+    //     return false;
+    //   }
+    // }
 
-//     // Date range filter
-//     if (this.selectedFromDate || this.selectedToDate) {
-//       const registrationDateRaw = item.is_case_altered === 'Yes' && item.altered_date ? item.altered_date : item.date_of_registration;
-//     const registrationDate = new Date(registrationDateRaw);
+    // Date range filter
+    if (this.selectedFromDate || this.selectedToDate) {
+      const registrationDateRaw = item.is_case_altered === 'Yes' && item.altered_date ? item.altered_date : item.date_of_registration;
+    const registrationDate = new Date(registrationDateRaw);
     
-//     if (this.selectedFromDate && !this.selectedToDate) {
-//       const fromDate = new Date(this.selectedFromDate);
-//       if (registrationDate < fromDate) {
-//         return false;
-//       }
-//     }
+    if (this.selectedFromDate && !this.selectedToDate) {
+      const fromDate = new Date(this.selectedFromDate);
+      if (registrationDate < fromDate) {
+        return false;
+      }
+    }
     
-//     if (this.selectedToDate && !this.selectedFromDate) {
-//       const toDate = new Date(this.selectedToDate);
-//       if (registrationDate > toDate) {
-//         return false;
-//       }
-//     }
+    if (this.selectedToDate && !this.selectedFromDate) {
+      const toDate = new Date(this.selectedToDate);
+      if (registrationDate > toDate) {
+        return false;
+      }
+    }
 
-//     if (this.selectedToDate && this.selectedFromDate) {
-//       const fromDate = new Date(this.selectedFromDate);
-//       const toDate = new Date(this.selectedToDate);
-//       if (registrationDate < fromDate || registrationDate > toDate) {
-//         return false;
-//       }
-//     }
-//   }
+    if (this.selectedToDate && this.selectedFromDate) {
+      const fromDate = new Date(this.selectedFromDate);
+      const toDate = new Date(this.selectedToDate);
+      if (registrationDate < fromDate || registrationDate > toDate) {
+        return false;
+      }
+    }
+  }
 
 
-//      if (this.selectedCreatedAt || this.selectedCreatedAtToDate) {
-//     const createdAT = new Date(item.created_at);
+     if (this.selectedCreatedAt || this.selectedCreatedAtToDate) {
+    const createdAT = new Date(item.created_at);
     
-//     if (this.selectedCreatedAt && !this.selectedCreatedAtToDate) {
-//       const fromDate = new Date(this.selectedCreatedAt);
-//       if (createdAT < fromDate) {
-//         return false;
-//       }
-//     }
+    if (this.selectedCreatedAt && !this.selectedCreatedAtToDate) {
+      const fromDate = new Date(this.selectedCreatedAt);
+      if (createdAT < fromDate) {
+        return false;
+      }
+    }
     
-//     if (this.selectedCreatedAtToDate && !this.selectedCreatedAt) {
-//       const toDate = new Date(this.selectedCreatedAtToDate);
-//       if (createdAT > toDate) {
-//         return false;
-//       }
-//     }
+    if (this.selectedCreatedAtToDate && !this.selectedCreatedAt) {
+      const toDate = new Date(this.selectedCreatedAtToDate);
+      if (createdAT > toDate) {
+        return false;
+      }
+    }
 
-//     if (this.selectedCreatedAtToDate && this.selectedCreatedAt) {
-//       const fromDate = new Date(this.selectedCreatedAt);
-//       const toDate = new Date(this.selectedCreatedAtToDate);
-//       if (createdAT < fromDate || createdAT > toDate) {
-//         return false;
-//       }
-//     }
-//   }
+    if (this.selectedCreatedAtToDate && this.selectedCreatedAt) {
+      const fromDate = new Date(this.selectedCreatedAt);
+      const toDate = new Date(this.selectedCreatedAtToDate);
+      if (createdAT < fromDate || createdAT > toDate) {
+        return false;
+      }
+    }
+  }
 
 
-//     if (this.selectedModifiedAt || this.selectedModifiedAtToDate) {
-//     const modifiedAT = new Date(item.modified_at);
+    if (this.selectedModifiedAt || this.selectedModifiedAtToDate) {
+    const modifiedAT = new Date(item.modified_at);
     
-//     if (this.selectedModifiedAt && !this.selectedModifiedAtToDate) {
-//       const fromDate = new Date(this.selectedModifiedAt);
-//       if (modifiedAT < fromDate) {
-//         return false;
-//       }
-//     }
+    if (this.selectedModifiedAt && !this.selectedModifiedAtToDate) {
+      const fromDate = new Date(this.selectedModifiedAt);
+      if (modifiedAT < fromDate) {
+        return false;
+      }
+    }
     
-//     if (this.selectedModifiedAtToDate && !this.selectedModifiedAt) {
-//       const toDate = new Date(this.selectedModifiedAtToDate);
-//       if (modifiedAT > toDate) {
-//         return false;
-//       }
-//     }
+    if (this.selectedModifiedAtToDate && !this.selectedModifiedAt) {
+      const toDate = new Date(this.selectedModifiedAtToDate);
+      if (modifiedAT > toDate) {
+        return false;
+      }
+    }
 
-//     if (this.selectedModifiedAtToDate && this.selectedModifiedAt) {
-//       const fromDate = new Date(this.selectedModifiedAt);
-//       const toDate = new Date(this.selectedModifiedAtToDate);
-//       if (modifiedAT < fromDate || modifiedAT > toDate) {
-//         return false;
-//       }
-//     }
-//   }
+    if (this.selectedModifiedAtToDate && this.selectedModifiedAt) {
+      const fromDate = new Date(this.selectedModifiedAt);
+      const toDate = new Date(this.selectedModifiedAtToDate);
+      if (modifiedAT < fromDate || modifiedAT > toDate) {
+        return false;
+      }
+    }
+  }
 
-//     return true;
-//   });
-// }
-
-// applyFilters() {
-//   this.filteredData = [...this.reportData];
-//   this.filteredData = this.filteredData.filter(item => {
-//     const matchesSearch =
-//       !this.searchText ||
-//       item.fir_number.toLowerCase() === this.searchText.toLowerCase().trim();
-
-//     const matchesDistrict =
-//       !this.selectedDistrict || item.revenue_district === this.selectedDistrict;
-
-//     const matchesPoliceCity =
-//       !this.selectedPoliceCity || item.policeCity === this.selectedPoliceCity;
-
-//     const matchesZone =
-//       !this.selectedZone || item.police_zone === this.selectedZone;
-
-//     const matchesCommunity =
-//       !this.selectedCommunity || item.community === this.selectedCommunity;
-
-//     const matchesCaste =
-//       !this.selectedCaste || item.caste === this.selectedCaste;
-
-//     const matchesStatus =
-//       !this.selectedStatus ||
-//       (this.selectedStatus === "UI" && item.filter_status <= 5) ||
-//       (this.selectedStatus === "PT" && item.filter_status > 5);
-
-//     // Date range helper
-//     const isInRange = (dateStr: string, from?: string, to?: string) => {
-//       if (!dateStr) return false;
-//       const date = new Date(dateStr);
-//       if (from && date < new Date(from)) return false;
-//       if (to && date > new Date(to)) return false;
-//       return true;
-//     };
-
-//     // Registration date (consider altered_date if applicable)
-//     const registrationDateRaw =
-//       item.is_case_altered === "Yes" && item.altered_date
-//         ? item.altered_date
-//         : item.date_of_registration;
-
-//     const matchesRegistrationDate =
-//       !this.selectedFromDate && !this.selectedToDate
-//         ? true
-//         : isInRange(registrationDateRaw, this.selectedFromDate, this.selectedToDate);
-
-//     const matchesCreatedAt =
-//       !this.selectedCreatedAt && !this.selectedCreatedAtToDate
-//         ? true
-//         : isInRange(item.created_at, this.selectedCreatedAt, this.selectedCreatedAtToDate);
-
-//     const matchesModifiedAt =
-//       !this.selectedModifiedAt && !this.selectedModifiedAtToDate
-//         ? true
-//         : isInRange(item.modified_at, this.selectedModifiedAt, this.selectedModifiedAtToDate);
-
-//     return (
-//       matchesSearch &&
-//       matchesDistrict &&
-//       matchesPoliceCity &&
-//       matchesZone &&
-//       matchesCommunity &&
-//       matchesCaste &&
-//       matchesStatus &&
-//       matchesRegistrationDate &&
-//       matchesCreatedAt &&
-//       matchesModifiedAt
-//     );
-//   });
-
-//   // 🔹 Reset S.No (sl_no) for filtered data
-//   this.filteredData = this.filteredData.map((item, index) => ({
-//     ...item,
-//     sl_no: index + 1
-//   }));
-
-//   console.log("filter apply", this.filteredData);
-// }
-
-
-applyFilters(): void {
-  this.fetchMonthlyReports();
+    return true;
+  });
 }
 
   // Updates the visibility of columns based on the selected columns.
@@ -996,34 +761,24 @@ applyFilters(): void {
 
   clearfilter(){
       this.searchText = '';
-      this.selectedPoliceCity='';
-      this.selectedZone='';
-      this.selectedPoliceRange = '';
       this.selectedDistrict = '';
-      this.selectedPoliceStation = '';
+      this.selectedNatureOfOffence = '';
+      this.selectedStatusOfCase = '';
+      this.selectedStatusOfRelief = '';
+      this.selectedStatus='';
+      this.selectedDistricts='';
       this.selectedCommunity='';
       this.selectedCaste='';
-      this.RegistredYear = '';
+      this.selectedZone='';
+      this.selectedOffence='';
+      this.selectedPoliceCity='';
       this.selectedFromDate='';
       this.selectedToDate = '';
-      this.CreatedATendDate = '';
-      this.CreatedATstartDate='';
-      this.ModifiedATDate = '';
-      this.ModifiedATstartDate = '';
-      this.selectedDataEntryStatus = '';
-      this.selectedStatusOfCase = '';
-      this.selectedOffenceGroup='';
-      this.selectedSectionOfLaw = '';
-      this.selectedCourt = '';
-      this.selectedConvictionType='';
-      this.selectedChargeSheetFromDate = '';
-      this.selectedChargeSheetToDate = '';
-      this.selectedLegal = '';
-      this.selectedCase = '';
-      this.selectedFiled = '';
-      this.selectedAppeal = '';
-    //  this.filteredData = [...this.reportData]; 
-    this.fetchMonthlyReports();
+      this.selectedCreatedAt = '';
+      this.selectedCreatedAtToDate = '';
+      this.selectedModifiedAt = '';
+      this.selectedModifiedAtToDate = '';
+     this.filteredData = [...this.reportData]; 
   }
 
   // Sorting logic
@@ -1068,18 +823,6 @@ applyFilters(): void {
     return Math.ceil(this.filteredData.length / this.itemsPerPage);
   }
 
-  visiblePages(): number[] {
-  const total = this.totalPages();
-  const start = Math.max(1, this.page - 4);
-  const end = Math.min(total, this.page + 4);
-
-  const pages: number[] = [];
-  for (let i = start; i <= end; i++) {
-    pages.push(i);
-  }
-  return pages;
-}
-
   // Generates an array of page numbers to display for pagination.
   totalPagesArray(): number[] {
     const total = this.totalPages();
@@ -1100,31 +843,13 @@ applyFilters(): void {
   }
 
   // Download Reports
-  // async onBtnExport(): Promise<void> {
-  //   await this.reportsCommonService.exportToExcelStyled(
-  //     this.filteredData,
-  //     this.displayedColumns,
-  //     'UI&PT-Reports' 
-  //   );
-  //   console.log("download filter",this.filteredData);
-  // }
-
   async onBtnExport(): Promise<void> {
-  // prepare export data with status text
-  const exportData = this.filteredData.map(item => ({
-    ...item,
-    status: this.getStatusText(item.status, item.has_case_mf), // override for Excel
-  }));
-
-  await this.reportsCommonService.exportToExcelStyled(
-    exportData,
-    this.displayedColumns,
-    'UI&PT-Reports'
-  );
-
-  console.log("download filter", exportData);
-}
-
+    await this.reportsCommonService.exportToExcelStyled(
+      this.filteredData,
+      this.displayedColumns,
+      'UI&PT-Reports'
+    );
+  }
 
 
   getReportData(){
@@ -2211,155 +1936,45 @@ private getDismissReason(reason: any): string {
 }
 
 
-//  getFilterParams() {
-//     const params: any = {};
+ getFilterParams() {
+    const params: any = {};
 
-//     if (this.selectedDistrict) {
-//       params.revenue_district = this.selectedDistrict;
-//     }
-
-//     if (this.selectedFilterDistricts) {
-//       params.districts = this.selectedFilterDistricts;
-//     }
-
-//     if (this.selectedZone) {
-//       params.police_zone = this.selectedZone;
-//     }
-
-//     if (this.selectedPoliceCity) {
-//       params.Police_City = this.selectedPoliceCity;
-//     }
-
-//     if (this.selectedFromDate) {
-//       params.start_date = this.selectedFromDate;
-//     }
-
-//     if (this.selectedToDate) {
-//       params.end_date = this.selectedToDate;
-//     }
-
-//     if (this.selectedStatus) {
-//       params.Status = this.selectedStatus;
-//     }
-
-//     if (this.selectedCommunity) {
-//       params.Community = this.selectedCommunity;
-//     }
-
-//     if (this.selectedCaste) {
-//       params.Caste = this.selectedCaste;
-//     }
-//     return params;
-//   }
-
-getFilterParams() {
-  const params: any = {};
-
-  const addParam = (key: string, value: any) => {
-    if (value !== undefined && value !== null && value !== '') {
-      params[key] = value;
+    if (this.selectedDistrict) {
+      params.district = this.selectedDistrict;
     }
-  };
 
-  // if (this.Parsed_UserInfo.access_type === 'District' && this.Parsed_UserInfo.role === 4) {
-  //   params.revenue_district = this.Parsed_UserInfo.district;
-  // } else if (this.Parsed_UserInfo.access_type === 'District' && this.Parsed_UserInfo.role === 3) {
-  //   params.revenue_district = this.Parsed_UserInfo.district;
-  //   params.district = this.Parsed_UserInfo.police_city;
-  // }
-
-  addParam('search', this.searchText);
-  addParam('district', this.selectedPoliceCity);
-  addParam('police_zone', this.selectedZone);
-  addParam('police_range', this.selectedPoliceRange);
-  addParam('revenue_district', this.selectedDistrict);
-  addParam('policeStation', this.selectedPoliceStation);
-  addParam('community', this.selectedCommunity);
-  addParam('caste', this.selectedCaste);
-  addParam('year', this.RegistredYear);
-  addParam('CreatedATstartDate', this.CreatedATstartDate);
-  addParam('CreatedATendDate', this.CreatedATendDate);
-  addParam('ModifiedATstartDate', this.ModifiedATstartDate);
-  addParam('ModifiedATDate', this.ModifiedATDate);
-  addParam('start_date', this.selectedFromDate);
-  addParam('end_date', this.selectedToDate);
-  addParam('statusOfCase', this.selectedStatusOfCase);
-  addParam('dataEntryStatus', this.selectedDataEntryStatus);
-  addParam('sectionOfLaw', this.selectedSectionOfLaw);
-  addParam('court', this.selectedCourt);
-  addParam('convictionType', this.selectedConvictionType);
-  addParam('chargesheetFromDate', this.selectedChargeSheetFromDate);
-  addParam('chargesheetToDate', this.selectedChargeSheetToDate);
-  addParam('hasLegalObtained', this.selectedLegal);
-  addParam('caseFitForAppeal', this.selectedCase);
-  addParam('filedBy', this.selectedFiled);
-  addParam('appealCourt', this.selectedAppeal);
-  addParam('OffenceGroup', this.selectedOffenceGroup);
-
-  return params;
-}
-
-
-  onCityChange(event: any)
-{
-
-  const district = event.target.value;
-   if (district) {
-      this.firGetService.getPoliceStations(district).subscribe(
-        (stations: string[]) => {
-          this.policeStations = stations.map(station =>
-            station.replace(/\s+/g, '-')); // Replace spaces with "-"
-          this.cdr.detectChanges(); // Trigger UI update
-        },
-        (error) => {
-          console.error('Error fetching police stations:', error);
-        }
-      );
+    if (this.selectedFilterDistricts) {
+      params.districts = this.selectedFilterDistricts;
     }
-}
- generateYearOptions(): void {
-    const currentYear = new Date().getFullYear();
-    for (let year = currentYear; year >= 1980; year--) {
-      this.years.push(year);
+
+    if (this.selectedZone) {
+      params.police_zone = this.selectedZone;
     }
+
+    if (this.selectedPoliceCity) {
+      params.Police_City = this.selectedPoliceCity;
+    }
+
+    if (this.selectedFromDate) {
+      params.start_date = this.selectedFromDate;
+    }
+
+    if (this.selectedToDate) {
+      params.end_date = this.selectedToDate;
+    }
+
+    if (this.selectedStatus) {
+      params.Status = this.selectedStatus;
+    }
+
+    if (this.selectedCommunity) {
+      params.Community = this.selectedCommunity;
+    }
+
+    if (this.selectedCaste) {
+      params.Caste = this.selectedCaste;
+    }
+    return params;
   }
 
-  loadOptions() {
-    this.firGetService.getOffences().subscribe(
-      (offences: any) => {
-        // console.log(offences);
-        this.sectionOfLaw = offences
-          .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
-          this.sectionOfLaw.push(
-              { offence_act_name: '3(2)(va)', offence_name: '3(2)(va)', id : 24 },
-              { offence_act_name: '3(2)(v), 3(2)(va)', offence_name: '3(2)(v), 3(2)(va)', id: 25 }
-          );
-      },
-      (error: any) => {
-        Swal.fire('Error', 'Failed to load offence options.', 'error');
-      }
-    );
-  }
-
-  onDistrictChange(event:any){
- const selectedDivision = event.target.value;
- 
-     if (selectedDivision) {
-       this.firGetService.getCourtRangesByDivision(selectedDivision).subscribe(
-         (ranges: string[]) => {
-           this.courtList = ranges; // Populate court range options based on division
-         },
-         (error) => {
-           console.error('Error fetching court ranges:', error);
-           Swal.fire('Error', 'Failed to load court ranges for the selected division.', 'error');
-         }
-       );
-     }
 }
-
- SearchList() {
-      this.applyFilters();
-  }
-}
-
-

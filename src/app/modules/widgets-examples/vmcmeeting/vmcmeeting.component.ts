@@ -18,7 +18,8 @@ export class VmcmeetingComponent implements OnInit {
     const meetingKeys = ['1st Meeting', '2nd Meeting', '3rd Meeting', '4th Meeting'];
     return meetingKeys[index] || '';
   }
-  
+  totalRecords = 0;
+  itemsPerPage = 10;
   districts: any;
   subdivisionsMap: { [key: string]: string[] } = {};
   filteredAttendees: any[] = [];
@@ -52,6 +53,7 @@ export class VmcmeetingComponent implements OnInit {
   filter_meeting_type = '';
   filter_meeting_quarter = '';
   filter_year = '';
+  filter_meeting_status = '';
 
   year = ['2025','2024','2023','2022','2021','2020']
   meeting_quater_list = ['Jan-Mar', 'Apr-Jun', 'Jul-Sep', 'Oct-Dec'];
@@ -182,6 +184,9 @@ export class VmcmeetingComponent implements OnInit {
           this.MeetingList = results.data;
           this.TotalMember = results.total_members;
           this.filteredMeeting = this.MeetingList;
+          this.totalRecords = this.filteredMeeting.length;
+                this.page = 1;
+
           console.log(this.filteredMeeting)
           this.cdr.detectChanges();
         },
@@ -196,14 +201,7 @@ export class VmcmeetingComponent implements OnInit {
       );
     }
   
-    // Filter members based on search text
-    // filterMeeting() {
-    //   this.filteredMeeting = this.MeetingList.filter((meeting) =>
-    //     (meeting.name ? meeting.name.toLowerCase() : '').includes(
-    //       this.searchText.toLowerCase()
-    //     )
-    //   );
-    // }
+   
 
     filterMeeting() {
       const lowerSearch = this.searchText.toLowerCase();
@@ -257,7 +255,9 @@ export class VmcmeetingComponent implements OnInit {
         params.meeting_quarter = this.filter_meeting_quarter;
       }
 
-
+      if(this.filter_meeting_status){
+        params.meeting_status = this.filter_meeting_status;
+      }
         
       return params;
     }
@@ -265,6 +265,7 @@ export class VmcmeetingComponent implements OnInit {
     clearfilter(){
       this.searchText = '';
       this.filter_District = '';
+      this.filter_meeting_status = '';
       this.filter_meeting_type = '';
       this.filter_meeting_quarter = '';
       this.filter_year = '';
@@ -950,4 +951,7 @@ export class VmcmeetingComponent implements OnInit {
   });
   }
 
+    get totalPages(): number {
+  return Math.ceil(this.totalRecords / this.itemsPerPage);
+}
 }

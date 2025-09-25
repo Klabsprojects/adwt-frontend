@@ -72,9 +72,10 @@
       </table>
 
       <!-- Pagination Controls -->
-      <div class="d-flex justify-content-end align-items-center">
-        <pagination-controls (pageChange)="page = $event"></pagination-controls>
-      </div>
+      <div class="float-left w-100 text-center">
+      <pagination-controls (pageChange)="page = $event"></pagination-controls>
+      <span>Page {{ page }} of {{ totalPages }} ({{ totalRecords }} records)</span>
+    </div>
     </div>
   </div>
 

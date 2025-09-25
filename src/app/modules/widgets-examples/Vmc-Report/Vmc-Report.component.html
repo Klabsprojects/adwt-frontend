@@ -41,37 +41,60 @@
 
   <div class="card-body pt-0">
     <!-- Filters -->
-    <div class="d-flex gap-3 mb-3">
-      <select class="form-select" [(ngModel)]="selectedYear" (change)="applyFilters()">
+    <div class="row d-flex mb-3 align-items-center outer pt-4 pb-2 px-3 m-0">
+     <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <select class="form-select" [(ngModel)]="selectedYear">
         <option value="" selected>Year</option>
         <option *ngFor="let item of year" [value]="item">{{ item }}</option>
       </select>
+      </div>
 
-      <select class="form-select" [(ngModel)]="selectedMeetingType" (change)="applyFilters()">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <select class="form-select" [(ngModel)]="selectedMeetingType">
         <option value="" selected>Meeting Type</option>
         <option *ngFor="let item of meeting_type_list" [value]="item">{{ item }}</option>
       </select>
+      </div>
 
-      <select class="form-select" [(ngModel)]="selectedMeetingQuarter" (change)="applyFilters()">
+       <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <select class="form-select" [(ngModel)]="selectedMeetingQuarter">
         <option value="" selected>Meeting Quarter</option>
         <option *ngFor="let item of meeting_quater_list" [value]="item">{{ item }}</option>
       </select>
+      </div>
 
-      <select *ngIf="Parsed_UserInfo.access_type == 'State'" class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters();getSubdivisions()">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="Parsed_UserInfo.access_type == 'State'">
+      <select  class="form-select" [(ngModel)]="selectedDistrict" (change)="getSubdivisions()">
         <option value="" selected>district</option>
         <option *ngFor="let item of districts" [value]="item">{{ item }}</option>
       </select>
+      </div>
 
-      <select class="form-select" [(ngModel)]="selectedSubDivision" (change)="applyFilters()">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <select class="form-select" [(ngModel)]="selectedSubDivision">
         <option value="" selected>Sub Division</option>
         <option *ngFor="let item of subdivisionsMap" [value]="item">{{ item }}</option>
       </select>
+      </div>
 
-      <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <select class="form-select" [(ngModel)]="selectedStatus">
+        <option value="" selected hidden disabled>Meeting Status</option>
+        <option value="Completed">Completed</option>
+        <option value="Pending">Pending</option>
+      </select>
+      </div>
+
+      <div class="col-xl-5 col-lg-3 col-md-4 mb-3">
+        <button (click)="applyFilters()" class="btn btn-primary btn-sm">Apply Filters</button>
+        <button (click)="clearfilter()" class="btn btn-secondary btn-sm" style="margin-left: 5px;">Clear</button>
+      </div>
+
+      <!-- <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button> -->
     </div>
 
-    <div class="card-body pt-0 overflow-auto">
-      <table class="table table-bordered table-responsive">
+    <div class="card-body pt-0 overflow-auto px-0" style="width: 100%; overflow-y: auto; overflow-x: auto; min-height: 500px;">
+      <table class="table table-striped table-bordered table-hover">
         <thead>
           <tr>
             <th *ngFor="let column of displayedColumns" [hidden]="!column.visible" (click)="column.sortable ? sortTable(column.field) : null">
@@ -94,7 +117,11 @@
       <div *ngIf="loading" class="alert alert-warning">Loading...</div>
       <!-- Show message if filtered data is empty -->
       <div *ngIf="filteredData.length === 0 && !loading" class="alert alert-warning">No FIR data available.</div>
-      <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button>
+      <!-- <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button> -->
+      <div class="mt-3 float-right">
+  <button class="btn btn-primary me-2 py-2 px-3" (click)="onBtnExport()">
+    <i class="fas fa-download me-1"></i> Excel
+  </button> </div>
       <nav *ngIf="filteredData.length > itemsPerPage" class="d-flex justify-content-end mt-3">
         <ul class="pagination">
           <li class="page-item" [class.disabled]="page === 1">
@@ -108,6 +135,9 @@
           <li class="page-item" [class.disabled]="page === totalPages()">
             <button class="page-link" (click)="nextPage()">Next</button>
           </li>
+            <span class="ms-3 mt-2">
+        Page {{ page }} of {{ totalPages() }} ({{ filteredData.length }} records)
+      </span>
         </ul>
       </nav>
     </div>

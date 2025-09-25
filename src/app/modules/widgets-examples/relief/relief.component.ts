@@ -654,6 +654,7 @@ export class ReliefComponent implements OnInit {
     const firstInstallmentData = {
       firId: this.firId,
       saveDraft,
+      firstInstallmentStatus: saveDraft ? 0 : 1,
       victims: this.victimsArray.value.map((victim: any, index: number) => ({
         victimReliefId: this.victimsReliefDetails?.[index]?.victim_relif_id || null, // Ensure index exists before accessing
         victimId: victim.victimId || null,
@@ -737,6 +738,7 @@ export class ReliefComponent implements OnInit {
     const secondInstallmentData = {
       firId: this.firId,
       saveDraft,
+      secondInstallmentStatus: saveDraft ? 0 : 1,
       victims: this.secondInstallmentVictimsArray.value.map((victim: any, index: number) => ({
         victimId: victim.victimId || null,
         victimChargesheetId: this.secondFormVictimInformation?.[index]?.victim_chargesheet_id || null,
@@ -814,6 +816,7 @@ export class ReliefComponent implements OnInit {
     const thirdInstallmentData = {
       firId: this.firId,
       saveDraft,
+      thirdInstallmentStatus: saveDraft ? 0 : 1,
       victims: this.thirdInstallmentVictimsArray.value.map((victim: any, index: number) => ({
         trialId: victim.trialId, // Use existing trial_id
         victimId: victim.victimId, // Use victim_id

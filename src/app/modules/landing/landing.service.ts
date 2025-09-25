@@ -236,12 +236,12 @@ This SOP is for the call centre representatives on setting up the call centre he
 
       fileType: "PDF",
       downloadUrl: "assets/pdf/8. G.O. for enhancement of relief given to SC ST victims of Atrocities 2022.pdf"
-    },
-    {
-      title: "9. Standard Operating Procedure for implementation of the Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act, 1989 & Rules, 1995 (English)",
-      fileType: "PDF",
-      downloadUrl: "assets/pdf/Prevention of Atrocities Act_Eng_Web-compressed.pdf"
     }
+    // {
+    //   title: "9. Standard Operating Procedure for implementation of the Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act, 1989 & Rules, 1995 (English)",
+    //   fileType: "PDF",
+    //   downloadUrl: "assets/pdf/Prevention of Atrocities Act_Eng_Web-compressed.pdf"
+    // }
   ]
   };
 

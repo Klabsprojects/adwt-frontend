@@ -19,9 +19,40 @@ export class MonthlyReportService {
   }
 
   // Fetches all monthly report details 
-  getMonthlyReportDetail(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/get-monthly-report-details`);
+  getMonthlyReportDetail(params: any = {}): Observable<any> {
+    return this.http.get(`${this.baseUrl}/get-monthly-report-details`,{ params });
   }
+
+//   getMonthlyReportDetail(revenue_district?: string): Observable<any> {
+//   let params = new HttpParams();
+//   if (revenue_district) {
+//     params = params.set('revenue_district', revenue_district);
+//   }
+
+//   return this.http.get(`${this.baseUrl}/get-monthly-report-details`, { params });
+// }
+
+
+// getMonthlyReportDetail(page?: number, pageSize?: number, filters: any = {}): Observable<any> {
+//   let params = new HttpParams();
+
+//   // Only add page/pageSize if provided
+//   if (page !== undefined) {
+//     params = params.set('page', page.toString());
+//   }
+//   if (pageSize !== undefined) {
+//     params = params.set('pageSize', pageSize.toString());
+//   }
+
+//   // Add filters (only if key has a non-empty value)
+//   Object.keys(filters).forEach(key => {
+//     if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+//       params = params.set(key, filters[key]);
+//     }
+//   });
+
+//   return this.http.get(`${this.baseUrl}/get-monthly-report-details`, { params });
+// }
 
   GetDistrictWisePendingUI( filters: any = {}): Observable<any> {
   let params = new HttpParams();

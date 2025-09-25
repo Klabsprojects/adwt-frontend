@@ -1318,36 +1318,45 @@
 
         <div *ngIf="firForm.get('caseType')?.value === 'sectionDeleted'" class="col-md-12">
             <div class="row">
-                 
               <div class="row mb-4">
-              <div class="mb-4 col-6">
-                <label class="form-label required">Proceedings File No.</label>
-                <input type="text" class="form-control" formControlName="proceedingsFileNo_1" placeholder="Enter File No." required />
-              </div>
-              <div class="mb-4 col-6">
-                <label class="form-label required">Proceedings Date</label>
-                <input type="date" class="form-control" formControlName="proceedingsDate_1" [max]="today" required/>
+                <div class="mb-4 col-6">
+                  <label class="form-label required">Proceedings File No.</label>
+                  <input type="text" class="form-control" formControlName="proceedingsFileNo_1" placeholder="Enter File No." required />
+                </div>
+                <div class="mb-4 col-6">
+                  <label class="form-label required">Proceedings Date</label>
+                  <input type="date" class="form-control" formControlName="proceedingsDate_1" [max]="today" required/>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label required">Upload Section Deleted Copy</label> <span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
+                    <input type="file" id = "sectionDeleted" class="form-control" required 
+                      (change)="sectionDeletedCopyFileUpload($event)" *ngIf="!sectionDeletedCopyPath"/>
+                      <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="sectionDeletedCopyPath">
+                      <div class="d-flex justify-content-start align-items-center">
+                        {{sectionDeletedCopyPath}}
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-primary btn-sm me-2" (click)="viewSectionDeletedCopyFile()">View</button>
+                        <button class="btn btn-danger btn-sm" (click)="removeSectionCopyFile()"><i class="fas fa-times"></i></button>
+                      </div>
+                </div>
+          </div>
               </div>
             </div>
+        </div>
 
-              <div class="mb-4">
+         <!-- <div class="mb-4" *ngIf="firForm.get('caseType')?.value === 'chargeSheet'">
               <label class="form-label required">Upload Commissionerate / S.P. Office Proceedings</label> <span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
-         
-            <input type="file" [id]="'uploadProceedings_1' + i" class="form-control" required 
-            (change)="onProceedingsFileUpload2($event)" multiple *ngIf="!proceedingFileName2"/>
-            <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingFileName2">
-            <div class="d-flex justify-content-start align-items-center">
-              {{proceedingFileName2}}
+              <input type="file" [id]="'uploadProceedings_1' + i" class="form-control" required 
+              (change)="onProceedingsFileUpload2($event)" multiple *ngIf="!proceedingFileName2"/>
+              <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingFileName2">
+              <div class="d-flex justify-content-start align-items-center">{{proceedingFileName2}}</div>
+              <div class="d-flex justify-content-between align-items-center">
+                <button class="btn btn-primary btn-sm me-2" (click)="viewProceedingsCopy2()">View</button>
+                <button class="btn btn-danger btn-sm" (click)="removeProceedingsCopy2()"><i class="fas fa-times"></i></button>
+              </div>
             </div>
-            <div class="d-flex justify-content-between align-items-center">
-              <button class="btn btn-primary btn-sm me-2" (click)="viewProceedingsCopy2()">View</button>
-              <button class="btn btn-danger btn-sm" (click)="removeProceedingsCopy2()"><i class="fas fa-times"></i></button>
-            </div>
-          </div>
-          </div>
-
-        </div>
-        </div>
+          </div> -->
 
 
               <div *ngIf="firForm.get('caseType')?.value === 'referredChargeSheet'" class="col-md-12">
@@ -1360,12 +1369,6 @@
                     <label for="rcsFilingDate" class="form-label required">69. Referred Charge Sheet (RCS) filing date</label>
                     <input type="date" id="rcsFilingDate" class="form-control" formControlName="rcsFilingDate" required placeholder="Enter Case Number"/>
                   </div>
-
-                  <!-- <div class="col-lg-6">
-                    <label for="mfCopy" class="form-label">70. Upload MF copy</label>
-                    <input type="file" id="mfCopy" class="form-control" formControlName="mfCopy" required/>
-                  </div> -->
-
 
                     <div class="mb-4">
                         <label class="form-label required">70. Upload MF copy</label><span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
@@ -1446,23 +1449,9 @@
                 <input type="date" class="form-control" formControlName="proceedingsDate_1" [max]="today" required/>
               </div>
             </div>
-            <!-- <div class="mb-4">
-              <label class="form-label">71. Upload Commissionerate / S.P. Office Proceedings *</label>
-              <input type="file" class="form-control" id="uploadProceedings_1" />
-              <div *ngIf="firForm.get('uploadProceedings_1')?.value"> 
-                <img [src]="firForm.get('uploadProceedings_1')?.value" alt="Proceedings File" class="file-preview-img" />
-              </div>
-            </div> -->
 
             <div class="mb-4">
               <label class="form-label required">78. Upload Commissionerate / S.P. Office Proposal</label><span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
-              <!-- <input type="file" class="form-control" formControlName="uploadProceedings_1" required/> -->
-              <!-- <input
-              type="file"
-              class="form-control"
-              (change)="onProceedingsFileChange_1($event)" required
-            /> -->
-
 
             <input type="file" [id]="'uploadProceedings_1' + i" class="form-control" required 
             (change)="onProceedingsFileUpload2($event)" multiple *ngIf="!proceedingFileName2"/>
@@ -1476,46 +1465,6 @@
             </div>
           </div>
           </div>
-
-
-          <!-- <div *ngIf="fileUrls_proceding1[i] ; else existingFile1">
-            <img [src]="fileUrls_proceding1[i]" class="img-thumbnail" 
-                 alt="Proceedings File1" style="max-width: 150px; margin-bottom: 10px;">
-          </div>
-
-          <ng-template #existingFile1>
-            <div *ngIf="firForm.get('uploadProceedings_1')?.value">
-              <img [src]="image_access + firForm.get('uploadProceedings_1')?.value" 
-                   class="img-thumbnail" alt="FIR Copy" style="max-width: 150px; margin-bottom: 10px;">
-            </div>
-          </ng-template> -->
-
-
-            <!-- <div class="mb-4">
-              <label class="form-label">79. Upload Other Attachment (If any)</label>
-              <div class="file-drop-container">
-                <ngx-dropzone (drop)="onDrop2($event)" (fileOver)="onFileOver2($event)" (click)="triggerFileInputClick2()" [accept]="'image/*'" [multiple]="true" class="dropzone">
-                  <input #fileInput type="file" (change)="onChange2($event)" multiple accept="image/*" class="file-input-hidden" />
-                  <div class="dropzone-content" [ngClass]="{'file-over': isFileOver}">
-                    <p *ngIf="!isFileOver2">Drag and drop your files here or click to select</p>
-                    <p *ngIf="isFileOver2">Release to drop the files!</p>
-                  </div>
-                </ngx-dropzone>
-                <div class="file-previews">
-                  <div *ngFor="let file of allFiles1; let i = index" class="file-preview">
-                    <img [src]="file.file_path" alt="Uploaded File preview" class="file-preview-img" />
-                    <p></p>
-                    <button class="btn btn-primary">View</button>
-                    <button class="remove-file" (click)="removeFile4(i)">Remove</button>
-                  </div> 
-                  <div *ngFor="let file of files2; let i = index" class="file-preview">
-                    <img *ngIf="file.previewUrl" [src]="file.previewUrl" alt="file preview" class="file-preview-img" />
-                    <p>{{ file.name }}</p>
-                    <button class="remove-file" (click)="removeFile3(i)">Remove</button>
-                  </div>
-                </div>
-              </div>
-            </div> -->
 
                 <div class="mb-4" formArrayName="attachments_1">
                   <label class="form-label">79. Upload Other Attachments (If any)</label> <span style="color: red;font-size: 9px;margin-left: 10px;" >(The maximum file size allowed is 2 MB)</span>
@@ -1582,10 +1531,10 @@
           </div>
         </div>
         <div class="mt-4">
-          <button type="button" class="btn btn-warning me-2" [disabled]="!SubmitButton" (click)="saveAsDraft_6()">Save as Draft</button>
+          <button type="button" class="btn btn-warning me-2" [disabled]="!SubmitButton" (click)="submitStepSix(); saveAsDraft_6()">Save as Draft</button>
           <!-- <button type="button" class="btn btn-secondary me-2" (click)="previousStep()">Previous</button> -->
           <button type="button" class="btn btn-secondary me-2" (click)="previousMainStep()">Previous</button>
-          <button type="button" class="btn btn-primary" (click)="submitStepSix();saveAsDraft_6()" [disabled]="!isStep6Valid() || !SubmitButton">Submit</button>
+          <button type="button" class="btn btn-primary" (click)="submitStepSix();saveAsDraft_6();" [disabled]="!isStep6Valid() || !SubmitButton">Submit</button>
         </div>
       </div>
      

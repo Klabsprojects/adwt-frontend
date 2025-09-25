@@ -52,7 +52,7 @@
 
 
 <!-- Begin Sidebar Menu Wrapper -->
-<div *ngIf="permissionsLoaded" id="kt_app_sidebar_menu_scroll" class="scroll-y my-5 mx-3"
+<div *ngIf="permissionsLoaded" id="kt_app_sidebar_menu_scroll" class="scroll-y mb-5 mx-3"
      data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto"
      data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer"
      data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px"
@@ -281,9 +281,9 @@
     <div class="menu-item menu-accordion" *ngIf="hasPermission('reports')" data-kt-menu-trigger="click" routerLinkActive="here show">
   <span class="menu-link">
     <span class="menu-icon">
-      <i class="fas fa-file"></i>
+      <i class="fas fa-file" style="color: #fff !important;"></i>
     </span>
-    <span class="menu-title">Reports</span>
+    <span class="menu-title" style="color: #fff !important;">Reports</span>
     <span class="menu-arrow"></span>
   </span>
 

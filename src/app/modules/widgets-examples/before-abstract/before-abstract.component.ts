@@ -34,7 +34,7 @@ export class BeforeAbstractComponent {
     reportData: Array<any> = [];
     filteredData: Array<any> = [];
     page: number = 1;
-    itemsPerPage: number = 10;
+    itemsPerPage: number = 38;
     isReliefLoading: boolean = true;
     loading: boolean = false;
     // Filters
@@ -146,6 +146,7 @@ export class BeforeAbstractComponent {
     selectedReliefStatus: string = '';
     currentSortField: string = '';
     isAscending: boolean = true;
+    Parsed_UserInfo:any;
   
     constructor(
       // private firService: FirListTestService,
@@ -163,6 +164,8 @@ export class BeforeAbstractComponent {
   
     // Initializes component data and fetches necessary information on component load.
     ngOnInit(): void {
+      const UserInfo: any = sessionStorage.getItem('user_data');
+      this.Parsed_UserInfo = JSON.parse(UserInfo);
       this.groupedBySection = this.groupOrder.reduce((acc, groupName) => {
       const cols = this.displayedColumns.filter(
         col => col.group === groupName && col.visible
@@ -405,8 +408,13 @@ export class BeforeAbstractComponent {
   
   
     fetchBeforeAbstract(): void {
+      let districtParam = '';
+         if ((this.Parsed_UserInfo.access_type === 'District' && this.Parsed_UserInfo.role === 4)||(this.Parsed_UserInfo.role === 3)) {
+        districtParam = this.Parsed_UserInfo.district;
+        this.selectedDistrict = districtParam;
+      }
       this.loader = true;
-      this.additionalAbstractService.getBeforeAbstract().subscribe({
+      this.additionalAbstractService.getBeforeAbstract(districtParam).subscribe({
         next: (response) => {
           console.log('Abstract:', response.data); // Debugging
           // Transform API response to match frontend structure

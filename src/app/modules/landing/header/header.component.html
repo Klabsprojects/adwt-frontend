@@ -134,13 +134,15 @@
       <div>
         <button role="button" class="btn mobile-link loginout" data-bs-toggle="modal" data-bs-target="#exampleModal"
           *ngIf="!is_user">{{lang.lang.officers_login}}</button>
+           <!-- <button role="button" class="btn mobile-link loginout" (click)="ssoRoute()"
+          *ngIf="!is_user">{{lang.lang.officers_login}}</button> -->
         <button class="btn mobile-link loginout" *ngIf="is_user" (click)="logout()">{{lang.lang.logout}}</button>
       </div>
     </ng-container>
   </nav>
 </div>
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" style="margin-top: 220px;">
+  <div class="modal-dialog modal-lg" style="margin-top: 50px;"> 
     <div class="modal-content">
       <div class="modal-body">
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

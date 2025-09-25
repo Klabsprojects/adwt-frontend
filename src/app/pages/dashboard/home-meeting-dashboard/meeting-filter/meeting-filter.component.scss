@@ -3,10 +3,55 @@
     padding: 0;
     box-sizing: border-box;
 }
-.filter{
-    padding: 1.5rem;
-    background-color: #186cbd;
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
+
+.filter-nav{
+    background-color: #186CBD;
+    padding: 1rem;
+    color: #fff;
+}
+.title-box h3{
+    font-size: 2rem;
+    text-align: center;
+    color: #fff;
+}
+.filters{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    column-gap: 0.5rem;
+    row-gap: 1rem;
+    padding: 2rem;
+}
+.filter{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.filter select,input{
+    width: 100%;
+    padding:8px;
+    border-radius: 0.3rem;
+}
+
+.filter div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.img-container{
+    align-items: flex-start;
+}
+::ng-deep .mat-mdc-text-field-wrapper {
+  height: 47px !important;
+}
+
 ul{
     list-style: none;
     display: grid;
@@ -14,13 +59,13 @@ ul{
     align-items: center;
 }
 
-.filters{
-    gap: 1rem;
-}
+// .filters{
+//     gap: 1rem;
+// }
 
-.filters div{
-    flex: 1;
-}
+// .filters div{
+//     flex: 1;
+// }
 
 select{
     width: 100%;

@@ -50,6 +50,7 @@ export class VmcReportComponent implements OnInit {
   selectedColumns: string[] = [];
   districts: string[] = [];
   subdivisionsMap: string[] = [];
+  selectedStatus:string='';
 
   // Visible Columns Management
   displayedColumns: {
@@ -243,6 +244,10 @@ getFilterParams() {
   if (this.selectedMeetingQuarter) {
     params.meeting_quarter = this.selectedMeetingQuarter;
   }
+
+   if (this.selectedStatus) {
+    params.meeting_status = this.selectedStatus;
+  }
   
   if (this.selectedDistrict) {
     if(this.Parsed_UserInfo.access_type == 'District'){
@@ -295,6 +300,7 @@ getFilterParams() {
     this.searchText = '';
     this.selectedMeetingType = '';
     this.selectedYear = '';
+    this.selectedStatus = '';
     this.selectedMeetingQuarter = '';
     this.selectedDistrict = '';
     this.selectedSubDivision = '';

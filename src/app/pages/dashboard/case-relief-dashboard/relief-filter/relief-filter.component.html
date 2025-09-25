@@ -1,50 +1,163 @@
-<section class="filter">
-    <div class="d-flex justify-content-between align-items-center title-box">
-        <h1>Relief Dashboard</h1>
-        <img src="assets/images/filter.png" alt="" width="40px" (click)="clear()">
+  <div class="col-md-12" style="background-color: #fff; float: left;" >
+     <mat-form-field appearance="outline" class="w-250px" style="float:right;">
+  <mat-label>Select Filters</mat-label>
+  <mat-select [multiple]="true" [(value)]="activeFilters" (selectionChange)="updateFilterVisibility()">
+     <mat-option *ngFor="let filter of filterFields" [value]="filter.key">
+      {{ filter.label }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+</div>
+<section class="filter-nav">
+    <div class="title-box">
+        <h3 class="py-5" style="width:100%; margin-top:60px;">Relief Dashboard</h3>
     </div>
-    <div class="row">
-        <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4">
+    <div class="filters px-0 pt-0">
+        <div class="filter" *ngIf="isVisible('before/after')">
             <p>Before/After 2016</p>
             <select name="" id="" [(ngModel)]="selectedBeforeAfter" (change)="get_other_details()">
                 <option value="" selected>Select</option>
                 <option [value]="ba" *ngFor="let ba of before_after">{{ba}}</option>
             </select>
         </div>
-        <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4">
-            <p>District</p>
+
+         <div class="filter" *ngIf="isVisible('city')">
+            <p>Police City</p>
+            <select name="" id="" [(ngModel)]="selectedPoliceCity" (change)="get_other_details(); onCityChange($event)" [disabled]="isDistrictDisabled">
+                <option value="" selected>Select</option>
+                <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
+            </select>
+        </div>
+
+        <div class="filter" *ngIf="isVisible('revenueDistrict')">
+            <p> District</p>
             <select name="" id="" [(ngModel)]="selectedDistrict" (change)="get_other_details()" [disabled]="isDistrictDisabled">
                 <option value="" selected>Select</option>
                 <option [value]="district.district_name" *ngFor="let district of districts">{{district.district_name}}</option>
             </select>
         </div>
-        <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4">
+
+         <div class="filter"  *ngIf="isVisible('station')">
+            <p>Police Station</p>
+             <select  [(ngModel)]="selectedPoliceStation">
+          <option value="" selected  disabled>Select</option>
+          <option *ngFor="let station of policeStations" [value]="station">{{ station }}</option>
+       </select>
+        </div>
+
+
+        <div class="filter" *ngIf="isVisible('community')">
             <p>Community</p>
             <select name="" id="" [(ngModel)]="selectedCommunity" (change)="get_caste()">
                 <option value="" selected>Select</option>
                 <option [value]="Community" *ngFor="let Community of communities">{{Community}}</option>
             </select>
         </div>
-        <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4">
+        <div class="filter" *ngIf="isVisible('caste')">
             <p>Caste</p>
             <select name="" id="" [(ngModel)]="selectedCaste" (change)="get_other_details()">
                 <option value="" selected>Select</option>
                 <option [value]="caste" *ngFor="let caste of castes">{{caste}}</option>
             </select>
         </div>
-        <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4">
+        <div class="filter" *ngIf="isVisible('offenceGroup')">
             <p>Nature of offence</p>
             <select name="" id="" [(ngModel)]="selectedNatureOfOffence" (change)="get_other_details()">
                 <option value="" selected>Select</option>
                 <option [value]="nof" *ngFor="let nof of nature_of_offence">{{nof}}</option>
             </select>
         </div>
-        <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4">
+        <div class="filter" *ngIf="isVisible('sectionOfLaw')">
+           <p>Section of Law</p>
+          <select [(ngModel)]="selectedSectionOfLaw">
+        <option value="" selected hidden disabled>Select</option>
+        <option *ngFor="let section of sectionOfLaw" [value]="section.offence_act_name">{{ section.offence_act_name }}</option>
+      </select>
+        </div>
+
+        <div class="filter"  *ngIf="isVisible('chargeSheetDate')">
+           <p>Date Of Chargesheet</p>
+            <div>
+              <div class="tooltip-container">
+                <input type="date" class="filter-input" [(ngModel)]="selectedChargeSheetFromDate" (ngModelChange)="get_other_details()"/>
+              <span class="tooltip-text">From Date</span> 
+              </div>
+              <div class="tooltip-container">
+                <input type="date" class="filter-input" [(ngModel)]="selectedChargeSheetToDate" (ngModelChange)="get_other_details()"/>
+              <span class="tooltip-text">To Date</span>  
+              </div>
+              </div>
+        </div>
+
+        <div class="filter" *ngIf="isVisible('regDate')">
+            <p>Date Of Registration</p>
+            <div>
+              <div class="tooltip-container">
+                <input type="date" class="filter-input" [(ngModel)]="selectedFromDate" (ngModelChange)="get_other_details()"/>
+              <span class="tooltip-text">From Date</span> 
+              </div>
+              <div class="tooltip-container">
+                <input type="date" class="filter-input" [(ngModel)]="selectedToDate" (ngModelChange)="get_other_details()"/>
+              <span class="tooltip-text">To Date</span>  
+              </div>
+              </div>
+        </div>
+
+        <div class="filter" *ngIf="isVisible('amountDate')">
+            <p>Date Of Amount Disbursed</p>
+            <div>
+              <div class="tooltip-container">
+                <input type="date" class="filter-input" [(ngModel)]="selectedAmountFromDate" (ngModelChange)="get_other_details()"/>
+              <span class="tooltip-text">From Date</span> 
+              </div>
+              <div class="tooltip-container">
+                <input type="date" class="filter-input" [(ngModel)]="selectedAmountToDate" (ngModelChange)="get_other_details()"/>
+              <span class="tooltip-text">To Date</span>  
+              </div>
+              </div>
+        </div>
+
+        <div class="filter" *ngIf="isVisible('status')">
+            <p>Status Of Case</p>
+            <select class="filter-select" [(ngModel)]="selectedStatus" (change)="get_other_details()">
+                <option value="" selected  disabled>Select</option>
+                 <option value="UI">UI</option>
+                  <option value="PT">PT</option>
+                  <option value="Convicted">Conviction</option>
+                  <option value="Acquitted">Acquitted</option>
+                  <option value="FirQuashed">FIR Quashed</option>
+                  <option value="MF">MF</option>
+                  <option value="SectionDeleted">Section Deleted</option>
+                  <option value="Charge_Abated"> Charge Abated</option>
+                  <option value="Quashed"> Quashed</option>
+            </select>
+        </div>
+        
+        <div class="filter" *ngIf="isVisible('reliefDataEntryStatus')">
+            <p>Relief Data Entry Status</p>
+            <select name="" id="" [(ngModel)]="selectedReliefDataEntryStatus" (change)="get_other_details()">
+                <option value="" selected>Select</option>
+            </select>
+        </div>
+
+        <div class="filter" *ngIf="isVisible('reliefStage')">
+            <p>Relief Stage</p>
+            <select name="" id="" [(ngModel)]="selectedReliefStage" (change)="get_other_details()">
+                <option value="" selected>Select</option>
+            </select>
+        </div>
+
+
+        <div class="filter" *ngIf="isVisible('additionalReliefType')">
             <p>Type of Relief</p>
             <select name="" id="" [(ngModel)]="selectedReliefStatus" (change)="get_other_details()">
                 <option value="" selected>Select</option>
                 <option [value]="rs" *ngFor="let rs of relief_status">{{rs}}</option>
             </select>
         </div>
+        <div class="filter img-container">
+     <img src="assets/images/filter.png" alt="" width="40px" (click)="clear()">
+     </div>
     </div>
+    
 </section>

@@ -46,113 +46,129 @@
     <!-- Filters -->
 
    
-    <div class="d-flex gap-3 mb-3">
-      <select *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('city')" class="form-select" (change)="onCityChange($event)" [(ngModel)]="selectedDistrict">
+    <div class="row d-flex mb-3 align-items-center outer pt-4 pb-2 px-3 m-0">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('city')">
+      <select  class="form-select" (change)="onCityChange($event)" [(ngModel)]="selectedDistrict">
         <option value="" selected hidden disabled>Police City</option>
         <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
       </select>
+      </div>
 
-      <select *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('zone')" class="form-select" [(ngModel)]="selectedPoliceZone"
-        >
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('zone')">
+      <select class="form-select" [(ngModel)]="selectedPoliceZone">
         <option value="" selected hidden disabled>Police Zone</option>
         <option *ngFor="let item of policeZones" [value]="item">{{ item }}</option>
       </select>
+      </div>
 
-
-      <select *ngIf="Parsed_UserInfo.access_type != 'District'  && isVisible('range')" class="form-select" [(ngModel)]="selectedPoliceRange"
-        >
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="Parsed_UserInfo.access_type != 'District'  && isVisible('range')">
+      <select  class="form-select" [(ngModel)]="selectedPoliceRange">
         <option value="" selected hidden disabled>Police Range</option>
         <option *ngFor="let item of policeRanges" [value]="item.police_range">{{ item.police_range }}</option>
       </select>
+    </div>
 
-      <select *ngIf="Parsed_UserInfo.access_type != 'District'  && isVisible('revenueDistrict')" class="form-select"
-        [(ngModel)]="selectedRevenue_district" (change)="onDistrictChange($event)">
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('revenueDistrict') || Parsed_UserInfo.role === 3">
+      <select  class="form-select"  [(ngModel)]="selectedRevenue_district" (change)="onDistrictChange($event)">
         <option value="" selected hidden disabled>Revenue District</option>
         <option *ngFor="let item of revenueDistricts" [value]="item.revenue_district">{{ item.revenue_district }}
         </option>
       </select>
+    </div>
 
-       <select *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('station')" class="form-select"
-       [(ngModel)]="selectedPoliceStation">
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('station')">
+       <select  class="form-select" [(ngModel)]="selectedPoliceStation">
           <option value="" disabled>Police Station</option>
           <option *ngFor="let station of policeStations" [value]="station">{{ station }}</option>
        </select>
+      </div>
 
-    </div>
-
-    <div class="d-flex gap-3 mb-3">
-
-       <select *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('community')" class="form-select"
-       [(ngModel)]="selectedCommunity" (change)="onCommunityChange($event)"  >
+   
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('community')">
+       <select  class="form-select"  [(ngModel)]="selectedCommunity" (change)="onCommunityChange($event)"  >
           <option value="" disabled>Community</option>
           <option *ngFor="let community of communitiesOptions" [value]="community">{{ community }}</option>
+        </select>
+      </div>
 
-       </select>
-
-       <select *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('caste')" class="form-select"
-       [(ngModel)]="selectedCaste">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="Parsed_UserInfo.access_type != 'District' && isVisible('caste')">
+       <select  class="form-select" [(ngModel)]="selectedCaste">
           <option value="" disabled>Caste</option>
           <option *ngFor="let caste of casteOptions" [value]="caste">{{ caste }}</option>
       </select>
+      </div>
 
-       <select *ngIf="isVisible('registeredYear')" class="form-select" [(ngModel)]="RegistredYear">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('registeredYear')">
+       <select  class="form-select" [(ngModel)]="RegistredYear">
         <option value="" selected hidden disabled>Year of Registration</option>
         <option *ngFor="let item of years" [value]="item">
           {{ item }}
         </option>
       </select>
-
-      <div class="tooltip-container" *ngIf="isVisible('regDate')">
-        <input type="date" [(ngModel)]="startDate"  class="form-control"
-          placeholder="Start Date">
-        <span class="tooltip-text">Date of Registration From Date</span>
       </div>
 
-      <div class="tooltip-container" *ngIf="isVisible('regDate')">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('regDate')">
+        <div class="tooltip-container">
+          <input type="date" [(ngModel)]="startDate"  class="form-control" placeholder="Start Date">
+          <span class="tooltip-text">Date of Registration From Date</span>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('regDate')">
+      <div class="tooltip-container">
         <input type="date" [(ngModel)]="endDate"  class="form-control" placeholder="End Date">
         <span class="tooltip-text">Date of Registration To Date</span>
       </div>
-</div>
-
-    <div class="d-flex gap-3 mb-3">
-
-      <div class="tooltip-container" *ngIf="isVisible('createdAt')">
-        <input type="date" [(ngModel)]="CreatedATstartDate"  class="form-control"
-          placeholder="Start Date">
-        <span class="tooltip-text">Created AT From Date</span>
       </div>
 
-      <div class="tooltip-container" *ngIf="isVisible('createdAt')">
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('createdAt')">
+      <div class="tooltip-container">
+        <input type="date" [(ngModel)]="CreatedATstartDate"  class="form-control" placeholder="Start Date">
+        <span class="tooltip-text">Created AT From Date</span>
+      </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('createdAt')">
+      <div class="tooltip-container">
         <input type="date" [(ngModel)]="CreatedATendDate"  class="form-control" placeholder="End Date">
         <span class="tooltip-text">Created AT To Date</span>
       </div>
-
-       <div class="tooltip-container" *ngIf="isVisible('modifiedAt')">
-        <input type="date" [(ngModel)]="ModifiedATstartDate"  class="form-control"
-          placeholder="Start Date">
-        <span class="tooltip-text">Modified AT From Date</span>
       </div>
 
-      <div class="tooltip-container" *ngIf="isVisible('modifiedAt')">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('modifiedAt')">
+       <div class="tooltip-container">
+        <input type="date" [(ngModel)]="ModifiedATstartDate"  class="form-control" placeholder="Start Date">
+        <span class="tooltip-text">Modified AT From Date</span>
+      </div>
+      </div>
+      
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('modifiedAt')">
+      <div class="tooltip-container">
         <input type="date" [(ngModel)]="ModifiedATDate"  class="form-control" placeholder="End Date">
         <span class="tooltip-text">Modified AT To Date</span>
       </div>
+      </div>
 
-
-      <select class="form-select" [(ngModel)]="selectedDataEntryStatus" *ngIf="isVisible('dataEntryStatus')">
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('dataEntryStatus')">
+      <select class="form-select" [(ngModel)]="selectedDataEntryStatus">
         <option value="" selected  disabled>Data Entry Status</option>
         <option value="0">FIR Draft</option>
-        <option value="1">Step 1 Completed</option>
-        <option value="2">Step 2 Completed</option>
-        <option value="3">Step 3 Completed</option>
-        <option value="4">Step 4 Completed</option>
+        <option value="1">Pending | FIR Stage | Step 1 Completed</option>
+        <option value="2">Pending | FIR Stage | Step 2 Completed</option>
+        <option value="3">Pending | FIR Stage | Step 3 Completed</option>
+        <option value="4">Pending | FIR Stage | Step 4 Completed</option>
         <option value="5">Completed | FIR Stage</option>
         <option value="6">Charge Sheet Completed</option>
         <option value="7">Trial Stage Completed</option>
+        <!-- <option value="7">Mistake of Fact</option>
+        <option value="7">Section Altered</option>
+        <option value="7">Section Deleted</option>
+        <option value="7">FIR Quashed</option> -->
       </select>
-
-    
-      <select class="form-select" [(ngModel)]="selectedStatusOfCase" *ngIf="isVisible('status')">
+      </div>
+      
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('status')">
+      <select class="form-select" [(ngModel)]="selectedStatusOfCase">
         <option value="" selected hidden disabled>Status of Case</option>
         <option value="UI">UI</option>
         <option value="PT">PT</option>
@@ -163,33 +179,39 @@
         <option value="SectionDeleted">Section Deleted</option>
         <option value="Charge_Abated"> Charge Abated</option>
         <option value="Quashed"> Quashed</option>
+        <option value="Appeal">Appeal</option>
       </select>
-    </div>
+   </div>
 
 
 
-    <div class="d-flex gap-3 mb-3">  
-      <select class="form-select" [(ngModel)]="selectedOffenceGroup" *ngIf="isVisible('offenceGroup')">
+  <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('offenceGroup')">
+      <select class="form-select" [(ngModel)]="selectedOffenceGroup">
         <option value="" selected hidden disabled>Nature of Case</option>
         <option *ngFor="let item of offenceGroupsList" [value]="item">
           {{ item }}
         </option>
       </select>
+      </div>
 
-      <select class="form-select" [(ngModel)]="selectedSectionOfLaw" *ngIf="isVisible('sectionOfLaw')">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('sectionOfLaw')">
+      <select class="form-select" [(ngModel)]="selectedSectionOfLaw">
         <option value="" selected hidden disabled>Section of Law</option>
         <option *ngFor="let section of sectionOfLaw" [value]="section.offence_act_name">{{ section.offence_act_name }}</option>
-
       </select>
+      </div>
 
-      <select class="form-select" [(ngModel)]="selectedCourt" *ngIf="isVisible('court')">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('court')">
+      <select class="form-select" [(ngModel)]="selectedCourt">
         <option value="" selected hidden disabled>Court</option>
         <option *ngFor="let item of courtList" [value]="item">
           {{ item }}
         </option>
       </select>
+      </div>
 
-      <select class="form-select" [(ngModel)]="selectedConvictionType" *ngIf="isVisible('convictionType')">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('convictionType')">
+      <select class="form-select" [(ngModel)]="selectedConvictionType">
         <option value="" selected hidden disabled>Conviction Type</option>
         <option value="Life Sentence">Life Sentence</option>
         <option value="Below 5 years imprisonment">Below 5 years imprisonment</option>
@@ -200,44 +222,59 @@
         <option value="Above 10 Years imprisonment">Above 10 Years imprisonment</option>
         <option value="Above 5 Years imprisonment">Above 5 Years imprisonment</option>
       </select>
-
-      <div class="tooltip-container" *ngIf="isVisible('chargeSheetDate')">
-        <input type="date" [(ngModel)]="selectedChargeSheetDate"  class="form-control" placeholder="End Date">
-        <span class="tooltip-text">Chargesheet Date</span>
       </div>
-  </div>
 
-  <div class="d-flex gap-3 mb-3">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('chargeSheetDate')">
+      <div class="tooltip-container">
+        <input type="date" [(ngModel)]="selectedChargeSheetFromDate"  class="form-control" placeholder="End Date">
+        <span class="tooltip-text">Chargesheet From Date</span>
+      </div>
+      </div>
 
-   <select class="form-select" [(ngModel)]="selectedLegal" *ngIf="isVisible('legal')">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('chargeSheetDate')">
+      <div class="tooltip-container">
+        <input type="date" [(ngModel)]="selectedChargeSheetToDate"  class="form-control" placeholder="End Date">
+        <span class="tooltip-text">Chargesheet To Date</span>
+      </div>
+      </div>
+  
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('legal')">
+   <select class="form-select" [(ngModel)]="selectedLegal">
         <option value="" selected hidden disabled>Has Legal Opnion Obtained</option>
         <option value="yes">Yes</option>
         <option value="no">No</option>
       </select>
+      </div>
 
-      <select class="form-select" [(ngModel)]="selectedCase" *ngIf="isVisible('fitCase')">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('fitCase')">
+      <select class="form-select" [(ngModel)]="selectedCase">
         <option value="" selected hidden disabled>Is the Case fit for Appeal</option>
         <option value="yes">Yes</option>
          <option value="no">No</option>
       </select>
+      </div>
 
-      <select class="form-select" [(ngModel)]="selectedFiled" *ngIf="isVisible('filedBy')">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="isVisible('filedBy')">
+      <select class="form-select" [(ngModel)]="selectedFiled">
         <option value="" selected hidden disabled>Who has filed the appeal</option>
         <option value="victim">Victim</option>
         <option value="government">Government</option>
       </select>
+      </div>
 
-      <select class="form-select" [(ngModel)]="selectedAppeal" *ngIf="isVisible('appealCourt')">
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3"  *ngIf="isVisible('appealCourt')">
+      <select class="form-select" [(ngModel)]="selectedAppeal">
         <option value="" selected hidden disabled>Appeal Court</option>
         <option value="High Court">High Court</option>
         <option value="Supreme Court">Supreme Court</option>
       </select>
+      </div>
 
     
-
-       <button style="width: 8% !important;" (click)="SearchList()" class="btn btn-primary btn-sm">Search</button>
-      <button style="width: 8% !important;" (click)="clearfilter()" class="btn btn-primary btn-sm">Clear
-        Filters</button>
+<div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+       <button  (click)="SearchList()" class="btn btn-primary btn-sm">Apply Filters</button>
+      <button  (click)="clearfilter()" class="btn btn-secondary btn-sm"  style="margin-left: 5px;">Clear</button>
+      </div>
 </div>
 
 
@@ -248,7 +285,7 @@
 
     <!-- Updated Table -->
 
-    <div style="width: 100%; overflow-y: auto; overflow-x: auto; min-height: 500px;">
+    <div style="width: 100%; overflow-y: auto; overflow-x: auto; min-height: 500px; padding-right:30px !important;">
 
       <table *ngIf="filteredFirList().length > 0" class="table table-striped table-bordered table-hover">
         <thead>
@@ -281,7 +318,15 @@
                 <span *ngSwitchCase="'complaintReceiverName'">{{ fir.complaintReceiverName }}</span>
                 <span *ngSwitchCase="'officer_designation'">{{ fir.officer_designation }}</span>
                 <span *ngSwitchCase="'place_of_occurrence'">{{ fir.place_of_occurrence }}</span>
-                <span *ngSwitchCase="'date_of_registration'">{{ fir.date_of_registration }}</span>
+                <span *ngSwitchCase="'date_of_registration'">
+        <ng-container *ngIf="fir.is_case_altered === 'Yes' && fir.altered_date; else showRegDate">
+            {{ fir.altered_date | date:'dd/MM/yyyy' }}
+          </ng-container>
+          <ng-template #showRegDate>
+            {{ fir.date_of_registration }}
+          </ng-template>
+        </span>
+
 
                 <span *ngSwitchCase="'time_of_registration'">{{ fir.time_of_registration }}</span>
                 <span *ngSwitchCase="'date_of_occurrence'">{{ fir.date_of_occurrence }}</span>
@@ -294,17 +339,55 @@
                 <span *ngSwitchCase="'created_at'">{{ fir.created_at }}</span>
                 <span *ngSwitchCase="'modified_at'">{{ fir.modified_at }}</span>
                 <span *ngSwitchCase="'status'">
-                  <!-- <span style="margin-right: 3px;" class="badge" [ngClass]="getStatusBadgeClass(fir.status)">
-                    {{ getStatusText(fir.status,fir.HascaseMF) }}
-                  </span> -->
-                  <span *ngIf="fir.HascaseMF == 1" class="badge badge-danger" style="margin-right: 3px;">
-  Mistake Of Fact
-</span>
-<span *ngIf="fir.HascaseMF != 1" style="margin-right: 3px;" class="badge" [ngClass]="getStatusBadgeClass(fir.status)">
+                  
+                  <!-- <span *ngIf="fir.HascaseMF != 1" style="margin-right: 3px;" class="badge" [ngClass]="getStatusBadgeClass(fir.status)">
+                    {{ getStatusText(fir.status, 0) }}
+                  </span>
+                  <span *ngIf="appliedStatusOfCase"
+                          class="badge me-1"
+                          [ngClass]="getCaseStatusBadgeClass(appliedStatusOfCase)">
+                      {{ formatStatusOfCase(appliedStatusOfCase) }}
+                    </span> -->
+
+                <!-- <span *ngIf="fir.case_altered_status == 1" class="badge" [ngClass]="alteredBadgeClass(fir.case_altered_status)"> {{ isaltered(fir.case_altered_status) }}</span> -->
+                    <!-- Data Entry Status Badge -->
+                    <!-- <span *ngIf="appliedDataEntryStatus && !appliedStatusOfCase" class="badge me-1" [ngClass]="getStatusBadgeClass(fir.status)">
+                      {{ getStatusText(fir.status, 0) }}
+                    </span>
+                    <span *ngIf="appliedStatusOfCase && !appliedDataEntryStatus" class="badge me-1" [ngClass]="getCaseStatusBadgeClass(appliedStatusOfCase)">
+                      {{ formatStatusOfCase(appliedStatusOfCase) }}
+                    </span>
+                    <span *ngIf="appliedDataEntryStatus && appliedStatusOfCase" class="badge me-1" [ngClass]="getStatusBadgeClass(fir.status)">
+                      {{ getStatusText(fir.status, 0) }}
+                    </span>
+                    <span *ngIf="appliedDataEntryStatus && appliedStatusOfCase" class="badge me-1" [ngClass]="getCaseStatusBadgeClass(appliedStatusOfCase)">
+                      {{ formatStatusOfCase(appliedStatusOfCase) }}
+                    </span> -->
+                    <!-- Data Entry Status Badge -->
+<span 
+      class="badge me-1" 
+      [ngClass]="getStatusBadgeClass(fir.status)">
   {{ getStatusText(fir.status, 0) }}
 </span>
 
-                <span *ngIf="fir.case_altered_status == 1" class="badge" [ngClass]="alteredBadgeClass(fir.case_altered_status)"> {{ isaltered(fir.case_altered_status) }}</span>
+<!-- <span *ngIf="fir.HascaseMF === 1"
+      class="badge me-1"
+      [ngClass]="getCaseStatusBadgeClass('MF')">
+  Mistake Of Fact
+</span> -->
+
+<!-- Case Status Badge -->
+<!-- <span *ngIf="appliedStatusOfCase && fir.HascaseMF !== 1"
+      class="badge me-1" 
+      [ngClass]="getCaseStatusBadgeClass(appliedStatusOfCase)">
+  {{ formatStatusOfCase(appliedStatusOfCase) }}
+</span> -->
+
+<span class="badge me-1" 
+      [ngClass]="getCaseStatusBadgeClass(appliedStatusOfCase)">
+  {{ formatStatusOfCase(appliedStatusOfCase) }}
+</span>
+
 
                 </span>
                 <span *ngSwitchCase="'Case_Status'">
@@ -313,7 +396,7 @@
                   </span>
                 </span>
                 <span *ngSwitchCase="'actions'">
-                  <div ngbDropdown class="d-inline-block">
+                  <div ngbDropdown class="d-inline-block" container="body">
                     <button ngbDropdownToggle class="btn btn-circle btn-icon btn-bg-light btn-active-color-primary">
                       <i class="fas fa-ellipsis-h fs-3"></i>
                     </button>
@@ -410,7 +493,7 @@
       FIR Details
     </h5>
     <button *ngIf="!RecivedFirData" type="button" class="btn-close btn-close-white" aria-label="Close"
-      (click)="modal.dismiss()">
+      (click)="handleClose(modal)">
     </button>
     <button *ngIf="RecivedFirData" type="button" class="btn-close btn-close-white" aria-label="Close"
       (click)="modal.dismiss();GotoRelief()">
@@ -1222,6 +1305,20 @@
                   [value]="chargeSheetDate" readonly />
               </div>
 
+              <div class="mb-4" *ngIf="caseType === 'chargeSheet'">
+                    <label class="form-label">Upload Commissionerate / S.P. Office Proceedings *</label>
+
+
+                    <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingFileName2">
+                      <div class="d-flex justify-content-start align-items-center">
+                        {{proceedingFileName2}}
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-primary btn-sm me-2" (click)="viewProceedingsCopy2()">View</button>
+                      </div>
+                    </div>
+                  </div>
+
               <div *ngIf="caseType === 'firQuashed'" class="col-md-12">
                 <div class="row">
 
@@ -1271,18 +1368,20 @@
                   </div>
 
                   <div class="mb-4">
-                    <label class="form-label">Upload Commissionerate / S.P. Office Proceedings *</label>
+                    <label class="form-label">Upload Section Deleted Copy</label>
 
 
-                    <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="proceedingFileName2">
+                    <div class="d-flex justify-content-between align-items-center uploaded" *ngIf="sectionDeletedFileName2">
                       <div class="d-flex justify-content-start align-items-center">
-                        {{proceedingFileName2}}
+                        {{sectionDeletedFileName2}}
                       </div>
                       <div class="d-flex justify-content-between align-items-center">
-                        <button class="btn btn-primary btn-sm me-2" (click)="viewProceedingsCopy2()">View</button>
+                        <button class="btn btn-primary btn-sm me-2" (click)="viewSectionDeletedCopy2()">View</button>
                       </div>
                     </div>
                   </div>
+
+                  
 
                 </div>
               </div>
@@ -1359,7 +1458,7 @@
           </div>
 
         </div> -->
-        <div class="card border-primary mb-4">
+        <div class="card border-primary mb-4" *ngIf="caseType === 'chargeSheet'">
           <div class="card-body">
             <h4 class="mb-4">Victim Relief Details</h4>
             <div *ngFor="let victimRelief of victimsReliefs; let i = index"
@@ -1404,7 +1503,7 @@
         </div>
 
         <!-- Compensation and Attachments -->
-        <div class="card border-primary mb-4">
+        <div class="card border-primary mb-4" *ngIf="caseType === 'chargeSheet'">
           <div class="card-body">
             <h5>Compensation Details</h5>
             <div class="row mb-3">
@@ -1969,52 +2068,8 @@
       Next
     </button>
     <button *ngIf="!RecivedFirData" type="button" class="btn btn-secondary me-2"
-      (click)="modal.dismiss()">Close</button>
+      (click)="handleClose(modal)">Close</button>
     <button *ngIf="RecivedFirData" type="button" class="btn btn-secondary me-2"
       (click)="modal.dismiss();GotoRelief()">Close</button>
   </div>
 </ng-template>
-
-
-
-<style>
-  .tooltip-container {
-    position: relative;
-    display: inline-block;
-  }
-
-  .tooltip-text {
-    visibility: hidden;
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 6px 8px;
-    border-radius: 5px;
-    position: absolute;
-    top: -35px;
-    /* Position above the input */
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    font-size: 12px;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  .tooltip-container:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-  }
-  .loader-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.8);
-  z-index: 99;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-</style>

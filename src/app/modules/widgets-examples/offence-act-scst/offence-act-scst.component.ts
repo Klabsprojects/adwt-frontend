@@ -16,6 +16,8 @@ export class OffenceActScStComponent implements OnInit {
   offenceActs: any[] = [];
   page: number = 1;
   editIndex: number | null = null;
+  totalRecords = 0;
+  itemsPerPage = 10;
 
   constructor(
     private modalService: NgbModal,
@@ -31,6 +33,7 @@ export class OffenceActScStComponent implements OnInit {
     this.offenceActService.getAllOffenceActs().subscribe(
       (data) => {
         this.offenceActs = data;
+        this.totalRecords = this.offenceActs.length;
         this.cdr.detectChanges(); // Refresh the table to reflect data changes
       },
       (error) => {
@@ -144,4 +147,8 @@ export class OffenceActScStComponent implements OnInit {
       offenceAct.offence_act_name.toLowerCase().includes(this.searchText.toLowerCase())
     );
   }
+
+    get totalPages(): number {
+  return Math.ceil(this.totalRecords / this.itemsPerPage);
+}
 }

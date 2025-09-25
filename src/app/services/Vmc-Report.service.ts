@@ -7,8 +7,8 @@ import { environment } from 'src/environments/environment.prod';
   providedIn: 'root',
 })
 export class VmcReportService {
-  private baseUrl = environment.apiUrl+'monetaryRelief';
-
+  // private baseUrl = environment.apiUrl+'monetaryRelief';
+  private baseUrl = environment.apiUrl+'vmcmeeting';
   constructor(private http: HttpClient) {}
 
   // Fetches all monetary report details 
@@ -17,7 +17,7 @@ export class VmcReportService {
     Object.keys(filters).forEach(key => {
       params = params.set(key, filters[key]);
     });
-    return this.http.get(`${this.baseUrl}/getVmcReportList`, { params });
+    return this.http.get(`${this.baseUrl}/getVmcReportListV1`, { params });
   }
   
 }

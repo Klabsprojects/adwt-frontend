@@ -7,3 +7,69 @@
 .app-sidebar-logo {
   background-color: #ffffff !important; /* Slightly lighter gray for logo */
 }
+.app-sidebar-toggle{
+  margin-left:35px;
+  margin-top: 30px;
+  background-color: #2d9ffd !important;
+}
+
+/* Wrapper for logo + text */
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+}
+
+/* Circle background around logo */
+.logo-circle {
+  width: 70px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:5px 3px;
+}
+
+.logo-img {
+  // height: 28px;
+  width: 100%;
+}
+
+/* Text next to logo */
+.logo-text {
+  font-size: 22px;
+  font-weight: 600;
+  white-space: nowrap;
+  color:#fff;
+  padding-left:10px;
+}
+
+/* Toggle button */
+.sidebar-toggle {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  background: #2d9ffd;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border:1px solid #fff;
+  color:#fff;
+}
+
+/* Minimized sidebar fixes */
+::ng-deep body.sidebar-minimized .sidebar-logo .logo-wrapper {
+  display: none !important;
+}
+.hidden {
+  display: none !important;
+}

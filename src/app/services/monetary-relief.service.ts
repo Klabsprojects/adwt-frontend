@@ -29,8 +29,13 @@ export class MonetaryReliefService {
   return this.http.get(`${this.baseUrl}/getmonetaryReliefDatav1`, { params });
 }
 
-getMonetaryReliefDownload(): Observable<any> {
-  return this.http.get(`${this.baseUrl}/getmonetaryReliefDatav1?download=yes`);
+getMonetaryReliefDownload(filters: any = {}): Observable<any> {
+   let params = new HttpParams()
+   Object.keys(filters).forEach(key => {
+        params = params.set(key, filters[key]);
+      });
+
+  return this.http.get(`${this.baseUrl}/getmonetaryReliefDatav1?download=yes`,{params});
 }
 
   

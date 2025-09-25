@@ -44,6 +44,9 @@ import { ReliefReliefStatusComponent } from 'src/app/pages/dashboard/case-relief
 import { ReliefTableComponent } from 'src/app/pages/dashboard/case-relief-dashboard/relief-table/relief-table.component';
 import { BaseChartDirective } from 'ng2-charts';
 import { LoadingDashComponent } from 'src/app/pages/dashboard/loading-dash/loading-dash.component';
+import { MatOptionModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 @NgModule({
   declarations: [
     MeetingCardsComponent,
@@ -89,6 +92,9 @@ import { LoadingDashComponent } from 'src/app/pages/dashboard/loading-dash/loadi
     NgApexchartsModule,
     BaseChartDirective,
     DashboardNewComponent,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatOptionModule,
     RouterModule.forChild([
       {
         path: '',

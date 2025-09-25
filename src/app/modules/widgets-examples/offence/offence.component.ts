@@ -16,7 +16,8 @@ export class OffenceComponent implements OnInit {
   offences: any[] = []; // Offence list will be loaded from backend
   page: number = 1;
   editIndex: number | null = null; // Track if we're editing an offence
-
+  itemsPerPage: number = 10;
+  totalRecords: number = 0;
   constructor(
     private modalService: NgbModal,
     private offenceService: OffenceService,
@@ -32,6 +33,7 @@ export class OffenceComponent implements OnInit {
     this.offenceService.getAllOffences().subscribe(
       (data) => {
         this.offences = data;
+        this.totalRecords = this.offences.length;
         this.refreshTable(); // Refresh the table to reflect data changes
       },
       (error) => {
@@ -39,6 +41,10 @@ export class OffenceComponent implements OnInit {
       }
     );
   }
+
+    get totalPages(): number {
+  return Math.ceil(this.totalRecords / this.itemsPerPage);
+}
 
   // Open Modal for Adding or Editing an Offence
   openModal() {

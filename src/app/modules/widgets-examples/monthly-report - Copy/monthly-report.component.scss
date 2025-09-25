@@ -1,0 +1,110 @@
+.common-column {
+  width: 150px; /* Adjust the width as needed */
+}
+
+.table-dark {
+  --bs-table-color: #ffffff;
+  --bs-table-bg: #1F497D;
+  --bs-table-border-color: #1F497D;
+  --bs-table-striped-bg: #292c34;
+  --bs-table-striped-color: #ffffff;
+  --bs-table-active-bg: #1F497D;
+  --bs-table-active-color: #ffffff;
+  --bs-table-hover-bg: #2f3239;
+  --bs-table-hover-color: #ffffff;
+  color: var(--bs-table-color);
+  border-color: var(--bs-table-border-color);
+}
+
+
+.side_border{
+  border-left: #fff solid 1px !important;
+  border-right: #fff solid 1px !important;
+  text-align: center !important;
+}
+
+.tab-border{
+  border: solid #1f497d 1px;
+}
+
+// .modal-content {
+//   position: relative;
+//   top: 280px;
+//   display: flex
+// ;
+//   flex-direction: column;
+//   width: 100%;
+//   color: var(--bs-modal-color);
+//   pointer-events: auto;
+//   background-color: var(--bs-modal-bg);
+//   background-clip: padding-box;
+//   border: var(--bs-modal-border-width) solid var(--bs-modal-border-color);
+//   border-radius: var(--bs-modal-border-radius);
+//   box-shadow: var(--bs-modal-box-shadow);
+//   outline: 0;
+// }
+
+.modal-content {
+  position: relative;
+  display: flex;
+  top: 280px !important;
+  flex-direction: column;
+  width: 100%;
+  color: var(--bs-modal-color);
+  pointer-events: auto;
+  background-color: var(--bs-modal-bg);
+  background-clip: padding-box;
+  border: var(--bs-modal-border-width) solid var(--bs-modal-border-color);
+  border-radius: var(--bs-modal-border-radius);
+  box-shadow: var(--bs-modal-box-shadow);
+  outline: 0;
+}
+
+::ng-deep tr.grandTotalStyle td {
+  color: #fff !important;
+  background-color: #1f497d !important;
+}
+
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 99;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+
+  .tooltip-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .tooltip-text {
+    visibility: hidden;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 6px 8px;
+    border-radius: 5px;
+    position: absolute;
+    top: -35px;
+    /* Position above the input */
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }

@@ -80,6 +80,36 @@ export class HeaderComponent implements OnInit {
   }
   logout(){
     this.auth.logout();
-    window.location.reload();
+    // window.location.reload();
   }
+
+    private generateCodeVerifier(): string {
+    const array = new Uint32Array(56);
+    window.crypto.getRandomValues(array);
+    return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
+  }
+
+ssoRoute() {
+  const codeVerifier = this.generateCodeVerifier();
+    localStorage.setItem('pkce_code_verifier', codeVerifier);
+
+  const keycloakUrl = 'http://74.208.113.233:8081/realms/klabs';
+  const clientId = 'adwt-client';
+  const redirectUri = 'http://localhost:4200/callback';
+  const codeChallenge = codeVerifier; 
+  const codeChallengeMethod = 'plain'; 
+
+  const authUrl =
+    `${keycloakUrl}/protocol/openid-connect/auth` +
+    `?client_id=${clientId}` +
+    `&redirect_uri=${redirectUri}` +
+    `&response_type=code` +
+    `&scope=openid` +
+    `&code_challenge=${codeChallenge}` +
+    `&code_challenge_method=${codeChallengeMethod}`;
+
+  window.location.href = authUrl;
+  console.log(authUrl);
+}
+
 }

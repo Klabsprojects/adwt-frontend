@@ -1,7 +1,79 @@
-<section class="filter">
-    <ul>
+<section class="filter-nav">
+     <div class="title-box ">
+        <h3 class="py-5" style="width:100%;">Meeting Dashboard</h3>
+    </div>
+    <div class="filters px-0 pt-0 pt-3">
+            <div class="filter">
+              <p>Year</p>
+                <select name="" id="" [(ngModel)]="selectedyear" (change)="get_other_values()">
+                    <option value="" selected>Select</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                </select>
+            </div>
+
+            <div class="filter">
+              <p>Quarter</p>
+                <select name="" id="" [(ngModel)]="selectedQuarter" (change)="get_other_values()">
+                    <option value="" selected>Select</option>
+                    <option value="Q1">Q1</option>
+                    <option value="Q2">Q2</option>
+                    <option value="Q3">Q3</option>
+                    <option value="Q4">Q4</option>
+                </select>
+            </div>
+            <div class="filter">
+               <p>District</p>
+                <select name="" id="" [(ngModel)]="selectedDistrict" (change)="getSubdivisions()" [disabled]="isDistrictDisabled">
+                    <option value="" selected>Select</option>
+                    <option [value]="district" *ngFor="let district of districts">{{district}}</option>
+                </select>
+            </div>
+            <div class="filter">
+              <p>Sub Division</p>
+                <select name="" id="" [(ngModel)]="selectedSubDivision" (change)="get_other_values()">
+                    <option value="" selected>Select</option>
+                    <option [value]="subdiv" *ngFor="let subdiv of subdivs">{{subdiv}}</option>
+                </select>
+            </div>
+            <div class="filter">
+              <p>Meeting Type</p>
+                <select name="" id="" [(ngModel)]="selectedMeetingType" (change)="get_other_values()">
+                    <option value="" selected>Select</option>
+                    <option value="DLVMC">DLVMC</option>
+                    <option value="SDLVMC">SDLVMC</option>
+                    <option value="SLVMC">SLVMC</option>
+                </select>
+            </div>
+            <div class="filter">
+              <p>Meeting Status</p>
+                <select name="" id="" [(ngModel)]="selectedStatus" (change)="get_other_values()">
+                    <option value="" selected>Select</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Pending">Pending</option>
+                </select>
+            </div>
+            <div class="filter img-container">
+              <img src="assets/images/filter.png" alt="filter" width="40px" (click)="clear()">
+            </div>
+    </div>
+    <!-- <ul>
         <li><h1>Meeting Dashboard</h1></li>
         <li class="d-flex justify-content-center align-items-center filters">
+            <div>
+                <p>Year</p>
+                <select name="" id="" [(ngModel)]="selectedyear" (change)="get_other_values()">
+                    <option value="" selected>Select</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                </select>
+            </div>
             <div>
                 <p>Quarter</p>
                 <select name="" id="" [(ngModel)]="selectedQuarter" (change)="get_other_values()">
@@ -26,21 +98,10 @@
                     <option [value]="subdiv" *ngFor="let subdiv of subdivs">{{subdiv}}</option>
                 </select>
             </div>
-            <div>
-                <p>Year</p>
-                <select name="" id="" [(ngModel)]="selectedyear" (change)="get_other_values()">
-                    <option value="" selected>Select</option>
-                    <option value="2025">2025</option>
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
-                    <option value="2021">2021</option>
-                    <!-- <option [value]="subdiv" *ngFor="let subdiv of subdivs">{{subdiv}}</option> -->
-                </select>
-            </div>
+            
         </li>
         <li class="d-flex justify-content-end align-items-center">
             <img src="assets/images/filter.png" alt="filter" width="40px" (click)="clear()">
         </li>
-    </ul>
+    </ul> -->
 </section>

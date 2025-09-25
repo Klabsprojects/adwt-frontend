@@ -6,6 +6,7 @@ import { AuthModel } from '../models/auth.model';
 import { AuthHTTPService } from './auth-http';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 export type UserType = UserModel | undefined;
 
@@ -13,6 +14,11 @@ export type UserType = UserModel | undefined;
   providedIn: 'root',
 })
 export class AuthService implements OnDestroy {
+
+  private keycloakTokenUrl = 'http://74.208.113.233:8081/realms/klabs/protocol/openid-connect/token';
+  private clientId = 'adwt-client';
+  private redirectUri = 'http://localhost:4200/callback'; // must match Keycloak settings
+  [x: string]: any;
   // private fields
   private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
   private authLocalStorageToken = `${environment.appVersion}-${environment.USERDATA_KEY}`;
@@ -33,7 +39,8 @@ export class AuthService implements OnDestroy {
 
   constructor(
     private authHttpService: AuthHTTPService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {
     this.isLoadingSubject = new BehaviorSubject<boolean>(false);
     this.currentUserSubject = new BehaviorSubject<UserType>(undefined);
@@ -58,6 +65,20 @@ export class AuthService implements OnDestroy {
       console.error('Error validating session:', error);
       return false;
     }
+  }
+
+   getTokenFromCode(code: string): Observable<any> {
+    const verifier = localStorage.getItem('pkce_code_verifier') || '';
+     const body = new HttpParams()
+      .set('grant_type', 'authorization_code')
+      .set('code', code)
+      .set('redirect_uri', this.redirectUri)
+      .set('client_id', this.clientId)
+      .set('code_verifier', verifier);
+
+    return this.http.post(this.keycloakTokenUrl, body.toString(), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    });
   }
 
   // public methods
@@ -99,13 +120,27 @@ export class AuthService implements OnDestroy {
   }
 
 
-  logout() {
-    // Remove all session data
-    sessionStorage.clear();
-  
-    // Navigate to the login page
-    this.router.navigate(['/landing'], { replaceUrl: true });
-  }
+//   logout() {
+//   const logoutUrl = 'http://74.208.113.233:8081/realms/klabs/protocol/openid-connect/logout';
+//   this.http.get(logoutUrl).subscribe({
+//     next: () => {
+//       console.log('Logged out successfully from Keycloak');
+//       sessionStorage.clear();
+//       // this.router.navigate(['/landing'], { replaceUrl: true });
+//     },
+//     error: (err) => {
+//       console.error('Logout failed:', err);
+//       sessionStorage.clear();
+//       this.router.navigate(['/landing'], { replaceUrl: true });
+//     }
+//   });
+// }
+
+  async logout() {
+  const logoutUrl = "http://74.208.113.233:8081/realms/klabs/protocol/openid-connect/logout?redirect_uri=http://localhost:4200/landing";
+  window.location.href = logoutUrl;
+}
+
   
 
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReliefService } from 'src/app/services/relief.service';
 import { FormsModule } from '@angular/forms';
@@ -12,13 +12,16 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FirService } from 'src/app/services/fir.service';
 import { VmcMeetingService } from 'src/app/services/vmc-meeting.service';
 import { PoliceDivisionService } from 'src/app/services/police-division.service';
+import { FirListTestService } from 'src/app/services/fir-list-test.service';
+import Swal from 'sweetalert2';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-relief-list',
   templateUrl: './relief-list.component.html',
   styleUrls: ['./relief-list.component.scss'],
   standalone: true,
-  imports: [CommonModule,DragDropModule,RouterModule,FormsModule,MatSelectModule,MatOptionModule,MatCheckboxModule],
+  imports: [CommonModule,DragDropModule,RouterModule,FormsModule,MatSelectModule,MatOptionModule,MatCheckboxModule,MatProgressSpinnerModule],
 
 })
 export class ReliefListComponent implements OnInit {
@@ -26,20 +29,24 @@ export class ReliefListComponent implements OnInit {
   displayedFirList: any[] = []; // FIRs to show on current page
   page = 1; // Current page
   currentPage: number = 1;
-  itemsPerPage = 10; // Items per page
-  totalPages = 1; // Total number of pages
+  pageSize: number = 10;// Items per page
+  totalPages: number = 0;
+  totalRecords = 0;
   isLoading = true; // Loading indicator
+  loader : boolean = false;
   searchText: string = '';
   dorf:any;
   dort:any;
   Parsed_UserInfo : any;
   policeStationlist : any;
+  activeFilters:any[]=[];
 
   constructor(
     private reliefService: ReliefService,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private firService: FirService,
+    private firListService : FirListTestService,
     private vmcMeeting: VmcMeetingService,
     private policeDivisionService :PoliceDivisionService
   ) {
@@ -51,136 +58,198 @@ export class ReliefListComponent implements OnInit {
   });
   }
 
+  filterFields = [
+  { key: 'city', label: 'Police City', visible: false },
+  { key: 'zone', label: 'Police Zone', visible: false },
+  { key: 'range', label: 'Police Range', visible: false },
+  { key: 'revenueDistrict', label: 'Revenue District', visible: false },
+  { key: 'station', label: 'Police Station', visible: false },
+  { key: 'community', label: 'Community', visible: false },
+  { key: 'caste', label: 'Caste', visible: false },
+  { key: 'registeredYear', label: 'Year of Registration', visible: false },
+  { key: 'regDate', label: 'Reg. Date From - To', visible: false },
+  { key: 'createdAt', label: 'Created At From - To', visible: false },
+  { key: 'modifiedAt', label: 'Modified At From - To', visible: false },
+  { key: 'status', label: 'Status of Case', visible: false },
+  { key: 'dataEntryStatus', label: 'Data Entry Status', visible: false },
+  { key: 'offenceGroup', label: 'Nature of Case', visible: false },
+  { key: 'sectionOfLaw', label: 'Section of Law', visible: false },
+  { key: 'court', label: 'Court', visible: false },
+  { key: 'convictionType', label: 'Conviction Type', visible: false },
+  { key: 'chargeSheetDate', label: 'Chargesheet Date From - To', visible: false },
+  { key: 'legal', label: 'Legal Opinion', visible: false },
+  { key: 'fitCase', label: 'Fit for Appeal', visible: false },
+  { key: 'filedBy', label: 'Filed By', visible: false },
+  { key: 'appealCourt', label: 'Appeal Court', visible: false },
+  { key: 'selectedStatus', label: 'Relief Status', visible: false }
+];
+
+selectedStatus:string[]=[];
+displayText : string = 'Select Status';
+isOpen = false;
+allStageOptions = [
+  { value: 'firProposalNotYetReceived', label: 'FIR Proposal Not Yet Received' },
+  { value: 'firReliefStageGiven', label: 'FIR Relief Stage Given' },
+  { value: 'firReliefStagePending', label: 'FIR Relief Stage Pending' },
+  { value: 'chargesheetReliefStageGiven', label: 'Chargesheet Relief Stage Given' },
+  { value: 'chargesheetReliefStagePending', label: 'Chargesheet Relief Stage Pending' },
+  { value: 'trialReliefStageGiven', label: 'Trial Relief Stage Given' },
+  { value: 'trialReliefStagePending', label: 'Trial Relief Stage Pending' },
+  { value: 'mistakeOfFact', label: 'Mistake of Fact' },
+  { value: 'sectionDeleted', label: 'Section Deleted' },
+  { value: 'firQuashed', label: 'FIR Quashed' },
+  { value: 'acquitted', label: 'Acquitted' },
+  { value: 'chargeAbated', label: 'Charge Abated' },
+  { value: 'quashed', label: 'Quashed' }
+];
+
   ngOnInit(): void {
-
-    const savedFilters = localStorage.getItem('firFilters');
-  if (savedFilters) {
-    const filters = JSON.parse(savedFilters);
-    this.selectedDistrict = filters.selectedDistrict || '';
-    this.policeStationName = filters.policeStationName || '';
-    this.dorf = filters.dorf || '';
-    this.dort = filters.dort || '';
-
-    if (this.selectedDistrict) {
-      this.loadPoliceStations(this.selectedDistrict); // Ensure station list loads
+     if (this.selectedDistrict) {
+      this.loadPoliceStations(this.selectedDistrict);
     }
-
-    this.applyFilters(); // Apply saved filters to list
+    this.updateSelectedColumns();
+    this.fetchFIRList(1, this.pageSize);
+    this.updateSelectedColumns();
+    this.loadPoliceDivision();
+    this.loadPoliceRanges();
+    this.loadRevenue_district();
+    this.generateYearOptions();
+    this.loadCommunities();
+    this.loadOptions();
+    if (this.Parsed_UserInfo.access_type === 'District') {
+    this.activeFilters = ['city', 'station', 'regDate', 'dataEntryStatus'];
+    } else if (this.Parsed_UserInfo.access_type === 'State') {
+      this.activeFilters = ['city', 'zone', 'range', 'revenueDistrict', 'station'];
+    } else {
+      this.activeFilters = this.filterFields.map(f => f.key);
+    }
+    this.updateFilterVisibility();
   }
 
-    this.updateSelectedColumns();
-    this.fetchFIRList();
-    this.loadPolicecity();
+   toggleDropdown() {
+    this.isOpen = !this.isOpen;
+  }
+
+  toggleSelection(value: string) {
+    const index = this.selectedStatus.indexOf(value);
+    if (index > -1) {
+      this.selectedStatus.splice(index, 1);
+    } else {
+      this.selectedStatus.push(value);
+    }
+    this.updateDisplayText();
   }
 
   
 
-get totalRecords(): number {
-    return this.firList.length;
+  isSelected(value: string): boolean {
+    return this.selectedStatus.includes(value);
   }
 
+  updateDisplayText() {
+  if (this.selectedStatus.length === 0) {
+    this.displayText = 'Select Status';
+  } else {
+    const selectedLabels = this.allStageOptions
+      .filter(stage => this.selectedStatus.includes(stage.value))
+      .map(stage => stage.label);
+
+    this.displayText = selectedLabels.join(', ');
+  }
+}
+  @HostListener('document:click', ['$event'])
+  clickOutside(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.custom-multiselect')) {
+      this.isOpen = false;
+    }
+  }
+ 
   
 
   paginatedData(): any[] {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.firList.slice(startIndex, startIndex + this.itemsPerPage);
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    return this.firList.slice(startIndex, startIndex + this.pageSize);
   }
 
   
-
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
+previousPage() {
+  if (this.currentPage > 1) {
+      this.fetchFIRList(this.currentPage - 1);
     }
-  }
-
-  goToPage(page: number): void {
-  if (page >= 1 && page <= this.totalPages) {
-    this.currentPage = page;
-    this.cdr.detectChanges();  // optional, only if view not updating
-  }
 }
 
 nextPage(): void {
   if (this.currentPage < this.totalPages) {
-    this.currentPage++;
-    this.cdr.detectChanges();
+    this.fetchFIRList(this.currentPage + 1);
+  }
+}
+
+ goToPage(page: number): void {
+  if (page >= 1 && page <= this.totalPages) {
+    this.fetchFIRList(page); // ADD THIS
   }
 }
   goToFirstPage(): void {
-    this.currentPage = 1;
+    if (this.currentPage !== 1) {
+      this.fetchFIRList(1);
+    }
   }
 
-  goToLastPage(): void {
-    this.currentPage = this.totalPages;
+    goToLastPage(): void {
+    if (this.currentPage !== this.totalPages) {
+      this.fetchFIRList(this.totalPages);
+    }
   }
 
+  
   hasNextPage(): boolean {
     return this.currentPage < this.totalPages;
   }
 
 
-  // Fetch FIR data from the service
-  fetchFIRList(): void {
-    this.isLoading = true;
-    this.reliefService.getFIRReliefList(this.getFilterParams()).subscribe(
-      (data) => {
-        this.firList = data;
-        this.updatePagination();
+fetchFIRList(page: number = 1, pageSize: number = this.pageSize): void {
+  this.isLoading = true;
+  this.loader = true;
+  this.currentPage = page;
+  this.pageSize = pageSize;
+
+  this.reliefService.getFIRReliefList(page, pageSize, this.getFilterParams())
+    .subscribe({
+      next: (response: any | any[]) => {
+        if (Array.isArray(response)) {
+          this.firList = response;
+        } else if (response?.data && Array.isArray(response.data)) {
+          this.firList = response.data;
+          this.totalRecords = response.total
+           this.totalPages = Math.ceil(this.totalRecords / this.pageSize);;
+        } else if (response?.rows && Array.isArray(response.rows)) {
+          this.firList = response.rows;
+        } else {
+          this.firList = [];
+        }
         this.isLoading = false;
-        this.cdr.detectChanges(); // Ensure the UI is updated immediately
+        this.loader = false;
+        this.cdr.detectChanges(); // Ensure UI updates
       },
-      (error) => {
-        console.error('Error fetching FIR data:', error);
+      error: (error) => {
+        console.error("Error fetching FIR data:", error);
         this.isLoading = false;
+        this.loader = false;
       }
-    );
-  }
+    });
+}
 
-  // Update pagination data
-  updatePagination(): void {
-    this.totalPages = Math.ceil(this.firList.length / this.itemsPerPage);
-    this.updateDisplayedList();
-  }
-
-  // Update the list of FIRs for the current page
-  updateDisplayedList(): void {
-    const startIndex = (this.page - 1) * this.itemsPerPage;
-    this.displayedFirList = this.firList.slice(startIndex, startIndex + this.itemsPerPage);
-  }
-
-
-  // totalPagesArray(): number[] {
-  //   return Array(this.totalPages)
-  //     .fill(0)
-  //     .map((_, i) => i + 1);
-  // }
-
-  // Get badge classes for the status
- // Get badge classes for the status
-// getStatusBadgeClass(status: number): string {
-//   const badgeClassMap = {
-//     0: 'badge bg-info text-white',
-//     1: 'badge bg-warning text-dark',
-//     2: 'badge bg-warning text-dark',
-//     3: 'badge bg-warning text-dark',
-//     4: 'badge bg-warning text-dark',
-//     5: 'badge bg-danger text-white', // Red for FIR Stage pending
-//     6: 'badge bg-danger text-white', // Red for Chargesheet Stage pending
-//     7: 'badge bg-danger text-white',
-//     // 8: 'badge bg-danger text-white',
-//     // 9: 'badge bg-danger text-white', // Red for Trial Stage pending
-//     11: 'badge bg-primary text-white', // On completion of Disbursement of FIR Stage Relief
-//     12: 'badge bg-success text-white', // Chargesheet Stage completed
-//     13: 'badge bg-success text-white', // Completed
-//   } as { [key: number]: string };
-
-//   return badgeClassMap[status] || 'badge bg-secondary text-white';
+// ✅ No changes needed here, this just returns the list for the table
+// paginatedFirList(): any[] {
+//   return this.firList;
 // }
 
-getStatusBadgeClass(status: number): string {
+
+
+getStatusBadgeClass(status: any): string {
   const badgeClassMap = {
-    0: 'badge bg-info text-white',
+    0: 'badge bg-warning text-dark',
     1: 'badge bg-warning text-dark',
     2: 'badge bg-warning text-dark',
     3: 'badge bg-warning text-dark',
@@ -190,85 +259,66 @@ getStatusBadgeClass(status: number): string {
     7: 'badge bg-success text-white',
     8: 'badge bg-danger text-white',
     9: 'badge bg-danger text-white',
-    10: 'badge bg-danger text-white', // Add this entry for status 12
+    10:'badge bg-danger text-white',
   } as { [key: number]: string };
 
-  return badgeClassMap[status] || 'badge bg-secondary text-white';
+  return badgeClassMap[status] || 'badge bg-warning text-dark';
 }
 
-// Get status text for the status
-getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string): string {
-  const statusTextMap = {
+getStatusText(status: number, reliefStatus: number,selectedStatus?: any): string {
+  // Handle frontend-only statuses
+  if (selectedStatus) {
+    const customStatusMap: { [key: string]: string } = {
+      mistakeOfFact: 'Mistake of Fact',
+      sectionDeleted: 'Section Deleted',
+      firQuashed: 'FIR Quashed',
+      acquitted: 'Acquitted',
+      chargeAbated: 'Charge Abated',
+      quashed: 'Quashed'
+    };
+    if (customStatusMap[selectedStatus]) {
+      return customStatusMap[selectedStatus];
+    }
+  }
+
+  // Normal flow (from API)
+  if (status <= 4) {
+    return 'FIR Proposal Not Yet Received';
+  }
+
+  const statusTextMap: { [key: number]: string } = {
     0: 'Just Starting',
     1: 'Pending | FIR Stage | Step 1 Completed',
     2: 'Pending | FIR Stage | Step 2 Completed',
     3: 'Pending | FIR Stage | Step 3 Completed',
-    // 4: 'Pending | FIR Stage | Step 4 Completed',
     4: 'FIR Stage pending',
     5: 'FIR Stage pending',
     6: 'Chargesheet Stage pending',
     7: 'Trial Stage pending',
-    // 8: 'Altered case',
-    // 9: 'Mistake of Fact',
     11: 'FIR Stage Completed',
     12: 'Chargesheet Stage completed',
     13: 'Trial Completed',
-  } as { [key: number]: string };
+  };
 
-  if (status === 5 && reliefStatus === 0) {
-    return 'FIR relief Stage pending';
-  }
-  if (status === 5 && reliefStatus === 1) {
-    return 'FIR relief Stage completed';
-  }
-  if (status === 6 && reliefStatus === 1) {
-    return 'Chargesheet Stage pending';
-  }
-  if (status === 6 && reliefStatus === 2) {
-    return 'Chargesheet Stage completed';
-  }
-  if (status === 7 && reliefStatus === 3) {
-    return 'Appeal';
-  }
-  if ((status === 5 || status === 6) && reliefStatus === 0) {
-    return 'FIR Stage pending | Chargesheet Stage Pending';
-  }
-  if (status === 7 && (reliefStatus === 1 || reliefStatus === 2)) {
-    return 'Trial Stage pending';
-  }
-  if ((status === 6 || status === 7) && reliefStatus === 1) {
-    return 'Chargesheet Stage Pending | Trial Stage Pending';
-  }
+  // Custom rules
+  if (status === 5 && reliefStatus === 0) return 'FIR Relief Stage Pending';
+  if (status === 5 && reliefStatus === 1) return 'FIR Relief Stage Completed';
+  if (status === 6 && reliefStatus === 1) return 'Chargesheet Stage Pending';
+  if (status === 6 && reliefStatus === 2) return 'Chargesheet Stage Completed';
+  if (status === 7 && reliefStatus === 3) return 'Appeal';
+  if ((status === 5 || status === 6) && reliefStatus === 0) return 'FIR Stage pending | Chargesheet Stage Pending';
+  if (status === 7 && (reliefStatus === 1 || reliefStatus === 2)) return 'Trial Stage pending';
+  if ((status === 6 || status === 7) && reliefStatus === 1) return 'Chargesheet Stage Pending | Trial Stage Pending';
+  if ((status === 5 || status === 6 || status === 7) && reliefStatus === 0) return 'FIR Stage pending | Charge sheet Stage Pending | Trial stage pending';
+  if ((status === 5 || status === 6 || status === 7) && reliefStatus === 3) return 'Completed';
 
-  if (( status === 5 || status === 6 || status === 7) && reliefStatus === 0) {
-    return 'FIR Stage pending | Charge sheet Stage Pending | Trial stage pending';
-  }
-
-  if (( status === 5 || status === 6 || status === 7) && reliefStatus === 3) {
-    return 'Completed';
-  }
-
-  if (status === 6 && (natureOfJudgement === 'Acquitted' || natureOfJudgement === 'Convicted')) {
-    return 'Acquitted';
-  }
-
-  if (status === 7 && natureOfJudgement === 'Convicted') {
-    return 'Convicted';
-  }
+  if (status >= 4) return 'Proposal Not yet Received';
 
   return statusTextMap[status] || 'Unknown';
 }
 
 
-  // navigateToRelief(firId: string): void {
-  //   this.router.navigate(['widgets-examples/relief'], {
-  //     queryParams: { fir_id: firId },
-
-  //   });
-  // }
-
   navigateToRelief(firId: string): void {
-  // Store current filters in localStorage
   const filters = {
     selectedDistrict: this.selectedDistrict,
     policeStationName: this.policeStationName,
@@ -283,20 +333,49 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
   });
 }
 
-
-
-
-
-
-  // Filters
+// Filters
   selectedDistrict: string = '';
+  selectedPoliceZone:string='';
+  selectedPoliceRange: string = '';
+  selectedRevenue_district: string = '';
+  selectedPoliceStation:string = '';
   policeStationName : string = '';
   selectedNatureOfOffence: string = '';
   selectedStatusOfCase: string = '';
   selectedStatusOfRelief: string = '';
+  selectedDataEntryStatus:string='';
+  selectedOffenceGroup: string = '';
+  selectedSectionOfLaw:string='';
+  selectedCourt:string='';
+  selectedConvictionType:string='';
+  selectedCommunity:string='';
+  selectedCaste:string='';
+  selectedComplaintReceivedType: string = '';
+  RegistredYear: string = '';
+  startDate: string = '';
+  endDate: string = '';
+  CreatedATstartDate: string = '';
+  CreatedATendDate: string = '';
+  ModifiedATstartDate: string = '';
+  ModifiedATDate: string = '';
+  selectedUIPT: string = '';
+  selectedChargeSheetFromDate:string='';
+  selectedChargeSheetToDate:string='';
+  selectedLegal:string='';
+  selectedCase:string='';
+  selectedFiled:string='';
+  selectedAppeal:string='';
 
   // Filter options
   districts: any;
+  policeZones: any;
+  policeRanges: any;
+  communitiesOptions: string[] = [];
+  casteOptions:string[]=[];
+  sectionOfLaw: any[] = [];
+  courtList:any[]=[];
+  revenueDistricts: any;
+  years: number[] = [];
 
   naturesOfOffence: string[] = [
     'Theft',
@@ -319,6 +398,20 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
     'Attempt to Murder',
     'Hate Crime',
     'Terrorism'
+  ];
+  offenceGroupsList: string[] = [
+    "Non GCR",
+    "Murder",
+    "Rape",
+    "POCSO",
+    "Other POCSO",
+    "Gang Rape",
+    "Rape by Cheating",
+    "Arson",
+    "Death",
+    "GCR",
+    "Attempt Murder",
+    "Rape POCSO"
   ];
 
   statusesOfCase: string[] = ['Just Starting', 'Pending', 'Completed'];
@@ -345,9 +438,6 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
   currentSortField: string = '';
   isAscending: boolean = true;
 
-
-
-
   updateSelectedColumns() {
     this.selectedColumns = this.displayedColumns.filter((col) => col.visible);
   }
@@ -367,84 +457,46 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
   // Apply filters to the FIR list
   applyFilters() {
     this.page = 1; // Reset pagination to the first page
-    this.filteredFirList(); // Update displayed list
+    this.fetchFIRList(1); // Update displayed list
     this.cdr.detectChanges(); // Ensure UI updates
   }
 
 
-  // filteredFirList() {
-  //   const searchLower = this.searchText.toLowerCase();
-  //   console.log(searchLower)
-  //   return this.firList.filter((fir) => {
-  //     // Apply search filter
-  //     const matchesSearch =
-  //       fir.fir_id.toString().toLowerCase().includes(searchLower) ||
-  //       (fir.police_city || '').toLowerCase().includes(searchLower) ||
-  //       (fir.fir_number || '').toLowerCase().includes(searchLower) ||
-  //       (fir.police_station || '').toLowerCase().includes(searchLower);
-
-  //     // Apply dropdown filters
-  //     const matchesDistrict = this.selectedDistrict ? fir.police_city === this.selectedDistrict : true;
-  //     const matchesNatureOfOffence = this.selectedNatureOfOffence? fir.police_station === this.selectedNatureOfOffence: true;
-  //     // const matchesStatusOfCase = this.selectedStatusOfCase ? fir.relief_status == this.selectedStatusOfCase : true;
-  //     // const matchesStatusOfRelief = this.selectedStatusOfRelief ? fir.status == this.selectedStatusOfRelief : true;
-  //     let matchesStatusOfRelief = true;
-  //     if (this.selectedStatusOfRelief) {
-  //       if (this.selectedStatusOfRelief === 'FIR Stage') {
-  //         matchesStatusOfRelief = fir.relief_status == '1';
-  //       } else if (this.selectedStatusOfRelief === 'ChargeSheet Stage') {
-  //         matchesStatusOfRelief = fir.relief_status == '2';
-  //       } else if (this.selectedStatusOfRelief === 'Trial Stage') {
-  //         matchesStatusOfRelief = fir.relief_status == '3';
-  //       }
-  //     }
-
-  //     let matchesStatusOfCase = true;
-  //     if (this.selectedStatusOfCase) {
-  //       if (this.selectedStatusOfCase === 'Just Starting') {
-  //         matchesStatusOfCase = fir.status == '0';
-  //       } else if (this.selectedStatusOfCase === 'Pending') {
-  //         matchesStatusOfCase = (fir.status >= '1' && fir.status <= '12') ;
-  //       } else if (this.selectedStatusOfCase === 'Completed') {
-  //         matchesStatusOfCase = fir.status == '13';
-  //       }
-  //     }
-
-  //     return (
-  //       matchesSearch &&
-  //       matchesDistrict &&
-  //       matchesNatureOfOffence &&
-  //       matchesStatusOfCase &&
-  //       matchesStatusOfRelief
-  //     );
-  //   });
-  // }
-
-
   getFilterParams() {
-  const params: any = {};
-  
-  if (this.searchText) {
-    params.search = this.searchText;
-  }
-  
-  if (this.selectedDistrict) {
-    params.district = this.selectedDistrict;
-  }
+ const params: any = {};
 
-  if (this.policeStationName) {
-    params.policeStationName = this.policeStationName;
-  }
+  const addParam = (key: string, value: any) => {
+    if (value) params[key] = value;
+  };
 
-  if (this.dorf) {
-    params.start_date = this.dorf;
-  }
-
-  if (this.dort) {
-    params.end_date = this.dort;
-  }
-
-  
+  addParam('search', this.searchText);
+  addParam('district', this.selectedDistrict);
+  addParam('police_zone', this.selectedPoliceZone);
+  addParam('police_range', this.selectedPoliceRange);
+  addParam('revenue_district', this.selectedRevenue_district);
+  addParam('policeStation', this.selectedPoliceStation);
+  addParam('community', this.selectedCommunity);
+  addParam('caste', this.selectedCaste);
+  addParam('year', this.RegistredYear);
+  addParam('CreatedATstartDate', this.CreatedATstartDate);
+  addParam('CreatedATendDate', this.CreatedATendDate);
+  addParam('ModifiedATstartDate', this.ModifiedATstartDate);
+  addParam('ModifiedATDate', this.ModifiedATDate);
+  addParam('start_date', this.startDate);
+  addParam('end_date', this.endDate);
+  addParam('statusOfCase', this.selectedStatusOfCase);
+  addParam('dataEntryStatus', this.selectedDataEntryStatus);
+  addParam('sectionOfLaw', this.selectedSectionOfLaw);
+  addParam('court', this.selectedCourt);
+  addParam('convictionType', this.selectedConvictionType);
+  addParam('chargesheetFromDate', this.selectedChargeSheetFromDate);
+  addParam('chargesheetToDate', this.selectedChargeSheetToDate);
+  addParam('hasLegalObtained', this.selectedLegal);
+  addParam('caseFitForAppeal', this.selectedCase);
+  addParam('filedBy', this.selectedFiled);
+  addParam('appealCourt', this.selectedAppeal);
+  addParam('OffenceGroup', this.selectedOffenceGroup);
+  addParam('selectedStatus',this.selectedStatus.join(','));
   if(this.Parsed_UserInfo.role == '3'){
     params.district = this.Parsed_UserInfo.police_city
   } 
@@ -458,14 +510,19 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
   return params;
 }
 
-   filteredFirList() {
-    this.reliefService.getFIRReliefList(this.getFilterParams()).subscribe(
+   filteredFirList(page: number = 1, pageSize: number = this.pageSize) {
+    this.isLoading = true;
+    this.loader = true;
+    this.currentPage = page;
+    this.pageSize = pageSize;
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    this.reliefService.getFIRReliefList(page, pageSize,this.getFilterParams()).subscribe(
       (data) => {
         this.firList = [];
         // this.firList = (data || []).filter((fir) => [4 ,5, 6, 7, 11, 12,13].includes(fir.status)); // Filter data
         this.firList  = data;
-        this.updatePagination();
         this.isLoading = false;
+        this.loader = false;
         this.cdr.detectChanges(); // Ensure the UI is updated immediately
       },
       (error) => {
@@ -492,11 +549,39 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
   }
 
     clearfilter(){
-    this.searchText = '';
-    this.selectedDistrict = '';
-    this.policeStationName = '';
-    this.dorf = '';
-    this.dort = '';
+    // this.searchText = '';
+    // this.selectedDistrict = '';
+    // this.policeStationName = '';
+    // this.dorf = '';
+    // this.dort = '';
+     this.searchText='';
+ this.selectedDistrict='';
+ this.selectedPoliceZone='';
+  this.selectedPoliceRange='';
+ this.selectedRevenue_district='';
+ this.selectedPoliceStation='';
+  this.selectedCommunity='';
+  this.selectedCaste='';
+  this.RegistredYear='';
+  this.CreatedATstartDate='';
+  this.CreatedATendDate='';
+  this.ModifiedATstartDate='';
+  this.ModifiedATDate='';
+  this.startDate='';
+  this.endDate='';
+  this.selectedStatusOfCase='';
+  this.selectedSectionOfLaw='';
+  this.selectedCourt='';
+  this.selectedConvictionType='';
+  this.selectedChargeSheetFromDate='';
+  this.selectedChargeSheetToDate='';
+  this.selectedLegal='';
+  this.selectedCase='';
+  this.selectedFiled='';
+  this.selectedAppeal='';
+  this.selectedDataEntryStatus='';
+  this.selectedStatus = [];
+  this.displayText = 'Select Status';
     this.applyFilters();
     localStorage.removeItem('firFilters');
 
@@ -545,39 +630,176 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
 
 
   paginatedFirList(): any[] {
-  const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-  const endIndex = startIndex + this.itemsPerPage;
-  const result = this.firList.slice(startIndex, endIndex);
-  console.log(`Page ${this.currentPage}: Showing ${result.length} items`);
-  return result;
+    return this.firList;
+}
+
+updateFilterVisibility(): void {
+  this.filterFields.forEach(f => {
+    f.visible = this.activeFilters.includes(f.key);
+  });
+}
+
+//   isVisible(key: string): boolean {
+//   const field = this.filterFields.find(f => f.key === key);
+//   return field ? field.visible : false;
+// }
+
+isVisible(key: string): boolean {
+  const field = this.filterFields.find(f => f.key === key);
+  if (!field) return false;
+
+  // Default filters by login type
+  let defaults: string[] = [];
+  if (this.Parsed_UserInfo.access_type === 'District') {
+    defaults = ['city', 'station', 'regDate', 'dataEntryStatus'];
+  } else if (this.Parsed_UserInfo.access_type === 'State') {
+    defaults = ['city', 'range', 'zone', 'revenueDistrict', 'station'];
+  }
+
+  // If it's part of defaults → always visible
+  if (defaults.includes(key)) {
+    return true;
+  }
+
+  // Otherwise → depends on dropdown selections
+  return this.activeFilters.includes(key);
 }
 
 
+onFilterSelectionChange(event: any): void {
+  this.activeFilters = event.value; // event.value gives the full selected array
+  this.updateFilterVisibility();
+}
 
-  totalPagesArray(): number[] {
-    const totalPages = Math.ceil(this.firList.length / this.itemsPerPage);
-    const pageNumbers = [];
-  
-    // Define how many pages to show before and after the current page
-    const delta = 2; // Number of pages to show before and after the current page
-  
-    // Calculate start and end page numbers
-    let startPage = Math.max(1, this.page - delta);
-    let endPage = Math.min(totalPages, this.page + delta);
-  
-    // Adjust start and end if there are not enough pages before or after
-    if (this.page <= delta) {
-      endPage = Math.min(totalPages, startPage + delta * 2);
-    } else if (this.page + delta >= totalPages) {
-      startPage = Math.max(1, endPage - delta * 2);
-    }
-  
-    for (let i = startPage; i <= endPage; i++) {
-      pageNumbers.push(i);
-    }
-  
-    return pageNumbers;
+
+  loadPoliceDivision() {
+    this.policeDivisionService.getAllPoliceDivisions().subscribe(
+      (data: any) => {
+
+        this.districts = data.map((item: any) => item.district_division_name);
+        this.policeZones = data.map((item: any) => item.police_zone_name);
+        this.policeZones = [...new Set(this.policeZones)];
+      },
+      (error: any) => {
+        console.error(error)
+      }
+    );
   }
 
+  loadPoliceRanges() {
+    this.firListService.getPoliceRanges().subscribe(
+      (response: any) => {
+        this.policeRanges = response;
+      },
+      (error: any) => {
+        console.error('Error', 'Failed to load FIR data', 'error', error);
+      }
+    );
+  }
+
+  onDistrictChange(event:any){
+   const selectedDivision = event.target.value;
+   
+       if (selectedDivision) {
+         this.firService.getCourtRangesByDivision(selectedDivision).subscribe(
+           (ranges: string[]) => {
+             this.courtList = ranges; // Populate court range options based on division
+           },
+           (error) => {
+             console.error('Error fetching court ranges:', error);
+             Swal.fire('Error', 'Failed to load court ranges for the selected division.', 'error');
+           }
+         );
+       }
+  }
+
+  loadCommunities(): void {
+      this.firService.getAllCommunities().subscribe(
+        (communities: any) => {
+          this.communitiesOptions = communities; // Populate community options
+        },
+        (error) => {
+          console.error('Error loading communities:', error);
+          Swal.fire('Error', 'Failed to load communities.', 'error');
+        }
+      );
+    }
+  
+  
+  onCommunityChange(event: any): void {
+    const selectedCommunity = event.target.value;
+    console.log('Selected community:', selectedCommunity);
+  
+    if (selectedCommunity) {
+      this.firService.getCastesByCommunity(selectedCommunity).subscribe(
+        (res: string[]) => {
+          console.log('API caste list:', res);
+          this.casteOptions = [];
+          res.forEach(caste => {
+            this.casteOptions.push(caste);
+          });
+  
+          // Optional: trigger change detection
+          this.cdr.detectChanges();
+        },
+        (error:any) => {
+          console.error('Error fetching castes:', error);
+          Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
+        }
+      );
+    } 
+  }
+  
+  loadRevenue_district() {
+    this.firListService.getRevenue_district().subscribe(
+      (response: any) => {
+        this.revenueDistricts = response;
+      },
+      (error: any) => {
+        console.error('Error', 'Failed to load FIR data', 'error', error);
+      }
+    );
+  }
+
+  generateYearOptions(): void {
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 1980; year--) {
+      this.years.push(year);
+    }
+  }
+  
+  loadOptions() {
+      this.firService.getOffences().subscribe(
+        (offences: any) => {
+          // console.log(offences);
+          this.sectionOfLaw = offences
+            .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
+            this.sectionOfLaw.push(
+                { offence_act_name: '3(2)(va)', offence_name: '3(2)(va)', id : 24 },
+                { offence_act_name: '3(2)(v), 3(2)(va)', offence_name: '3(2)(v), 3(2)(va)', id: 25 }
+            );
+        },
+        (error: any) => {
+          Swal.fire('Error', 'Failed to load offence options.', 'error');
+        }
+      );
+    }
+  
+SearchList() {
+      this.applyFilters();
+  }
+
+  totalPagesArray(): number[] {
+  const pages: number[] = [];
+  const maxVisiblePages = 5;
+  const startPage = Math.floor((this.currentPage - 1) / maxVisiblePages) * maxVisiblePages + 1;
+  const endPage = Math.min(startPage + maxVisiblePages - 1, this.totalPages);
+
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  } 
+
+  return pages;
+}
 
 }

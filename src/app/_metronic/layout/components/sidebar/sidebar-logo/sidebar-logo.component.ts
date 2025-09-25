@@ -17,6 +17,9 @@ export class SidebarLogoComponent implements OnInit, OnDestroy {
   currentLayoutType: LayoutType | null;
 
   toggleAttr: string;
+  isSidebarMinimized = true;   // default expanded
+  // isHovering = true;
+  
 
   constructor(private layout: LayoutService) {}
 
@@ -28,6 +31,11 @@ export class SidebarLogoComponent implements OnInit, OnDestroy {
         this.currentLayoutType = layout;
       });
     this.unsubscribe.push(layoutSubscr);
+  }
+
+  toggleSidebar() {
+    this.isSidebarMinimized = !this.isSidebarMinimized;
+    console.log(this.isSidebarMinimized);
   }
 
   ngOnDestroy() {

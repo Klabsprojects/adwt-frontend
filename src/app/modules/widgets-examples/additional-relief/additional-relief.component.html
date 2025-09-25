@@ -28,6 +28,7 @@
             <select id="pensionStatus" class="form-select" formControlName="pensionStatus" required>
               <option value="" disabled>Select an option</option>
               <option value="Yes">Yes</option>
+              <option value="No">No</option>
               <option value="Not Applicable">Not Applicable</option>
             </select>
           </div>
@@ -59,32 +60,32 @@
             </mat-form-field>
           </div>
           <!-- Pension Amount -->
-          <div class="col-md-4 mb-3">
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('pensionStatus')?.value === 'Yes'">
             <label for="pensionAmount">Pension Amount *</label>
             <input id="pensionAmount" type="number" class="form-control" formControlName="pensionAmount" placeholder="Enter the pension amount" required min="0">
           </div>
           <!-- Dearness Allowance -->
-          <div class="col-md-4 mb-3">
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('pensionStatus')?.value === 'Yes'">
             <label for="dearnessAllowance">Dearness Allowance *</label>
             <input id="dearnessAllowance" type="number" class="form-control" formControlName="dearnessAllowance" placeholder="Enter the dearness allowance" required min="0">
           </div>
           <!-- Total Pension Amount -->
-          <div class="col-md-4 mb-3">
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('pensionStatus')?.value === 'Yes'">
             <label for="totalPensionAmount">Total Pension Amount + Dearness Allowance *</label>
             <input id="totalPensionAmount" type="number" class="form-control" formControlName="totalPensionAmount" placeholder="Total will be calculated" readonly required>
           </div>
           <!-- Proceedings File Number -->
-          <div class="col-md-4 mb-3">
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('pensionStatus')?.value === 'Yes'">
             <label for="fileNumber">Proceedings File Number *</label>
             <input id="fileNumber" type="text" class="form-control" formControlName="fileNumber" placeholder="Enter file number" required title="Alphanumeric with optional hyphens">
           </div>
           <!-- Date of Proceedings Document -->
-          <div class="col-md-4 mb-3">
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('pensionStatus')?.value === 'Yes'">
             <label for="proceedingsDate">Date of Proceedings Document *</label>
             <input id="proceedingsDate" type="date" class="form-control" formControlName="proceedingsDate" required>
           </div>
         
-          <div class="col-md-4 mb-3">                
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('pensionStatus')?.value === 'Yes'">                
             <div *ngIf="uploadProceedingsExisitingPath && !showFileInput">
             <div class="col-12 mb-3">
               <div style="padding: 7px;" class="card">
@@ -463,8 +464,8 @@
           </div>
           <!-- Why is it not applicable? (If 'Not Applicable' is chosen) -->
           <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('educationConcessionStatus')?.value === 'Not Applicable'">
-            <label for="notApplicableReasonEducation">Why is it not applicable? *</label>
-            <select formControlName="notApplicableReasonEducation" class="form-select" required>
+            <label for="educationConcessionReason">Why is it not applicable? *</label>
+            <select formControlName="educationConcessionReason" class="form-select" required>
               <option value="" disabled>Select a reason</option>
               <option value="No children">No children</option>
               <option value="No children of school-going age">No children of school-going age</option>
@@ -474,12 +475,12 @@
             </select>
           </div>
           <!-- Specify 'Others' Reason -->
-          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('notApplicableReasonEducation')?.value === 'Others'">
-            <label for="otherReasonEducation">Specify Reason *</label>
+          <div class="col-md-4 mb-3" *ngIf="additionalReliefForm.get('educationConcessionReason')?.value === 'Others'">
+            <label for="educationOtherReason">Specify Reason *</label>
             <input
               type="text"
               class="form-control"
-              formControlName="otherReasonEducation"
+              formControlName="educationOtherReason"
               placeholder="Enter reason"
               required
             />

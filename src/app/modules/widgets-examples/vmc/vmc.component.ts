@@ -48,15 +48,17 @@ export class VmcComponent implements OnInit {
   isSubdivisionDisabled: boolean = false;
 
   // new
-  selectedDistrict: any;
-  selectedSubDivision: any;
+  selectedDistrict: string = '';
+  selectedSubDivision: string='';
   distandsubdivs: any;
-  selectedStatus: any;
-  selectedMemberType: any;
-  selectedDesignationMember: any;
+  selectedStatus: string = '';
+  selectedMemberType: string  = '';
+  selectedDesignationMember: string = '';
   doa: any;
-  selectedMemberLevel: any;
+  selectedMemberLevel: string = '';
   subdivs: any[] = [];
+  itemsPerPage: number = 10;
+  totalRecords: number = 0;
   status: any[] = ['Active', 'Inactive']
   options = [
     "Hon'ble Chief Minister (Chairperson)",
@@ -139,6 +141,7 @@ export class VmcComponent implements OnInit {
       designation: this.selectedDesignationMember,
       appointment_date: this.doa
     }
+  
   }
 
   clear(){
@@ -198,6 +201,7 @@ export class VmcComponent implements OnInit {
         (results: any[]) => {
           this.members = results;
           this.filteredMembers = this.members;
+          this.totalRecords = this.filteredMembers.length;
           this.cdr.detectChanges();
         },
         () => {
@@ -214,6 +218,7 @@ export class VmcComponent implements OnInit {
         (results: any[]) => {
           this.members = results;
           this.filteredMembers = this.members;
+           this.totalRecords = this.filteredMembers.length;
           console.log('filteredMembers', this.filteredMembers);
           this.cdr.detectChanges();
         },
@@ -604,5 +609,9 @@ allowOnlyValidCharacters(event: KeyboardEvent) {
 onInputChange(event: Event) {
   const input = event.target as HTMLInputElement;
   input.value = input.value.replace(this.disallowedPattern, '');
+}
+
+  get totalPages(): number {
+  return Math.ceil(this.totalRecords / this.itemsPerPage);
 }
 }

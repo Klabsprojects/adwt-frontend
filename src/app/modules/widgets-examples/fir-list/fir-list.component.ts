@@ -12,6 +12,7 @@ import { PoliceDivisionService } from 'src/app/services/police-division.service'
 import { FirService } from 'src/app/services/fir.service';
 import { formatDate } from '@angular/common';
 import { event } from 'jquery';
+import { FilterStateService } from 'src/app/services/filter-state-service';
 @Component({
   selector: 'app-fir-list',
   templateUrl: './fir-list.component.html',
@@ -119,6 +120,7 @@ export class FirListComponent implements OnInit {
   proceedingsDate_1: string = '';
   proceedingsFile: string = ''; // Default: Text
   proceedingFileName2: string = ''; // Default: Text
+  sectionDeletedFileName2:string = '';
   attachments: any; // Default: Text
   chargeSheetattachments: any; // Default: Text
   quash_petition_no: string = '';
@@ -375,10 +377,22 @@ export class FirListComponent implements OnInit {
   get progressPercentage(): number {
     return ((this.currentStep + 1) / this.steps.length) * 100;
   }
+
+
+  selectedMrfDistrict:string= '';
+    selectedMrfPoliceCity:string= '';
+    selectedMrfZone :string= '';
+    selectedMrfStatus :string= '';
+    selectedMrfFromDate :string= '';
+    selectedMrfToDate :string= '';
+
+
   // Filters
   selectedDistrict: string = '';
   selectedNatureOfOffence: string = '';
   selectedStatusOfCase: string = '';
+  appliedStatusOfCase: string = ''; 
+  appliedDataEntryStatus: string = 'DATA_ENTRY';
   selectedDataEntryStatus:string='';
   selectedStatusOfRelief: string = '';
   selectedOffenceGroup: string = '';
@@ -400,7 +414,8 @@ export class FirListComponent implements OnInit {
   ModifiedATstartDate: string = '';
   ModifiedATDate: string = '';
   selectedUIPT: string = '';
-  selectedChargeSheetDate:string='';
+  selectedChargeSheetFromDate:string='';
+  selectedChargeSheetToDate:string='';
   selectedLegal:string='';
   selectedCase:string='';
   selectedFiled:string='';
@@ -559,7 +574,7 @@ export class FirListComponent implements OnInit {
   { key: 'sectionOfLaw', label: 'Section of Law', visible: false },
   { key: 'court', label: 'Court', visible: false },
   { key: 'convictionType', label: 'Conviction Type', visible: false },
-  { key: 'chargeSheetDate', label: 'Chargesheet Date', visible: false },
+  { key: 'chargeSheetDate', label: 'Chargesheet Date From - To', visible: false },
   { key: 'legal', label: 'Legal Opinion', visible: false },
   { key: 'fitCase', label: 'Fit for Appeal', visible: false },
   { key: 'filedBy', label: 'Filed By', visible: false },
@@ -577,6 +592,8 @@ activeFilters: string[] = ['city', 'zone', 'range', 'revenueDistrict', 'station'
   currentSortField: string = '';
   isAscending: boolean = true;
   RecivedFirData: any;
+  ReceivedFirData:any;
+  returnFilters:any;
 
 
   pageSizeOptions: number[] = [5, 10, 20, 50]; // Available page size options
@@ -597,37 +614,305 @@ activeFilters: string[] = ['city', 'zone', 'range', 'revenueDistrict', 'station'
     private router: Router,
     private route: ActivatedRoute,
     private modalService: NgbModal,
-    private policeDivisionService: PoliceDivisionService
+    private policeDivisionService: PoliceDivisionService,
+    private firFilter:FilterStateService
   ) { }
 
-  ngOnInit(): void {
-    const UserInfo: any = sessionStorage.getItem('user_data');
-    this.Parsed_UserInfo = JSON.parse(UserInfo)
+
+  
+//   ngOnInit(): void {
+//     const UserInfo: any = sessionStorage.getItem('user_data');
+//     this.Parsed_UserInfo = JSON.parse(UserInfo);
+//     const savedFilters = this.firFilter.getFIRFilters();
+
+//   if (savedFilters) {
+//     this.searchText              = savedFilters.search || '';
+//     this.selectedDistrict        = savedFilters.district || '';
+//     this.selectedPoliceZone      = savedFilters.police_zone || '';
+//     this.selectedPoliceRange     = savedFilters.police_range || '';
+//     this.selectedRevenue_district= savedFilters.revenue_district || '';
+//     this.selectedPoliceStation   = savedFilters.policeStation || '';
+//     this.selectedCommunity       = savedFilters.community || '';
+//     this.selectedCaste           = savedFilters.caste || '';
+//     this.RegistredYear           = savedFilters.year || '';
+//     this.CreatedATstartDate      = savedFilters.CreatedATstartDate || '';
+//     this.CreatedATendDate        = savedFilters.CreatedATendDate || '';
+//     this.ModifiedATstartDate     = savedFilters.ModifiedATstartDate || '';
+//     this.ModifiedATDate          = savedFilters.ModifiedATDate || '';
+//     this.startDate               = savedFilters.start_date || '';
+//     this.endDate                 = savedFilters.end_date || '';
+//     this.selectedStatusOfCase    = savedFilters.statusOfCase || '';
+//     this.selectedSectionOfLaw    = savedFilters.sectionOfLaw || '';
+//     this.selectedCourt           = savedFilters.court || '';
+//     this.selectedConvictionType  = savedFilters.convictionType || '';
+//     this.selectedChargeSheetFromDate = savedFilters.chargesheetFromDate || '';
+//     this.selectedChargeSheetToDate   = savedFilters.chargesheetToDate || '';
+//     this.selectedLegal           = savedFilters.hasLegalObtained || '';
+//     this.selectedCase            = savedFilters.caseFitForAppeal || '';
+//     this.selectedFiled           = savedFilters.filedBy || '';
+//     this.selectedAppeal          = savedFilters.appealCourt || '';
+//     this.selectedDataEntryStatus = savedFilters.dataEntryStatus || '';
+//     this.selectedOffenceGroup    = savedFilters.OffenceGroup || '';
+
+//     this.applyFilters();
+//   } else {
+//     this.loadFirList(1, this.pageSize);
+//   }
+//     this.updateSelectedColumns();
+//     this.loadPoliceDivision();
+//     this.loadPoliceRanges();
+//     this.loadRevenue_district();
+//     this.generateYearOptions();
+//     this.loadCommunities();
+//     this.loadOptions();
+//     this.updateFilterVisibility();
+
+
+//     setTimeout(() => {
+//       this.route.queryParams.subscribe(params => {
+//         if (params['shouldCallFunction'] == 'true') {
+//           this.RecivedFirData = decodeURIComponent(params['data']);
+//           if (this.RecivedFirData) {
+//             let data = {
+//               fir_id: this.RecivedFirData.replace(/"/g, '')
+//             }
+//             this.openModal(data);
+//           }
+//         }
+//       });
+//     }, 2000);
+
+//     const allowedCities = ["Tambaram City", "Chennai City", "Avadi City"];
+// console.log("User District:", this.Parsed_UserInfo.district);
+
+// if (allowedCities.includes(this.Parsed_UserInfo.police_city) && this.Parsed_UserInfo.role === 3) {
+//   this.firGetService.getPoliceDivision(this.Parsed_UserInfo.police_city).subscribe(
+//     (data: any) => {
+//       console.log('Police Division Data:', data);
+//       this.revenueDistricts = [];
+
+//       data.forEach((item: any) => {
+//         const districts = item.revenue_district_name.split(',');
+//         districts.forEach((district: string) => {
+//           this.revenueDistricts.push({
+//             revenue_district: district.trim(),
+//           });
+//         });
+//       });
+//       this.revenueDistricts = Array.from(
+//         new Map(this.revenueDistricts.map((d:any) => [d.revenue_district, d])).values()
+//       );
+
+//       // ✅ Match with Parsed_UserInfo.district
+//       const userDistrict = this.Parsed_UserInfo.district?.trim();
+//       const matched = this.revenueDistricts.find(
+//         (d:any) => d.revenue_district.toLowerCase() === userDistrict?.toLowerCase()
+//       );
+
+//       if (matched) {
+//         this.selectedRevenue_district = matched.revenue_district;
+//       } else if (this.revenueDistricts.length > 0) {
+//         // fallback: select first district
+//         this.selectedRevenue_district = this.revenueDistricts[0].revenue_district;
+//       }
+
+//       // ✅ Trigger district change if needed
+//       this.onDistrictChange(this.selectedRevenue_district);
+//     },
+//     (error) => {
+//       console.error('Error fetching Police Division:', error);
+//     }
+//   );
+// }
+
+//   }
+
+  
+ngOnInit(): void {
+  const userInfo: any = sessionStorage.getItem('user_data');
+  this.Parsed_UserInfo = userInfo ? JSON.parse(userInfo) : null;
+  const savedFilters = this.firFilter.getFIRFilters();
+
+  
+  const savedMrfFilters:any = sessionStorage.getItem('mrfFilters');
+  console.log(savedMrfFilters);
+  if (savedMrfFilters) {
+    const filters = JSON.parse(savedMrfFilters);
+
+    this.selectedMrfDistrict   = filters.district   || '';
+    this.selectedMrfPoliceCity = filters.policeCity || '';
+    this.selectedMrfZone       = filters.zone       || '';
+    this.selectedMrfStatus     = filters.status     || '';
+    this.selectedMrfFromDate   = filters.fromDate   || '';
+    this.selectedMrfToDate     = filters.toDate     || ''
+}
+
+  if (savedFilters) {
+    this.restoreSavedFilters(savedFilters);
+    this.applyFilters();
+  } else {
     this.loadFirList(1, this.pageSize);
-    this.updateSelectedColumns();
-    this.loadPoliceDivision();
-    this.loadPoliceRanges();
+  }
+
+  // 🔹 Load dropdown data (async) and re-apply saved values after options arrive
+  // this.loadDistricts(savedFilters);
+  this.loadPoliceDivision();
+  this.loadPoliceRanges();
+  // this.loadRevenueDistricts(savedFilters);
+  this.generateYearOptions();
+  this.loadCommunities();
+  this.loadOptions();
+
+  this.updateSelectedColumns();
+  this.updateFilterVisibility();
     this.loadRevenue_district();
-    this.generateYearOptions();
     this.loadCommunities();
     this.loadOptions();
-    this.updateFilterVisibility();
 
-
-    setTimeout(() => {
-      this.route.queryParams.subscribe(params => {
-        if (params['shouldCallFunction'] == 'true') {
-          this.RecivedFirData = decodeURIComponent(params['data']);
-          if (this.RecivedFirData) {
-            let data = {
-              fir_id: this.RecivedFirData.replace(/"/g, '')
-            }
-            this.openModal(data);
-          }
+  // 🔹 Check if modal should be opened
+  setTimeout(() => {
+    this.route.queryParams.subscribe(params => {
+      if (params['shouldCallFunction'] === 'true') {
+        this.RecivedFirData = decodeURIComponent(params['data']);
+        if (this.RecivedFirData) {
+          const data = { fir_id: this.RecivedFirData.replace(/"/g, '') };
+          this.openModal(data);
         }
-      });
-    }, 2000);
+      }
+    });
+  }, 2000);
+
+  // 🔹 Allowed city-specific logic
+  const allowedCities = ["Tambaram City", "Chennai City", "Avadi City"];
+  if (allowedCities.includes(this.Parsed_UserInfo?.police_city) && this.Parsed_UserInfo.role === 3) {
+    this.firGetService.getPoliceDivision(this.Parsed_UserInfo.police_city).subscribe(
+      (data: any) => {
+        this.revenueDistricts = [];
+
+        data.forEach((item: any) => {
+          const districts = item.revenue_district_name.split(',');
+          districts.forEach((district: string) => {
+            this.revenueDistricts.push({ revenue_district: district.trim() });
+          });
+        });
+
+        this.revenueDistricts = Array.from(
+          new Map(this.revenueDistricts.map((d: any) => [d.revenue_district, d])).values()
+        );
+
+        // ✅ Apply saved filter after options ready
+        if (savedFilters?.revenue_district) {
+          this.selectedRevenue_district = savedFilters.revenue_district;
+        } else {
+          const userDistrict = this.Parsed_UserInfo.district?.trim();
+          const matched = this.revenueDistricts.find(
+            (d: any) => d.revenue_district.toLowerCase() === userDistrict?.toLowerCase()
+          );
+          this.selectedRevenue_district = matched?.revenue_district || this.revenueDistricts[0]?.revenue_district || '';
+        }
+
+        this.onDistrictChange(this.selectedRevenue_district);
+      },
+      (error) => console.error('Error fetching Police Division:', error)
+    );
   }
+
+
+}
+
+// ngAfterViewInit(): void {
+//   const navState = history.state;
+//   console.log("NavState:", navState);
+
+//   if (navState?.from === 'mrf-abstract') {
+//     this.ReceivedFirData = true;  // ✅ came from MRF Abstract
+//     this.openModalFromMrf(navState);
+//     history.replaceState({}, '');  
+//   } 
+// }
+
+ngAfterViewInit(): void {
+  const navState = history.state;
+  console.log("NavState in FIR List:", navState);
+
+  if (navState?.from === 'mrf-abstract') {
+    this.ReceivedFirData = true;
+    this.openModalFromMrf(navState);
+
+    // keep filters safe for returning back
+    this.returnFilters = navState.filters || null;
+
+    history.replaceState({}, '');  
+  }
+}
+
+
+// 🔹 Helper: restore filters into component properties
+private restoreSavedFilters(saved: any): void {
+  this.searchText              = saved.search ?? '';
+  this.selectedDistrict        = saved.district ?? '';
+  this.selectedPoliceZone      = saved.police_zone ?? '';
+  this.selectedPoliceRange     = saved.police_range ?? '';
+  this.selectedRevenue_district= saved.revenue_district ?? '';
+  this.selectedPoliceStation   = saved.policeStation ?? '';
+  this.selectedCommunity       = saved.community ?? '';
+  this.selectedCaste           = saved.caste ?? '';
+  this.RegistredYear           = saved.year ?? '';
+  this.CreatedATstartDate      = saved.CreatedATstartDate ?? '';
+  this.CreatedATendDate        = saved.CreatedATendDate ?? '';
+  this.ModifiedATstartDate     = saved.ModifiedATstartDate ?? '';
+  this.ModifiedATDate          = saved.ModifiedATDate ?? '';
+  this.startDate               = saved.start_date ?? '';
+  this.endDate                 = saved.end_date ?? '';
+  this.selectedStatusOfCase    = saved.statusOfCase ?? '';
+  this.selectedSectionOfLaw    = saved.sectionOfLaw ?? '';
+  this.selectedCourt           = saved.court ?? '';
+  this.selectedConvictionType  = saved.convictionType ?? '';
+  this.selectedChargeSheetFromDate = saved.chargesheetFromDate ?? '';
+  this.selectedChargeSheetToDate   = saved.chargesheetToDate ?? '';
+  this.selectedLegal           = saved.hasLegalObtained ?? '';
+  this.selectedCase            = saved.caseFitForAppeal ?? '';
+  this.selectedFiled           = saved.filedBy ?? '';
+  this.selectedAppeal          = saved.appealCourt ?? '';
+  this.selectedDataEntryStatus = saved.dataEntryStatus ?? '';
+  this.selectedOffenceGroup    = saved.OffenceGroup ?? '';
+}
+
+// 🔹 Apply filters and reload list
+applyFilters(): void {
+  this.firFilter.setFIRFilters({
+    search: this.searchText,
+    district: this.selectedDistrict,
+    police_zone: this.selectedPoliceZone,
+    police_range: this.selectedPoliceRange,
+    revenue_district: this.selectedRevenue_district,
+    policeStation: this.selectedPoliceStation,
+    community: this.selectedCommunity,
+    caste: this.selectedCaste,
+    year: this.RegistredYear,
+    CreatedATstartDate: this.CreatedATstartDate,
+    CreatedATendDate: this.CreatedATendDate,
+    ModifiedATstartDate: this.ModifiedATstartDate,
+    ModifiedATDate: this.ModifiedATDate,
+    start_date: this.startDate,
+    end_date: this.endDate,
+    statusOfCase: this.selectedStatusOfCase,
+    dataEntryStatus: this.selectedDataEntryStatus,
+    sectionOfLaw: this.selectedSectionOfLaw,
+    court: this.selectedCourt,
+    convictionType: this.selectedConvictionType,
+    chargesheetFromDate: this.selectedChargeSheetFromDate,
+    chargesheetToDate: this.selectedChargeSheetToDate,
+    hasLegalObtained: this.selectedLegal,
+    caseFitForAppeal: this.selectedCase,
+    filedBy: this.selectedFiled,
+    appealCourt: this.selectedAppeal,
+    OffenceGroup: this.selectedOffenceGroup,
+  });
+
+  this.loadFirList(1);
+}
+
   isPreviewVisible = false;
   showPreview() {
     this.isPreviewVisible = !this.isPreviewVisible;
@@ -693,7 +978,7 @@ onCommunityChange(event: any): void {
 loadOptions() {
     this.firGetService.getOffences().subscribe(
       (offences: any) => {
-        console.log(offences);
+        // console.log(offences);
         this.sectionOfLaw = offences
           .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
           this.sectionOfLaw.push(
@@ -731,6 +1016,7 @@ loadOptions() {
         this.time_of_occurrence_to = response.data.time_of_occurrence_to;
         this.placeOfOccurrence = response.data.place_of_occurrence;
         this.dateOfRegistration = response.data.date_of_registration ? this.convertToNormalDate(response.data.date_of_registration) : response.data.date_of_registration;
+
         this.timeOfRegistration = response.data.time_of_registration;
         this.is_case_altered = response.data.is_case_altered;
         this.altered_date = response.data.altered_date ? this.convertToNormalDate(response.data.altered_date) : response.data.altered_date;
@@ -787,6 +1073,7 @@ loadOptions() {
         this.rcsFileNumber = response.data4.rcs_file_number;
         this.rcsFilingDate = response.data4.rcs_filing_date ? this.convertToNormalDate(response.data4.rcs_filing_date) : response.data4.rcs_filing_date;
         this.mfCopy = response.data4.mf_copy_path;
+        this.sectionDeletedFileName2 = response.data4.section_deleted_copy_path;
         this.proceedingsFileNo_1 = response.data4.proceedings_file_no;
         this.proceedingsDate_1 = response.data4.proceedings_date ? this.convertToNormalDate(response.data4.proceedings_date) : response.data4.proceedings_date;
         this.proceedingFileName2 = response.data4.upload_proceedings_path;
@@ -1469,6 +1756,14 @@ loadOptions() {
     }
   }
 
+   viewSectionDeletedCopy2(): void {
+       const path = this.sectionDeletedFileName2;
+    if (path) {
+      const url = `${env.file_access}${path}`;
+      window.open(url, '_blank');
+    }
+      }
+
   viewProceedingFileName(): void {
     const path = this.proceedingsFile;
     if (path) {
@@ -1531,6 +1826,25 @@ loadOptions() {
     // this.fetchFirDetails(this.firId); // Fetch details after opening the modal
     this.loadFirDetails(this.firId);
   }
+
+
+  openModalFromMrf(data: any): void {
+  console.log("Full data:", data);
+
+  // Extract firId from firData
+  this.firId = data?.firData?.firId;
+
+  console.log("Extracted FIR ID:", this.firId);
+
+  this.currentStep = 0; 
+  this.modalService.open(this.firDetailsModal, { size: 'xl', backdrop: 'static' });
+
+  if (this.firId) {
+    this.loadFirDetails(this.firId);
+  } else {
+    console.warn("No FIR ID found in data");
+  }
+}
 
 
   // Load FIR list from the backend
@@ -1726,7 +2040,13 @@ loadOptions() {
   const addParam = (key: string, value: any) => {
     if (value) params[key] = value;
   };
-
+  if (this.Parsed_UserInfo.access_type === 'District' && this.Parsed_UserInfo.role === 4) {
+    params.revenue_district = this.Parsed_UserInfo.district;
+  }else if (this.Parsed_UserInfo.access_type === 'District' && this.Parsed_UserInfo.role === 3) {
+    params.revenue_district = this.Parsed_UserInfo.district;
+    params.district = this.Parsed_UserInfo.police_city;
+  }
+  
   addParam('search', this.searchText);
   addParam('district', this.selectedDistrict);
   addParam('police_zone', this.selectedPoliceZone);
@@ -1747,34 +2067,50 @@ loadOptions() {
   addParam('sectionOfLaw', this.selectedSectionOfLaw);
   addParam('court', this.selectedCourt);
   addParam('convictionType', this.selectedConvictionType);
-  addParam('chargesheetDate', this.selectedChargeSheetDate);
+  addParam('chargesheetFromDate', this.selectedChargeSheetFromDate);
+  addParam('chargesheetToDate', this.selectedChargeSheetToDate);
   addParam('hasLegalObtained', this.selectedLegal);
   addParam('caseFitForAppeal', this.selectedCase);
   addParam('filedBy', this.selectedFiled);
   addParam('appealCourt', this.selectedAppeal);
   addParam('OffenceGroup', this.selectedOffenceGroup);
-
-  // Override based on user role/access_type
-  if (this.Parsed_UserInfo.role === '3') {
-    params.district = this.Parsed_UserInfo.police_city;
-  } else if (this.Parsed_UserInfo.access_type === 'District') {
-    params.revenue_district = this.Parsed_UserInfo.district;
-    params.district = this.Parsed_UserInfo.police_city;
-  }
-
   return params;
 }
 
-  // Apply filters to the FIR list
-  // applyFilters() {
-  //   this.page = 1; // Reset to the first page
-  //   this.cdr.detectChanges();
-  //   this.filteredFirList();
-  // }
 
-  applyFilters() {
-    this.loadFirList(1);
-  }
+//   applyFilters() {
+//  this.firFilter.setFIRFilters({
+//   search: this.searchText,
+//   district: this.selectedDistrict,
+//   police_zone: this.selectedPoliceZone,
+//   police_range: this.selectedPoliceRange,
+//   revenue_district: this.selectedRevenue_district,
+//   policeStation: this.selectedPoliceStation,
+//   community: this.selectedCommunity,
+//   caste: this.selectedCaste,
+//   year: this.RegistredYear,
+//   CreatedATstartDate: this.CreatedATstartDate,
+//   CreatedATendDate: this.CreatedATendDate,
+//   ModifiedATstartDate: this.ModifiedATstartDate,
+//   ModifiedATDate: this.ModifiedATDate,
+//   start_date: this.startDate,
+//   end_date: this.endDate,
+//   statusOfCase: this.selectedStatusOfCase,
+//   dataEntryStatus: this.selectedDataEntryStatus,
+//   sectionOfLaw: this.selectedSectionOfLaw,
+//   court: this.selectedCourt,
+//   convictionType: this.selectedConvictionType,
+//   chargesheetFromDate: this.selectedChargeSheetFromDate,
+//   chargesheetToDate: this.selectedChargeSheetToDate,
+//   hasLegalObtained: this.selectedLegal,
+//   caseFitForAppeal: this.selectedCase,
+//   filedBy: this.selectedFiled,
+//   appealCourt: this.selectedAppeal,
+//   OffenceGroup: this.selectedOffenceGroup,
+// });
+
+//     this.loadFirList(1);
+//   }
 
   // Filtered FIR list based on search and filter criteria
   filteredFirList() {
@@ -1815,6 +2151,12 @@ loadOptions() {
   }
 
   clearfilter() {
+    this.selectedDataEntryStatus = '';
+  this.selectedStatusOfCase = '';
+
+  // reset defaults
+  this.appliedDataEntryStatus = '';
+  this.appliedStatusOfCase = '';
    this.searchText='';
  this.selectedDistrict='';
  this.selectedPoliceZone='';
@@ -1834,17 +2176,21 @@ loadOptions() {
   this.selectedSectionOfLaw='';
   this.selectedCourt='';
   this.selectedConvictionType='';
-  this.selectedChargeSheetDate='';
+  this.selectedChargeSheetFromDate='';
+  this.selectedChargeSheetToDate='';
   this.selectedLegal='';
   this.selectedCase='';
   this.selectedFiled='';
   this.selectedAppeal='';
   this.selectedDataEntryStatus='';
+  this.appliedStatusOfCase = '';
  
     this.applyFilters();
   }
 
     SearchList() {
+      this.appliedStatusOfCase = this.selectedStatusOfCase;
+      this.appliedDataEntryStatus = this.selectedDataEntryStatus;
       this.applyFilters();
   }
 
@@ -1875,7 +2221,6 @@ loadOptions() {
       : 'fa-sort';
   }
 
-
   // Get status text based on status value
   getStatusText(status: number,HascaseMF:any): string {
     if (HascaseMF) {
@@ -1905,6 +2250,50 @@ loadOptions() {
       }
   }
 
+  getCaseStatusBadgeClass(statusOfCase: string): string {
+  switch (statusOfCase) {
+    case 'Convicted':
+      return 'badge bg-success text-white';
+    case 'Acquitted':
+      return 'badge bg-primary text-white';
+    case 'Quashed':
+    case 'FirQuashed':
+      return 'badge bg-warning text-dark';
+    case 'MF':
+      return 'badge bg-danger text-white';
+    case 'SectionDeleted':
+      return 'badge bg-dark text-white';
+    case 'Charge_Abated':
+      return 'badge bg-info text-dark';
+    case 'Appeal':
+      return 'badge bg-info text-white';
+    case 'UI':
+      return 'badge bg-purple text-white';
+    case 'PT':
+      return 'badge bg-dark text-white';
+    default:
+      return 'badge bg-secondary text-white';
+  }
+}
+
+formatStatusOfCase(statusOfCase: string): string {
+  const map: { [key: string]: string } = {
+    'UI': 'UI',
+    'PT': 'PT',
+    'Convicted': 'Conviction',
+    'Acquitted': 'Acquitted',
+    'FirQuashed': 'FIR Quashed',
+    'MF': 'Mistake of Fact',
+    'SectionDeleted': 'Section Deleted',
+    'Charge_Abated': 'Charge Abated',
+    'Quashed': 'Quashed',
+    'Appeal': 'Appeal'
+  };
+  return map[statusOfCase] || statusOfCase;
+}
+
+
+
   getStatusTextUIPT(status: number): string {
     const statusTextMap = {
       0: 'UI',
@@ -1922,8 +2311,6 @@ loadOptions() {
     return statusTextMap[status] || 'Unknown';
   }
 
-  // Get CSS class for status badge
-  // Get CSS class for status badge
   getStatusBadgeClass(status: number): string {
     const badgeClassMap = {
       0: 'badge bg-info text-white',
@@ -2137,6 +2524,21 @@ loadOptions() {
       return String(data2);
     }
   }
+
+ handleClose(modal: any): void {
+  modal.dismiss();
+
+  if (this.ReceivedFirData) {
+    this.RecivedFirData = false;
+    this.router.navigate(['/widgets-examples/mrf-abstract']).then(() => {
+  window.location.reload();
+});
+    
+  }
+}
+
+
+
 
 
   GotoRelief() {

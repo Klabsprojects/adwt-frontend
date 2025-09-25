@@ -1,7 +1,7 @@
 <div class="card">
-  <div class=" card-header mt-7">
+  <!-- <div class=" card-header mt-7">
     <h3>FIR Additional Relief List</h3>
-  </div>
+  </div> -->
 
   <div class="card-header border-0">
 
@@ -38,39 +38,60 @@
     </div>
 
   </div>
-<div class="p-10">
+<div class="p-10 pb-0">
    <!-- Filters -->
-   <div class="d-flex gap-3 mb-3">
-    <!-- <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
-      <option value="" selected disabled>Select One</option>
-      <option *ngFor="let item of firList" [value]="item.fir_id">{{ item.fir_id }}</option>
-    </select> -->
-
-    <!-- <select class="form-select" [(ngModel)]="selectedNatureOfOffence" (change)="applyFilters()">
-      <option value="" selected disabled>Victim ID</option>
-      <option *ngFor="let item of firList" [value]="item.victim_id">{{ item.victim_id }}</option>
-    </select>
-
-    <select class="form-select" [(ngModel)]="selectedStatusOfCase" (change)="applyFilters()">
-      <option value="" selected disabled>Victim Name</option>
-      <option *ngFor="let item of firList" [value]="item.victim_name">{{ item.victim_name }}</option>
-    </select> -->
-    <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
+   <div class="row d-flex mb-3 align-items-center outer pt-4 pb-2 px-3 m-0">
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+    <select class="form-select" [(ngModel)]="selectedDistrict">
         <option value="" selected disabled>District</option>
         <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
     </select>
+    </div>
 
-    <select class="form-select" [(ngModel)]="selectedPoliceCity" (change)="applyFilters();loadPoliceStations(selectedPoliceCity)">
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+    <select class="form-select" [(ngModel)]="selectedPoliceCity" (change)="loadPoliceStations(selectedPoliceCity)">
         <option value="" selected hidden disabled>Police City</option>
         <option *ngFor="let city of policeCities" [value]="city">{{ city }}</option>
     </select>
+    </div>
 
-    <select class="form-select" [(ngModel)]="selectedPoliceStation" (change)="applyFilters()">
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+    <select class="form-select" [(ngModel)]="selectedPoliceStation">
         <option value="" selected hidden disabled>Police Station Name</option>
         <option *ngFor="let policestation of policestations" [value]="policestation">{{ policestation }}</option>
     </select>
+    </div>
 
-    <button style="width: 40% !important;" (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
+     <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="start_date"/>
+        <span class="tooltip-text">Date of Registration From Date</span>
+      </div>
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+        <input type="date" class="form-control" [(ngModel)]="end_date"/>
+        <span class="tooltip-text">Date of Registration To Date</span>
+      </div>
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+   
+    <select class="form-select" [(ngModel)]="selectedType">
+  <option value="" selected hidden disabled>Additional Relief Type</option>
+  <option *ngFor="let relief of reliefType" [value]="relief.value">{{ relief.label }}</option>
+</select>
+
+    </div>
+
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+    <select class="form-select" [(ngModel)]="selectedStatus">
+        <option value="" selected hidden disabled>Status</option>
+        <option *ngFor="let status of reliefStatus" [value]="status.value">{{ status.label }}</option>
+    </select>
+    </div>
+
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+       <button  (click)="applyFilters()" class="btn btn-primary btn-sm">Apply Filters</button>
+      <button  (click)="clearfilter()" class="btn btn-secondary btn-sm"  style="margin-left: 5px;">Clear</button>
+</div>
+
 
     <!-- <select class="form-select" [(ngModel)]="selectedStatusOfRelief" (change)="applyFilters()">
       <option value="" selected disabled>Select One</option>
@@ -81,7 +102,7 @@
   </div>
 </div>
 
-  <div class="card-body">
+  <div class="card-body pt-0">
     <!-- Show loading spinner -->
     <div *ngIf="isLoading" class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
@@ -93,14 +114,9 @@
     </div>
 
     <!-- Table displaying FIRs -->
-    <table *ngIf="!isLoading && displayedFirList.length > 0" class="table table-striped table-bordered table-hover">
+    <!-- <table *ngIf="!isLoading && displayedFirList.length > 0" class="table table-striped table-bordered table-hover">
       <thead>
         <tr>
-          <!-- <th>#</th>
-          <th>FIR No</th>
-          <th>Victim ID</th>
-          <th>Victim Name</th>
-          <th>Actions</th> -->
           <th *ngFor="let column of displayedColumns" [hidden]="!column.visible">
             {{ column.label }}
             <i
@@ -123,6 +139,11 @@
               <td *ngSwitchCase="'revenue_district'">{{ fir.revenue_district }}</td>
               <td *ngSwitchCase="'police_city'">{{ fir.police_city }}</td>
               <td *ngSwitchCase="'police_station'">{{ fir.police_station }}</td>
+              <td *ngSwitchCase="'status'">
+                <span *ngIf="fir.HascaseMF == 1" class="badge badge-danger" style="margin-right: 3px;">Mistake Of Fact</span>
+                <span *ngIf="fir.HascaseMF != 1" style="margin-right: 3px;" class="badge" [ngClass]="getStatusBadgeClass(fir.status)">{{ getStatusText(fir.status, 0) }}</span>
+                <span *ngIf="fir.case_altered_status == 1" class="badge" [ngClass]="alteredBadgeClass(fir.case_altered_status)"> {{ isaltered(fir.case_altered_status) }}</span>
+              </td>
               <td *ngSwitchCase="'actions'">
                 <button class="btn btn-primary btn-sm" (click)="navigateToRelief(fir.fir_id,fir.victim_id)">
                   View
@@ -132,23 +153,100 @@
           </td>
         </tr>
       </tbody>
-    </table>
+    </table> -->
+
+        <div style="width: 100%; overflow-y: auto; overflow-x: auto; min-height: 500px; padding-right:30px !important;">
+
+   <table *ngIf="!isLoading && displayedFirList.length > 0" 
+       class="table table-striped table-bordered table-hover">
+  <thead>
+    <!-- First row (main headers) -->
+    <tr>
+      <th rowspan="2">Sl.No</th>
+      <th rowspan="2">FIR ID</th>
+      <th rowspan="2">Register Date</th>
+      <th rowspan="2">Victim Name</th>
+      <th rowspan="2">District</th>
+      <th rowspan="2">Police City</th>
+      <th rowspan="2">Police Station Name</th>
+      <th [attr.colspan]="getStatusColSpan()" style="text-align:center;">Status</th>
+      <th rowspan="2">Actions</th>
+    </tr>
+
+    <!-- Second row (sub-headers under Status) -->
+    <tr>
+      <th *ngIf="showColumn('pension')" style="border-top:1px solid #fff; border-radius: 0px !important;">Pension</th>
+      <th *ngIf="showColumn('employment')" style="border-top:1px solid #fff;">Employment</th>
+      <th *ngIf="showColumn('patta')" style="border-top:1px solid #fff;">House site Patta</th>
+      <th *ngIf="showColumn('education')" style="border-top:1px solid #fff;">Education</th>
+      <th *ngIf="showColumn('provision')" style="border-top:1px solid #fff; border-radius: 0px !important;">Provision</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let fir of displayedFirList; let i = index">
+      <td>{{ (page - 1) * pageSize + i + 1 }}</td>
+      <td>{{ fir.fir_number }}</td>
+      <td>{{ fir.date_of_registration | date:'dd/MM/YYYY' }}</td>
+      <td>{{ fir.victim_name }}</td>
+      <td>{{ fir.revenue_district }}</td>
+      <td>{{ fir.police_city }}</td>
+      <td>{{ fir.police_station }}</td>
+
+      <!-- Status sub-columns -->
+      <td *ngIf="showColumn('pension')">{{ fir.PensionStatus}}</td>
+      <td *ngIf="showColumn('employment')">{{ fir.EmpStatus}}</td>
+      <td *ngIf="showColumn('patta')">{{ fir.PattaStatus}}</td>
+      <td *ngIf="showColumn('education')">{{ fir.EducationStatus }}</td>
+      <td *ngIf="showColumn('provision')">{{ fir.ProvisionStatus }}</td>
+
+      <!-- Actions -->
+      <td>
+        <button class="btn btn-primary btn-sm" 
+                (click)="navigateToRelief(fir.fir_id, fir.victim_id)">
+          View
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
     <!-- Pagination Controls -->
     <nav *ngIf="totalPages > 1" class="mt-3">
-      <ul class="pagination justify-content-center">
-        <li class="page-item" [class.disabled]="page === 1">
-          <button class="page-link" (click)="previousPage()">Previous</button>
-        </li>
-        <li class="page-item" *ngFor="let pageNum of totalPagesArray()">
-          <button class="page-link" (click)="goToPage(pageNum)" [class.active]="page === pageNum">
-            {{ pageNum }}
-          </button>
-        </li>
-        <li class="page-item" [class.disabled]="page === totalPages">
-          <button class="page-link" (click)="nextPage()">Next</button>
-        </li>
-      </ul>
-    </nav>
+  <ul class="pagination justify-content-center">
+
+    <!-- Start -->
+    <li class="page-item" [class.disabled]="page === 1">
+      <button class="page-link" (click)="goToPage(1)">Start</button>
+    </li>
+
+    <!-- Previous -->
+    <li class="page-item" [class.disabled]="page === 1">
+      <button class="page-link" (click)="previousPage()">Previous</button>
+    </li>
+
+    <!-- Page numbers -->
+    <li class="page-item" *ngFor="let pageNum of getVisiblePages()" [class.active]="page === pageNum">
+      <button class="page-link" (click)="goToPage(pageNum)">
+        {{ pageNum }}
+      </button>
+    </li>
+
+    <!-- Next -->
+    <li class="page-item" [class.disabled]="page === totalPages">
+      <button class="page-link" (click)="nextPage()">Next</button>
+    </li>
+
+    <!-- End -->
+    <li class="page-item" [class.disabled]="page === totalPages">
+      <button class="page-link" (click)="goToPage(totalPages)">End</button>
+    </li>
+      <span class="ms-3 mt-2">
+    Page {{ page }} of {{ totalPages }} ({{ totalRecords }} records)
+  </span>
+  </ul>
+</nav>
+
   </div>
 </div>

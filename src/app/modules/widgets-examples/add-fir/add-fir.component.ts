@@ -552,7 +552,6 @@ loadAllOffenceReliefDetails(): void {
   this.firService.getOffenceReliefDetails().subscribe(
     (offence_relief: any[]) => {
       this.offenceReliefDetails = offence_relief; // Store data
-      console.log('Offence Relief Details:', this.offenceReliefDetails);
     },
     (error) => {
       console.error('Error loading districts:', error);
@@ -1721,16 +1720,10 @@ console.log(additionalReliefControl,"additionalReliefControl")
 
   // Ensure the value is retrieved as a number
   let selectedVictimCount = Number(this.firForm.get('complainantDetails.numberOfVictims')?.value) || 0;
-  console.log("count ----------> ",selectedVictimCount);
-  console.log("Selected Number of Victims from Dropdown:", selectedVictimCount);
-
-  console.log("Before Clearing: victimsRelief.controls.length =", victimsReliefArray.controls.length);
-
   victimsReliefArray.clear(); // Clear existing form controls
 
   for (let i = 0; i < selectedVictimCount; i++) {
     const victim = victimsReliefDetails[i] || {}; // Use existing data if available
-      console.log(`Adding victim #${i + 1}:`, victim);
       const reliefGroup = this.createVictimReliefGroup();
 
       // Set initial values for each victim
@@ -1815,9 +1808,6 @@ console.log(additionalReliefControl,"additionalReliefControl")
 
       victimsReliefArray.push(reliefGroup); // Add the relief group to the FormArray
     }
-
-    console.log("After Adding: victimsRelief.controls.length =", this.victimsRelief.controls.length);
-
     // Perform initial calculation
     this.updateTotalCompensation();
     this.updateTotalCompensation_1();
@@ -2331,7 +2321,6 @@ handleCaseTypeChange() {
   loadOptions() {
     this.firService.getOffences().subscribe(
       (offences: any) => {
-        console.log(offences);
         this.offenceOptions = offences
           .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v) , 3(2)(va)');
           this.offenceOptions.push(
@@ -2412,8 +2401,7 @@ handleCaseTypeChange() {
     this.firService.getPoliceDivision(district).subscribe(
       (data: any) => {
         this.policeCities = [district];
-
-        console.log(data,"this.policeCities")
+        console.log(data);
         this.policeZones = data.map((item: any) => item.police_zone_name);
         // this.policeRanges = data.map((item: any) => item.police_range_name);
         // this.revenueDistricts = data.map((item: any) => item.revenue_district_name);
@@ -2456,9 +2444,6 @@ handleCaseTypeChange() {
         // this.police_Cities_data = Array.from(
         //   new Set(data.map((item: any) => item.district_division_name as string))
         // ).sort((a: any, b: any) => a.localeCompare(b));
-        
-
-        console.log( data)
         // this.policeZones = data.map((item: any) => item.police_zone_name);
         this.policeRanges = data.map((item: any) => item.police_range_name);
         this.revenueDistricts = data.map((item: any) => item.revenue_district_name);
@@ -4517,7 +4502,7 @@ isStep1Valid(): boolean {
     
     // Check if the control exists and has a value
     if (!control || control.value === null || control.value === undefined || control.value === '') {
-      console.log(`Missing mandatory field in Step 1: ${field}`);
+      // console.log(`Missing mandatory field in Step 1: ${field}`);
       return false;
     }
     

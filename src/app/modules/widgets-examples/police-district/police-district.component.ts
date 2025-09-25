@@ -16,6 +16,8 @@ export class PoliceDistrictComponent implements OnInit {
   policeDivisions: any[] = []; // Police division list
   page: number = 1;
   editIndex: number | null = null;
+  itemsPerPage: number = 10;
+  totalRecords: number = 0;
 
   constructor(
     private modalService: NgbModal,
@@ -32,6 +34,7 @@ export class PoliceDistrictComponent implements OnInit {
     this.policeDivisionService.getAllPoliceDivisions().subscribe(
       (data: any) => {
         this.policeDivisions = data;
+        this.totalRecords = this.policeDivisions.length;
         this.refreshTable();
       },
       (error: any) => {
@@ -216,5 +219,9 @@ allowOnlyValidCharacters(event: KeyboardEvent) {
 onInputChange(event: Event) {
   const input = event.target as HTMLInputElement;
   input.value = input.value.replace(this.disallowedPattern, '');
+}
+
+  get totalPages(): number {
+  return Math.ceil(this.totalRecords / this.itemsPerPage);
 }
 }

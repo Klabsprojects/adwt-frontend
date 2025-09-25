@@ -24,6 +24,8 @@ export class UserListingComponent implements OnInit {
   users: any[] = [];
   roles: any[] = [];
   filteredUsers: any[] = []; // Added filteredUsers property
+  itemsPerPage: number = 10;
+  totalRecords: number = 0;
   user: any = {
     role: '',
     user_role_name: '',
@@ -106,6 +108,7 @@ export class UserListingComponent implements OnInit {
       (results) => {
         this.users = results;
         this.filteredUsers = this.users; // Initialize filteredUsers
+        this.totalRecords = this.filteredUsers.length;
         this.cdr.detectChanges();
       },
       (error) => {
@@ -123,6 +126,7 @@ export class UserListingComponent implements OnInit {
     this.userService.getAllRoles().subscribe(
       (results: any) => {
         this.roles = results as any[];
+        this.totalRecords = this.roles.length;
       },
       (error) => {
         Swal.fire({
@@ -134,6 +138,11 @@ export class UserListingComponent implements OnInit {
       }
     );
   }
+
+  get totalPages(): number {
+  return Math.ceil(this.totalRecords / this.itemsPerPage);
+}
+
 
   filterUsers() {
     this.filteredUsers = this.users.filter(user =>

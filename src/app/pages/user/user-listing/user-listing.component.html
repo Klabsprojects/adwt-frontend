@@ -16,7 +16,7 @@
     </div>
   </div>
 
-  <div class="card-body pt-0">
+    <div class="card-body pt-0 overflow-auto" style="width: 100%; overflow-y: auto; overflow-x: auto; min-height: 500px; padding-right:30px !important;">
     <table class="table table-striped table-bordered table-hover">
       <thead>
         <tr>
@@ -72,9 +72,18 @@
       </tbody>
     </table>
 
+    <!-- Pagination Control -->
+<div class="float-left w-100 text-center">
+  <pagination-controls (pageChange)="page = $event"></pagination-controls>
+   <span>
+    Page {{ page }} of {{ totalPages }} ({{ totalRecords }} records)
+  </span>
+</div>
+
+
 
     <!-- Pagination Control -->
-    <pagination-controls class="d-flex justify-content-end" (pageChange)="page = $event"></pagination-controls>
+    <!-- <pagination-controls class="d-flex justify-content-end" (pageChange)="page = $event"></pagination-controls> -->
   </div>
 </div>
 

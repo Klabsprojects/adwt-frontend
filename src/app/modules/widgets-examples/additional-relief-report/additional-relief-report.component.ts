@@ -42,6 +42,7 @@ export class AdditionalReliefReportComponent implements OnInit {
   itemsPerPage: number = 10;
   isReliefLoading: boolean = true;
   loading: boolean = false;
+  Parsed_UserInfo:any;
   // Filters
   selectedDistrict: string = '';
   selectedColumns: string[] = [];
@@ -303,6 +304,8 @@ export class AdditionalReliefReportComponent implements OnInit {
 
   // Initializes component data and fetches necessary information on component load.
   ngOnInit(): void {
+    const UserInfo: any = sessionStorage.getItem('user_data');
+    this.Parsed_UserInfo = JSON.parse(UserInfo);
     this.groupedBySection = this.groupOrder.reduce((acc, groupName) => {
     const cols = this.displayedColumns.filter(
       col => col.group === groupName && col.visible
@@ -439,12 +442,7 @@ export class AdditionalReliefReportComponent implements OnInit {
   // Returns the subset of filtered data for the current page.
   paginatedData(): any[] {
     const startIndex = (this.page - 1) * this.itemsPerPage;
-    console.log(
-      'this.filteredData.slice(startIndex, startIndex + this.itemsPerPage)'
-    );
-    console.log(
-      this.filteredData.slice(startIndex, startIndex + this.itemsPerPage)
-    );
+    // console.log(this.filteredData.slice(startIndex, startIndex + this.itemsPerPage));
     return this.filteredData.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
@@ -570,11 +568,15 @@ export class AdditionalReliefReportComponent implements OnInit {
 }
 
  fetchAdditionalReports(): void {
+  let districtParam = '';
+     if ((this.Parsed_UserInfo.access_type === 'District' && this.Parsed_UserInfo.role === 4)||(this.Parsed_UserInfo.role === 3)) {
+    districtParam = this.Parsed_UserInfo.district;
+    this.selectedDistrict = districtParam;
+  }
+
     this.loader = true;
-    this.additionalReportService.getAdditionalRelief().subscribe({
+    this.additionalReportService.getAdditionalRelief(districtParam).subscribe({
       next: (response) => {
-        //console.log('Additional Reports:', response.data); // Debugging
-        // Transform API response to match frontend structure
         this.reportData = response.data.map((item:any,index: number) => ({
           sl_no: index + 1,
           asperact: item.asperact,
@@ -589,14 +591,20 @@ export class AdditionalReliefReportComponent implements OnInit {
           caste: item.caste === "NULL" ? '' : item.caste,
          
           EmpStatus:item.EmpStatus,
-          JobGivendate:item.JobGivendate ? formatDate(item.JobGivendate,'yyyy-MM-dd','en') : '',
+          JobGivendate:item.JobGivendate,
           Employmentrelationship:item.Employmentrelationship,
           department_name:item.department_name,
           designation:item.designation,
 
           PensionStatus:item.PensionStatus,
           PensionGivendate:item.PensionGivendate ? formatDate(item.PensionGivendate,'yyyy-MM-dd', 'en') : '',
-          Pensionrelationship: JSON.parse(item.Pensionrelationship)[0],
+         Pensionrelationship: Array.isArray(item.Pensionrelationship)
+  ? item.Pensionrelationship.length === 1
+      ? item.Pensionrelationship[0]   // single value → just string
+      : item.Pensionrelationship.join(', ')  // multiple → comma separated
+  : item.Pensionrelationship,
+
+
 
           PattaStatus:item.PattaStatus,
           PattaGivendate:item.PattaGivendate ? formatDate(item.PattaGivendate,'yyyy-MM-dd','en') : '',

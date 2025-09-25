@@ -41,6 +41,9 @@ export class AlteredCaseListComponent implements OnInit {
   offenceOptions: any[] = [];
   offenceOptionData:any[]=[];
   firDetails : any;
+  currentPage: number = 1;
+  pageSize: number = 10;
+  totalRecords: number = 0;
   isActExcluded(act: string): boolean {
     const excluded = [
       '100 percent incapacitation',
@@ -79,12 +82,17 @@ export class AlteredCaseListComponent implements OnInit {
   }
 
   // Fetch FIR data from the service
-  fetchFIRList(): void {
+  fetchFIRList(page: number = 1, pageSize: number = this.pageSize): void {
     this.isLoading = true;
-    this.reliefService.getAlteredList(this.getFilterParams()).subscribe(
+    this.currentPage = page;
+    this.pageSize = pageSize;
+    this.reliefService.getAlteredList(page, pageSize,this.getFilterParams()).subscribe(
       (data) => {
+        this.totalRecords = data.length;
+        this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
         this.firList = (data || []).filter((fir) => [4 ,5, 6, 7, 11, 12,13].includes(fir.status)); // Filter data
-        this.updatePagination();
+        
+        // this.updatePagination();
         this.isLoading = false;
         this.cdr.detectChanges(); // Ensure the UI is updated immediately
       },
@@ -108,24 +116,24 @@ export class AlteredCaseListComponent implements OnInit {
   }
 
   // Pagination controls
-  previousPage(): void {
-    if (this.page > 1) {
-      this.page--;
-      this.updateDisplayedList();
-    }
-  }
+  // previousPage(): void {
+  //   if (this.page > 1) {
+  //     this.page--;
+  //     this.updateDisplayedList();
+  //   }
+  // }
 
-  nextPage(): void {
-    if (this.page < this.totalPages) {
-      this.page++;
-      this.updateDisplayedList();
-    }
-  }
+  // nextPage(): void {
+  //   if (this.page < this.totalPages) {
+  //     this.page++;
+  //     this.updateDisplayedList();
+  //   }
+  // }
 
-  goToPage(pageNum: number): void {
-    this.page = pageNum;
-    this.updateDisplayedList();
-  }
+  // goToPage(pageNum: number): void {
+  //   this.page = pageNum;
+  //   this.updateDisplayedList();
+  // }
 
   // totalPagesArray(): number[] {
   //   return Array(this.totalPages)
@@ -435,12 +443,17 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
   return params;
 }
 
-   filteredFirList() {
-    this.reliefService.getAlteredList(this.getFilterParams()).subscribe(
+   filteredFirList(page: number = 1, pageSize: number = this.pageSize) {
+    this.isLoading = true;
+     this.currentPage = page;
+    this.pageSize = pageSize;
+    this.reliefService.getAlteredList(page, pageSize,this.getFilterParams()).subscribe(
       (data) => {
+        this.totalRecords = data.length;
+        this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
         this.firList = [];
         this.firList = (data || []).filter((fir) => [4 ,5, 6, 7, 11, 12,13].includes(fir.status)); // Filter data
-        this.updatePagination();
+        // this.updatePagination();
         this.isLoading = false;
         this.cdr.detectChanges(); // Ensure the UI is updated immediately
       },
@@ -785,4 +798,33 @@ getStatusText(status: number, reliefStatus: number, natureOfJudgement?: string):
   return Array.from({ length: maxLength }, (_, index) => index);
 }
 
+goToFirstPage() {
+    if (this.currentPage !== 1) {
+      this.fetchFIRList(1);
+    }
+  }
+
+  goToLastPage() {
+    if (this.currentPage !== this.totalPages) {
+      this.fetchFIRList(this.totalPages);
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.fetchFIRList(this.currentPage - 1);
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.fetchFIRList(this.currentPage + 1);
+    }
+  }
+
+  goToPage(pageNum: number) {
+    if (pageNum >= 1 && pageNum <= this.totalPages) {
+      this.fetchFIRList(pageNum);
+    }
+  }
 }

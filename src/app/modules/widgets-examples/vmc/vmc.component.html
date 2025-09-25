@@ -1,5 +1,5 @@
-<div class="card">
-  <div class="card-header border-0 pt-6">
+<div class="card px-8 mt-5">
+  <div class="card-header border-0 pt-6 px-0">
     <div class="card-title">
       <div class="d-flex align-items-center position-relative my-1">
         <i class="fas fa-search fs-3 position-absolute ms-5"></i>
@@ -13,24 +13,24 @@
       </button>
     </div>
   </div>
-  <div class="row d-flex mb-3 p-4 align-items-center">
+  <div class="row d-flex mb-3 align-items-center outer pt-4 pb-2 px-3 m-0">
     <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-      <label for="form-label">District</label>
-      <select class="form-control" [(ngModel)]="selectedDistrict" (change)="getSubdivisions();get_filter_json()">
+      <!-- <label for="form-label">District</label> -->
+      <select class="form-control" [(ngModel)]="selectedDistrict" (change)="getSubdivisions()">
         <option value="" selected>District</option>
         <option [value]="district" *ngFor="let district of districts">{{district}}</option>
       </select>
     </div>
     <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-      <label for="form-label">Sub Division</label>
-      <select class="form-control" [(ngModel)]="selectedSubDivision" (change)="get_filter_json()">
+      <!-- <label for="form-label">Sub Division</label> -->
+      <select class="form-control" [(ngModel)]="selectedSubDivision">
         <option value="" selected>Sub Division</option>
         <option [value]="subdiv" *ngFor="let subdiv of subdivs">{{subdiv}}</option>
       </select>
     </div>
     <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-      <label for="form-label">Status</label>
-      <select class="form-control" [(ngModel)]="selectedStatus" (change)="get_filter_json()">
+      <!-- <label for="form-label">Status</label> -->
+      <select class="form-control" [(ngModel)]="selectedStatus">
         <option value="" selected>Status</option>
         <option *ngFor="let option of status" [value]="option">
           {{ option }}
@@ -38,39 +38,45 @@
       </select>
     </div>
     <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-      <label for="form-label">Member Type</label>
-      <select class="form-control" [(ngModel)]="selectedMemberType" (change)="get_filter_json()">
+      <!-- <label for="form-label">Member Type</label> -->
+      <select class="form-control" [(ngModel)]="selectedMemberType">
         <option value="" selected>Member Type</option>
         <option value="Official Member">Official Member</option>
         <option value="Non-Official Member">Non-Official Member</option>
       </select>
     </div>
     <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-      <label for="form-label">Designation of Member</label>
-      <select class="form-control" [(ngModel)]="selectedDesignationMember" (change)="get_filter_json()">
+      <!-- <label for="form-label">Designation of Member</label> -->
+      <select class="form-control" [(ngModel)]="selectedDesignationMember">
         <option value="" disabled>Select Designation</option>
         <option [value]="option" *ngFor="let option of options">{{option}}</option>
       </select>
     </div>
-    <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-      <label for="form-label">Date of Appointment</label>
-      <input type="date" class="form-control" [(ngModel)]="doa" (change)="get_filter_json()">
+
+    <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
+      <!-- <label for="form-label">Date of Appointment</label> -->
+      <input type="date" class="form-control" [(ngModel)]="doa">
+      <span class="tooltip-text">Date of Appointment</span>
     </div>
+
     <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-      <label for="form-label">Level of Member</label>
-      <select class="form-control" [(ngModel)]="selectedMemberLevel" (change)="get_filter_json()">
+      <!-- <label for="form-label">Level of Member</label> -->
+      <select class="form-control" [(ngModel)]="selectedMemberLevel">
         <option value="" disabled>Select Level</option>
             <option *ngIf="Parsed_UserInfo.role != '4'" value="State Level">State Level</option>
             <option value="District Level">District Level</option>
             <option value="Subdivision">Subdivision</option>
       </select>
     </div>
+    
     <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <button class="btn btn-primary btn-sm" (click)="clear()">Clear Filters</button>
-      </div>
+        <button (click)="get_filter_json()" class="btn btn-primary btn-sm">Apply Filters</button>
+        <button (click)="clear()" class="btn btn-secondary btn-sm" style="margin-left: 5px;">Clear</button>
+    </div>
+    
   </div>
 
-  <div class="card-body pt-0">
+    <div class="card-body pt-0 overflow-auto px-0" style="width: 100%; overflow-y: auto; overflow-x: auto; min-height: 500px;">
     <table class="table table-striped table-bordered table-hover">
       <thead>
         <tr>
@@ -130,8 +136,10 @@
       </tbody>
     </table>
 
-    <!-- Pagination Control -->
-    <pagination-controls class="d-flex justify-content-end" (pageChange)="page = $event"></pagination-controls>
+    <div class="float-left w-100 text-center">
+      <pagination-controls (pageChange)="page = $event"></pagination-controls>
+      <span>Page {{ page }} of {{ totalPages }} ({{ totalRecords }} records)</span>
+    </div>
   </div>
 </div>
 

@@ -12,6 +12,8 @@ import { AdditionalReportService } from 'src/app/services/additional-report.serv
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { FirListTestService } from 'src/app/services/fir-list-test.service';
 import { ReportsCommonService } from 'src/app/services/reports-common.service';
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-after-abstract',
@@ -35,7 +37,7 @@ export class AfterAbstractComponent {
     reportData: Array<any> = [];
     filteredData: Array<any> = [];
     page: number = 1;
-    itemsPerPage: number = 10;
+    itemsPerPage: number = 38;
     isReliefLoading: boolean = true;
     loading: boolean = false;
     // Filters
@@ -70,6 +72,7 @@ export class AfterAbstractComponent {
     selectedPoliceCity:string=''
     selectedFromDate:any="";
     selectedToDate:any="";
+    Parsed_UserInfo:any;
   
   displayedColumns: DisplayedColumn[] = [
     {
@@ -98,7 +101,7 @@ export class AfterAbstractComponent {
     },
   {
     label: 'Given',
-    field: 'job_Given',
+    field: 'employment_given',
     group: 'Employment',
     sortable: true,
     visible: true,
@@ -114,7 +117,7 @@ export class AfterAbstractComponent {
   },
   {
     label: 'Given',
-    field: 'Pension_Given',
+    field: 'pension_given',
     group: 'Pension',
     sortable: true,
     visible: true,
@@ -130,7 +133,7 @@ export class AfterAbstractComponent {
   },
   {
     label: 'Given',
-    field: 'Patta_Given',
+    field: 'patta_given',
     group: 'House Site Patta',
     sortable: true,
     visible: true,
@@ -146,7 +149,7 @@ export class AfterAbstractComponent {
   },
   {
     label: 'Given',
-    field: 'Education_Given',
+    field: 'education_given',
     group: 'Education Concession',
     sortable: true,
     visible: true,
@@ -188,6 +191,8 @@ export class AfterAbstractComponent {
   
     // Initializes component data and fetches necessary information on component load.
     ngOnInit(): void {
+      const UserInfo: any = sessionStorage.getItem('user_data');
+      this.Parsed_UserInfo = JSON.parse(UserInfo);
       this.groupedBySection = this.groupOrder.reduce((acc, groupName) => {
       const cols = this.displayedColumns.filter(
         col => col.group === groupName && col.visible
@@ -308,13 +313,80 @@ export class AfterAbstractComponent {
     }
   
     // Download Reports
-    async onBtnExport(): Promise<void> {
-      await this.reportsCommonService.exportToExcel(
-        this.filteredData,
-        this.displayedColumns,
-        'After-Abstract-Reports'
-      );
-    }
+    // async onBtnExport(): Promise<void> {
+    //   await this.reportsCommonService.exportToExcel(
+    //     this.filteredData,
+    //     this.displayedColumns,
+    //     'After-Abstract-Reports'
+    //   );
+    // }
+
+onBtnExport(): void {
+  const headers = [
+  [
+    'Sl. No.', 'District', 'Total Cases', 
+    'Employment', '',       // 3,4
+    'Pension', '',          // 5,6
+    'House Site Patta', '', // 7,8
+    'Education Concession', '' // 9,10
+  ],
+  [
+    '', '', '', 
+    'Given', 'Pending',
+    'Given', 'Pending',
+    'Given', 'Pending',
+    'Given', 'Pending'
+  ]
+];
+
+
+  const data = this.filteredData.map((item, index) => [
+    index + 1,
+    item.revenue_district,
+    item.total_cases,
+    item.employment_given,
+    item.employment_pending,
+    item.pension_given,
+    item.pension_pending,
+    item.patta_given,
+    item.patta_pending,
+    item.education_given,
+    item.education_pending
+  ]);
+
+  console.log(data);
+
+  const aoa = [...headers, ...data];
+  const worksheet = XLSX.utils.aoa_to_sheet(aoa);
+
+  // Correct merges based on headers
+  worksheet['!merges'] = [
+  { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } }, // Sl. No.
+  { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } }, // District
+  { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } }, // Total Cases
+  { s: { r: 0, c: 3 }, e: { r: 0, c: 4 } }, // Employment
+  { s: { r: 0, c: 5 }, e: { r: 0, c: 6 } }, // Pension
+  { s: { r: 0, c: 7 }, e: { r: 0, c: 8 } }, // House Site Patta
+  { s: { r: 0, c: 9 }, e: { r: 0, c: 10 } } // Education Concession
+];
+  const workbook: XLSX.WorkBook = {
+    Sheets: { 'After Abstract': worksheet },
+    SheetNames: ['After Abstract']
+  };
+
+  const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  this.saveAsExcelFile(excelBuffer, 'after_abstract');
+}
+
+saveAsExcelFile(buffer: any, filename: string): void {
+  const data: Blob = new Blob([buffer], { type: 'application/octet-stream' });
+  const url = window.URL.createObjectURL(data);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${filename}.xlsx`;
+  link.click();
+  window.URL.revokeObjectURL(url);
+}
   
       clearfilter(){
         this.searchText = '';
@@ -430,8 +502,13 @@ export class AfterAbstractComponent {
   
   
     fetchAfterAbstract(): void {
+      let districtParam = '';
+      if ((this.Parsed_UserInfo.access_type === 'District' && this.Parsed_UserInfo.role === 4)||(this.Parsed_UserInfo.role === 3)) {
+        districtParam = this.Parsed_UserInfo.district;
+        this.selectedDistrict = districtParam;
+      }
       this.loader = true;
-      this.additionalAbstractService.getAfterAbstract().subscribe({
+      this.additionalAbstractService.getAfterAbstract(districtParam).subscribe({
         next: (response) => {
           console.log('Abstract:', response.data); // Debugging
           // Transform API response to match frontend structure
@@ -441,13 +518,13 @@ export class AfterAbstractComponent {
             sl_no: index + 1,
             revenue_district: item.revenue_district,
             total_cases:item.total_cases,
-            job_Given: item.job_Given,
+            employment_given: item.employment_given,
             employment_pending: item.employment_pending,
-            Pension_Given: item.Pension_Given,
+            pension_given: item.pension_given,
             pension_pending: item.pension_pending,
-            Patta_Given: item.Patta_Given,
+            patta_given: item.patta_given,
             patta_pending: item.patta_pending,
-            Education_Given: item.Education_Given,
+            education_given: item.education_given,
             education_pending:item.education_pending
           }));
 

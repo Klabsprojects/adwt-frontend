@@ -12,9 +12,9 @@ export class AdditionalAbstractReportService {
   constructor(private http: HttpClient) {}
 
   // Fetches all monetary report details 
-  getBeforeAbstract(): Observable<any> {
+  getBeforeAbstract(district?:string): Observable<any> {
     const requestBody = {
-    district: '',
+    district: district || '',
     community: '',
     caste: '',
     police_city: '',
@@ -27,9 +27,9 @@ export class AdditionalAbstractReportService {
   }
 
 
-  getAfterAbstract(): Observable<any> {
+  getAfterAbstract(district?:string): Observable<any> {
     const requestBody = {
-    district: '',
+    district: district || '',
     community: '',
     caste: '',
     police_city: '',
@@ -41,17 +41,19 @@ export class AdditionalAbstractReportService {
     return this.http.post(`${this.baseUrl}/addtionalReport/af/abstract`,requestBody);
   }
 
-    getAdditionalRelief(): Observable<any> {
-    const requestBody = {
-    district: '',
+   // service
+getAdditionalRelief(district?: string): Observable<any> {
+  const requestBody: any = {
+    district: district || '',
     community: '',
     caste: '',
     police_city: '',
     Status_Of_Case: '',
     police_zone: '',
   };
-    return this.http.post(`${this.baseUrl}/additionalReliefData`,requestBody);
-  }
+  return this.http.post(`${this.baseUrl}/additionalReliefData`, requestBody);
+}
+
 
   
 }

@@ -22,7 +22,7 @@
       </mat-form-field>
     </div>
 
-    <div class="col-md-12 mb-3">
+    <div class="row d-flex mb-3 align-items-center outer pt-4 pb-2 px-3 m-0">
       <div class="col-md-2" style="float: left; padding-right: 10px;">
       <select  class="form-select" (change)="onCityChange($event)" [(ngModel)]="selectedDistrict">
         <option value="" selected hidden disabled>Police City</option>
@@ -45,7 +45,7 @@
       </select>
       </div> -->
 
-      <div class="col-md-2"  style="float: left;  padding-right: 10px;">
+      <div class="col-md-2" *ngIf="Parsed_UserInfo.access_type != 'District'"  style="float: left;  padding-right: 10px;">
       <select  class="form-select"
         [(ngModel)]="selectedRevenue_district">
         <option value="" selected hidden disabled>Revenue District</option>
@@ -91,7 +91,7 @@
       </select>
        </div>
 
-       <div class="col-md-2 mt-2" style="float: left; padding-right: 10px;">
+       <div class="col-md-4 mt-2" style="float: left; padding-right: 10px;">
         <select class="form-select" [(ngModel)]="selectedOffenceGroup">
         <option value=""  disabled>Nature of Case</option>
         <option *ngFor="let item of offenceGroupsList" [value]="item">
@@ -115,7 +115,7 @@
       </div>
       </div>
       
-      <div class="col-md-2 mt-2" style="float: left; padding-right: 10px;">
+      <!-- <div class="col-md-2 mt-2" style="float: left; padding-right: 10px;">
         <select class="form-select" [(ngModel)]="selectedStatusOfCase">
         <option value="" selected>Status of Case</option>
         <option value="UI">UI</option>
@@ -128,34 +128,107 @@
         <option value="Charge_Abated"> Charge Abated</option>
         <option value="Quashed"> Quashed</option>
       </select>
-       </div>
+       </div> -->
 
-       <div class="col-md-2 mt-2" style="float: left; padding-right: 10px;">
-        <select  class="form-select"
-       [(ngModel)]="selectedStage">
+       <!-- <div class="col-md-2 mt-2" style="float: left; padding-right: 10px;">
+        <select  class="form-select" [(ngModel)]="selectedStage" (change)="reliefStage($event)">
           <option value="" disabled>Relief Stage</option>
           <option value="FIR">FIR</option>
           <option value="Chargesheet">Chargesheet</option>
           <option value="TrialStage">Trial</option>
-       </select>
+          <option value="FirQuashed,MF,SectionDeleted,Charge_Abated,Quashed">MF, FIR Quashed, Section Deleted, Charge Abated, Quashed</option>
+        </select>
        </div>
 
 
        <div class="col-md-2 mt-2" style="float: left; padding-right: 10px;">
-       <select  class="form-select"
-       [(ngModel)]="selectedReliefStatus">
-          <option value="" disabled>Relief Status</option>
-          <option value="notyetreceived">Proposal not yet Received from SP Office</option>
-          <option value="pending">Relief Pending</option>
-          <option value="given">Relief Given</option>
-          <option value="FirQuashed,MF,SectionDeleted,Charge_Abated,Quashed">MF, FIR Quashed, Section Deleted, Charge Abated, Quashed</option>
-       </select>
-       </div>
+      <select class="form-select" [(ngModel)]="selectedReliefStatus">
+  <option value="" selected>Relief Status</option>
+  <ng-container *ngIf="selectedStage !== 'FirQuashed,MF,SectionDeleted,Charge_Abated,Quashed'">
+    <option *ngIf="selectedStage === 'FIR'" value="notyetreceived">
+      Proposal not yet Received from SP Office
+    </option>
+    <option value="pending">Relief Pending</option>
+    <option value="given">Relief Given</option>
+  </ng-container>
+</select>
+
+       </div> -->
+
+      <!-- <div class="col-md-4 mt-2">
+  <label>Status</label>
+  <select class="form-select"
+          multiple
+          [(ngModel)]="selectedStages"
+          (ngModelChange)="filterData()"
+          style="height: 200px;">
+    <option *ngFor="let stage of allStageOptions" [value]="stage">
+      {{ stage }}
+    </option>
+  </select>
+</div> -->
+<!-- <div class="col-md-4 mt-2 form-control">
+  <div class="custom-multiselect">
+    <div class="selected-values" (click)="toggleDropdown()">
+      {{ displayText }}
+      <span class="arrow">{{ isOpen ? '▲' : '▼' }}</span>
+    </div>
+    <ul class="dropdown-list" *ngIf="isOpen">
+      <li *ngFor="let stage of allStageOptions">
+        <label>
+          <input 
+            type="checkbox" 
+            [checked]="isSelected(stage.value)" 
+            (change)="toggleSelection(stage.value)">
+          {{ stage.label }}
+        </label>
+      </li>
+    </ul>
+  </div>
+</div> -->
+
+<!-- <div class="col-md-4 mt-2">
+  <div class="custom-multiselect">
+    <div class="selected-values form-select" (click)="toggleDropdown()">
+      {{ displayText }}
+    </div>
+    <ul class="dropdown-list select-dropdown" *ngIf="isOpen">
+      <li *ngFor="let stage of allStageOptions" style="list-style: none !important;">
+        <label>
+          <input  type="checkbox" 
+            [checked]="isSelected(stage.value)" 
+            (change)="toggleSelection(stage.value)">
+          {{ stage.label }}
+        </label>
+      </li>
+    </ul>
+  </div>
+</div> -->
+<div class="col-md-4 mt-2">
+  <div class="custom-multiselect">
+    <div class="selected-values form-select" (click)="toggleDropdown()">
+      {{ displayText }}
+    </div>
+    <ul class="dropdown-list select-dropdown" *ngIf="isOpen">
+      <li *ngFor="let stage of allStageOptions" style="list-style: none !important;">
+        <label>
+          <input
+            type="checkbox"
+            [checked]="isSelected(stage.value)"
+            [disabled]="isDisabled(stage.value)"
+            (change)="toggleSelection(stage.value)"
+          />
+          {{ stage.label }}
+        </label>
+      </li>
+    </ul>
+  </div>
+</div>
 
 
       <div class="col-xl-3 col-lg-3 col-md-4 mt-2" style="float: left;">
-        <button (click)="SearchList()" class="btn btn-primary btn-sm" style="margin-right:10px;">Search</button>
-        <button (click)="clearfilter()" class="btn btn-primary btn-sm">Clear Filters</button>
+        <button (click)="SearchList()" class="btn btn-primary btn-sm" style="margin-right:10px;">Apply Filter</button>
+        <button (click)="clearfilter()" class="btn btn-secondary btn-sm">Clear</button>
       </div>
     </div>
 
@@ -189,35 +262,22 @@
       </select>
     </div> -->
 
-    <div class="card-body pt-0 overflow-auto">
-      <table class="table table-bordered table-responsive">
-        <!-- <thead>
-          <tr>
-            <th *ngFor="let column of displayedColumns" [hidden]="!column.visible" (click)="column.sortable ? sortTable(column.field) : null">
-              {{ column.label }}
-              <i *ngIf="column.sortable" class="fas" [ngClass]="getSortIcon(column.field)"></i>
-            </th>
-          </tr>
-        </thead> -->
+    <div class="card-body pt-0 px-0 overflow-auto" style="width: 100%; overflow-y: auto; overflow-x: auto; min-height: 500px;">
+      <table class="table table-striped table-bordered table-hover">
         <thead>
   <tr>
-  <!-- Render ungrouped columns that come before groups -->
   <th *ngFor="let col of preGroupedColumns" rowspan="2">{{ col.label }}</th>
-
-  <!-- Grouped headers -->
   <th *ngFor="let groupName of groupOrder"
       [attr.colspan]="groupedBySection[groupName]?.length">
     {{ groupName }}
   </th>
-
-  <!-- Post-group ungrouped headers (e.g. days columns) -->
   <th *ngFor="let col of postGroupedColumns" rowspan="2">{{ col.label }}</th>
 </tr>
 
 <tr>
   <!-- Render sub-headers inside each group -->
   <ng-container *ngFor="let groupName of groupOrder">
-    <th *ngFor="let col of groupedBySection[groupName]">{{ col.label }}</th>
+    <th *ngFor="let col of groupedBySection[groupName]" style="background-color: #0da9bc !important; border-radius: 0px !important; border-top:1px solid #fff;">{{ col.label }}</th>
   </ng-container>
 </tr>
 
@@ -239,7 +299,11 @@
       <div *ngIf="loading" class="alert alert-warning">Loading...</div>
       <!-- Show message if filtered data is empty -->
       <div *ngIf="filteredData.length === 0 && !loading" class="alert alert-warning">No FIR data available.</div>
-      <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button>
+    <div class="mt-3 float-right">
+  <button class="btn btn-primary me-2 py-2 px-3" (click)="onBtnExport()">
+    <i class="fas fa-download me-1"></i> Excel
+  </button></div>
+      <!-- <button style="margin-left: 5px;" class="btn btn-primary mt-3" (click)="onBtnExport()">Download as Excel</button> -->
       <ul class="pagination">
 
       <li class="page-item" [class.disabled]="currentPage === 1">
@@ -315,4 +379,10 @@
     visibility: visible;
     opacity: 1;
   }
+  .select-dropdown{
+    position: absolute;
+    border: 1px solid #ccc;
+    padding: 10px 24px 10px 10px !important;
+    background: #fff;
+}
 </style>
