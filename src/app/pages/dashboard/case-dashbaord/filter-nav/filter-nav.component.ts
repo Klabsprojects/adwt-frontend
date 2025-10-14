@@ -103,11 +103,11 @@ export class FilterNavComponent implements OnInit, OnDestroy {
   { key: 'sectionOfLaw', label: 'Section of Law', visible: false },
   { key: 'chargeSheetDate', label: 'Chargesheet Date', visible: true },
   { key: 'court', label: 'Court', visible: false },
-  { key: 'judgementType', label: 'Judgement Type', visible: true },
+  // { key: 'judgementType', label: 'Judgement Type', visible: true },
   { key: 'convictionType', label: 'Conviction Type', visible: false }
 ];
 
-activeFilters: string[] = ['city', 'revenueDistrict', 'community','regDate','status','offenceGroup','judgementType','chargeSheetDate'];
+activeFilters: string[] = ['city', 'revenueDistrict', 'community','regDate','status','offenceGroup','chargeSheetDate'];
 
   filterOptions: any = {
     status: [
@@ -145,16 +145,15 @@ activeFilters: string[] = ['city', 'revenueDistrict', 'community','regDate','sta
     this.userData = JsonData ? JSON.parse(JsonData) : {};
     const userData = JsonData ? JSON.parse(JsonData) : {};
     const body = userData.access_type==='District'? {district:userData.district}:{};
-    this.callAllfunction();
+    // this.callAllfunction();
     this.subscription.add(
       this.hcs.distrct$.subscribe((res:any)=>{
         // if(res){
           // console.log("res1",res)
-          if(Object.keys(body).length === 0){
-            // console.log("res2",res)
+          // if(Object.keys(body).length === 0){
             this.selectedDistricts = res;
             this.callAllfunction();
-          }
+          // } 
         // }
       })
     )
@@ -180,15 +179,25 @@ isVisible(key: string): boolean {
 
   get filterJson(){
     return {
+      "police_city":this.selectedPoliceCity,
+      "police_zone": this.selectedZone,
+      "police_range":this.selectedPoliceRange,
       "district": this.selectedDistricts,
+      "policeStation": this.selectedPoliceStation,
       "community":this.selectedCommunity,
       "caste":this.selectedCaste,
-      "police_city":this.selectedPoliceCity,
-      "Status_Of_Case":this.selectedStatus,
-      "police_zone": this.selectedZone,
-      "offence" : this.selectedOffence,
-      "Filter_From_Date" : this.selectedFromDate,
-      "Filter_To_Date" : this.selectedToDate
+      "start_date" : this.selectedFromDate,
+      "end_date" : this.selectedToDate,
+      "statusOfCase":this.selectedStatus,
+      "dataEntryStatus":this.selectedDataEntryStatus,
+      "OffenceGroup" : this.selectedOffence,
+      "sectionOfLaw":this.selectedSectionOfLaw,
+      "chargesheetFromDate":this.selectedChargeSheetFromDate,
+      "chargesheetToDate":this.selectedChargeSheetToDate,
+      "court":this.selectedCourt,
+      "convictionType":this.selectedConvictionType
+     
+
     }
   }
   callAllfunction(){
@@ -198,7 +207,7 @@ isVisible(key: string): boolean {
   getDropdowns() {
     this.dashboardService.userGetMethod('districts').subscribe((res:any)=>{
       this.districts = res;
-      console.log(this.districts);
+      // console.log(this.districts);
     })
     this.dashboardService.userGetMethod('fir/communities').subscribe((res:any)=>{
       this.communities = res;

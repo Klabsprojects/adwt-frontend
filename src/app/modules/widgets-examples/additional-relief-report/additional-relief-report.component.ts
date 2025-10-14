@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal, TemplateRef, WritableSignal } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FirListTestService } from 'src/app/services/fir-list-test.service';
@@ -15,6 +15,8 @@ import { AdditionalReportService } from 'src/app/services/additional-report.serv
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { AdditionalAbstractReportService } from 'src/app/services/additional-abstract-service.module';
+import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-additional-relief-report',
@@ -34,7 +36,9 @@ import { AdditionalAbstractReportService } from 'src/app/services/additional-abs
 })
 export class AdditionalReliefReportComponent implements OnInit {
   // Variable Declarations
-  searchText: string = '';
+  private modalService = inject(NgbModal);
+  closeResult: WritableSignal<string> = signal('');
+  search: string = '';
   reportData: Array<any> = [];
   filteredData: Array<any> = [];
   page: number = 1;
@@ -269,6 +273,9 @@ export class AdditionalReliefReportComponent implements OnInit {
 
   currentSortField: string = '';
   isAscending: boolean = true;
+  selectedRecord: any = null;
+  reasonData = { employment: '', pension: '', patta: '', education: '' };
+  modalInstance: any;
 
   communities:any[]=[];
   castes:any[]=[];
@@ -369,7 +376,7 @@ export class AdditionalReliefReportComponent implements OnInit {
   // applyFilters(): void {
   //   this.filteredData = this.reportsCommonService.applyFilters(
   //     this.reportData,
-  //     this.searchText,
+  //     this.search,
   //     this.selectedDistrict,
   //     this.selectedNatureOfOffence,
   //     this.selectedStatusOfCase,
@@ -456,7 +463,7 @@ export class AdditionalReliefReportComponent implements OnInit {
   }
 
   clearfilter(){
-  this.searchText = '';
+  this.search = '';
   this.selectedDistrict = '';
   this.selectedStatus='';
   this.selectedDistricts='';
@@ -466,7 +473,8 @@ export class AdditionalReliefReportComponent implements OnInit {
   this.selectedPoliceCity='';
   this.selectedFromDate='';
   this.selectedToDate = '';
-  this.filteredData = [...this.reportData]; 
+  // this.filteredData = [...this.reportData]; 
+  this.fetchAdditionalReports();
   }
      getStatusTextUIPT(status: number): string {
     console.log(status,'statussssssss')
@@ -486,84 +494,97 @@ export class AdditionalReliefReportComponent implements OnInit {
     return statusTextMap[status] || '';
   }
 
-  
-  applyFilters() {
-  this.filteredData = this.reportData.filter(item => {
+ 
 
-    // Search filter for FIR number
-    if (this.searchText && this.searchText.trim() !== '' && 
-        item.fir_number.toLowerCase() !== this.searchText.toLowerCase().trim()) {
-      return false;
-    }
+getFilterParams() {
+  const params: any = {};
 
-    // District filter
-    if (this.selectedDistrict && this.selectedDistrict !== '' && 
-        item.revenue_district !== this.selectedDistrict) {
-      return false;
-    }
+  const addParam = (key: string, value: any) => {
+    params[key] = value ?? '';
+  };
+  addParam('search', this.search || '');
+  addParam('district', this.selectedDistrict || '');
+  addParam('community', this.selectedCommunity || '');
+  addParam('caste', this.selectedCaste || '');
+  addParam('police_city', this.selectedPoliceCity || '');
+  addParam('police_zone', this.selectedZone || '');
+  addParam('Filter_From_Date', this.selectedFromDate || '');
+  addParam('Filter_To_Date', this.selectedToDate || '');
+  addParam('Status_Of_Case', this.selectedStatus || '');
 
-    // Police City filter
-    if (this.selectedPoliceCity && this.selectedPoliceCity !== '' && 
-        item.police_city !== this.selectedPoliceCity) {
-      return false;
-    }
-
-    // Police Zone filter
-    if (this.selectedZone && this.selectedZone !== '' && 
-        item.police_zone !== this.selectedZone) {
-      return false;
-    }
-
-    // Community filter
-    if (this.selectedCommunity && this.selectedCommunity !== '' && 
-        item.community !== this.selectedCommunity) {
-      return false;
-    }
-
-    // Caste filter
-    if (this.selectedCaste && this.selectedCaste !== '' && 
-        item.caste !== this.selectedCaste) {
-      return false;
-    }
-
-    // Status filter (UI: status <= 5, PT: status > 5)
-    if (this.selectedStatus && this.selectedStatus !== '') {
-      if (this.selectedStatus === 'UI' && item.filter_status > 5) {
-        return false;
-      }
-      if (this.selectedStatus === 'PT' && item.filter_status <= 5) {
-        return false;
-      }
-    }
-
-    // Date range filter
-  if (this.selectedFromDate || this.selectedToDate) {
-  const registrationDate = new Date(item.date_of_registration);
-  
-  if (this.selectedFromDate && !this.selectedToDate) {
-    const fromDate = new Date(this.selectedFromDate);
-    if (registrationDate < fromDate) {
-      return false;
-    }
-  }
-  
-  if (this.selectedToDate && !this.selectedFromDate) {
-    const toDate = new Date(this.selectedToDate);
-    if (registrationDate > toDate) {
-      return false;
-    }
-  }
-
-  if (this.selectedToDate && this.selectedFromDate) {
-    const fromDate = new Date(this.selectedFromDate);
-    const toDate = new Date(this.selectedToDate);
-    if (registrationDate < fromDate || registrationDate > toDate) {
-      return false;
-    }
-  }
+  return params;
 }
 
-    return true;
+
+ applyFilters() {
+  // If user is district-level, lock district param
+  if (
+    (this.Parsed_UserInfo.access_type === 'District' && this.Parsed_UserInfo.role === 4) ||
+    this.Parsed_UserInfo.role === 3
+  ) {
+    this.selectedDistrict = this.Parsed_UserInfo.district?.district || this.Parsed_UserInfo.district;
+  }
+
+  const payload = this.getFilterParams(); // 👈 build payload from current filters
+  // console.log('Payload sent to API:', payload);
+
+  this.loader = true;
+
+  this.additionalReportService.getAdditionalRelief(payload).subscribe({
+    next: (response) => {
+      this.reportData = response.data.map((item: any, index: number) => ({
+        sl_no: index + 1,
+        asperact: item.asperact,
+        revenue_district: item.revenue_district,
+        police_city: item.police_city,
+        police_station: item.police_station,
+        fir_number: item.fir_number === 'NULL' || !item.fir_number ? '' : item.fir_number,
+        FIR_date: formatDate(item.FIR_date, 'yyyy-MM-dd', 'en'),
+        victimName: item.victimName === 'NULL' ? '' : item.victimName,
+        gender: item.gender === 'NULL' ? '' : item.gender,
+        community: item.community === 'NULL' ? '' : item.community,
+        caste: item.caste === 'NULL' ? '' : item.caste,
+        fir_id:item.fir_id,
+        created_by:item.created_by,
+        reason_for_status:item.reason_for_status,
+
+        EmpStatus: item.EmpStatus,
+        JobGivendate: item.JobGivendate,
+        Employmentrelationship: item.Employmentrelationship,
+        department_name: item.department_name,
+        designation: item.designation,
+
+        PensionStatus: item.PensionStatus,
+        PensionGivendate: item.PensionGivendate
+          ? formatDate(item.PensionGivendate, 'yyyy-MM-dd', 'en')
+          : '',
+        Pensionrelationship: Array.isArray(item.Pensionrelationship)
+          ? item.Pensionrelationship.length === 1
+            ? item.Pensionrelationship[0]
+            : item.Pensionrelationship.join(', ')
+          : item.Pensionrelationship,
+
+        PattaStatus: item.PattaStatus,
+        PattaGivendate: item.PattaGivendate
+          ? formatDate(item.PattaGivendate, 'yyyy-MM-dd', 'en')
+          : '',
+
+        EducationStatus: item.EducationStatus,
+        Schoolorcollege: item.Schoolorcollege,
+        EducationGivendate: item.EducationGivendate
+          ? formatDate(item.EducationGivendate, 'yyyy-MM-dd', 'en')
+          : '',
+      }));
+
+      this.filteredData = [...this.reportData];
+      console.log("Filter Data",this.filteredData);
+      this.loader = false;
+      this.cdr.detectChanges();
+    },
+    error: (error) => {
+      this.loader = false;
+      console.error('Error fetching reports:', error);
+    },
   });
 }
 
@@ -589,6 +610,9 @@ export class AdditionalReliefReportComponent implements OnInit {
           gender: item.gender === "NULL" ? '' : item.gender,
           community: item.community === "NULL" ? '' : item.community,
           caste: item.caste === "NULL" ? '' : item.caste,
+          fir_id:item.fir_id,
+          created_by:item.created_by,
+          reason_for_status:item.reason_for_status,
          
           EmpStatus:item.EmpStatus,
           JobGivendate:item.JobGivendate,
@@ -615,6 +639,7 @@ export class AdditionalReliefReportComponent implements OnInit {
 }));
         // Update filteredData to reflect the API data
         this.filteredData = [...this.reportData]; 
+        console.log("filter",this.filteredData);
         this.loader = false;
         this.cdr.detectChanges(); // Trigger change detection
       },
@@ -628,6 +653,134 @@ export class AdditionalReliefReportComponent implements OnInit {
  get ungroupedColumns(): DisplayedColumn[] {
   return this.displayedColumns.filter(col => col.group === null && col.visible);
 }
+
+open(content: TemplateRef<any>, record?: any) {
+  this.selectedRecord = record;
+  this.reasonData = {employment:'', pension: '', patta: '', education: '' }; // reset data
+  this.modalService.open(content, {
+    size: 'lg',
+    centered: true,
+    backdrop: 'static',
+  });
+}
+
+private getDismissReason(reason: any): string {
+  switch (reason) {
+    case ModalDismissReasons.ESC:
+      return 'by pressing ESC';
+    case ModalDismissReasons.BACKDROP_CLICK:
+      return 'by clicking on a backdrop';
+    default:
+      return `with: ${reason}`;
+  }
+}
+closeTab() {
+  const modalElement = document.getElementById('reasonModal'); 
+  if (modalElement) {
+    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+    modalInstance?.hide();
+  }
+}
+
+openReasonModal(record: any) {
+  this.selectedRecord = record;
+
+  // Reset all fields first
+  this.reasonData = { employment: '', pension: '', patta: '', education: '' };
+
+  // ✅ Parse the reason_for_status if it exists and is not empty
+  try {
+    if (record.reason_for_status) {
+      // Convert JSON string to array (if it’s stored as string)
+      const parsedReasons = typeof record.reason_for_status === 'string'
+        ? JSON.parse(record.reason_for_status)
+        : record.reason_for_status;
+
+      // ✅ Loop through and map to textarea fields
+      parsedReasons.forEach((item: any) => {
+        switch (item.sub_category) {
+          case 'job':
+            this.reasonData.employment = item.report_reason || '';
+            break;
+          case 'pension':
+            this.reasonData.pension = item.report_reason || '';
+            break;
+          case 'patta':
+            this.reasonData.patta = item.report_reason || '';
+            break;
+          case 'education':
+            this.reasonData.education = item.report_reason || '';
+            break;
+        }
+      });
+    }
+  } catch (err) {
+    console.error('Error parsing reason_for_status:', err);
+  }
+
+  // ✅ Open Bootstrap modal
+  const modalEl = document.getElementById('reasonModal');
+  this.modalInstance = new bootstrap.Modal(modalEl);
+  this.modalInstance.show();
+
+  console.log('🟢 Loaded reasons:', this.reasonData);
+}
+
+
+saveReason(): void {
+  if (!this.selectedRecord) return;
+
+  // Build sub-category reasons array
+  const reason_for_status: any[] = [];
+
+  if (this.reasonData.employment) {
+    reason_for_status.push({ sub_category: 'job', report_reason: this.reasonData.employment });
+  }
+  if (this.reasonData.pension) {
+    reason_for_status.push({ sub_category: 'pension', report_reason: this.reasonData.pension });
+  }
+  if (this.reasonData.patta) {
+    reason_for_status.push({ sub_category: 'patta', report_reason: this.reasonData.patta });
+  }
+  if (this.reasonData.education) {
+    reason_for_status.push({ sub_category: 'education', report_reason: this.reasonData.education });
+  }
+
+  const payload = {
+    reason_for_status,
+    fir_id: this.selectedRecord.fir_id,
+    category: 'Additional Relief',
+    created_by: Number(this.selectedRecord.created_by)
+  };
+
+  console.log('Payload:', payload);
+
+  this.additionalReportService.updateAdditionalReliefReason(payload).subscribe({
+    next: (response) => {
+      console.log('API Response:', response);
+      Swal.fire('Updated Successfully!', 'Reason details updated successfully.', 'success');
+
+      // ✅ Update same row in filtered data list
+      const updatedRow = this.filteredData.find(
+        (item: any) => item.fir_id === this.selectedRecord.fir_id
+      );
+      if (updatedRow) {
+        updatedRow.reason_for_status = JSON.stringify(reason_for_status); // refresh locally
+      }
+
+      // ✅ Close modal
+      this.modalInstance.hide();
+
+      // ✅ Detect UI changes
+      this.cdr.detectChanges();
+    },
+    error: (error) => {
+      console.error('Error updating reason:', error);
+      Swal.fire('Error', 'Failed to update reason. Please try again.', 'error');
+    }
+  });
+}
+
 }
 
 interface DisplayedColumn {

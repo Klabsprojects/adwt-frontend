@@ -21,7 +21,7 @@ export type ChartOptions = {
 export class UiCaseComponent implements OnInit, OnDestroy {
   loading:boolean=false;
   private subscription = new Subscription();
-  @ViewChild("chart") chart: ChartComponent;
+  @ViewChild("chart") chart!: ChartComponent;
   public chartOptions: ChartOptions;
   constructor(private hcs:homeCaseService, private cdr:ChangeDetectorRef){
     this.chartOptions = {
@@ -101,38 +101,49 @@ export class UiCaseComponent implements OnInit, OnDestroy {
   // barChart2: Chart | null = null;
   // uiBar: number[] = [];
   ngOnInit(): void {
-    this.subscription.add(
-      this.hcs.uibar$.subscribe((res: any) => {
-        if (res) {
-          const completed = [res.pt_less_than_1_year,res.pt_1_to_5_years,res.pt_6_to_10_years,res.pt_11_to_20_years,res.pt_greater_than_20_years];
-          // const categories = Object.keys(res);
-          const categories = ['< 1 year', '1 - 5 year', '6 - 10 year','11 - 20 year','> 20 year'];
-          this.chartOptions.series = [
-            { name: 'Cases', data: completed },
-          ];
-          this.chartOptions.xaxis = {
-            categories
-          };
-          this.cdr.detectChanges();
-          // this.uiBar = [
-          //   Number(res.ui_less_than_2_month) || 0,
-          //   Number(res.ui_2_to_4_month) || 0,
-          //   Number(res.ui_4_to_6_month) || 0,
-          //   Number(res.ui_6_to_12_month) || 0,
-          //   Number(res.ui_greater_than_1_year) || 0,
-          // ];
-          // this.createbarChart2();
-        }
+  // 🔹 Subscription for Bar Chart Data
+  this.subscription.add(
+    this.hcs.uibar$.subscribe((res: any) => {
+      console.log("response", res);
+
+      // ✅ Process only when valid data is received
+      if (res && Object.keys(res).length > 0) {
+        const completed = [
+          Number(res.ui_less_than_2_month) || 0,
+          Number(res.ui_2_to_4_month) || 0,
+          Number(res.ui_4_to_6_month) || 0,
+          Number(res.ui_6_to_12_month) || 0,
+          Number(res.ui_greater_than_1_year) || 0
+        ];
+
+        const categories = [
+          '< 2 Month',
+          '2 - 4 Month',
+          '4 - 6 Month',
+          '6 - 12 Month',
+          '> 1 Year'
+        ];
+
+        this.chartOptions = {
+          ...this.chartOptions,
+          series: [{ name: 'Cases', data: completed }],
+          xaxis: { categories }
+        };
+
         this.cdr.detectChanges();
-      })
-    )
-    this.subscription.add(
-      this.hcs.isUibarLoading$.subscribe((res:any)=>{
-        this.loading = res;
-        this.cdr.detectChanges();
-      })
-    )
-  }
+      }
+    })
+  );
+
+  // 🔹 Subscription for Loader
+  this.subscription.add(
+    this.hcs.isUibarLoading$.subscribe((res: any) => {
+      this.loading = !!res; // ensure boolean
+      this.cdr.detectChanges();
+    })
+  );
+}
+
   
   // createbarChart2(): void {
   //   const uiBar = this.uiBar;

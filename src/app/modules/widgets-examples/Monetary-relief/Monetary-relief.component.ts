@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit, signal, TemplateRef, WritableSignal } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FirListTestService } from 'src/app/services/fir-list-test.service';
@@ -19,6 +19,7 @@ import { PoliceDivisionService } from 'src/app/services/police-division.service'
 import { firstValueFrom, of } from 'rxjs';
 import * as XLSX from 'xlsx';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-monetary-relief',
@@ -38,6 +39,8 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
   styleUrls: ['./monetary-relief.component.scss'],
 })
 export class MonetaryReliefComponent implements OnInit {
+  private modalService = inject(NgbModal);
+  closeResult: WritableSignal<string> = signal('');
   // Variable Declarations
   searchText: string = '';
   reportData: Array<any> = [];
@@ -76,6 +79,8 @@ allStageOptions = [
   
   isReliefLoading: boolean = true;
   loading: boolean = false;
+  pendingReason : string = '';
+  selectedData:any;
   // Filters
   selectedDistrict: string = '';
   selectedColumns: string[] = [];
@@ -150,6 +155,14 @@ displayedColumns: DisplayedColumn[] = [
     group: null,
     sortable: false,
     visible: true,
+    sortDirection: null,
+  },
+  {
+    label: 'FIR ID',
+    field: 'fir_id',
+    group: null,
+    sortable: false,
+    visible: false,
     sortDirection: null,
   },
   {
@@ -471,11 +484,11 @@ displayedColumns: DisplayedColumn[] = [
 //   sortDirection: null,
 // },
 {
-  label: 'Reason for Pending - Current Month',
+  label: 'Reason for Pending ',
   field: 'report_reason',
   group: null,
   sortable: true,
-  visible: false,
+  visible: true,
   sortDirection: null,
 },
 ];
@@ -852,6 +865,7 @@ fetchMonetaryReliefDetails(page: number = 1, pageSize: number = this.pageSize):a
         this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
         this.reportData = response.data.map((item: any, index: number) => ({
           sl_no: startIndex + index + 1,
+          fir_id:item.fir_id,
           fir_number: item.fir_number === "NULL" || !item.fir_number ? '' : item.fir_number,
           FIR_date: formatDate(item.FIR_date, 'yyyy-MM-dd', 'en'),
           police_city: item.police_city,
@@ -902,10 +916,12 @@ fetchMonetaryReliefDetails(page: number = 1, pageSize: number = this.pageSize):a
           trial_pending_days:item.chargesheet_status === 'Relief Given' ? '-' : item.trial_pending_days,
           fir_proposal_status:item.fir_proposal_status,
           chargesheet_proposal_status:item.chargesheet_proposal_status,
-          trail_proposal_status:item.trail_proposal_status 
+          trail_proposal_status:item.trail_proposal_status ,
+          created_by: item.created_by
         }));
        
         this.filteredData = [...this.reportData];
+        console.log("filter",this.filteredData)
         this.loader = false;
         this.cdr.detectChanges();
       },
@@ -1245,7 +1261,73 @@ reliefStage(event: any) {
   }
 }
 
+openReasonModal(data: any) {
+  console.log('Selected Data:', data);
+  this.selectedData = data;
+  this.pendingReason = data?.report_reason || '';
+}
 
+submitReason() {
+  if (!this.pendingReason.trim()) {
+    alert('Please enter a reason.');
+    return;
+  }
+
+  const payload = {
+    fir_id: this.selectedData.fir_id,
+    category: 'monetary',
+    reason_for_status: this.pendingReason,
+    created_by: this.selectedData.created_by
+  };
+
+  console.log('Payload:', payload);
+
+  this.monetaryReliefService.updateMonetaryReliefDetails(payload).subscribe({
+    next: (response) => {
+      console.log('API Response:', response);
+      alert('Reason updated successfully!');
+
+      // ✅ Update the same row in table data
+      const updatedRow = this.filteredData.find(
+        (item: any) => item.fir_id === this.selectedData.fir_id
+      );
+      if (updatedRow) {
+        updatedRow.report_reason = this.pendingReason;
+      }
+
+      // ✅ Close the modal after success
+      this.modalService.dismissAll();
+
+      // ✅ Trigger UI refresh if using ChangeDetectorRef
+      this.cdr.detectChanges();
+    },
+    error: (error) => {
+      console.error('Error updating reason:', error);
+      alert('Failed to update reason.');
+    }
+  });
+}
+
+open(content: TemplateRef<any>) {
+  this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then(
+    (result) => {
+      this.closeResult.set(`Closed with: ${result}`);
+    },
+    (reason) => {
+      this.closeResult.set(`Dismissed ${this.getDismissReason(reason)}`);
+    },
+  );
+}
+private getDismissReason(reason: any): string {
+  switch (reason) {
+    case ModalDismissReasons.ESC:
+      return 'by pressing ESC';
+    case ModalDismissReasons.BACKDROP_CLICK:
+      return 'by clicking on a backdrop';
+    default:
+      return `with: ${reason}`;
+  }
+}
 
 }
 

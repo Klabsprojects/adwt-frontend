@@ -35,6 +35,12 @@ import { FirListComponent } from '../fir-list/fir-list.component';
 })
 export class MrfAbstractComponent {
 // Variable Declarations
+  sortColumn: 'fir' | 'chargesheet' | 'trial' | null = null;
+  sortDirection: 'asc' | 'desc' = 'asc';
+  showFirProposal:boolean = true;
+  showChargesheetProposal:boolean = true;
+  showTrialProposal:boolean=true;
+  Colspan = 4;
   searchText: string = '';
   reportData: Array<any> = [];
   filteredData: Array<any> = [];
@@ -134,7 +140,7 @@ displayedColumns: DisplayedColumn[] = [
     sortDirection: null,
   },
     {
-    label: 'Non MF Cases',
+    label: 'Atrocity Cases',
     field: 'nonmf_case',
     group: null,
     sortable: true,
@@ -279,7 +285,7 @@ ngOnInit(): void {
 
   // 🔹 Restore saved filters from sessionStorage
   const savedFilters = sessionStorage.getItem('mrfFilters');
-console.log(savedFilters);
+
 
 if (savedFilters) {
   const filters = JSON.parse(savedFilters);
@@ -443,17 +449,25 @@ if (savedFilters) {
   //   );
   // }
 
+sortTablePopup(column: 'fir' | 'chargesheet' | 'trial') {
+  if (this.sortColumn === column) {
+    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+  } else {
+    this.sortColumn = column;
+    this.sortDirection = 'asc';
+  }
+}
 caseDetailsExport() {
   const dataToExport = this.tableFilteredData();
 
   let headerRow1: string[] = ["S.No", "FIR Number","Police Station", "Register Date"];
-  let headerRow2: string[] = ["", "", "",""];
+  let headerRow2: string[] = ["", "", "","",];
   let dataRows: any[][] = [];
 
   if (this.showFIR && !this.showChargesheet && !this.showTrial) {
     // 🔹 FIR only
-    headerRow1.push("FIR", "", "");
-    headerRow2.push("Proposal Sent to DC", "Status", "Pending Days");
+    headerRow1.push("FIR", "", "", "");
+    headerRow2.push("Proposal Sent to DC", "Status", "Pending Days","Proposal Pending Days");
 
     dataRows = dataToExport.map((d: any, i: number) => [
       i + 1,
@@ -462,13 +476,14 @@ caseDetailsExport() {
       new Date(d.register_date).toLocaleDateString('en-GB'),
       d.fir_proposal_status,
       d.fir_status,
-      d.fir_status === 'Relief Given' ? '-' : d.fir_pending_days
+      d.fir_status === 'Relief Given' ? '-' : d.fir_pending_days,
+      d.fir_proposal_pending_days,
     ]);
   } 
   else if (this.showChargesheet && !this.showFIR && !this.showTrial) {
     // 🔹 Chargesheet only
-    headerRow1.push("Chargesheet", "", "");
-    headerRow2.push("Proposal Sent to DC", "Status", "Pending Days");
+    headerRow1.push("Chargesheet", "", "","");
+    headerRow2.push("Proposal Sent to DC", "Status", "Pending Days","Proposal Pending Days");
 
     dataRows = dataToExport.map((d: any, i: number) => [
       i + 1,
@@ -477,7 +492,8 @@ caseDetailsExport() {
       new Date(d.register_date).toLocaleDateString('en-GB'),
       d.chargesheet_proposal_status,
       d.chargesheet_status,
-      d.chargesheet_status === 'Relief Given' ? '-' : d.chargesheet_pending_days
+      d.chargesheet_status === 'Relief Given' ? '-' : d.chargesheet_pending_days,
+      d.chargesheet_proposal_pending_days
     ]);
   } 
   else if (this.showTrial && !this.showFIR && !this.showChargesheet) {
@@ -492,7 +508,8 @@ caseDetailsExport() {
       new Date(d.register_date).toLocaleDateString('en-GB'),
       d.trial_proposal_status,
       d.trial_status,
-      d.trial_status === 'Relief Given' ? '-' : d.trial_pending_days
+      d.trial_status === 'Relief Given' ? '-' : d.trial_pending_days,
+      d.trial_proposal_pending_days
     ]);
   }
   else if (!this.showTrial && !this.showFIR && !this.showChargesheet) {
@@ -505,11 +522,11 @@ caseDetailsExport() {
   } 
   else {
     // 🔹 District / All → include everything
-    headerRow1.push("FIR","","","Chargesheet","","","Trial","","");
+    headerRow1.push("FIR","","","","Chargesheet","","","","Trial","","","");
     headerRow2.push(
-      "Proposal Sent to DC","Status","Pending Days",
-      "Proposal Sent to DC","Status","Pending Days",
-      "Proposal Sent to DC","Status","Pending Days"
+      "Proposal Sent to DC","Status","Pending Days","Proposal Pending Days",
+      "Proposal Sent to DC","Status","Pending Days","Proposal Pending Days",
+      "Proposal Sent to DC","Status","Pending Days","Proposal Pending Days"
     );
 
     dataRows = dataToExport.map((d: any, i: number) => [
@@ -520,12 +537,15 @@ caseDetailsExport() {
       d.fir_proposal_status,
       d.fir_status,
       d.fir_status === 'Relief Given' ? '-' : d.fir_pending_days,
+      d.fir_proposal_pending_days,
       d.chargesheet_proposal_status,
       d.chargesheet_status,
       d.chargesheet_status === 'Relief Given' ? '-' : d.chargesheet_pending_days,
+      d.chargesheet_proposal_pending_days,
       d.trial_proposal_status,
       d.trial_status,
-      d.trial_status === 'Relief Given' ? '-' : d.trial_pending_days
+      d.trial_status === 'Relief Given' ? '-' : d.trial_pending_days,
+      d.trial_proposal_pending_days
     ]);
   }
 
@@ -541,15 +561,15 @@ ws['!merges'].push({ s: { r: 0, c: 3 }, e: { r: 1, c: 3 } }); // Register Date
 
 // 🔹 Stage headers (merge horizontally)
 if (this.showFIR && !this.showChargesheet && !this.showTrial) {
-  ws['!merges'].push({ s: { r: 0, c: 4 }, e: { r: 0, c: 6 } }); // FIR
+  ws['!merges'].push({ s: { r: 0, c: 4 }, e: { r: 0, c: 7 } }); // FIR 4 cols
 } else if (this.showChargesheet && !this.showFIR && !this.showTrial) {
-  ws['!merges'].push({ s: { r: 0, c: 4 }, e: { r: 0, c: 6 } }); // Chargesheet
+  ws['!merges'].push({ s: { r: 0, c: 4 }, e: { r: 0, c: 7 } }); // Chargesheet 4 cols
 } else if (this.showTrial && !this.showFIR && !this.showChargesheet) {
-  ws['!merges'].push({ s: { r: 0, c: 4 }, e: { r: 0, c: 6 } }); // Trial
+  ws['!merges'].push({ s: { r: 0, c: 4 }, e: { r: 0, c: 7 } }); // Trial 4 cols
 } else {
-  ws['!merges'].push({ s: { r: 0, c: 4 }, e: { r: 0, c: 6 } });  // FIR
-  ws['!merges'].push({ s: { r: 0, c: 7 }, e: { r: 0, c: 9 } });  // Chargesheet
-  ws['!merges'].push({ s: { r: 0, c: 10 }, e: { r: 0, c: 12 } }); // Trial
+  ws['!merges'].push({ s: { r: 0, c: 4 }, e: { r: 0, c: 7 } });   // FIR
+  ws['!merges'].push({ s: { r: 0, c: 8 }, e: { r: 0, c: 11 } });  // Chargesheet
+  ws['!merges'].push({ s: { r: 0, c: 12 }, e: { r: 0, c: 15 } }); // Trial
 }
 
   // 🔹 Create workbook & export
@@ -574,7 +594,7 @@ onBtnExport(): void {
   // Define multi-row headers
   const headers = [
     [
-      'Sl. No.', 'District', 'Total Cases', 'MF Case', 'Non MF Cases', 'Proposal Not Yet Received',
+      'Sl. No.', 'District', 'Total Cases', 'MF Case', 'Atrocity Cases', 'Proposal Not Yet Received',
       'FIR Relief', '', '',
       'Chargesheet Relief', '', '',
       'Trial Relief', '', ''
@@ -675,7 +695,7 @@ onBtnExportPDF(): void {
       { content: 'District', rowSpan: 2 },
       { content: 'Total Cases', rowSpan: 2 },
       { content: 'MF Case', rowSpan: 2 },
-      { content: 'Non MF Case', rowSpan: 2 },
+      { content: 'Atrocity Cases', rowSpan: 2 },
       { content: 'Proposal Not Yet Received', rowSpan: 2 },
       { content: 'FIR Relief', colSpan: 3 },
       { content: 'Chargesheet Relief', colSpan: 3 },
@@ -957,6 +977,8 @@ getColumnTotal(field: string): number {
   return this.displayedColumns.filter(col => col.visible);
 }
 
+
+
 openReliefPopup(report: any, status: string): void {
   this.selectedDistrict = report.revenue_district;
   this.tableSearchText = '';
@@ -970,6 +992,10 @@ openReliefPopup(report: any, status: string): void {
   this.showChargesheet = true;
   this.showTrial = true;
 
+  this.showFirProposal = true;
+  this.showChargesheetProposal = true;
+  this.showTrialProposal = true;
+
   // 👇 If "mf", hide FIR/Chargesheet/Trial sections
   if (status === 'mf') {
     this.showFIR = false;
@@ -982,10 +1008,14 @@ openReliefPopup(report: any, status: string): void {
     this.selectedStage = `Total Case Details`;
   }
   else if(status === 'nonmf'){
-    this.selectedStage = `Non MF Case Details`;
+    this.selectedStage = `Atrocity Case Details`;
   }
   else if(status === 'notyetreceived'){
     this.selectedStage = `Proposal Not Yet Received	`;
+    this.showFirProposal = false;
+    this.showChargesheetProposal = false;
+    this.showTrialProposal = false;
+    this.Colspan = 3;
   }
   // ✅ Show modal immediately with spinner
   this.ngZone.run(() => {
@@ -1017,12 +1047,16 @@ openReliefPopup(report: any, status: string): void {
           fir_proposal_status: item.fir_proposal_status || '-',
           fir_status: item.fir_status || '-',
           fir_pending_days: item.fir_pending_days ?? '-',
+          fir_proposal_pending_days: item.fir_proposal_pending_days ?? '-',
           chargesheet_proposal_status: item.chargesheet_proposal_status || '-',
           chargesheet_status: item.chargesheet_status || '-',
           chargesheet_pending_days: item.chargesheet_pending_days ?? '-',
+          chargesheet_proposal_pending_days: item.chargesheet_proposal_pending_days ?? '-',
           trial_proposal_status: item.trial_proposal_status || '-',
           trial_status: item.trial_status || '-',
           trial_pending_days: item.trial_pending_days ?? '-',
+          trial_proposal_pending_days: item.trial_proposal_pending_days ?? '-'
+
         }));
       }
 
@@ -1034,7 +1068,10 @@ openReliefPopup(report: any, status: string): void {
 
 openPendingPopup(report: any, type: 'fir' | 'charge' | 'trial'): void {
   this.selectedDistrict = report.revenue_district;
-
+   this.showFirProposal = true;
+  this.showChargesheetProposal = true;
+  this.showTrialProposal = true;
+  this.Colspan = 4;
   // Configure popup based on type
   const config: any = {
     fir: {
@@ -1051,7 +1088,8 @@ openPendingPopup(report: any, type: 'fir' | 'charge' | 'trial'): void {
         register_date: item.register_date,
         fir_proposal_status: item.fir_proposal_status || '-',
         fir_status: item.fir_status || '-',
-        fir_pending_days: item.fir_pending_days ?? '-'
+        fir_pending_days: item.fir_pending_days ?? '-',
+        fir_proposal_pending_days: item.fir_proposal_pending_days ?? '-'
       })
     },
     charge: {
@@ -1068,7 +1106,8 @@ openPendingPopup(report: any, type: 'fir' | 'charge' | 'trial'): void {
         register_date: item.register_date,
         chargesheet_proposal_status: item.chargesheet_proposal_status || '-',
         chargesheet_status: item.chargesheet_status || '-',
-        chargesheet_pending_days: item.chargesheet_pending_days ?? '-'
+        chargesheet_pending_days: item.chargesheet_pending_days ?? '-',
+        chargesheet_proposal_pending_days: item.chargesheet_proposal_pending_days ?? '-'
       })
     },
     trial: {
@@ -1085,7 +1124,8 @@ openPendingPopup(report: any, type: 'fir' | 'charge' | 'trial'): void {
         register_date: item.register_date,
         trial_proposal_status: item.trial_proposal_status || '-',
         trial_status: item.trial_status || '-',
-        trial_pending_days: item.trial_pending_days ?? '-'
+        trial_pending_days: item.trial_pending_days ?? '-',
+        trial_proposal_pending_days: item.trial_proposal_pending_days ?? '-'
       })
     }
   };
@@ -1118,7 +1158,10 @@ openPendingPopup(report: any, type: 'fir' | 'charge' | 'trial'): void {
 
 openGivenPopup(report: any, type: 'fir' | 'charge' | 'trial'): void {
   this.selectedDistrict = report.revenue_district;
-
+  this.showFirProposal = false;
+  this.showChargesheetProposal = false;
+  this.showTrialProposal = false;
+  this.Colspan = 3;
   // Configuration for each type
   const config: any = {
     fir: {
@@ -1264,41 +1307,96 @@ getPageNumbers(): number[] {
 //     );
 // }
 
+// tableFilteredData() {
+//   if (!this.tableSearchText) {
+//     return this.popupData;
+//   }
+
+//   const lower = this.tableSearchText.toLowerCase();
+
+//   return this.popupData.filter(d => {
+//     const fields = [
+//       d.fir_number_full,
+//       d.fir_proposal_status,
+//       d.fir_status,
+//       d.fir_pending_days,
+//       d.police_station
+//     ];
+//     if (this.showAllStages) {
+//       fields.push(
+//         d.chargesheet_proposal_status,
+//         d.chargesheet_status,
+//         d.chargesheet_pending_days,
+//         d.trial_proposal_status,
+//         d.trial_status,
+//         d.trial_pending_days
+//       );
+//     }
+
+//     return fields
+//       .map(val => (val !== null && val !== undefined ? String(val).toLowerCase() : ''))
+//       .some(val => val.includes(lower));
+//   });
+// }
+
 tableFilteredData() {
-  if (!this.tableSearchText) {
-    return this.popupData;
+  let data = [...this.popupData]; // clone array to avoid mutating original
+
+  // 🔍 Search Filter
+  if (this.tableSearchText && this.tableSearchText.trim() !== '') {
+    const lower = this.tableSearchText.toLowerCase();
+    data = data.filter(d => {
+      const fields = [
+        d.fir_number_full,
+        d.fir_proposal_status,
+        d.fir_status,
+        d.fir_pending_days,
+        d.fir_proposal_pending_days,
+        d.police_station
+      ];
+
+      if (this.showAllStages) {
+        fields.push(
+          d.chargesheet_proposal_status,
+          d.chargesheet_status,
+          d.chargesheet_pending_days,
+          d.chargesheet_proposal_pending_days,
+          d.trial_proposal_status,
+          d.trial_status,
+          d.trial_pending_days,
+          d.trial_proposal_pending_days
+        );
+      }
+
+      return fields
+        .map(val => (val !== null && val !== undefined ? String(val).toLowerCase() : ''))
+        .some(val => val.includes(lower));
+    });
   }
 
-  const lower = this.tableSearchText.toLowerCase();
+  // 🔼🔽 Sorting Logic
+  if (this.sortColumn) {
+    const sortKey =
+      this.sortColumn === 'fir'
+        ? 'fir_pending_days'
+        : this.sortColumn === 'chargesheet'
+        ? 'chargesheet_pending_days'
+        : 'trial_pending_days';
 
-  return this.popupData.filter(d => {
-    // Always search in FIR fields
-    const fields = [
-      d.fir_number_full,
-      d.fir_proposal_status,
-      d.fir_status,
-      d.fir_pending_days,
-      d.police_station
-    ];
+    data.sort((a, b) => {
+      const valA = Number(a[sortKey]) || 0;
+      const valB = Number(b[sortKey]) || 0;
 
-    // If all stages are shown, include chargesheet + trial fields
-    if (this.showAllStages) {
-      fields.push(
-        d.chargesheet_proposal_status,
-        d.chargesheet_status,
-        d.chargesheet_pending_days,
-        d.trial_proposal_status,
-        d.trial_status,
-        d.trial_pending_days
-      );
-    }
+      if (this.sortDirection === 'asc') {
+        return valA - valB;
+      } else {
+        return valB - valA;
+      }
+    });
+  }
 
-    return fields
-      .map(val => (val !== null && val !== undefined ? String(val).toLowerCase() : ''))
-      .some(val => val.includes(lower));
-  });
+  return data;
 }
-
 
 
 tableTotalPages() {

@@ -198,3 +198,12 @@ label.required::after {
   content: " *";
   color: red;
 }
+input[type="date"] {
+  pointer-events: auto;
+  user-select: none;
+}
+
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-clear-button {
+  display: none;
+}

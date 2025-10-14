@@ -41,6 +41,7 @@ import { MrfAbstractComponent } from './mrf-abstract/mrf-abstract.component';
 import { AfterAbstractComponent } from './after-abstract/after-abstract.component';
 import { BeforeAbstractComponent } from './before-abstract/before-abstract.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { WhatsappMessageComponent } from './whatsapp-message/whatsapp-message.component';
 
 const routes: Routes = [
   {
@@ -104,6 +105,7 @@ const routes: Routes = [
       { path: 'caste-and-community', component: CasteAndCommunityComponent },
       { path: 'fir-list', component: FirListComponent },
       { path: 'legacy-fir-list', component:LegacyFirListComponent},
+      { path: 'whatsapp-message', component:WhatsappMessageComponent},
       { path: 'add-fir', data: { title: 'Home Page' }, loadComponent: () => import('./add-fir/add-fir.component').then(m => m.AddFirComponent), },
       {
         path: 'statistics',

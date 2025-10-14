@@ -12,9 +12,9 @@ export class AdditionalAbstractReportService {
   constructor(private http: HttpClient) {}
 
   // Fetches all monetary report details 
-  getBeforeAbstract(district?:string): Observable<any> {
-    const requestBody = {
-    district: district || '',
+  getBeforeAbstract(payload:any): Observable<any> {
+    const defaultPayload = {
+    district: '',
     community: '',
     caste: '',
     police_city: '',
@@ -23,13 +23,15 @@ export class AdditionalAbstractReportService {
     Filter_From_Date: '',
     Filter_To_Date: ''
   };
+    const requestBody = { ...defaultPayload, ...payload };
+
     return this.http.post(`${this.baseUrl}/addtionalReport/bf/abstract`,requestBody);
   }
 
 
-  getAfterAbstract(district?:string): Observable<any> {
-    const requestBody = {
-    district: district || '',
+  getAfterAbstract(payload:any): Observable<any> {
+    const defaultPayload = {
+    district: '',
     community: '',
     caste: '',
     police_city: '',
@@ -38,22 +40,31 @@ export class AdditionalAbstractReportService {
     Filter_From_Date: '',
     Filter_To_Date: ''
   };
+  const requestBody = { ...defaultPayload, ...payload };
     return this.http.post(`${this.baseUrl}/addtionalReport/af/abstract`,requestBody);
   }
 
-   // service
-getAdditionalRelief(district?: string): Observable<any> {
-  const requestBody: any = {
-    district: district || '',
+getAdditionalRelief(payload: any): Observable<any> {
+  const defaultPayload = {
+    district: '',
     community: '',
     caste: '',
     police_city: '',
     Status_Of_Case: '',
     police_zone: '',
+    Filter_From_Date: '',
+    Filter_To_Date: '',
+    search:''
   };
+
+  // Merge defaults with payload (to ensure all keys are present)
+  const requestBody = { ...defaultPayload, ...payload };
+
   return this.http.post(`${this.baseUrl}/additionalReliefData`, requestBody);
 }
-
+updateAdditionalReliefReason(data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/additionalreport/additionalReliefReportReason`, data);
+  }
 
   
 }

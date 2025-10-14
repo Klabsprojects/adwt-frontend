@@ -310,15 +310,15 @@ export class VmcComponent implements OnInit {
       const formattedappointment_date = this.formatDateForBackend(this.member.appointment_date);
       const formattedValidityDate = this.formatDateForBackend(this.member.validityEndDate);
 
-      if (!formattedappointment_date) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Please enter valid dates.',
-          confirmButtonColor: '#d33',
-        });
-        return;
-      }
+      // if (!formattedappointment_date) {
+      //   Swal.fire({
+      //     icon: 'error',
+      //     title: 'Error',
+      //     text: 'Please enter valid dates.',
+      //     confirmButtonColor: '#d33',
+      //   });
+      //   return;
+      // }
 
       if (this.isInvalidBasedOnLevel()) {
         Swal.fire({

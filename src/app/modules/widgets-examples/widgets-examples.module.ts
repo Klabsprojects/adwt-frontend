@@ -42,10 +42,12 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { LegacyFirListComponent } from './legacy-fir-list/legacy-fir-list.component';
 import { ReliefListComponent } from './relief-list/relief-list.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
-
+import { RestrictAllFutureDatesDirective } from 'src/app/directives/restrict-all-future-dates.directive';
+import { WhatsappMessageComponent } from 'src/app/modules/widgets-examples/whatsapp-message/whatsapp-message.component'
 @NgModule({
   declarations: [
     WidgetsExamplesComponent,
+    RestrictAllFutureDatesDirective,
     ListsComponent,
     StatisticsComponent,
     ChartsComponent,
@@ -65,7 +67,8 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
     // ReliefListComponent,
     VmcComponent,
     VmcmeetingComponent,
-    LegacyFirListComponent
+    LegacyFirListComponent,
+    WhatsappMessageComponent
     // Remove AddFirComponent from here
   ],
   imports: [

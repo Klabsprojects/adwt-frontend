@@ -141,8 +141,9 @@
 </thead>
 
         <tbody>
-          <tr *ngFor="let report of paginatedData()">
-            <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
+          <tr *ngFor="let report of paginatedData(); let i=index;" [ngClass]="{ 'table-row-odd': i % 2 === 0, 'table-row-even': i % 2 !== 0 }">
+            <td *ngFor="let column of displayedColumns; let i = index" [hidden]="!column.visible"
+            [style.text-align]="i > 1 ? 'right' : 'left'">
               <ng-container [ngSwitch]="column.field">
 
               
@@ -151,6 +152,17 @@
               </ng-container>
             </td>
           </tr>
+          <tr style="font-weight:bold; background-color: #e0f7f9 !important;">
+  <!-- First two columns merged -->
+  <td [attr.colspan]="2" style="text-align:left;">Total</td>
+
+  <!-- Remaining numeric columns -->
+  <td *ngFor="let column of displayedColumns.slice(2)" [hidden]="!column.visible" style="text-align: right;">
+    <span *ngIf="column">{{ getTotals()[column.field] }}</span>
+    <span *ngIf="!column"></span>
+  </td>
+</tr>
+
         </tbody>
       </table>
       <!-- Show message if data is loading -->

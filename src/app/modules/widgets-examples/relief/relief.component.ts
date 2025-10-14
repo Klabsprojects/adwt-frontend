@@ -140,9 +140,9 @@ export class ReliefComponent implements OnInit {
       next: (response: any) => {
         const status = response.status;
 
-        if (status >= 5) this.enabledTabs[0] = true; // Enable First Installment
-        if (status >= 6) this.enabledTabs[1] = true; // Enable Second Installment
-        if (status >= 7) this.enabledTabs[2] = true; // Enable Third Installment
+        // if (status >= 5) this.enabledTabs[0] = true;
+        // if (status >= 6) this.enabledTabs[1] = true;
+        // if (status >= 7) this.enabledTabs[2] = true;
       },
       error: (err: any) => {
         console.error('Error fetching FIR status:', err);
@@ -875,14 +875,48 @@ export class ReliefComponent implements OnInit {
         if (this.firDetails && this.firDetails.data && this.firDetails.data.date_of_occurrence) {
           this.firDetails.data.date_of_occurrence = this.convertToNormalDate(this.firDetails.data.date_of_occurrence);
         }
-        console.log('fetchFirDetails', details);
         this.patchFirDetailsToForm(this.firDetails);
 
-        if (this.firDetails && this.firDetails.data && this.firDetails.data.status) {
-          if (this.firDetails.data.status >= 5) this.enabledTabs[0] = true; // Enable First Installment
-          if (this.firDetails.data.status >= 6) this.enabledTabs[1] = true; // Enable Second Installment
-          if (this.firDetails.data.status >= 7) this.enabledTabs[2] = true;
-        }
+        // if (this.firDetails && this.firDetails.data && this.firDetails.data.status) {
+        //   console.log(this.firDetails.data.status,this.firDetails.data.HascaseMF);
+        //   if (this.firDetails.data.status >= 5) this.enabledTabs[0] = true; 
+        //   if (this.firDetails.data.status >= 6) this.enabledTabs[1] = true; 
+        //   if (this.firDetails.data.status >= 7) this.enabledTabs[2] = true;
+        // }
+
+  if (this.firDetails && this.firDetails.data && this.firDetails.data.status) {
+  const { status, HascaseMF } = this.firDetails.data;
+  const case_type = this.firDetails.data4.case_type; // ✅ corrected key name
+  console.log("Status:", status, "HascaseMF:", HascaseMF, "Case Type:", case_type);
+  this.enabledTabs = [false, false, false];
+
+  if (HascaseMF == 1) {
+    if (status == 5) {
+      this.enabledTabs = [false, false, false];
+      // console.log("HascaseMF=1, status=5 → hide all");
+    } 
+    else if (status == 6 || status == 7) {
+      this.enabledTabs = [true, false, false];
+      // console.log("HascaseMF=1, status=6/7 → only first tab");
+    }
+  } 
+  else if (HascaseMF == 0 || HascaseMF == null) {
+    // Default enabling logic
+    if (status >= 5) this.enabledTabs[0] = true;
+    if (status >= 6) this.enabledTabs[1] = true;
+    if (status >= 7) this.enabledTabs[2] = true;
+    // console.log("HascaseMF=0 → normal enabling");
+  }
+  const restrictedTypes = ["referredChargeSheet", "sectionDeleted", "firQuashed"];
+  if (restrictedTypes.includes(case_type) && status >= 6) {
+    this.enabledTabs[1] = false;
+    this.enabledTabs[2] = false;
+    // console.log("Restricted case_type at stage 6+ → disable 2nd & 3rd tabs");
+  }
+
+  console.log("Enabled Tabs:", this.enabledTabs);
+}
+
 
 
       }),
@@ -896,7 +930,7 @@ export class ReliefComponent implements OnInit {
   private fetchVictimDetails(firId: string): Observable<any> {
     return this.ReliefService.getVictimsReliefDetails_1(firId).pipe(
       tap((response: any) => {
-        console.log('Fetched Victim Details:', response);
+        // console.log('Fetched Victim Details:', response);
         if (response?.victimsReliefDetails) {
           this.victimsReliefDetails = response.victimsReliefDetails;
           this.populateVictimFields(response.victimsReliefDetails);
@@ -914,7 +948,7 @@ export class ReliefComponent implements OnInit {
   private fetchSecondInstallmentDetails(firId: string): Observable<any> {
     return this.ReliefService.getSecondInstallmentDetails(firId).pipe(
       tap((response: any) => {
-        console.log('Fetched Second Installment Victim Details:', response);
+        // console.log('Fetched Second Installment Victim Details:', response);
         if (response?.victims && Array.isArray(response.victims)) {
           this.secondFormVictimInformation = response.victims;
           this.populateSecondInstallmentVictimFields(response.victims);
@@ -932,7 +966,7 @@ export class ReliefComponent implements OnInit {
   private fetchThirdInstallmentDetails(firId: string): Observable<any> {
     return this.ReliefService.getThirdInstallmentDetails(firId).pipe(
       tap((response: any) => {
-        console.log('Raw Third Installment Response:', response);
+        // console.log('Raw Third Installment Response:', response);
         const trialReliefDetails = response?.trialReliefDetails || [];
         console.log('Resolved trialReliefDetails:', trialReliefDetails);
         this.trialReliefDetails = response?.trialReliefDetails || [];
@@ -1046,7 +1080,7 @@ export class ReliefComponent implements OnInit {
     };
     this.ReliefService.FetchAllInstallmentDetails(Fir_ID).subscribe(
       (data: any) => {
-        console.log(data)
+        // console.log(data)
         if (data && data.firstInstallment && data.firstInstallment[0]) {
           this.FirstrelifDetails(data.firstInstallment[0])
         }
@@ -1087,7 +1121,7 @@ export class ReliefComponent implements OnInit {
   }
 
   SecondrelifDetails(InstallementDetails: any) {
-    console.log('function called')
+    // console.log('function called')
     if (InstallementDetails.file_number) {
       this.reliefForm.get('secondInstallmentProceedingsFileNumber')?.setValue(InstallementDetails.file_number);
     }
@@ -1110,7 +1144,7 @@ export class ReliefComponent implements OnInit {
   }
 
   ThirdrelifDetails(InstallementDetails: any) {
-    console.log('function called')
+    // console.log('function called')
     if (InstallementDetails.file_number) {
       this.reliefForm.get('thirdInstallmentProceedingsFileNumber')?.setValue(InstallementDetails.file_number);
     }

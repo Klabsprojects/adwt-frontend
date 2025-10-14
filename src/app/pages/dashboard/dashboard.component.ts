@@ -602,7 +602,7 @@ export class DashboardComponent implements AfterViewInit  {
 
     //   this.cdRef.detectChanges();
     // });
-    // this.getStatusOfCase({});
+    // this.getNatureOfOffence({});
     // this.getAnnualOverView({});
 
     // this.dashboardService.getCasesByYearRange().subscribe(data => {
@@ -973,7 +973,7 @@ export class DashboardComponent implements AfterViewInit  {
   }
   onDistrictClick(district: any): void {
     console.log('Clicked district:', district);
-    this.getStatusOfCase({district:district.name});
+    this.getNatureOfOffence({district:district.name});
     this.getAnnualOverView({district:district.name});
     this.cds.selectDistrict(district.name);
   }
@@ -988,18 +988,28 @@ export class DashboardComponent implements AfterViewInit  {
   }
   onDistrictClick1(district: any): void {
     console.log('Clicked district:', district);
-    this.getStatusOfCase({district:district.name});
+    this.getNatureOfOffence({district:district.name});
     this.getAnnualOverView({district:district.name});
     this.cds.selectDistrict(district.name);
   }
 
-  getStatusOfCase(body:any){
+  getNatureOfOffence(body:any){
     this.dashboardService.userPostMethod('GetNatureOfOffenceChartValue',body).subscribe((res:any)=>{
       const data = {gcr:res.data[0].gcr,non_gcr:res.data[0].non_gcr};
       this.status_of_case = data;
       this.createPieChart();
     })
   }
+
+  getStatusOfCase(body:any){
+    this.dashboardService.userPostMethod('GetStatusofCaseChartValue',body).subscribe((res:any)=>{
+      //const data = {gcr:res.data[0].gcr,non_gcr:res.data[0].non_gcr};
+      const data = res;
+      this.status_of_case = data;
+      this.createPieChart();
+    })
+  }
+
   public Annualcases:any;
   getAnnualOverView(body:any){
     this.dashboardService.userPostMethod('GetAnnualOverViewRegisterdCases',body).subscribe((res:any)=>{

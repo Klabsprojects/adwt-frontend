@@ -539,7 +539,7 @@ loadPoliceRanges() {
            this.loader = false;
           this.reportData = response.data.map((item: any, index: number) => {  
             const alteredDate = item.altered_date;
-            console.log(alteredDate); 
+            // console.log(alteredDate); 
             return { 
             sl_no: index + 1,
             policeCity: item.police_city,
@@ -942,6 +942,7 @@ applyFilters(): void {
     this.selectedStatus = '';
     this.selectedFromDate = '';
     this.selectedToDate ='';
+    this.selectedReason = '';
     this.GetDistrictWisePendingUI();
   }
 
@@ -2295,6 +2296,7 @@ getFilterParams() {
   addParam('filedBy', this.selectedFiled);
   addParam('appealCourt', this.selectedAppeal);
   addParam('OffenceGroup', this.selectedOffenceGroup);
+  addParam('selectReason',this.selectedReason);
 
   return params;
 }

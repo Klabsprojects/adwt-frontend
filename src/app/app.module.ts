@@ -13,6 +13,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 import { AppRoutingModule, routes } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { RestrictAllFutureDatesDirective } from  'src/app/directives/restrict-all-future-dates.directive';
 import { AuthService } from './modules/auth/services/auth.service';
 import { environment } from 'src/environments/environment';
 import { FakeAPIService } from './_fake/fake-api.service';

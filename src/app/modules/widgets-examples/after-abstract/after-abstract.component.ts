@@ -116,6 +116,14 @@ export class AfterAbstractComponent {
     sortDirection: null,
   },
   {
+    label: 'Ineligible',
+    field: 'employment_notApplicable',
+    group: 'Employment',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+  {
     label: 'Given',
     field: 'pension_given',
     group: 'Pension',
@@ -126,6 +134,14 @@ export class AfterAbstractComponent {
   {
     label: 'Pending',
     field: 'pension_pending',
+    group: 'Pension',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
+   {
+    label: 'Ineligible',
+    field: 'pension_notApplicable',
     group: 'Pension',
     sortable: true,
     visible: true,
@@ -147,6 +163,14 @@ export class AfterAbstractComponent {
     visible: true,
     sortDirection: null,
   },
+   {
+    label: 'Ineligible',
+    field: 'patta_notApplicable',
+    group: 'House Site Patta',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
   {
     label: 'Given',
     field: 'education_given',
@@ -162,7 +186,15 @@ export class AfterAbstractComponent {
     sortable: true,
     visible: true,
     sortDirection: null,
-  }
+  },
+   {
+    label: 'Ineligible',
+    field: 'education_notApplicable',
+    group: 'Education Concession',
+    sortable: true,
+    visible: true,
+    sortDirection: null,
+  },
   ];
   
   
@@ -325,17 +357,17 @@ onBtnExport(): void {
   const headers = [
   [
     'Sl. No.', 'District', 'Total Cases', 
-    'Employment', '',       // 3,4
-    'Pension', '',          // 5,6
-    'House Site Patta', '', // 7,8
-    'Education Concession', '' // 9,10
+    'Employment', '','',       
+    'Pension', '','',          
+    'House Site Patta', '','', 
+    'Education Concession', '','', 
   ],
   [
     '', '', '', 
-    'Given', 'Pending',
-    'Given', 'Pending',
-    'Given', 'Pending',
-    'Given', 'Pending'
+    'Given', 'Pending','Ineligible',
+    'Given', 'Pending','Ineligible',
+    'Given', 'Pending','Ineligible',
+    'Given', 'Pending','Ineligible',
   ]
 ];
 
@@ -346,29 +378,53 @@ onBtnExport(): void {
     item.total_cases,
     item.employment_given,
     item.employment_pending,
+    item.employment_notApplicable,
     item.pension_given,
     item.pension_pending,
+    item.pension_notApplicable,
     item.patta_given,
     item.patta_pending,
+    item.patta_notApplicable,
     item.education_given,
-    item.education_pending
+    item.education_pending,
+    item.education_notApplicable,
   ]);
+
+  const totalRow = [
+      '',
+      'Total',
+      this.sumByKey('total_cases'),
+      this.sumByKey('employment_given'),
+      this.sumByKey('employment_pending'),
+      this.sumByKey('employment_notApplicable'),
+      this.sumByKey('pension_given'),
+      this.sumByKey('pension_pending'),
+      this.sumByKey('pension_notApplicable'),
+      this.sumByKey('patta_given'),
+      this.sumByKey('patta_pending'),
+      this.sumByKey('patta_notApplicable'),
+      this.sumByKey('education_given'),
+      this.sumByKey('education_pending'),
+      this.sumByKey('education_notApplicable')
+    ];
+  
+    const aoa = [...headers, ...data, totalRow];
+    const worksheet = XLSX.utils.aoa_to_sheet(aoa);
 
   console.log(data);
 
-  const aoa = [...headers, ...data];
-  const worksheet = XLSX.utils.aoa_to_sheet(aoa);
-
   // Correct merges based on headers
-  worksheet['!merges'] = [
+ worksheet['!merges'] = [
   { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } }, // Sl. No.
   { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } }, // District
   { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } }, // Total Cases
-  { s: { r: 0, c: 3 }, e: { r: 0, c: 4 } }, // Employment
-  { s: { r: 0, c: 5 }, e: { r: 0, c: 6 } }, // Pension
-  { s: { r: 0, c: 7 }, e: { r: 0, c: 8 } }, // House Site Patta
-  { s: { r: 0, c: 9 }, e: { r: 0, c: 10 } } // Education Concession
+
+  { s: { r: 0, c: 3 }, e: { r: 0, c: 5 } }, // Employment (Given, Pending, Ineligible)
+  { s: { r: 0, c: 6 }, e: { r: 0, c: 8 } }, // Pension (Given, Pending, Ineligible)
+  { s: { r: 0, c: 9 }, e: { r: 0, c: 11 } }, // House Site Patta (Given, Pending, Ineligible)
+  { s: { r: 0, c: 12 }, e: { r: 0, c: 14 } }, // Education Concession (Given, Pending, Ineligible)
 ];
+
   const workbook: XLSX.WorkBook = {
     Sheets: { 'After Abstract': worksheet },
     SheetNames: ['After Abstract']
@@ -376,6 +432,10 @@ onBtnExport(): void {
 
   const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
   this.saveAsExcelFile(excelBuffer, 'after_abstract');
+}
+
+sumByKey(key: string): number {
+  return this.filteredData.reduce((sum, item) => sum + (Number(item[key]) || 0), 0);
 }
 
 saveAsExcelFile(buffer: any, filename: string): void {
@@ -399,7 +459,8 @@ saveAsExcelFile(buffer: any, filename: string): void {
         this.selectedPoliceCity='';
         this.selectedFromDate='';
         this.selectedToDate = '';
-        this.filteredData = [...this.reportData]; 
+        // this.filteredData = [...this.reportData]; 
+        this.fetchAfterAbstract();
     }
   
       getStatusTextUIPT(status: number): string {
@@ -421,83 +482,151 @@ saveAsExcelFile(buffer: any, filename: string): void {
     }
   
   
-    applyFilters() {
-    this.filteredData = this.reportData.filter(item => {
+  //   applyFilters() {
+  //   this.filteredData = this.reportData.filter(item => {
   
-      if (this.searchText && this.searchText.trim() !== '' && 
-      item.fir_number.toLowerCase() !== this.searchText.toLowerCase().trim()) {
-      return false;
-      }
+  //     if (this.searchText && this.searchText.trim() !== '' && 
+  //     item.fir_number.toLowerCase() !== this.searchText.toLowerCase().trim()) {
+  //     return false;
+  //     }
   
-      // District filter
-      if (this.selectedDistrict && this.selectedDistrict !== '' && 
-          item.revenue_district !== this.selectedDistrict) {
-        return false;
-      }
+  //     // District filter
+  //     if (this.selectedDistrict && this.selectedDistrict !== '' && 
+  //         item.revenue_district !== this.selectedDistrict) {
+  //       return false;
+  //     }
   
-      // Police City filter
-      if (this.selectedPoliceCity && this.selectedPoliceCity !== '' && 
-          item.police_city !== this.selectedPoliceCity) {
-        return false;
-      }
+  //     // Police City filter
+  //     if (this.selectedPoliceCity && this.selectedPoliceCity !== '' && 
+  //         item.police_city !== this.selectedPoliceCity) {
+  //       return false;
+  //     }
   
-      // Police Zone filter
-      if (this.selectedZone && this.selectedZone !== '' && 
-          item.police_zone !== this.selectedZone) {
-        return false;
-      }
+  //     // Police Zone filter
+  //     if (this.selectedZone && this.selectedZone !== '' && 
+  //         item.police_zone !== this.selectedZone) {
+  //       return false;
+  //     }
   
-      // Community filter
-      if (this.selectedCommunity && this.selectedCommunity !== '' && 
-          item.community !== this.selectedCommunity) {
-        return false;
-      }
+  //     // Community filter
+  //     if (this.selectedCommunity && this.selectedCommunity !== '' && 
+  //         item.community !== this.selectedCommunity) {
+  //       return false;
+  //     }
   
-      // Caste filter
-      if (this.selectedCaste && this.selectedCaste !== '' && 
-          item.caste !== this.selectedCaste) {
-        return false;
-      }
+  //     // Caste filter
+  //     if (this.selectedCaste && this.selectedCaste !== '' && 
+  //         item.caste !== this.selectedCaste) {
+  //       return false;
+  //     }
   
-      // Status filter (UI: status <= 5, PT: status > 5)
-      if (this.selectedStatus && this.selectedStatus !== '') {
-        if (this.selectedStatus === 'UI' && item.filter_status > 5) {
-          return false;
-        }
-        if (this.selectedStatus === 'PT' && item.filter_status <= 5) {
-          return false;
-        }
-      }
+  //     // Status filter (UI: status <= 5, PT: status > 5)
+  //     if (this.selectedStatus && this.selectedStatus !== '') {
+  //       if (this.selectedStatus === 'UI' && item.filter_status > 5) {
+  //         return false;
+  //       }
+  //       if (this.selectedStatus === 'PT' && item.filter_status <= 5) {
+  //         return false;
+  //       }
+  //     }
   
-      // Date range filter
-      if (this.selectedFromDate || this.selectedToDate) {
-      const registrationDate = new Date(item.date_of_registration);
+  //     // Date range filter
+  //     if (this.selectedFromDate || this.selectedToDate) {
+  //     const registrationDate = new Date(item.date_of_registration);
       
-      if (this.selectedFromDate && !this.selectedToDate) {
-        const fromDate = new Date(this.selectedFromDate);
-        if (registrationDate < fromDate) {
-          return false;
-        }
-      }
+  //     if (this.selectedFromDate && !this.selectedToDate) {
+  //       const fromDate = new Date(this.selectedFromDate);
+  //       if (registrationDate < fromDate) {
+  //         return false;
+  //       }
+  //     }
       
-      if (this.selectedToDate && !this.selectedFromDate) {
-        const toDate = new Date(this.selectedToDate);
-        if (registrationDate > toDate) {
-          return false;
-        }
-      }
+  //     if (this.selectedToDate && !this.selectedFromDate) {
+  //       const toDate = new Date(this.selectedToDate);
+  //       if (registrationDate > toDate) {
+  //         return false;
+  //       }
+  //     }
   
-      if (this.selectedToDate && this.selectedFromDate) {
-        const fromDate = new Date(this.selectedFromDate);
-        const toDate = new Date(this.selectedToDate);
-        if (registrationDate < fromDate || registrationDate > toDate) {
-          return false;
-        }
-      }
-    }
+  //     if (this.selectedToDate && this.selectedFromDate) {
+  //       const fromDate = new Date(this.selectedFromDate);
+  //       const toDate = new Date(this.selectedToDate);
+  //       if (registrationDate < fromDate || registrationDate > toDate) {
+  //         return false;
+  //       }
+  //     }
+  //   }
   
-      return true;
-    });
+  //     return true;
+  //   });
+  // }
+
+  getFilterParams() {
+  const params: any = {};
+
+  const addParam = (key: string, value: any) => {
+    params[key] = value ?? '';
+  };
+
+  addParam('district', this.selectedDistrict || '');
+  addParam('community', this.selectedCommunity || '');
+  addParam('caste', this.selectedCaste || '');
+  addParam('police_city', this.selectedPoliceCity || '');
+  addParam('police_zone', this.selectedZone || '');
+  addParam('Filter_From_Date', this.selectedFromDate || '');
+  addParam('Filter_To_Date', this.selectedToDate || '');
+  addParam('Status_Of_Case', this.selectedStatus || '');
+
+  return params;
+}
+
+
+  applyFilters() {
+    // If user is district-level, lock district param
+    let districtParam = '';
+      if ((this.Parsed_UserInfo.access_type === 'District' && this.Parsed_UserInfo.role === 4)||(this.Parsed_UserInfo.role === 3)) {
+        districtParam = this.Parsed_UserInfo.district;
+        this.selectedDistrict = districtParam;
+      }
+      this.loader = true;
+      const payload = this.getFilterParams(); // 👈 build payload from current filters
+  console.log('Payload sent to API:', payload);
+
+  this.loader = true;
+      this.additionalAbstractService.getAfterAbstract(payload).subscribe({
+        next: (response) => {
+          console.log('Abstract:', response.data); // Debugging
+          // Transform API response to match frontend structure
+          this.reportData = response.data
+          .filter((item: any) => item.revenue_district && item.revenue_district.trim() !== '')
+          .map((item: any, index: number) => ({
+            sl_no: index + 1,
+            revenue_district: item.revenue_district,
+            total_cases:item.total_cases,
+            employment_given: item.employment_given,
+            employment_pending: item.employment_pending,
+            employment_notApplicable: item.employment_notApplicable,
+            pension_given: item.pension_given,
+            pension_pending: item.pension_pending,
+            pension_notApplicable: item.pension_notApplicable,
+            patta_given: item.patta_given,
+            patta_pending: item.patta_pending,
+            patta_notApplicable: item.patta_notApplicable,
+            education_given: item.education_given,
+            education_pending:item.education_pending,
+            education_notApplicable: item.education_notApplicable,
+          }));
+
+          // Update filteredData to reflect the API data
+          this.filteredData = [...this.reportData]; 
+          this.loader = false;
+          this.cdr.detectChanges(); // Trigger change detection
+        },
+        error: (error) => {
+          this.loader = false;
+          console.error('Error fetching reports:', error);
+        }
+      });
   }
   
   
@@ -520,12 +649,16 @@ saveAsExcelFile(buffer: any, filename: string): void {
             total_cases:item.total_cases,
             employment_given: item.employment_given,
             employment_pending: item.employment_pending,
+            employment_notApplicable: item.employment_notApplicable,
             pension_given: item.pension_given,
             pension_pending: item.pension_pending,
+            pension_notApplicable: item.pension_notApplicable,
             patta_given: item.patta_given,
             patta_pending: item.patta_pending,
+            patta_notApplicable: item.patta_notApplicable,
             education_given: item.education_given,
-            education_pending:item.education_pending
+            education_pending:item.education_pending,
+            education_notApplicable: item.education_notApplicable,
           }));
 
           // Update filteredData to reflect the API data
@@ -564,8 +697,18 @@ postGroupedColumns = this.displayedColumns.filter(
     const colIndex = this.displayedColumns.indexOf(col);
     return colIndex > finalStageIndex;
   }
+  getTotals() {
+  const totals: any = {};
   
-  
+  this.displayedColumns.forEach(col => {
+    if (col.visible) { // only numeric columns
+      totals[col.field] = this.paginatedData().reduce((sum, row) => sum + (Number(row[col.field]) || 0), 0);
+    }
+  });
+
+  return totals;
+}
+
   }
   
    interface DisplayedColumn {
@@ -576,4 +719,3 @@ postGroupedColumns = this.displayedColumns.filter(
     visible: boolean;
     sortDirection: 'asc' | 'desc' | null;
   }
-

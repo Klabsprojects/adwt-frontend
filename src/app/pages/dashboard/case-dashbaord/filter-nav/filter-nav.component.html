@@ -18,7 +18,7 @@
     <div class="filters px-0 pt-0 pt-3">
         <div class="filter" *ngIf="isVisible('city')">
             <p>Police City</p>
-            <select name="" id="" [(ngModel)]="selectedPoliceCity" (change)="getOtherValues(); onCityChange($event)" [disabled]="isPolicecityDisabled">
+            <select name="" id="" [(ngModel)]="selectedPoliceCity" (change)="onCityChange($event)" [disabled]="isPolicecityDisabled">
                 <option value="">Select</option>
                 <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
             </select>
@@ -26,7 +26,7 @@
 
         <div class="filter"  *ngIf="isVisible('zone')">
             <p>Police Zone</p>
-            <select name="" id="" [(ngModel)]="selectedZone" (change)="getOtherValues()">
+            <select name="" id="" [(ngModel)]="selectedZone">
                 <option value="">Select</option>
                 <option [value]="zone.police_zone" *ngFor="let zone of zones">{{zone.police_zone}}</option>
             </select>
@@ -42,8 +42,8 @@
 
         <div class="filter"  *ngIf="isVisible('revenueDistrict')">
             <p>Revenue District</p>
-            <select class="filter-select" [(ngModel)]="selectedDistricts" (change)="getOtherValues(); onDistrictChange($event)">
-                <option value="" selected >Select</option>
+            <select class="filter-select" [(ngModel)]="selectedDistricts" (change)="onDistrictChange($event)">
+                <option value="">Select</option>
                 <option *ngFor="let option of districts" [value]="option.district_name">
                     {{ option.district_name }}
                 </option>
@@ -68,7 +68,7 @@
 
         <div class="filter" *ngIf="isVisible('caste')">
             <p>Caste</p>
-            <select class="filter-select" [(ngModel)]="selectedCaste" (change)="getOtherValues()">
+            <select class="filter-select" [(ngModel)]="selectedCaste">
                 <option value="" selected>Select</option>
                 <option *ngFor="let option of castes" [value]="option">
                     {{ option }}
@@ -80,11 +80,11 @@
             <p>Date Of Registration</p>
             <div>
               <div class="tooltip-container">
-                <input type="date" class="filter-input" [(ngModel)]="selectedFromDate" (ngModelChange)="getOtherValues()"/>
+                <input type="date" class="filter-input" [(ngModel)]="selectedFromDate"/>
               <span class="tooltip-text">From Date</span> 
               </div>
               <div class="tooltip-container">
-                <input type="date" class="filter-input" [(ngModel)]="selectedToDate" (ngModelChange)="getOtherValues()"/>
+                <input type="date" class="filter-input" [(ngModel)]="selectedToDate"/>
               <span class="tooltip-text">To Date</span>  
               </div>
               </div>
@@ -92,7 +92,7 @@
 
         <div class="filter" *ngIf="isVisible('status')">
             <p>Status Of Case</p>
-            <select class="filter-select" [(ngModel)]="selectedStatus" (change)="getOtherValues()">
+            <select class="filter-select" [(ngModel)]="selectedStatus">
                 <option value="" selected  disabled>Select</option>
                  <option value="UI">UI</option>
                   <option value="PT">PT</option>
@@ -108,7 +108,7 @@
         
         <div class="filter" *ngIf="isVisible('dataEntryStatus')">
             <p>Data Entry Status</p>
-            <select class="filter-select" [(ngModel)]="selectedDataEntryStatus" (change)="getOtherValues()">
+            <select class="filter-select" [(ngModel)]="selectedDataEntryStatus">
                 <option value="" selected  disabled>Select</option>
                 <option value="0">FIR Draft</option>
                 <option value="1">Pending | FIR Stage | Step 1 Completed</option>
@@ -123,7 +123,7 @@
 
         <div class="filter" *ngIf="isVisible('offenceGroup')">
             <p>Nature of Offence</p>
-            <select name="" id="" [(ngModel)]="selectedOffence" (change)="getOtherValues()">
+            <select name="" id="" [(ngModel)]="selectedOffence">
                 <option value="">Select</option>
                 <option [value]="offence" *ngFor="let offence of offences">{{offence}}</option>
             </select>
@@ -141,11 +141,11 @@
             <p>Date Of Chargesheet</p>
             <div>
               <div class="tooltip-container">
-                <input type="date" class="filter-input" [(ngModel)]="selectedChargeSheetFromDate" (ngModelChange)="getOtherValues()"/>
+                <input type="date" class="filter-input" [(ngModel)]="selectedChargeSheetFromDate"/>
               <span class="tooltip-text">From Date</span> 
               </div>
               <div class="tooltip-container">
-                <input type="date" class="filter-input" [(ngModel)]="selectedChargeSheetToDate" (ngModelChange)="getOtherValues()"/>
+                <input type="date" class="filter-input" [(ngModel)]="selectedChargeSheetToDate"/>
               <span class="tooltip-text">To Date</span>  
               </div>
               </div>
@@ -161,7 +161,7 @@
       </select>
         </div>
 
-        <div class="filter" *ngIf="isVisible('judgementType')">
+        <!-- <div class="filter" *ngIf="isVisible('judgementType')">
           <p>Judgement Type</p>
           <select [(ngModel)]="selectedJudgementType">
             <option value="" selected hidden disabled>Select</option>
@@ -170,7 +170,7 @@
             <option value="Charge_Abated">Charge Abated</option>
             <option value="Quashed">Quashed</option>
           </select>
-        </div>
+        </div> -->
 
         <div class="filter" *ngIf="isVisible('convictionType')">
           <p>Conviction Type</p>
@@ -187,10 +187,14 @@
       </select>
         </div>
 
+        
+       
+            <button  (click)="getOtherValues()" class="btn btn-primary btn-sm mt-8" style="height: 35px;">Apply Filters</button>
+            <button  (click)="clear()" class="btn btn-secondary btn-sm mt-8"  style="width: max-content !important; height: 35px;">Clear</button>
 
-        <div class="filter img-container">
+        <!-- <div class="filter img-container">
             <img src="assets/images/filter.png" alt="filter" width="40px" (click)="clear()">
-        </div>
+        </div> -->
     </div>
     </section>
   

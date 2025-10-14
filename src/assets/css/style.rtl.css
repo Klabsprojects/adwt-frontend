@@ -72,7 +72,7 @@
   --bs-danger-border-subtle: #fca9bd;
   --bs-light-border-subtle: #F1F1F4;
   --bs-dark-border-subtle: #99A1B7;
-  --bs-white-rgb: 255, 255, 255;
+  --bs-white-rgb: #ffffff;
   --bs-black-rgb: 0, 0, 0;
   /* --bs-font-sans-serif: Inter, Helvetica, "sans-serif"; */
   --bs-font-sans-serif:'Inter', sans-serif !important;

@@ -237,9 +237,10 @@
 
         <!-- Meeting Date -->
         <div class="col-md-12 mt-3">
-          <label for="appointment_date" class="form-label">Date of Appointment</label><span class="required"></span>
+          <label for="appointment_date" class="form-label">Date of Appointment</label>
+          <span class="required" *ngIf="member.level_of_member !== 'State Level'"></span>
           <input type="date" class="form-control" id="appointment_date" name="appointment_date"
-            [(ngModel)]="member.appointment_date" required />
+            [(ngModel)]="member.appointment_date" [required]="member.level_of_member !== 'State Level'" />
         </div>
 
         <!-- Validity End Date -->

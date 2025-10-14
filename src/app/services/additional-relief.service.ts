@@ -38,6 +38,9 @@ export class AdditionalReliefService {
   getAdditionalReliefByFirId(firId: string,victimId: string): Observable<any[]> {
     return this.http.get<any[]>(this.baseUrl+`get-additional-relief-details?fir_id=${firId}&victim_id=${victimId}`);
   }
+  updateAdditionalReliefDetails(data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/additionalReliefReportReason`, data);
+  }
 
 }
 

@@ -232,7 +232,7 @@
                     <div class="col-md-4 mb-3">
                       <label for="dateOfOccurrence" class="form-label">10.From Date of Occurrence</label>
                       <input
-                          type="date"
+                          type="date" restrictAllFutureDates
                           id="dateOfOccurrence"
                           class="form-control"
                           formControlName="dateOfOccurrence"
@@ -243,7 +243,7 @@
                   <div class="col-md-4 mb-3">
                     <label for="todateOfOccurrence" class="form-label">10a. To Date of Occurrence</label>
                     <input
-                        type="date"
+                        type="date" restrictAllFutureDates
                         id="todateOfOccurrence"
                         class="form-control"
                         formControlName="date_of_occurrence_to"
@@ -295,7 +295,7 @@
                   <div class="col-md-4 mb-3">
                       <label for="dateOfRegistration" class="form-label">13a. Date of Case Registration *</label>
                       <input
-                          type="date"
+                          type="date" restrictAllFutureDates
                           id="dateOfRegistration"
                           class="form-control"
                           formControlName="dateOfRegistration"
@@ -310,7 +310,7 @@
                   <div *ngIf="firForm.get('is_case_altered')?.value === 'Yes'" class="col-md-4 mb-3">
                     <label for="altered_date" class="form-label">13b. Date of Case Alteration *</label>
                     <input
-                        type="date"
+                        type="date" restrictAllFutureDates
                         id="altered_date"
                         class="form-control"
                         formControlName="altered_date"
@@ -1159,6 +1159,7 @@
                                 [value]="option.value" 
                                 [id]="'additionalRelief-' + option.value + '-' + i" 
                                 (change)="onAdditionalReliefChange($event, option.value, i)" 
+                                [checked]="isChecked(option.value, i)"
                               />
                               <label 
                                 class="form-check-label ms-2" 
@@ -1193,7 +1194,7 @@
 
                     <div class="mb-4 col-6">
                         <label class="form-label">60. Proceedings Date *</label>
-                        <input type="date" class="form-control" formControlName="proceedingsDate" [max]="today" />
+                        <input type="date" restrictAllFutureDates class="form-control" formControlName="proceedingsDate" [max]="today" />
                     </div>
                 </div>
 
@@ -1390,7 +1391,7 @@
                         <div class="col-lg-4" *ngIf="firForm.get('caseType')?.value === 'chargeSheet'">
                           <label for="chargeSheetDate" class="form-label">67b. Date of Chargesheet</label>
                           <input
-                            type="date"
+                            type="date" restrictAllFutureDates
                             id="chargeSheetDate"
                             class="form-control"
                             formControlName="chargeSheetDate"
@@ -1414,7 +1415,7 @@
                           <div class="col-lg-4">
                             <label for="rcsFilingDate" class="form-label">69. Referred Charge Sheet (RCS) filing date</label>
                             <input
-                              type="date"
+                              type="date" restrictAllFutureDates
                               id="rcsFilingDate"
                               class="form-control"
                               formControlName="rcsFilingDate"
@@ -1527,7 +1528,7 @@
 
                             <div class="mb-4 col-6">
                                 <label class="form-label">77. Proceedings Date *</label>
-                                <input type="date" class="form-control" formControlName="proceedingsDate_1" [max]="today" required/>
+                                <input type="date" restrictAllFutureDates class="form-control" formControlName="proceedingsDate_1" [max]="today" required/>
                             </div>
                         </div>
 
@@ -1753,7 +1754,7 @@
                           <!-- First Hearing Date -->
                           <div class="col-md-4 mb-3">
                               <label class="form-label">85. First Hearing Date *</label>
-                              <input type="date" class="form-control" formControlName="firstHearingDate" required />
+                              <input type="date" restrictAllFutureDates class="form-control" formControlName="firstHearingDate" required />
                           </div>
 
                           <!-- Has a Judgement been awarded in the case? -->
@@ -1793,7 +1794,7 @@
                       <div class="col-md-4 mb-3">
                         <label class="form-label">87. Next Hearing Date *</label>
                         <input
-                          type="date"
+                          type="date" restrictAllFutureDates
                           class="form-control"
                           formControlName="nextHearingDate"
                           placeholder="Select Next Hearing Date"
@@ -2030,7 +2031,7 @@
                                   <!-- First Hearing Date -->
                                   <div class="col-md-4 mb-3">
                                       <label class="form-label">5. First Hearing Date *</label>
-                                      <input type="date" class="form-control" formControlName="firstHearingDate_one" required />
+                                      <input type="date" restrictAllFutureDates class="form-control" formControlName="firstHearingDate_one" required />
                                   </div>
 
                                   <!-- Has a Judgement been awarded in the case? -->
@@ -2071,7 +2072,7 @@
                               <div class="col-md-4 mb-3">
                                 <label class="form-label">9. Next Hearing Date *</label>
                                 <input
-                                  type="date"
+                                  type="date" restrictAllFutureDates
                                   class="form-control"
                                   formControlName="nextHearingDate_one"
                                   placeholder="Select Next Hearing Date"
@@ -2316,7 +2317,7 @@
                                   <!-- First Hearing Date -->
                                   <div class="col-md-4 mb-3">
                                       <label class="form-label">6. First Hearing Date *</label>
-                                      <input type="date" class="form-control" formControlName="firstHearingDate_two" required />
+                                      <input type="date" restrictAllFutureDates class="form-control" formControlName="firstHearingDate_two" required />
                                   </div>
 
                                   <!-- Has a Judgement been awarded in the case? -->
@@ -2357,7 +2358,7 @@
                               <div class="col-md-4 mb-3">
                                 <label class="form-label">9. Next Hearing Date *</label>
                                 <input
-                                  type="date"
+                                  type="date" restrictAllFutureDates
                                   class="form-control"
                                   formControlName="nextHearingDate_two"
                                   placeholder="Select Next Hearing Date"
@@ -2631,7 +2632,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">94. Proceedings Date *</label>
-                                <input type="date" class="form-control" formControlName="proceedingsDate_2" [max]="today" />
+                                <input type="date" restrictAllFutureDates class="form-control" formControlName="proceedingsDate_2" [max]="today" />
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">95. Upload Commissionerate / S.P. Office Proceedings *</label>

@@ -29,7 +29,7 @@ export class homeCaseService {
     public isDwcdmUiLoading = new BehaviorSubject<boolean>(false);
     isDwcdmUiLoading$ = this.isDwcdmUiLoading.asObservable();
 
-    public uibar = new BehaviorSubject<any>(null);
+    public uibar = new BehaviorSubject<any>({});
     uibar$ = this.uibar.asObservable();
     public isUibarLoading = new BehaviorSubject<boolean>(false);
     isUibarLoading$ = this.isUibarLoading.asObservable();
@@ -43,6 +43,12 @@ export class homeCaseService {
     status$ = this.status.asObservable();
     public isStatusLoading = new BehaviorSubject<boolean>(false);
     isStatusLoading$ = this.isStatusLoading.asObservable();
+
+
+    public natureOfoffence = new BehaviorSubject<any>(null);
+    natureOfoffence$ = this.natureOfoffence.asObservable();
+    public isOffenceLoading = new BehaviorSubject<boolean>(false);
+    isOffenceLoading$ = this.isOffenceLoading.asObservable();
 
     public annual = new BehaviorSubject<any>(null);
     annual$ = this.annual.asObservable();
@@ -75,7 +81,8 @@ export class homeCaseService {
         this.setDwcdmUi(data);
         this.setPtbar(data);
         this.setUibar(data);
-        this.setStatus(data);
+        this.setNatureOfOffence(data);
+        this.setStatusOfCase(data);
         this.setAnnual(data);
         this.setHorizontal(data);
         this.setPieChart(data);
@@ -124,15 +131,24 @@ export class homeCaseService {
 
     setUibar(data: any) {
         this.isUibarLoading.next(true);
-        this.dashboardService.userPostMethod('GetPTPendencyCasesGroupedByYears', data).subscribe((res: any) => {
+        this.dashboardService.userPostMethod('GetUIPendencyCasesGrouped', data).subscribe((res: any) => {
+            console.log(res);
             this.uibar.next(res.data[0]);
             this.isUibarLoading.next(false);
         });
     }
 
-    setStatus(data: any) {
-        this.isStatusLoading.next(true);
+    setNatureOfOffence(data: any) {
+        this.isOffenceLoading.next(true);
         this.dashboardService.userPostMethod('GetNatureOfOffenceChartValue', data).subscribe((res: any) => {
+            this.natureOfoffence.next(res.data[0]);
+            this.isOffenceLoading.next(false);
+        });
+    }
+
+    setStatusOfCase(data: any) {
+        this.isStatusLoading.next(true);
+        this.dashboardService.userPostMethod('GetStatusofCaseChartValue', data).subscribe((res: any) => {
             this.status.next(res.data[0]);
             this.isStatusLoading.next(false);
         });

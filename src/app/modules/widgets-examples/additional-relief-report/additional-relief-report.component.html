@@ -8,8 +8,7 @@
           <i class="fas fa-search fs-3 position-absolute ms-5"></i>
           <input
             type="text"
-            [(ngModel)]="searchText"
-            (input)="applyFilters()"
+            [(ngModel)]="search"
             class="form-control form-control-solid w-250px ps-12"
             placeholder="Search Reports"
           />
@@ -48,34 +47,34 @@
      
       <div class="row d-flex mb-3 align-items-center outer pt-4 pb-2 px-3 m-0">
       <div class="col-xl-3 col-lg-3 col-md-4 mb-3" *ngIf="Parsed_UserInfo.access_type != 'District'">
-        <select class="form-select" [(ngModel)]="selectedDistrict" (change)="applyFilters()">
+        <select class="form-select" [(ngModel)]="selectedDistrict">
           <option value="" selected>District</option>
           <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
         </select>
       </div>
 
         <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <select name="" id="" [(ngModel)]="selectedPoliceCity" class="form-select" (change)="applyFilters()">
+        <select name="" id="" [(ngModel)]="selectedPoliceCity" class="form-select">
           <option value="">Police City</option>
           <option [value]="city.police_city" *ngFor="let city of policeCities">{{city.police_city}}</option>
         </select>
       </div>
 
         <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <select name="" id="" [(ngModel)]="selectedZone" class="form-select" (change)="applyFilters()">
+        <select name="" id="" [(ngModel)]="selectedZone" class="form-select">
           <option value="">Police Zone</option>
           <option [value]="zone.police_zone" *ngFor="let zone of zones">{{zone.police_zone}}</option>
         </select>
       </div>
 
         <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <select name="" id="" [(ngModel)]="selectedCommunity" (change)="getCaste()" class="form-select" (change)="applyFilters()">
+        <select name="" id="" [(ngModel)]="selectedCommunity" (change)="getCaste()" class="form-select">
           <option value="">Community</option>
           <option [value]="community" *ngFor="let community of communities">{{community}}</option>
         </select>
       </div>
       <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <select class="form-select" [(ngModel)]="selectedCaste" (change)="applyFilters()">
+        <select class="form-select" [(ngModel)]="selectedCaste">
           <option value="" selected>Caste</option>
           <option *ngFor="let option of castes" [value]="option">
             {{ option }}
@@ -84,7 +83,7 @@
       </div>
 
       <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-        <select class="form-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+        <select class="form-select" [(ngModel)]="selectedStatus">
           <option value="" selected>Status Of Case</option>
           <option *ngFor="let option of status" [value]="option.key">
             {{ option.value }}
@@ -93,17 +92,17 @@
       </div>
 
       <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
-        <input type="date" class="form-control" [(ngModel)]="selectedFromDate" (change)="applyFilters()"/>
+        <input type="date" class="form-control" [(ngModel)]="selectedFromDate"/>
         <span class="tooltip-text">Date of Registration From Date</span>
       </div>
       <div class="col-xl-3 col-lg-3 col-md-4 mb-3 tooltip-container">
-        <input type="date" class="form-control" [(ngModel)]="selectedToDate" (change)="applyFilters()"/>
+        <input type="date" class="form-control" [(ngModel)]="selectedToDate"/>
         <span class="tooltip-text">Date of Registration To Date</span>
       </div>
 
       <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
-       <button  (click)="applyFilters()" class="btn btn-primary btn-sm">Apply Filters</button>
-      <button  (click)="clearfilter()" class="btn btn-secondary btn-sm"  style="margin-left: 5px;">Clear</button>
+       <button type="button" (click)="applyFilters()" class="btn btn-primary btn-sm">Apply Filters</button>
+      <button  type="button" (click)="clearfilter()" class="btn btn-secondary btn-sm"  style="margin-left: 5px;">Clear</button>
       </div>
 
       <!-- <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
@@ -113,33 +112,65 @@
   
       <div class="card-body pt-0 overflow-auto px-0" style="width: 100%; overflow-y: auto; overflow-x: auto; min-height: 500px; padding-right:30px !important;">
         <table class="table table-striped table-bordered table-hover">
-         <thead>
-  <tr>
-    <th *ngFor="let col of ungroupedColumns" rowspan="2">{{ col.label }}</th>
+  <thead>
+    <tr>
+      <!-- Ungrouped Columns -->
+      <th *ngFor="let col of ungroupedColumns" rowspan="2">{{ col.label }}</th>
 
-    <th *ngFor="let groupName of groupOrder" 
-        [attr.colspan]="groupedBySection[groupName]?.length">
-      {{ groupName }}
-    </th>
-  </tr>
+      <!-- Grouped Columns -->
+      <th *ngFor="let groupName of groupOrder"
+          [attr.colspan]="groupedBySection[groupName]?.length">
+        {{ groupName }}
+      </th>
 
-  <tr>
-    <ng-container *ngFor="let groupName of groupOrder">
-      <th *ngFor="let col of groupedBySection[groupName]" style="background-color: #0da9bc !important; border-radius: 0px !important; border:1px solid #fff;">{{ col.label }}</th>
-    </ng-container>
-  </tr>
-</thead>
-          <tbody>
-            <tr *ngFor="let report of paginatedData()">
-              <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
-                <ng-container [ngSwitch]="column.field">
-                  <!-- Default Case -->
-                  <span *ngSwitchDefault>{{ report[column.field] }}</span>
-                </ng-container>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Action Column (Always Last) -->
+      <th rowspan="2">Action</th>
+    </tr>
+
+    <!-- Sub-Headers for Groups -->
+    <tr>
+      <ng-container *ngFor="let groupName of groupOrder">
+        <th *ngFor="let col of groupedBySection[groupName]"
+            style="background-color: #0da9bc !important; border:1px solid #fff;">
+          {{ col.label }}
+        </th>
+      </ng-container>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let report of paginatedData()">
+      <!-- Regular Columns -->
+      <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
+        <span>{{ report[column.field] }}</span>
+      </td>
+
+      <!-- Action Column (Always Last) -->
+      <td>
+        <!-- <button class="btn btn-primary btn-sm" [disabled]="report.EmpStatus === 'Job Pending' 
+                || report.PensionStatus === 'Pension Pending' 
+                || report.EducationStatus === 'Education Pending' 
+                || report.PattaStatus === 'Patta Pending'" (click)="openReasonModal(report)">
+          Update Reason
+        </button> -->
+        <button
+  class="btn btn-primary btn-sm"
+  [disabled]="!(
+    report.EmpStatus === 'Job Pending' ||
+    report.PensionStatus === 'Pension Pending' ||
+    report.EducationStatus === 'Education Pending' ||
+    report.PattaStatus === 'Patta Pending'
+  )"
+  (click)="openReasonModal(report)"
+>
+  Update Reason
+</button>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
        <!-- Show message if data is loading -->
       <div *ngIf="loading" class="alert alert-warning">Loading...</div>
       <!-- Show message if filtered data is empty -->
@@ -189,7 +220,205 @@
 
     </div>
   </div>
-  
+ 
+  <div
+  class="modal fade"
+  id="reasonModal"
+  tabindex="-1"
+  aria-labelledby="reasonModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-3 shadow">
+      <div class="modal-header bg-primary text-white p-5">
+        <h5 class="modal-title" id="reasonModalLabel" style="color: #fff;">
+          Update Reason 
+          <!-- - {{ selectedRecord?.designation }} -->
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Nav tabs -->
+       <ul class="nav nav-tabs mb-3" id="reasonTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button
+      class="nav-link"
+      [class.active]="true"
+      [class.disabled]="selectedRecord?.EmpStatus !== 'Job Pending'"
+      id="employment-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#employment"
+      type="button"
+      role="tab"
+      [attr.aria-disabled]="selectedRecord?.EmpStatus !== 'Job Pending'"
+    >
+      Employment
+    </button>
+  </li>
+
+  <li class="nav-item" role="presentation">
+    <button
+      class="nav-link"
+      [class.disabled]="selectedRecord?.PensionStatus !== 'Pension Pending'"
+      id="pension-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#pension"
+      type="button"
+      role="tab"
+      [attr.aria-disabled]="selectedRecord?.PensionStatus !== 'Pension Pending'"
+    >
+      Pension
+    </button>
+  </li>
+
+  <li class="nav-item" role="presentation">
+    <button
+      class="nav-link"
+      [class.disabled]="selectedRecord?.PattaStatus !== 'Patta Pending'"
+      id="patta-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#patta"
+      type="button"
+      role="tab"
+      [attr.aria-disabled]="selectedRecord?.PattaStatus !== 'Patta Pending'"
+    >
+      House Site Patta
+    </button>
+  </li>
+
+  <li class="nav-item" role="presentation">
+    <button
+      class="nav-link"
+      [class.disabled]="selectedRecord?.EducationStatus !== 'Education Pending'"
+      id="education-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#education"
+      type="button"
+      role="tab"
+      [attr.aria-disabled]="selectedRecord?.EducationStatus !== 'Education Pending'"
+    >
+      Education Concession
+    </button>
+  </li>
+</ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+  <!-- Employment Tab -->
+  <div
+    class="tab-pane fade show active"
+    id="employment"
+    role="tabpanel"
+    aria-labelledby="employment-tab"
+  >
+    <div class="mb-3">
+      <label class="form-label fw-bold">Employment Reason</label>
+      <textarea
+        class="form-control"
+        rows="3"
+        [(ngModel)]="reasonData.employment"
+        placeholder="Enter Employment reason"
+      ></textarea>
+    </div>
+    <div class="d-flex justify-content-end gap-2">
+    <button class="btn btn-secondary" (click)="closeTab()">
+      Close
+    </button>
+    <button class="btn btn-success" (click)="saveReason()">
+      Save
+    </button>
+  </div>
+  </div>
+
+  <!-- Pension Tab -->
+  <div
+    class="tab-pane fade"
+    id="pension"
+    role="tabpanel"
+    aria-labelledby="pension-tab"
+  >
+    <div class="mb-3">
+      <label class="form-label fw-bold">Pension Reason</label>
+      <textarea
+        class="form-control"
+        rows="3"
+        [(ngModel)]="reasonData.pension"
+        placeholder="Enter pension reason"
+      ></textarea>
+    </div>
+   <div class="d-flex justify-content-end gap-2">
+    <button class="btn btn-secondary" (click)="closeTab()">
+      Close
+    </button>
+    <button class="btn btn-success" (click)="saveReason()">
+      Save
+    </button>
+  </div>
+  </div>
+
+  <!-- Patta Tab -->
+  <div
+    class="tab-pane fade"
+    id="patta"
+    role="tabpanel"
+    aria-labelledby="patta-tab"
+  >
+    <div class="mb-3">
+      <label class="form-label fw-bold">Patta Reason</label>
+      <textarea
+        class="form-control"
+        rows="3"
+        [(ngModel)]="reasonData.patta"
+        placeholder="Enter patta reason"
+      ></textarea>
+    </div>
+    <div class="d-flex justify-content-end gap-2">
+    <button class="btn btn-secondary" (click)="closeTab()">
+      Close
+    </button>
+    <button class="btn btn-success" (click)="saveReason()">
+      Save
+    </button>
+  </div>
+  </div>
+
+  <!-- Education Tab -->
+  <div
+    class="tab-pane fade"
+    id="education"
+    role="tabpanel"
+    aria-labelledby="education-tab"
+  >
+    <div class="mb-3">
+      <label class="form-label fw-bold">Education Reason</label>
+      <textarea
+        class="form-control"
+        rows="3"
+        [(ngModel)]="reasonData.education"
+        placeholder="Enter education reason"
+      ></textarea>
+    </div>
+    <div class="d-flex justify-content-end gap-2">
+    <button class="btn btn-secondary" (click)="closeTab()">
+      Close
+    </button>
+    <button class="btn btn-success" (click)="saveReason()">
+      Save
+    </button>
+  </div>
+  </div>
+</div>
+
+      </div>
+    </div>
+  </div>
+</div>
 
   <style>
   .loader-overlay {

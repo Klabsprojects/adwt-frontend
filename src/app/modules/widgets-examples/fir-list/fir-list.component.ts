@@ -581,7 +581,7 @@ export class FirListComponent implements OnInit {
   { key: 'appealCourt', label: 'Appeal Court', visible: false }
 ];
 
-activeFilters: string[] = ['city', 'zone', 'range', 'revenueDistrict', 'station'];
+activeFilters: string[] = ['city', 'zone', 'range', 'revenueDistrict', 'station','regDate'];
 
 
   years: number[] = [];
@@ -2197,20 +2197,60 @@ loadOptions() {
 
 
   // Sorting logic
-  sortTable(field: string) {
-    if (this.currentSortField === field) {
-      this.isAscending = !this.isAscending;
-    } else {
-      this.currentSortField = field;
-      this.isAscending = true;
+  // sortTable(field: string) {
+  //   if (this.currentSortField === field) {
+  //     this.isAscending = !this.isAscending;
+  //   } else {
+  //     this.currentSortField = field;
+  //     this.isAscending = true;
+  //   }
+
+  //   this.firList.sort((a, b) => {
+  //     const valA = a[field]?.toString().toLowerCase() || '';
+  //     const valB = b[field]?.toString().toLowerCase() || '';
+  //     return this.isAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
+  //   });
+  // }
+
+  sortTable(field: string): void {
+  if (this.currentSortField === field) {
+    this.isAscending = !this.isAscending;
+  } else {
+    this.currentSortField = field;
+    this.isAscending = true;
+  }
+
+  this.firList.sort((a, b) => {
+    let valA = a[field];
+    let valB = b[field];
+
+    // Handle null or undefined
+    if (valA == null) valA = '';
+    if (valB == null) valB = '';
+
+    // Detect and handle numbers
+    const numA = parseFloat(valA);
+    const numB = parseFloat(valB);
+    if (!isNaN(numA) && !isNaN(numB)) {
+      return this.isAscending ? numA - numB : numB - numA;
     }
 
-    this.firList.sort((a, b) => {
-      const valA = a[field]?.toString().toLowerCase() || '';
-      const valB = b[field]?.toString().toLowerCase() || '';
-      return this.isAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
-    });
-  }
+    // Detect and handle dates
+    const dateA = Date.parse(valA);
+    const dateB = Date.parse(valB);
+    if (!isNaN(dateA) && !isNaN(dateB)) {
+      return this.isAscending ? dateA - dateB : dateB - dateA;
+    }
+
+    // Default string comparison (case-insensitive)
+    const strA = valA.toString().toLowerCase();
+    const strB = valB.toString().toLowerCase();
+    return this.isAscending ? strA.localeCompare(strB) : strB.localeCompare(strA);
+  });
+
+  console.log(this.firList);
+}
+
 
   // Get the sort icon class
   getSortIcon(field: string): string {

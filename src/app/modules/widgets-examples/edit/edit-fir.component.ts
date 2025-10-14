@@ -114,7 +114,7 @@ export class EditFirComponent implements OnInit, OnDestroy {
   case_id: string | undefined = '';
         case_id1: string | undefined = '';
         case_id2: string | undefined = '';
-
+  allPossibleValues = ['Pension', 'Employment / Job', 'Education concession', 'Provisions', 'House site Patta'];
   userId: string = '';
   loader: boolean = false;
   yearOptions: number[] = [];
@@ -2464,7 +2464,10 @@ removeFIRCopy(): void {
 
       response.data1.forEach((victim: any, index: number) => {
 
-      const sectionsArray = JSON.parse(victim.sectionsIPC_JSON);
+      // const sectionsArray = JSON.parse(victim.sectionsIPC_JSON);
+      const sectionsArray = victim.sectionsIPC_JSON ? JSON.parse(victim.sectionsIPC_JSON) : [];
+
+      console.log(sectionsArray);
 
       // Get the form array for the specific victim index (assuming index 0 for example)
       const victimIndex = index; // Adjust this based on your logic
@@ -3286,7 +3289,9 @@ removeFIRCopy(): void {
        // Loop through each victim and add to the array
       for (let i = 0; i < numberOfVictims; i++) {
         const victimControl = victimsArray.at(i);
-        const victim = victimControl.value;
+        // const victim = victimControl.value;
+        const victim = victimControl?.value || {}; // ensure victim is always an object
+
         
         victims.push({
           victim_id: victim.victim_id || null,
@@ -3628,8 +3633,10 @@ removeFIRCopy(): void {
         reliefAmountScst: relief.reliefAmountScst,
         reliefAmountExGratia: relief.reliefAmountExGratia,
         reliefAmountFirstStage: relief.reliefAmountFirstStage,
-        additionalRelief: relief.additionalRelief,
+        // additionalRelief: relief.additionalRelief,
+        additionalRelief:this.allPossibleValues,
       })),
+      
       totalCompensation: this.firForm.get('totalCompensation')?.value,
       proceedingsFileNo: this.firForm.get('proceedingsFileNo')?.value,
       proceedingsDate: this.firForm.get('proceedingsDate')?.value,
@@ -3640,7 +3647,7 @@ removeFIRCopy(): void {
       attachments: this.attachmentss_1 ? this.attachmentss_1.map((item: any) => item.path) : [],
       // status: isSubmit ? 5 : undefined,
     };
-  // console.log(firData,"firDatafirDatafirData")
+  console.log(firData,"firDatafirDatafirData")
 
     this.firService.updatestep5(firData).subscribe(
       (response) => {
@@ -4443,21 +4450,57 @@ uploadedImageSrc: any | ArrayBuffer;
   }
 
 
+  // onAdditionalReliefChange(event: Event, value: string, index: number): void {
+  //   const checked = (event.target as HTMLInputElement).checked;
+  //   const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
+  //   const victimGroup = victimsReliefArray.at(index) as FormGroup;
+  
+  //   let currentValues = victimGroup.get('additionalRelief')?.value;
+  //   console.log("gh",currentValues);
+  
+  //   if (checked && !currentValues.includes(value)) {
+  //     currentValues.push(value);
+  //   } else if (!checked) {
+  //     currentValues = currentValues.filter((item: string) => item !== value);
+  //   }
+  
+  //   victimGroup.get('additionalRelief')?.setValue(currentValues);
+  // }
+
   onAdditionalReliefChange(event: Event, value: string, index: number): void {
-    const checked = (event.target as HTMLInputElement).checked;
-    const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
-    const victimGroup = victimsReliefArray.at(index) as FormGroup;
-  
-    let currentValues = victimGroup.get('additionalRelief')?.value || [];
-  
-    if (checked && !currentValues.includes(value)) {
-      currentValues.push(value);
-    } else if (!checked) {
-      currentValues = currentValues.filter((item: string) => item !== value);
-    }
-  
-    victimGroup.get('additionalRelief')?.setValue(currentValues);
+  const checked = (event.target as HTMLInputElement).checked;
+  const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
+  const victimGroup = victimsReliefArray.at(index) as FormGroup;
+  let currentValues: string[] = victimGroup.get('additionalRelief')?.value || [];
+  if (currentValues.length === 0) {
+    currentValues = [...this.allPossibleValues];
   }
+
+  // when a user checks/unchecks
+  if (checked && !currentValues.includes(value)) {
+    currentValues = [...currentValues, value];
+  } else if (!checked) {
+    currentValues = currentValues.filter((item) => item !== value);
+  }
+
+  victimGroup.get('additionalRelief')?.setValue(currentValues);
+}
+isChecked(value: string, index: number): boolean {
+  const control = this.victimsRelief.controls[index]?.get('additionalRelief');
+
+  // If no value is stored yet (first load), treat as all checked
+  if (!control?.value || control.value.length === 0) {
+    return this.allPossibleValues.includes(value);
+  }
+
+  return control.value.includes(value);
+}
+
+
+//  isChecked(value: string, victimIndex: number): boolean {
+//     const victimGroup = this.victimsRelief.at(victimIndex) as FormGroup;
+//     return (victimGroup.get('additionalRelief')?.value || []).includes(value);
+//   }
 
 
   onJudgementSelectionChange_two(event: any): void {
@@ -5036,7 +5079,6 @@ uploadedImageSrc: any | ArrayBuffer;
   createVictimReliefGroup(victimReliefDetail: any): FormGroup {
 
 // console.log(victimReliefDetail,"cretaieg")
-
     return this.fb.group({
       victimId: [victimReliefDetail.victim_id || ''],
       victimName: [victimReliefDetail.victim_name || ''],
@@ -5048,7 +5090,7 @@ uploadedImageSrc: any | ArrayBuffer;
       additionalRelief: this.fb.array(
         victimReliefDetail.additional_relief 
           ? JSON.parse(victimReliefDetail.additional_relief).map((relief: string) => new FormControl(relief)) 
-          : []
+          : [this.allPossibleValues]
       )
     });
   }
@@ -6217,7 +6259,7 @@ controls.forEach((controlName) => {
 
 
   saveAsDraft(): void {
-
+    console.log("save as draft");
     if (this.step === 1) {
       this.saveStepOneAsDraft();
     } else if (this.step === 2) {
@@ -6942,6 +6984,7 @@ async UpdateAsDraft_7() {
       );
     }
   }
+
 
   onCourtDivisionChange2(event: any): void {
     const selectedDivision = event; 

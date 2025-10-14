@@ -8,7 +8,7 @@
       <option value="General" selected>General</option>
       <option value="District_Wise_Pending_UI">District Wise Pending UI</option>
       <option value="Reason_for_Pending_UI">Reason for Pending UI</option>
-      <option value="Community_Certificate">Community Certificate</option>
+      <!-- <option value="Community_Certificate">Community Certificate</option> -->
       <option value="District_wise_PT">District-wise PT</option>
       <option value="Conviction">Conviction for this Year</option>
       <!-- <option value="general" >Conviction</option> -->
@@ -467,6 +467,14 @@
         <input type="date" class="form-control" [(ngModel)]="selectedToDate" (change)="GetDistrictWisePendingUI()"/>
         <span class="tooltip-text">Date of Registration To Date</span>
       </div>
+
+      <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
+      <select [(ngModel)]="selectedReason" class="form-select" [(ngModel)]="reason_Update">
+          <option value="" disabled selected>Select a reason</option>
+          <option *ngFor="let reason of reasons" [value]="reason.name">{{ reason.name }}</option>
+      </select>
+      </div>
+
       <div class="col-xl-3 col-lg-3 col-md-4 mb-3">
        <button (click)="GetDistrictWisePendingUI()" class="btn btn-primary btn-sm">Apply Filters</button>
         <button (click)="clearfilterReport1()" class="btn btn-secondary btn-sm" style="margin-left: 5px;">Clear</button>

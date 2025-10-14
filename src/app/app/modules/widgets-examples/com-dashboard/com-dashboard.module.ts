@@ -26,6 +26,7 @@ import { CaseDwcdmUiComponent } from 'src/app/pages/dashboard/case-dashbaord/cas
 import { PtCaseComponent } from 'src/app/pages/dashboard/case-dashbaord/pt-case/pt-case.component';
 import { UiCaseComponent } from 'src/app/pages/dashboard/case-dashbaord/ui-case/ui-case.component';
 import { CaseStatusComponent } from 'src/app/pages/dashboard/case-dashbaord/case-status/case-status.component';
+import { StatusCaseComponent } from 'src/app/pages/dashboard/case-dashbaord/status-case/status-case.component';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { CaseAnnualComponent } from 'src/app/pages/dashboard/case-dashbaord/case-annual/case-annual.component';
 import { CaseHorizontalBarComponent } from 'src/app/pages/dashboard/case-dashbaord/case-horizontal-bar/case-horizontal-bar.component';
@@ -68,6 +69,7 @@ import { MatSelectModule } from '@angular/material/select';
     PtCaseComponent,
     UiCaseComponent,
     CaseStatusComponent,
+    StatusCaseComponent,
     CaseAnnualComponent,
     CaseHorizontalBarComponent,
     CasePiechartComponent,

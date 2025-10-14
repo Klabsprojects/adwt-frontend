@@ -6,7 +6,7 @@
     <div class="card-title">
       <div class="d-flex align-items-center position-relative my-1">
         <i class="fas fa-search fs-3 position-absolute ms-5"></i>
-        <input type="text" [(ngModel)]="searchText" (input)="applyFilters()"
+        <input type="text" [(ngModel)]="searchText"
           class="form-control form-control-solid w-250px ps-12" placeholder="Search Reports" />
       </div>
     </div>
@@ -290,6 +290,15 @@
               
                 <!-- Default Case -->
                 <span *ngSwitchDefault>{{ report[column.field] }}</span>
+                <span *ngSwitchCase="'report_reason'">
+      <div class="d-inline-block">
+        <button class="btn btn-primary btn-sm" [disabled]="report.fir_status === 'Relief Given' 
+                && report.chargesheet_status === 'Relief Given' 
+                && report.trial_status === 'Relief Given'" (click)="openReasonModal(report);open(content)">
+          Update Reason
+        </button>
+      </div>
+    </span>
               </ng-container>
             </td>
           </tr>
@@ -337,6 +346,37 @@
 
   </div>
 </div>
+
+<ng-template #content let-modal>
+  <div class="modal-header p-4  text-white" style="background-color: #043c6c;">
+    <h4 class="modal-title" id="modal-basic-title" style="color: #fff;">Update Reason</h4>
+   <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          (click)="modal.dismiss('cancel click')"
+          aria-label="Close"
+        ></button>
+  </div>
+
+  <div class="modal-body">
+    <label class="form-label" for="reason">Reason</label>
+    <textarea
+      class="form-control h-auto p-1 mr-2 mt-2 w-100"
+      style="min-height: 70px; border: 1px solid #ccc;"
+      [(ngModel)]="pendingReason"
+      name="reason"
+    ></textarea>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" style="background-color: #DBDFE9 !important; color: #000 !important;" (click)="modal.dismiss('cancel click')">Close</button>
+    <button type="button" class="btn btn-success" (click)="submitReason(); modal.close('Submit click')">Submit</button>
+  </div>
+</ng-template>
+
+
+
 
 <style>
   .loader-overlay {
@@ -386,3 +426,4 @@
     background: #fff;
 }
 </style>
+

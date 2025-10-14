@@ -298,6 +298,19 @@ this.loadPoliceDivision();
     antecedentsControl?.updateValueAndValidity();
   }
 
+  // Returns true if this checkbox should be checked by default
+isChecked(value: string, index: number): boolean {
+  const control = this.victimsRelief.controls[index]?.get('additionalRelief');
+  
+  // If no value yet, default all checkboxes to checked
+  if (!control?.value || control.value.length === 0) {
+    return true;
+  }
+
+  return control.value.includes(value);
+}
+
+
   updateAllVictims() {
     const isVictimSame = this.firForm.get('complainantDetails.isVictimSameAsComplainant')?.value === 'true';
     const complainantDetails = this.firForm.get('complainantDetails')?.value || {};
@@ -5564,6 +5577,7 @@ viewAttachment_2(index: number): void {
     ];
     return excluded.includes(act);
   }
+
 
   // removeSelectedOffence(index: number, offenceName: string): void {
   //   const selected = this.victims.at(index).get('offenceCommitted')?.value || [];

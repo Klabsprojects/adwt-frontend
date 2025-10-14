@@ -219,18 +219,23 @@ fetchFIRList(page: number = 1, pageSize: number = this.pageSize): void {
       next: (response: any | any[]) => {
         if (Array.isArray(response)) {
           this.firList = response;
+          console.log("if");
         } else if (response?.data && Array.isArray(response.data)) {
           this.firList = response.data;
           this.totalRecords = response.total
-           this.totalPages = Math.ceil(this.totalRecords / this.pageSize);;
+           this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
+           console.log("else if 1",this.firList);
+           
         } else if (response?.rows && Array.isArray(response.rows)) {
           this.firList = response.rows;
+          console.log("else if 2");
         } else {
           this.firList = [];
+          console.log("else");
         }
         this.isLoading = false;
         this.loader = false;
-        this.cdr.detectChanges(); // Ensure UI updates
+        this.cdr.detectChanges(); 
       },
       error: (error) => {
         console.error("Error fetching FIR data:", error);
@@ -247,7 +252,10 @@ fetchFIRList(page: number = 1, pageSize: number = this.pageSize): void {
 
 
 
-getStatusBadgeClass(status: any): string {
+getStatusBadgeClass(status: any,selectedStatus?: any): string {
+  if (selectedStatus === '1') {
+    return 'badge bg-danger text-white'; // Mistake of Fact
+  }
   const badgeClassMap = {
     0: 'badge bg-warning text-dark',
     1: 'badge bg-warning text-dark',
@@ -262,10 +270,11 @@ getStatusBadgeClass(status: any): string {
     10:'badge bg-danger text-white',
   } as { [key: number]: string };
 
-  return badgeClassMap[status] || 'badge bg-warning text-dark';
+  return badgeClassMap[status] ?? 'badge bg-danger text-white';
 }
 
 getStatusText(status: number, reliefStatus: number,selectedStatus?: any): string {
+  // console.log(selectedStatus);
   // Handle frontend-only statuses
   if (selectedStatus) {
     const customStatusMap: { [key: string]: string } = {
@@ -300,7 +309,10 @@ getStatusText(status: number, reliefStatus: number,selectedStatus?: any): string
     13: 'Trial Completed',
   };
 
+  
+
   // Custom rules
+  if (selectedStatus === "1") return 'Mistake of Fact';
   if (status === 5 && reliefStatus === 0) return 'FIR Relief Stage Pending';
   if (status === 5 && reliefStatus === 1) return 'FIR Relief Stage Completed';
   if (status === 6 && reliefStatus === 1) return 'Chargesheet Stage Pending';
@@ -653,7 +665,7 @@ isVisible(key: string): boolean {
   if (this.Parsed_UserInfo.access_type === 'District') {
     defaults = ['city', 'station', 'regDate', 'dataEntryStatus'];
   } else if (this.Parsed_UserInfo.access_type === 'State') {
-    defaults = ['city', 'range', 'zone', 'revenueDistrict', 'station'];
+    defaults = ['city', 'range', 'zone', 'revenueDistrict', 'station','regDate'];
   }
 
   // If it's part of defaults → always visible

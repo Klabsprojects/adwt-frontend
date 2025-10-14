@@ -236,6 +236,7 @@
       {{ totalRow[column.field] || '' }}
     </td>
   </tr>
+  
 </tbody>
 
 
@@ -308,27 +309,43 @@
       <th rowspan="2">Date of Registration</th>
       
 
-      <th *ngIf="showFIR" colspan="3" class="text-center">FIR</th>
-      <th *ngIf="showChargesheet" colspan="3" class="text-center">Chargesheet</th>
-      <th *ngIf="showTrial" colspan="3" class="text-center">Trial</th>
+      <!-- <th *ngIf="showFIR" colspan="4" class="text-center">FIR</th>
+      <th *ngIf="showChargesheet" colspan="4" class="text-center">Chargesheet</th>
+      <th *ngIf="showTrial" colspan="4" class="text-center">Trial</th> -->
+      <th *ngIf="showFIR" [attr.colspan]="Colspan" class="text-center">FIR</th>
+      <th *ngIf="showChargesheet" [attr.colspan]="Colspan" class="text-center">Chargesheet</th>
+      <th *ngIf="showTrial" [attr.colspan]="Colspan" class="text-center">Trial</th>
+
     </tr>
     <tr>
       <ng-container *ngIf="showFIR">
         <th>Proposal sent to DC</th>
         <th>Status</th>
-        <th>Pending Days</th>
+        <th (click)="sortTablePopup('fir')" style="cursor:pointer">
+          Pending Days
+        <span *ngIf="sortColumn==='fir'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+        </th>
+        <th *ngIf="showFirProposal">Proposal Pending Days</th>
       </ng-container>
 
       <ng-container *ngIf="showChargesheet">
         <th>Proposal sent to DC</th>
         <th>Status</th>
-        <th>Pending Days</th>
+        <th (click)="sortTablePopup('chargesheet')" style="cursor:pointer">
+          Pending Days
+        <span *ngIf="sortColumn==='chargesheet'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+        </th>
+        <th *ngIf="showChargesheetProposal">Proposal Pending Days</th>
       </ng-container>
 
       <ng-container *ngIf="showTrial">
         <th>Proposal sent to DC</th>
         <th>Status</th>
-        <th>Pending Days</th>
+        <th (click)="sortTablePopup('trial')" style="cursor:pointer">
+          Pending Days
+          <span *ngIf="sortColumn==='trial'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+        </th>
+        <th *ngIf="showTrialProposal">Proposal Pending Days</th>
       </ng-container>
     </tr>
   </thead>
@@ -351,6 +368,10 @@
             style="text-align: center;">
           {{ d.fir_status === 'Relief Given' ? '-' : d.fir_pending_days }}
         </td>
+        <!-- <td class="status-column" *ngIf="showFirProposal">{{ d.fir_proposal_pending_days }}</td> -->
+      <td class="status-column text-center" *ngIf="showFirProposal" [ngClass]="{ 'text-danger fw-bold': d.fir_proposal_pending_days != null }" >
+        {{ d.fir_proposal_pending_days != null ? d.fir_proposal_pending_days : '-' }}
+      </td>
       </ng-container>
 
       <!-- Chargesheet -->
@@ -361,25 +382,33 @@
             style="text-align: center;">
           {{ d.chargesheet_status === 'Relief Given' ? '-' : d.chargesheet_pending_days }}
         </td>
+        <!-- <td class="status-column" *ngIf="showChargesheetProposal">{{ d.chargesheet_proposal_pending_days }}</td> -->
+      <td class="status-column text-center" *ngIf="showChargesheetProposal" [ngClass]="{ 'text-danger fw-bold': d.chargesheet_proposal_pending_days != null }">
+        {{ d.chargesheet_proposal_pending_days != null ? d.chargesheet_proposal_pending_days : '-' }}
+      </td>
       </ng-container>
 
       <!-- Trial -->
-      <ng-container *ngIf="showTrial">
+      <ng-container *ngIf="showTrial"> 
         <td>{{ d.trial_proposal_status }}</td>
         <td class="status-column">{{ d.trial_status }}</td>
         <td [ngClass]="{'text-danger  fw-bold': d.trial_status !== 'Relief Given' && d.trial_pending_days > 50}"
             style="text-align: center;">
           {{ d.trial_status === 'Relief Given' ? '-' : d.trial_pending_days }}
         </td>
+        <!-- <td class="status-column" *ngIf="showTrialProposal">{{ d.trial_proposal_pending_days }}</td> -->
+       <td class="status-column text-center" *ngIf="showTrialProposal" [ngClass]="{ 'text-danger fw-bold': d.trial_proposal_pending_days != null }">
+        {{ d.trial_proposal_pending_days != null ? d.trial_proposal_pending_days : '-' }}
+      </td>
       </ng-container>
     </tr>
 
     <!-- No Records Row -->
     <tr *ngIf="tableFilteredData().length === 0">
-      <td [attr.colspan]="3 
-          + (showFIR ? 3 : 0) 
-          + (showChargesheet ? 3 : 0) 
-          + (showTrial ? 3 : 0)" 
+      <td [attr.colspan]="4 
+          + (showFIR ? 4 : 0) 
+          + (showChargesheet ? 4 : 0) 
+          + (showTrial ? 4 : 0)" 
           class="text-center text-muted">
         No Records Found
       </td>
