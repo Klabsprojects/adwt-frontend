@@ -421,27 +421,20 @@
                     required>
                   </ng-select> -->
                 </div>
+               
                 <div class="col-md-4 mb-3">
-                  <label for="victimCaste{{ i }}" class="form-label required">25. Caste of the Victim</label>
-                  <select [id]="'victimCaste' + i" class="form-select" formControlName="caste" required>
+                  <label for="victimCaste{{ i }}" class="form-label required">26. Caste of the Victim</label>
+                  <select [id]="'victimCaste' + i" (change)="onCasteChange($event, i)" class="form-select" formControlName="caste" required>
                     <option value="" disabled>Select Caste</option>
-                    <!-- <option *ngFor="let caste of scstSectionsOptions" [value]="caste">{{ caste }}</option> -->
                     <option *ngFor="let caste of victims.at(i).get('availableCastes')?.value" [value]="caste">
                       {{ caste }}
                     </option>
                   </select>
-                  <!-- <ng-select  
-                    [id]="'victimCaste' + i"
-                    class="form-select"
-                    [items]="victims.at(i).get('availableCastes')?.value"
-                    bindLabel="caste"
-                    bindValue="caste"
-                    formControlName="caste"
-                    [searchable]="true"
-                    [clearable]="false"
-                    [placeholder]="victims.at(i).get('caste')?.value ? '' : 'Select Caste'"
-                    required>
-                  </ng-select> -->
+                </div>
+                 <div class="col-md-4 mb-3" *ngIf="victims.at(i).get('showOtherCaste')?.value">
+                  <label for="otherCaste" class="form-label">26a. Others</label>
+                    <input type="text"  class="form-control" />
+
                 </div>
                 <div class="col-md-4 mb-3">
                   <label for="victimGuardian{{ i }}" class="form-label required">27. Name of the Victim's Guardian</label>
@@ -543,7 +536,11 @@
               </ng-select>
                 </div>
 
+                <div class="col-md-4 mb-3" *ngIf="victims.at(i).get('showOtherOffence')?.value">
+                  <label for="otherCaste" class="form-label">30a. Others</label>
+                    <input type="text"  class="form-control" />
 
+                </div>
 
 
                 <div class="col-md-12 mb-3"> 
@@ -1018,14 +1015,13 @@
                     class="form-check-input"
                     [id]="'additionalRelief-' + option.value + '-' + j + '-' + i"
                     [value]="option.value"
-                    (change)="onAdditionalReliefChange($event, option.value, i)"
+                    disabled
                     [checked]="isChecked(option.value, i)"
                   />
                   <label
                     class="form-check-label ms-2 selected-text"
                     [for]="'additionalRelief-' + option.value + '-' + j + '-' + i"
-                    [ngClass]="{ 'selected-text1': victimRelief.get('additionalRelief')?.value.includes(option.value) }"
-                  >
+                    [ngClass]="{ 'selected-text1': victimRelief.get('additionalRelief')?.value.includes(option.value) }">
                     {{ option.label }}
                   </label>
                 </div>

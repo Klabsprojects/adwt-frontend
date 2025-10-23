@@ -1213,8 +1213,8 @@ async onBtnExport(): Promise<void> {
       item.second_proceeding_date ? formatDate(item.second_proceeding_date, 'yyyy-MM-dd', 'en') : '',
       numberValue(item.secondInstallmentReliefScst),
       numberValue(item.secondInstallmentReliefExGratia),
-      item.second_disbursement_date ? formatDate(item.second_disbursement_date, 'yyyy-MM-dd', 'en') : '',
       numberValue(item.secondInstallmentReliefScst) + numberValue(item.secondInstallmentReliefExGratia),
+      item.second_disbursement_date ? formatDate(item.second_disbursement_date, 'yyyy-MM-dd', 'en') : '',
       
       item.trail_proposal_status,
       item.trial_status,

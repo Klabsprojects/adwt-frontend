@@ -2212,7 +2212,7 @@ loadOptions() {
   //   });
   // }
 
-  sortTable(field: string): void {
+sortTable(field: string): void {
   if (this.currentSortField === field) {
     this.isAscending = !this.isAscending;
   } else {
@@ -2221,34 +2221,34 @@ loadOptions() {
   }
 
   this.firList.sort((a, b) => {
-    let valA = a[field];
-    let valB = b[field];
+    let valA = a[field] || '';
+    let valB = b[field] || '';
 
-    // Handle null or undefined
-    if (valA == null) valA = '';
-    if (valB == null) valB = '';
-
-    // Detect and handle numbers
-    const numA = parseFloat(valA);
-    const numB = parseFloat(valB);
-    if (!isNaN(numA) && !isNaN(numB)) {
-      return this.isAscending ? numA - numB : numB - numA;
+    // Detect dd/MM/yyyy format
+    const dateA = this.parseCustomDate(valA);
+    const dateB = this.parseCustomDate(valB);
+    if (dateA && dateB) {
+      return this.isAscending
+        ? dateA.getTime() - dateB.getTime()
+        : dateB.getTime() - dateA.getTime();
     }
 
-    // Detect and handle dates
-    const dateA = Date.parse(valA);
-    const dateB = Date.parse(valB);
-    if (!isNaN(dateA) && !isNaN(dateB)) {
-      return this.isAscending ? dateA - dateB : dateB - dateA;
-    }
-
-    // Default string comparison (case-insensitive)
-    const strA = valA.toString().toLowerCase();
-    const strB = valB.toString().toLowerCase();
-    return this.isAscending ? strA.localeCompare(strB) : strB.localeCompare(strA);
+    // Default string comparison
+    return this.isAscending
+      ? valA.toString().localeCompare(valB.toString())
+      : valB.toString().localeCompare(valA.toString());
   });
 
-  console.log(this.firList);
+  // console.log(`Sorted by "${field}" in ${this.isAscending ? 'Ascending' : 'Descending'} order`);
+  // console.log(this.firList.map(f => f[field]));
+}
+
+parseCustomDate(dateStr: string): Date | null {
+  if (!dateStr) return null;
+  const parts = dateStr.split('/');
+  if (parts.length !== 3) return null;
+  const [day, month, year] = parts.map(Number);
+  return new Date(year, month - 1, day);
 }
 
 

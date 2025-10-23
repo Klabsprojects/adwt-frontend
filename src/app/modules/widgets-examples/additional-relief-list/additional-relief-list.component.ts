@@ -207,8 +207,6 @@ export class AdditionalReliefListComponent implements OnInit {
       }
   }
 
-
-
   // Fetch FIR data from the service
   fetchFIRList(): void {
     this.isLoading = true;
@@ -432,22 +430,7 @@ getFilterParams() {
 }
 
 
-  // Sorting logic
-  sortTable(field: string) {
-    if (this.currentSortField === field) {
-      this.isAscending = !this.isAscending;
-    } else {
-      this.currentSortField = field;
-      this.isAscending = true;
-    }
-
-    this.firList.sort((a, b) => {
-      const valA = a[field]?.toString().toLowerCase() || '';
-      const valB = b[field]?.toString().toLowerCase() || '';
-      return this.isAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
-    });
-  }
-
+  
   // Get the sort icon class
   getSortIcon(field: string): string {
     return this.currentSortField === field
@@ -456,6 +439,54 @@ getFilterParams() {
         : 'fa-sort-down'
       : 'fa-sort';
   }
+
+  sortTable(field: string): void {
+  if (this.currentSortField === field) {
+    this.isAscending = !this.isAscending;
+  } else {
+    this.currentSortField = field;
+    this.isAscending = true;
+  }
+
+  this.displayedFirList.sort((a, b) => {
+    let valA = a[field] ?? '';
+    let valB = b[field] ?? '';
+
+    // Detect dd/MM/yyyy format
+    const dateA = this.parseCustomDate(valA);
+    const dateB = this.parseCustomDate(valB);
+    if (dateA && dateB) {
+      return this.isAscending
+        ? dateA.getTime() - dateB.getTime()
+        : dateB.getTime() - dateA.getTime();
+    }
+
+    // Detect numbers
+    const numA = parseFloat(valA);
+    const numB = parseFloat(valB);
+    if (!isNaN(numA) && !isNaN(numB)) {
+      return this.isAscending ? numA - numB : numB - numA;
+    }
+
+    // Default string comparison
+    return this.isAscending
+      ? valA.toString().localeCompare(valB.toString())
+      : valB.toString().localeCompare(valA.toString());
+  });
+
+  console.log(`Sorted by "${field}" in ${this.isAscending ? 'Ascending' : 'Descending'} order`);
+}
+
+// Helper to parse dd/MM/yyyy
+parseCustomDate(dateStr: string): Date | null {
+  if (!dateStr) return null;
+  const parts = dateStr.split('/');
+  if (parts.length !== 3) return null;
+  const [day, month, year] = parts.map(Number);
+  const date = new Date(year, month - 1, day);
+  return isNaN(date.getTime()) ? null : date;
+}
+
 
   // Paginated FIR list
   paginatedFirList() {

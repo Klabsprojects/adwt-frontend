@@ -390,7 +390,9 @@ isChecked(value: string, index: number): boolean {
 loadCommunities(): void {
   this.firService.getAllCommunities().subscribe(
     (communities: string[]) => {
-      this.communitiesOptions = communities; // Populate community options
+      // this.communitiesOptions = communities; // Populate community options
+      this.communitiesOptions = [...communities, 'Other'];
+
     },
     (error) => {
       console.error('Error loading communities:', error);

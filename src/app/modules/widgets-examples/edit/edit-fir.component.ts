@@ -114,8 +114,9 @@ export class EditFirComponent implements OnInit, OnDestroy {
   case_id: string | undefined = '';
         case_id1: string | undefined = '';
         case_id2: string | undefined = '';
-  allPossibleValues = ['Pension', 'Employment / Job', 'Education concession', 'Provisions', 'House site Patta'];
-  userId: string = '';
+  // allPossibleValues = ['Pension', 'Employment / Job', 'Education concession', 'Provisions', 'House site Patta'];
+  allPossibleValues: string[] = []; // <-- define it here
+userId: string = '';
   loader: boolean = false;
   yearOptions: number[] = [];
   today: string = '';
@@ -174,6 +175,8 @@ export class EditFirComponent implements OnInit, OnDestroy {
     { label: 'Accused Information' },
     { label: 'FIR Stage(MRF) Details' },
   ];
+  showOtherCaste:boolean=false;
+  showOtherOffence:boolean = false;
 
   @ViewChild('tagifyInput', { static: false }) tagifyInput!: ElementRef;
   // sectionsIPC: string[] = []; // Array to store multiple tags
@@ -424,62 +427,6 @@ loadAccusedCommunities(): void {
   );
 }
 
-// onCommunityChange(event: any, index: number): void {
-//   const selectedCommunity = event.target.value;
-// onCommunityChange(selectedCommunity: string, index: number): void {
-//  console.log(selectedCommunity,"wssss")
-//     if (selectedCommunity) {
-//       this.firService.getCastesByCommunity(selectedCommunity).subscribe(
-//         (castes: string[]) => {
-//           const victimGroup = this.victims.at(index) as FormGroup;
-//           victimGroup.patchValue({ caste: '' }); // Reset caste selection
-//           victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
-//           this.cdr.detectChanges();
-//         },
-//         (error) => {
-//           console.error('Error fetching castes:', error);
-//           Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
-//         }
-//       );
-//     }
-// }
-
-// // onAccusedCommunityChange(event: any, index: number): void {
-// //   const selectedCommunity = event.target.value;
-// onAccusedCommunityChange(selectedCommunity: string, index: number): void {
-//   if (selectedCommunity) {
-//     this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
-//       (castes: string[]) => {
-//         const accusedGroup = this.accuseds.at(index) as FormGroup;
-//         accusedGroup.patchValue({ caste: '' }); // Reset caste selection
-//         accusedGroup.get('availableCastes')?.setValue(castes);
-//         // console.log(accusedGroup.get('availableCastes')?.value,"datdadadadada"); 
-//         this.cdr.detectChanges();
-//       },
-//       (error) => {
-//         console.error('Error fetching accused castes:', error);
-//         Swal.fire('Error', 'Failed to load castes for the selected accused community.', 'error');
-//       }
-//     );
-//   }
-// }
-
-  // onFileSelect_1(event: any, index: number): void {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     const attachmentGroup = this.attachments_1.at(index) as FormGroup;
-  
-  //     const simulatedFilePath = `/uploads/${file.name}`;
-  
-    
-  //     attachmentGroup.patchValue({
-  //       fileName: file.name,
-  //    file
-  //     });
-  
-  //     this.cdr.detectChanges();
-  //   }
-  // }
 
   onChange1(event: Event): void { 
     const inputElement = event.target as HTMLInputElement;
@@ -1000,7 +947,7 @@ loadAccusedCommunities(): void {
   loadDistricts(): void {
     this.firService.getDistricts().subscribe(
       (districts: string[]) => {
-        this.courtDistricts = districts; // Populate district options
+        this.courtDistricts = [...districts,'Others']; // Populate district options
       },
       (error) => {
         console.error('Error loading districts:', error);
@@ -1014,7 +961,9 @@ loadAccusedCommunities(): void {
 
         // console.log('Communities fetched:', communities);
 
-        this.communitiesOptions = communities;
+        // this.communitiesOptions = communities;
+        this.communitiesOptions = [...communities, 'Other'];
+        console.log(this.communitiesOptions);
       },
       (error) => {
         console.error('Error loading communities:', error);
@@ -2448,7 +2397,8 @@ removeFIRCopy(): void {
         if(victim.community){
         this.firService.getCastesByCommunity(victim.community).subscribe(
           (castes: string[]) => {
-            victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
+            const updatedCastes = [...castes, 'Others'];
+            victimGroup.get('availableCastes')?.setValue(updatedCastes); // Dynamically update caste options
           },
           (error) => {
             console.error('Error fetching castes:', error);
@@ -3078,6 +3028,16 @@ removeFIRCopy(): void {
 
 
 
+onCasteChange(event: any, index: number): void {
+  const selectedCaste = event.target.value;
+  const victimGroup = this.victims.at(index) as FormGroup;
+  console.log(selectedCaste);
+  if (selectedCaste == 'Others') {
+    victimGroup.patchValue({ showOtherCaste: true });
+  } else {
+    victimGroup.patchValue({ showOtherCaste: false, otherCaste: '' });
+  }
+}
 
 
 
@@ -3616,37 +3576,37 @@ removeFIRCopy(): void {
 
   saveStepFiveAsDraft(isSubmit: boolean = false): void {
     this.SubmitButton = false;
-    // hellow
     if (!this.firId) {
       Swal.fire('Error', 'FIR ID is missing. Unable to proceed.', 'error');
       return;
     }
     const attachmentsControl = this.firForm.get('attachments_1') as FormArray;
-    const firData = {
-      firId: this.firId,
-      HascaseMF: this.isMf,
-      victimsRelief: this.victimsRelief.value.map((relief: any) => ({
-
-        victimId:relief.victimId,
-        victimName:relief.victimName,
-        communityCertificate: relief.communityCertificate,
-        reliefAmountScst: relief.reliefAmountScst,
-        reliefAmountExGratia: relief.reliefAmountExGratia,
-        reliefAmountFirstStage: relief.reliefAmountFirstStage,
-        // additionalRelief: relief.additionalRelief,
-        additionalRelief:this.allPossibleValues,
-      })),
-      
-      totalCompensation: this.firForm.get('totalCompensation')?.value,
-      proceedingsFileNo: this.firForm.get('proceedingsFileNo')?.value,
-      proceedingsDate: this.firForm.get('proceedingsDate')?.value,
-      // uploadFIRCopy: this.multipleFiles[index] || null
-      // this.multipleFilesForproceeding[i]
-      // proceedingsFile: this.multipleFilesForproceeding || '',
-      proceedingsFile : this.firForm.get('proceedingsFile')?.value || '',
-      attachments: this.attachmentss_1 ? this.attachmentss_1.map((item: any) => item.path) : [],
-      // status: isSubmit ? 5 : undefined,
+   const firData = {
+  firId: this.firId,
+  HascaseMF: this.isMf,
+  victimsRelief: this.victimsRelief.value.map((relief: any) => {
+    const isEligible = relief.relief_applicable == 1; // ✅ only check if checkbox is enabled
+    console.log("ere",isEligible);
+    return {
+      victimId: relief.victimId,
+      victimName: relief.victimName,
+      communityCertificate: relief.communityCertificate,
+      reliefAmountScst: relief.reliefAmountScst,
+      reliefAmountExGratia: relief.reliefAmountExGratia,
+      reliefAmountFirstStage: relief.reliefAmountFirstStage,
+      additionalRelief: isEligible 
+                 ? this.additionalReliefOptions.map(opt => opt.value) // all options
+                 : [], // none
+      // additionalRelief: isEligible ? this.additionalReliefOptions.map(opt => opt.value) : [],
     };
+  }),
+  totalCompensation: this.firForm.get('totalCompensation')?.value,
+  proceedingsFileNo: this.firForm.get('proceedingsFileNo')?.value,
+  proceedingsDate: this.firForm.get('proceedingsDate')?.value,
+  proceedingsFile: this.firForm.get('proceedingsFile')?.value || '',
+  attachments: this.attachmentss_1 ? this.attachmentss_1.map((item: any) => item.path) : [],
+};
+
   console.log(firData,"firDatafirDatafirData")
 
     this.firService.updatestep5(firData).subscribe(
@@ -4450,22 +4410,6 @@ uploadedImageSrc: any | ArrayBuffer;
   }
 
 
-  // onAdditionalReliefChange(event: Event, value: string, index: number): void {
-  //   const checked = (event.target as HTMLInputElement).checked;
-  //   const victimsReliefArray = this.firForm.get('victimsRelief') as FormArray;
-  //   const victimGroup = victimsReliefArray.at(index) as FormGroup;
-  
-  //   let currentValues = victimGroup.get('additionalRelief')?.value;
-  //   console.log("gh",currentValues);
-  
-  //   if (checked && !currentValues.includes(value)) {
-  //     currentValues.push(value);
-  //   } else if (!checked) {
-  //     currentValues = currentValues.filter((item: string) => item !== value);
-  //   }
-  
-  //   victimGroup.get('additionalRelief')?.setValue(currentValues);
-  // }
 
   onAdditionalReliefChange(event: Event, value: string, index: number): void {
   const checked = (event.target as HTMLInputElement).checked;
@@ -4487,20 +4431,16 @@ uploadedImageSrc: any | ArrayBuffer;
 }
 isChecked(value: string, index: number): boolean {
   const control = this.victimsRelief.controls[index]?.get('additionalRelief');
+  const victim = this.victimsRelief.at(index).value;
 
-  // If no value is stored yet (first load), treat as all checked
   if (!control?.value || control.value.length === 0) {
-    return this.allPossibleValues.includes(value);
-  }
+  return victim.relief_applicable === 1
+         ? true
+         : false;
+}
 
   return control.value.includes(value);
 }
-
-
-//  isChecked(value: string, victimIndex: number): boolean {
-//     const victimGroup = this.victimsRelief.at(victimIndex) as FormGroup;
-//     return (victimGroup.get('additionalRelief')?.value || []).includes(value);
-//   }
 
 
   onJudgementSelectionChange_two(event: any): void {
@@ -5063,10 +5003,11 @@ isChecked(value: string, index: number): boolean {
       isNativeDistrictSame: ['', Validators.required],
       nativeDistrict: [''],
       offenceCommitted: ['', Validators.required],
-      scstSections:  ['', Validators.required], // Ensure this field exists for multi-select
-      // sectionsIPC:  ['',Validators.required],
+      scstSections:  ['', Validators.required], 
       sectionDetails: this.fb.array([this.createSection()]),
       availableCastes: [[]],
+      showOtherCaste:[false],
+      showOtherOffence:[false]
     });
   }
 
@@ -5164,7 +5105,9 @@ isChecked(value: string, index: number): boolean {
       this.firService.getOffences().subscribe(
         (offences: any) => {
           // console.log(offences);
+           
           this.offenceOptions = offences;
+          console.log(this.offenceOptions);
             // .filter((offence: any) => offence.offence_act_name !== '3(2)(va)' && offence.offence_act_name !== '3(2)(v)');
             // this.offenceOptions.push(
             //   { offence_act_name: '3(2)(va)', offence_name: '3(2)(va)', id : 24 },
@@ -5225,23 +5168,9 @@ isChecked(value: string, index: number): boolean {
       const victimGroup = this.victims.at(index) as FormGroup;
       victimGroup.patchValue({ caste: '' });
       victimGroup.get('availableCastes')?.setValue(this.victimSubCaste[selectedCommunity]);
+      
       this.cdr.detectChanges();
     }
-  // console.log(selectedCommunity,"wssss")
-      // if (selectedCommunity) {
-      //   this.firService.getCastesByCommunity(selectedCommunity).subscribe(
-      //     (castes: string[]) => {
-      //       const victimGroup = this.victims.at(index) as FormGroup;
-      //       victimGroup.patchValue({ caste: '' }); // Reset caste selection
-      //       victimGroup.get('availableCastes')?.setValue(castes); // Dynamically update caste options
-      //       this.cdr.detectChanges();
-      //     },
-      //     (error) => {
-      //       console.error('Error fetching castes:', error);
-      //       Swal.fire('Error', 'Failed to load castes for the selected community.', 'error');
-      //     }
-      //   );
-      // }
   }
   showSubCaste = true;
   showSubCasteText = false;
@@ -5273,32 +5202,7 @@ isChecked(value: string, index: number): boolean {
       accusedGroup.get('availableCastes')?.setValue(this.AccusedSubCastes[selectedCommunity]);
       this.cdr.detectChanges();
     }
-    // const selectedCommunity = event;
-    // // console.log(selectedCommunity);
-    // if(selectedCommunity == "General" || selectedCommunity == "Others"){
-    //   this.showSubCaste = false;
-    //   this.showSubCasteText = true;
-    // }
-    // else{
-    //   this.showSubCaste = true;
-    //   this.showSubCasteText = false;
-    // }
-    // if (selectedCommunity) {
-    //   this.firService.getAccusedCastesByCommunity(selectedCommunity).subscribe(
-    //     (castes: string[]) => {
-    //       this.scstSectionsOptions = castes;
-    //       const accusedGroup = this.accuseds.at(index) as FormGroup;
-    //       accusedGroup.patchValue({ caste: '' }); // Reset caste selection
-    //       accusedGroup.get('availableCastes')?.setValue(castes);
-    //       // console.log(accusedGroup.get('availableCastes')?.value,"datdadadadada"); 
-    //       this.cdr.detectChanges();
-    //     },
-    //     (error) => {
-    //       console.error('Error fetching accused castes:', error);
-    //       Swal.fire('Error', 'Failed to load castes for the selected accused community.', 'error');
-    //     }
-    //   );
-    // }
+    
   }
 
   // loadUserData() {
@@ -6974,7 +6878,8 @@ async UpdateAsDraft_7() {
     if (selectedDivision) {
       this.firService.getCourtRangesByDivision(selectedDivision).subscribe(
         (ranges: string[]) => {
-          this.courtRanges = ranges; 
+          // this.courtRanges = ranges; 
+          this.courtRanges = [...ranges,'Others']; 
           this.firForm.patchValue({ courtName: '' }); 
         },
         (error) => {
@@ -6991,7 +6896,8 @@ async UpdateAsDraft_7() {
     if (selectedDivision) {
       this.firService.getCourtRangesByDivision(selectedDivision).subscribe(
         (ranges: string[]) => {
-          this.courtRanges5 = ranges; 
+          // this.courtRanges5 = ranges; 
+          this.courtRanges5 = [...ranges,'Others']; 
           // this.firForm.patchValue({ courtName: '' }); 
         },
         (error) => {

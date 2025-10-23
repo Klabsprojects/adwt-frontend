@@ -1,10 +1,10 @@
-import { ChangeDetectorRef, Component, inject, TemplateRef } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, signal, TemplateRef, WritableSignal } from '@angular/core';
 import { WhatsappTriggerService } from '../../../app/services/whatsapp.service';
 import { Router } from '@angular/router';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { ReportsCommonService } from 'src/app/services/reports-common.service';
 import bootstrap from 'bootstrap';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
@@ -15,6 +15,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 export class WhatsappMessageComponent {
  // Variable Declarations
     private modalService = inject(NgbModal);
+    closeResult: WritableSignal<string> = signal('');
     searchText: string = '';
     selectAll: boolean = false;
     selectedTemplate: string = '';
@@ -35,6 +36,9 @@ export class WhatsappMessageComponent {
     naturesOfOffence: string[] = [];
     statusesOfCase: string[] = ['Just Starting', 'Pending', 'Completed'];
      loader: boolean = false;
+     pageSize: number = 10;
+     totalRecords: number = 0; 
+     currentPage: number = 1;
     statusesOfRelief: string[] = [
       'FIR Stage',
       'ChargeSheet Stage',
@@ -141,7 +145,7 @@ export class WhatsappMessageComponent {
         .subscribe(({ districts, offences }) => {
           this.districts = districts;
           this.naturesOfOffence = offences;
-          this.fetchUserList();
+          this.fetchUserList(1, this.pageSize);
         });
         this.getDropdowns();
       // this.filteredData = [...this.reportData];
@@ -264,23 +268,7 @@ export class WhatsappMessageComponent {
         this.fetchUserList();
     }
   
-      getStatusTextUIPT(status: number): string {
-      console.log(status,'statussssssss')
-      const statusTextMap = {
-        0: 'UI',
-        1: 'UI',
-        2: 'UI',
-        3: 'UI',
-        4: 'UI',
-        5: 'UI',
-        6: 'PT',
-        7: 'PT',
-        8: 'PT',
-        9: 'PT',
-      } as { [key: number]: string };
-  
-      return statusTextMap[status] || '';
-    }
+      
 
    getFilterParams() {
   const params: any = {};
@@ -341,37 +329,29 @@ export class WhatsappMessageComponent {
   
   
   
-    fetchUserList(): void {
+    fetchUserList(page: number = 1, pageSize: number = this.pageSize): void {
       let districtParam = '';
          if ((this.Parsed_UserInfo.access_type === 'District' && this.Parsed_UserInfo.role === 4)||(this.Parsed_UserInfo.role === 3)) {
         districtParam = this.Parsed_UserInfo.district;
         this.selectedDistrict = districtParam;
       }
       this.loader = true;
-      this.filteredData = [
-  {
-    sl_no: 1,
-    revenue_district: 'Chennai',
-    cug: 8766766768,
-    userType: 'Collector',
-    status: 'Pending'
-  },
-  {
-    sl_no: 2,
-    revenue_district: 'Madurai',
-    cug: 9887667667,
-    userType: 'DADWO',
-    status: 'Send'
-  },
-  {
-    sl_no: 3,
-    revenue_district: 'Salem',
-    cug: 6787667667,
-    userType: 'Collector',
-    status: 'Not Send'
-  }
-];
-console.log(this.filteredData);
+      this.currentPage = page;
+      this.pageSize = pageSize;
+       this.WhatsappService.getUserList(page, pageSize,this.getFilterParams()).subscribe({
+      next: (response: any) => {
+        this.reportData = response.data;
+        console.log(this.reportData);
+       
+        this.loader = false;
+        this.cdr.detectChanges();
+      },
+      error: (error) => { 
+        this.loader = false;
+        console.error('Error fetching reports:', error);
+      }
+    });
+     
 
     }
 
@@ -430,13 +410,25 @@ onEdit(report: any): void {
 
   return totals;
 }
-
-open(content: TemplateRef<any>, record?: any) {
-  this.modalService.open(content, {
-    size: 'lg',
-    centered: true,
-    backdrop: 'static',
-  });
+open(content: TemplateRef<any>) {
+  this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then(
+    (result) => {
+      this.closeResult.set(`Closed with: ${result}`);
+    },
+    (reason) => {
+      this.closeResult.set(`Dismissed ${this.getDismissReason(reason)}`);
+    },
+  );
+}
+private getDismissReason(reason: any): string {
+  switch (reason) {
+    case ModalDismissReasons.ESC:
+      return 'by pressing ESC';
+    case ModalDismissReasons.BACKDROP_CLICK:
+      return 'by clicking on a backdrop';
+    default:
+      return `with: ${reason}`;
+  }
 }
 
   }
