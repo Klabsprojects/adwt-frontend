@@ -101,6 +101,11 @@
               </div>
 
               <div class="col-md-12 mb-3">
+                  <label for="offenceOther {{ i }}" class="form-label"> Others</label>
+                    <input type="text"  class="form-control" readonly formControlName="offenceOther" />
+              </div>
+
+              <div class="col-md-12 mb-3">
                 <label class="form-label"><strong>Current SC/ST POA Sections:</strong></label>
                 <input 
                   type="text" 
@@ -216,6 +221,12 @@
                   </ng-template>
                 </ng-select>
               </div>
+
+              <div class="col-md-12 mb-3" *ngIf="victims.at(i).get('showOtherOffence')?.value">
+                  <label for="offenceOther {{ i }}" class="form-label">30a. Others</label>
+                    <input type="text"  class="form-control" formControlName="offenceOther" />
+
+                </div>
 
               <div class="col-md-12 mb-3">
                 <label class="form-label"><strong>New SC/ST POA Sections: *</strong></label>

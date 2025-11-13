@@ -18,8 +18,8 @@ import { environment } from 'src/environments/environment.prod';
   selector: 'app-relief',
   templateUrl: './relief.component.html',
   styleUrls: ['./relief.component.scss'],
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  // standalone: true,
+  // imports: [CommonModule, ReactiveFormsModule],
 })
 export class ReliefComponent implements OnInit {
   tabs: string[] = ['First Installment', 'Second Installment', 'Third Installment'];

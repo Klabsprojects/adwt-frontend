@@ -2,3 +2,31 @@
     height: 300px;
     overflow-y: scroll;
 }
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+  }
+  
+  .custom-table th {
+    background-color: #79829d;
+    color: white;
+    padding: 5px;
+    text-align: left;
+  }
+  
+  .custom-table td {
+    padding: 5px;
+    border: 1px solid #ddd;
+  }
+  
+  .row-white {
+    background-color: white;
+  }
+  
+  .row-gray {
+    background-color: #f2f2f2;
+  }
+  .pl-2{
+    padding-left: 10px !important;
+  }

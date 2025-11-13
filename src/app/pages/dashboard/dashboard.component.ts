@@ -132,10 +132,15 @@ export class DashboardComponent implements AfterViewInit  {
 
   chartInstance: any;
   chartInstance1: any;
-  barChart: Chart | null = null;
-  barChart13: Chart | null = null;
-  barChart14:Chart | null = null;
-  chartInstance2: Chart | null = null;
+  // barChart: Chart | null = null;
+  // barChart13: Chart | null = null;
+  // barChart14:Chart | null = null;
+  // chartInstance2: Chart | null = null;
+  barChart!: Chart<'bar', number[], string> | any;
+  barChart13: Chart<'bar', number[], string> | any;
+  barChart14:Chart<'bar', number[], string> | any;
+  chartInstance2:Chart<'bar', number[], string> | any;
+  
 
   caseCounts1 = {
     fir: 0,

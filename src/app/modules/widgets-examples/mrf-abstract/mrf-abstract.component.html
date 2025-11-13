@@ -322,30 +322,30 @@
         <th>Proposal sent to DC</th>
         <th>Status</th>
         <th (click)="sortTablePopup('fir')" style="cursor:pointer">
-          Pending Days
+          Days Pending Since FIR Filing
         <span *ngIf="sortColumn==='fir'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
         </th>
-        <th *ngIf="showFirProposal">Proposal Pending Days</th>
+        <th *ngIf="showFirProposal">Days Pending Since Proposal signing</th>
       </ng-container>
 
       <ng-container *ngIf="showChargesheet">
         <th>Proposal sent to DC</th>
         <th>Status</th>
         <th (click)="sortTablePopup('chargesheet')" style="cursor:pointer">
-          Pending Days
+          Days Pending Since FIR Filing
         <span *ngIf="sortColumn==='chargesheet'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
         </th>
-        <th *ngIf="showChargesheetProposal">Proposal Pending Days</th>
+        <th *ngIf="showChargesheetProposal">Days Pending Since Proposal signing</th>
       </ng-container>
 
       <ng-container *ngIf="showTrial">
         <th>Proposal sent to DC</th>
         <th>Status</th>
         <th (click)="sortTablePopup('trial')" style="cursor:pointer">
-          Pending Days
+          Days Pending Since FIR Filing
           <span *ngIf="sortColumn==='trial'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
         </th>
-        <th *ngIf="showTrialProposal">Proposal Pending Days</th>
+        <th *ngIf="showTrialProposal">Days Pending Since Proposal signing</th>
       </ng-container>
     </tr>
   </thead>

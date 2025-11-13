@@ -32,8 +32,11 @@
 
 /* helper class */
 .red{
-    background-color:#d64550;
+    background-color:#74afcb;
 }
 .blue{
-    background-color:#48327a;
+    background-color:#74afcb;
+}
+.orange{
+    background-color: #ec9770;
 }

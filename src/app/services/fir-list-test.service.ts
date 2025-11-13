@@ -40,19 +40,44 @@ export class FirListTestService {
   }
 
 
-  getPaginatedFirList(page: number, pageSize: number , filters: any = {}) {
-    let params = new HttpParams()
-      .set('page', page.toString())
-      .set('pageSize', pageSize.toString());
+  // getPaginatedFirList(page: number, pageSize: number , filters: any = {}) {
+  //   let params = new HttpParams()
+  //     .set('page', page.toString())
+  //     .set('pageSize', pageSize.toString());
       
-      // Add all filters to params
-      Object.keys(filters).forEach(key => {
-        params = params.set(key, filters[key]);
-      });
-        // Add other filters as needed
+  //     // Add all filters to params
+  //     Object.keys(filters).forEach(key => {
+  //       params = params.set(key, filters[key]);
+  //     });
+  //       // Add other filters as needed
     
-    return this.http.get<any>(`${this.baseUrl}/list_paginated`, { params });
+  //   return this.http.get<any>(`${this.baseUrl}/list_paginated`, { params });
+  // }
+
+  getPaginatedFirList(
+  page: number,
+  pageSize: number,
+  filters: any = {},
+  sortField?: string,
+  sortOrder?: string
+) {
+  let params = new HttpParams()
+    .set('page', page.toString())
+    .set('pageSize', pageSize.toString());
+  Object.keys(filters).forEach(key => {
+    if (filters[key] !== null && filters[key] !== undefined && filters[key] !== '') {
+      params = params.set(key, filters[key]);
+    }
+  });
+  if (sortField) {
+    params = params
+      .set('sortFlag', 'true')
+      .set('sortField', sortField)
+      .set('sortOrder', sortOrder || 'ASC');
   }
+  return this.http.get<any>(`${this.baseUrl}/list_paginated`, { params });
+}
+
 
   getLegacyPaginatedFirList(page: number, pageSize: number , filters: any = {}) {
     // https://adwatrocity.onlinetn.com/api/v1/fir_list/list_paginated?page=29&pageSize=10&district=Villupuram&legacy=yes

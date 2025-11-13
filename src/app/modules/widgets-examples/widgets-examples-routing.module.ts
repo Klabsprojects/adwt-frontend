@@ -42,6 +42,8 @@ import { AfterAbstractComponent } from './after-abstract/after-abstract.componen
 import { BeforeAbstractComponent } from './before-abstract/before-abstract.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { WhatsappMessageComponent } from './whatsapp-message/whatsapp-message.component';
+import { CollectorsComponent } from './collectors/collectors.component';
+import { AutoGenerationComponent } from 'src/app/app/modules/widgets-examples/auto-generation/auto-generation.component';
 
 const routes: Routes = [
   {
@@ -64,7 +66,10 @@ const routes: Routes = [
         path: 'court',
         component: CourtComponent,
       },
-
+      {
+        path: 'collectors',
+        component: CollectorsComponent,
+      },
       {
         path: 'revenue-district',
         component: RevenueDistrictComponent,
@@ -106,6 +111,7 @@ const routes: Routes = [
       { path: 'fir-list', component: FirListComponent },
       { path: 'legacy-fir-list', component:LegacyFirListComponent},
       { path: 'whatsapp-message', component:WhatsappMessageComponent},
+      { path: 'auto-generation', component:AutoGenerationComponent},
       { path: 'add-fir', data: { title: 'Home Page' }, loadComponent: () => import('./add-fir/add-fir.component').then(m => m.AddFirComponent), },
       {
         path: 'statistics',

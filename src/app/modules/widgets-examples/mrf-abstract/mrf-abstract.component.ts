@@ -467,7 +467,7 @@ caseDetailsExport() {
   if (this.showFIR && !this.showChargesheet && !this.showTrial) {
     // 🔹 FIR only
     headerRow1.push("FIR", "", "", "");
-    headerRow2.push("Proposal Sent to DC", "Status", "Pending Days","Proposal Pending Days");
+    headerRow2.push("Proposal Sent to DC", "Status", "Days Pending Since FIR Filing","Days Pending Since Proposal Signing");
 
     dataRows = dataToExport.map((d: any, i: number) => [
       i + 1,
@@ -483,7 +483,7 @@ caseDetailsExport() {
   else if (this.showChargesheet && !this.showFIR && !this.showTrial) {
     // 🔹 Chargesheet only
     headerRow1.push("Chargesheet", "", "","");
-    headerRow2.push("Proposal Sent to DC", "Status", "Pending Days","Proposal Pending Days");
+    headerRow2.push("Proposal Sent to DC", "Status", "Days Pending Since FIR Filing","Days Pending Since Proposal Signing");
 
     dataRows = dataToExport.map((d: any, i: number) => [
       i + 1,
@@ -499,7 +499,7 @@ caseDetailsExport() {
   else if (this.showTrial && !this.showFIR && !this.showChargesheet) {
     // 🔹 Trial only
     headerRow1.push("Trial", "", "");
-    headerRow2.push("Proposal Sent to DC", "Status", "Pending Days");
+    headerRow2.push("Proposal Sent to DC", "Status", "Days Pending Since FIR Filing");
 
     dataRows = dataToExport.map((d: any, i: number) => [
       i + 1,
@@ -524,9 +524,9 @@ caseDetailsExport() {
     // 🔹 District / All → include everything
     headerRow1.push("FIR","","","","Chargesheet","","","","Trial","","","");
     headerRow2.push(
-      "Proposal Sent to DC","Status","Pending Days","Proposal Pending Days",
-      "Proposal Sent to DC","Status","Pending Days","Proposal Pending Days",
-      "Proposal Sent to DC","Status","Pending Days","Proposal Pending Days"
+      "Proposal Sent to DC","Status","Days Pending Since FIR Filing","Days Pending Since Proposal Signing",
+      "Proposal Sent to DC","Status","Days Pending Since FIR Filing","Days Pending Since Proposal Signing",
+      "Proposal Sent to DC","Status","Days Pending Since FIR Filing","Days Pending Since Proposal Signing"
     );
 
     dataRows = dataToExport.map((d: any, i: number) => [

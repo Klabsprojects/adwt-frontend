@@ -1,7 +1,8 @@
 import { Directive, ElementRef, OnInit, HostListener } from '@angular/core';
 
 @Directive({
-  selector: '[restrictAllFutureDates]'
+  selector: '[restrictAllFutureDates]',
+
 })
 export class RestrictAllFutureDatesDirective implements OnInit {
   constructor(private el: ElementRef) {}

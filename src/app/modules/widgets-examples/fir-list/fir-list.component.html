@@ -793,6 +793,12 @@
                       [value]="victim.caste" />
                   </div>
 
+                  <div class="col-md-4 mb-3">
+                    <label for="victimCaste{{ i }}" class="form-label">26a. Others </label>
+                    <input readonly type="text" name="victimCaste{{ i }}" id="victimCaste{{ i }}" class="form-control"
+                      [value]="victim.caste_other" />
+                  </div>
+
                   <div class="col-md-5 mb-3">
                     <label for="victimGuardian{{ i }}" class="form-label">27. Name of Victim’s Father/ Mother/ Spouse/
                       Guardian *</label>
@@ -818,6 +824,12 @@
                       victim *</label>
                     <textarea readonly name="victimOffence{{ i }}" id="victimOffence{{ i }}"
                       class="form-control">{{ victim.offence_committed }}</textarea>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label for="victimOffence{{ i }}" class="form-label">30a. Others </label>
+                    <input readonly type="text" name="victimOffence{{ i }}" id="victimOffence{{ i }}" class="form-control"
+                      [value]="victim.offence_other" />
                   </div>
 
                   <div class="col-md-6 mb-3">

@@ -1,30 +1,79 @@
 <app-relief-filter/>
 <app-relief-cards/>
 <div class="row">
-    <div class="col-xl-4 col-lg-4 col-md-6">
+    <div class="col-xl-12 col-lg-12 col-md-12">
         <app-relief-table/>
     </div>
-    <div class="col-xl-4 col-lg-4 col-md-6">
+    <div class="col-xl-12 col-lg-12 col-md-12">
         <app-relief-given/>
     </div>
-    <div class="col-xl-4 col-lg-4 col-md-6">
+    <div class="col-xl-12 col-lg-12 col-md-12">
         <app-relief-pending/>
     </div>
 </div>
-<div class="row" style="margin-top: 2rem;">
-    <div class="col-xl-4 col-lg-4 col-md-6">
+        <h1 class="text-center" style="width:100%; margin-top:60px;">Additional Relief Dashboard</h1>
+
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12">
+        <app-before-additional/>
+        <!-- <app-relief-job-status/> -->
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-6">
         <app-relief-job-status/>
     </div>
-    <div class="col-xl-4 col-lg-4 col-md-6">
+    <div class="col-xl-3 col-lg-3 col-md-6">
         <app-relief-pension-status/>
     </div>
-    <div class="col-xl-4 col-lg-4 col-md-6">
+    <div class="col-xl-3 col-lg-3 col-md-6">
         <app-relief-patta-status/>
     </div>
-    <div class="col-xl-4 col-lg-4 col-md-6">
+    <div class="col-xl-3 col-lg-3 col-md-6">
         <app-relief-education-status/>
     </div>
-    <div class="col-xl-4 col-lg-4 col-md-6">
+    <!-- <div class="col-xl-3 col-lg-3 col-md-6">
         <app-relief-relief-status/>
+    </div> -->
+    <div class="col-xl-6 col-lg-6 col-md-12" style="margin-top:30px;">
+        <div class="card">
+            <div class="card-header" style="min-height: 0px;"><h2>Before Cases Districtwise Pendency</h2></div>
+        <div id="chart" style="position: relative;">
+  <apx-chart
+    [series]="chartOptions!.series"
+    [chart]="chartOptions!.chart"
+    [dataLabels]="chartOptions!.dataLabels"
+    [plotOptions]="chartOptions!.plotOptions"
+    [xaxis]="chartOptions!.xaxis"
+    [stroke]="chartOptions!.stroke"
+    [fill]="chartOptions!.fill"
+    [yaxis]="chartOptions!.yaxis"
+    [title]="chartOptions!.title"
+    [tooltip]="chartOptions!.tooltip"
+    [legend]="chartOptions!.legend"
+  ></apx-chart>
+  </div>
+  <app-loading-dash *ngIf="loading"/>
+</div>
+    </div>
+
+    <div class="col-xl-6 col-lg-6 col-md-12" style="margin-top:30px;">
+        <div class="card">
+            <div class="card-header" style="min-height: 0px;"><h2>After Cases Districtwise Pendency</h2></div>
+        <div id="chart" style="position: relative;">
+        <apx-chart
+            [series]="pendingChartOptions!.series"
+            [chart]="pendingChartOptions!.chart"
+            [dataLabels]="pendingChartOptions!.dataLabels"
+            [plotOptions]="pendingChartOptions!.plotOptions"
+            [xaxis]="pendingChartOptions!.xaxis"
+            [stroke]="pendingChartOptions!.stroke"
+            [fill]="pendingChartOptions!.fill"
+            [yaxis]="pendingChartOptions!.yaxis"
+            [title]="pendingChartOptions!.title"
+            [tooltip]="pendingChartOptions!.tooltip"
+            [legend]="pendingChartOptions!.legend"
+        ></apx-chart>
+        <app-loading-dash *ngIf="loading"/>
+        </div> 
+</div>
     </div>
 </div>

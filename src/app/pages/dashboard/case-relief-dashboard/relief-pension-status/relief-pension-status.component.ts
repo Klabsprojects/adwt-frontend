@@ -28,7 +28,7 @@ export class ReliefPensionStatusComponent {
           this.loading = Object.keys(res).length === 0 ? true : false;
           this.pieChartDatasets = [{
             data: [res.Given, res.Pending],
-            backgroundColor: ['#d64550', '#48327a']
+            backgroundColor: ['#2A9D8F', '#E9C46A'],
           }];
           this.cdr.detectChanges();
         }
@@ -54,8 +54,8 @@ export class ReliefPensionStatusComponent {
   public pieChartLabels = ['Job Given', 'Job Pending'];
 
   public pieChartDatasets = [{
-    data: [5, 5],
-    backgroundColor: ['#d64550', '#48327a']
+    data: [3, 3],
+     backgroundColor: ['#2A9D8F', '#E9C46A'],
   }];
 
   // 👇 Cast plugin array to correct type

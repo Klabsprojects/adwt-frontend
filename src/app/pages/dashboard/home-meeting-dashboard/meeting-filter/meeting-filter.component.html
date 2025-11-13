@@ -5,7 +5,7 @@
     <div class="filters px-0 pt-0 pt-3">
             <div class="filter">
               <p>Year</p>
-                <select name="" id="" [(ngModel)]="selectedyear" (change)="get_other_values()">
+                <select name="" id="" [(ngModel)]="selectedyear">
                     <option value="" selected>Select</option>
                     <option value="2025">2025</option>
                     <option value="2024">2024</option>
@@ -17,7 +17,7 @@
 
             <div class="filter">
               <p>Quarter</p>
-                <select name="" id="" [(ngModel)]="selectedQuarter" (change)="get_other_values()">
+                <select name="" id="" [(ngModel)]="selectedQuarter">
                     <option value="" selected>Select</option>
                     <option value="Q1">Q1</option>
                     <option value="Q2">Q2</option>
@@ -34,14 +34,14 @@
             </div>
             <div class="filter">
               <p>Sub Division</p>
-                <select name="" id="" [(ngModel)]="selectedSubDivision" (change)="get_other_values()">
+                <select name="" id="" [(ngModel)]="selectedSubDivision">
                     <option value="" selected>Select</option>
                     <option [value]="subdiv" *ngFor="let subdiv of subdivs">{{subdiv}}</option>
                 </select>
             </div>
             <div class="filter">
               <p>Meeting Type</p>
-                <select name="" id="" [(ngModel)]="selectedMeetingType" (change)="get_other_values()">
+                <select name="" id="" [(ngModel)]="selectedMeetingType">
                     <option value="" selected>Select</option>
                     <option value="DLVMC">DLVMC</option>
                     <option value="SDLVMC">SDLVMC</option>
@@ -50,15 +50,18 @@
             </div>
             <div class="filter">
               <p>Meeting Status</p>
-                <select name="" id="" [(ngModel)]="selectedStatus" (change)="get_other_values()">
+                <select name="" id="" [(ngModel)]="selectedStatus">
                     <option value="" selected>Select</option>
                     <option value="Completed">Completed</option>
                     <option value="Pending">Pending</option>
                 </select>
             </div>
-            <div class="filter img-container">
+
+            <button  (click)="get_other_values()" class="btn btn-primary btn-sm mt-8" style="height: 35px;">Apply Filters</button>
+            <button  (click)="clear()" class="btn btn-secondary btn-sm mt-8"  style="width: max-content !important; height: 35px;">Clear</button>
+            <!-- <div class="filter img-container">
               <img src="assets/images/filter.png" alt="filter" width="40px" (click)="clear()">
-            </div>
+            </div> -->
     </div>
     <!-- <ul>
         <li><h1>Meeting Dashboard</h1></li>

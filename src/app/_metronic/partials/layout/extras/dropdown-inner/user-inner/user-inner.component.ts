@@ -38,11 +38,32 @@ export class UserInnerComponent implements OnInit {
 
 
 
+  // logout() {
+  //   this.auth.logout();
+  //   sessionStorage.clear(); // Clear all session data on logout
+  //   document.location.reload(); // Reload the page after logout
+  // }
+
   logout() {
+  const isSSO = sessionStorage.getItem('isSSOLogin') === 'true';
+  const idToken = sessionStorage.getItem('id_token');
+  const redirectUri = window.location.origin + '/login'; 
+
+  if (isSSO && idToken) {
+    const logoutUrl = `http://74.208.113.233:8081/realms/klabs/protocol/openid-connect/logout?id_token_hint=${idToken}&post_logout_redirect_uri=${encodeURIComponent(redirectUri)}`;
+    sessionStorage.clear();
+    localStorage.removeItem('access_token');
+
+    // 🔁 Redirect to Keycloak logout endpoint
+    window.location.href = logoutUrl;
+  } else {
     this.auth.logout();
-    sessionStorage.clear(); // Clear all session data on logout
-    document.location.reload(); // Reload the page after logout
+    sessionStorage.clear();
+    localStorage.removeItem('access_token');
+    document.location.reload();
   }
+}
+
 
   selectLanguage(lang: string) {
     this.translationService.setLanguage(lang);

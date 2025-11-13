@@ -13,7 +13,6 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 import { AppRoutingModule, routes } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { RestrictAllFutureDatesDirective } from  'src/app/directives/restrict-all-future-dates.directive';
 import { AuthService } from './modules/auth/services/auth.service';
 import { environment } from 'src/environments/environment';
 import { FakeAPIService } from './_fake/fake-api.service';
@@ -115,14 +114,16 @@ function appInitializer(authService: AuthService) {
         console.log('Auth code detected:', authCode);
         authService.getTokenFromCode(authCode).subscribe({
           next: (token) => {
-            console.log('Token response:', token, token.access_token);
-
+            // console.log('Token response:', token, token.access_token);
+            sessionStorage.setItem('isSSOLogin', 'true');
+            sessionStorage.setItem('id_token', token.id_token);
             const decoded = decodeJwt(token.access_token);
-            console.log('Decoded JWT:', decoded);
+            decoded.token = token.access_token;
+            // console.log('Decoded JWT:', decoded);
 
-            sessionStorage.setItem('user_data', decoded.role);
+            sessionStorage.setItem('user_data', JSON.stringify(decoded));
 
-            // ✅ Redirect based on role
+            
             if (decoded.role == 3) {
               router.navigate(['/widgets-examples/VmcmeetingComponent']); 
             } else {
@@ -132,14 +133,11 @@ function appInitializer(authService: AuthService) {
           },
           error: (err) => {
             console.error('❌ Error exchanging token:', err);
-
-            // 🔔 Show alert
             Swal.fire({
               icon: 'error',
               title: 'Login Failed',
               text: 'Unable to login. Please try again.',
             }).then(() => {
-              // Optional → redirect to login page
               router.navigate(['/login']);
             });
 
@@ -151,7 +149,6 @@ function appInitializer(authService: AuthService) {
         authService.getUserByToken().subscribe({
           next: () => resolve(),
           error: () => {
-            // 🔔 If token also invalid
             Swal.fire({
               icon: 'error',
               title: 'Session Expired',
@@ -169,8 +166,8 @@ function appInitializer(authService: AuthService) {
 
 
 function decodeJwt(token: string) {
-  const payload = token.split('.')[1]; // take the 2nd part
-  const base64 = payload.replace(/-/g, '+').replace(/_/g, '/'); // base64url -> base64
+  const payload = token.split('.')[1];
+  const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
   const jsonPayload = decodeURIComponent(
     atob(base64)
       .split('')

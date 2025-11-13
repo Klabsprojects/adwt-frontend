@@ -118,27 +118,40 @@ function getChartOptions(
         },
       },
     },
+    // states: {
+    //   normal: {
+    //     filter: {
+    //       type: 'none',
+    //       value: 0,
+    //     },
+    //   },
+    //   hover: {
+    //     filter: {
+    //       type: 'none',
+    //       value: 0,
+    //     },
+    //   },
+    //   active: {
+    //     allowMultipleDataPointsSelection: false,
+    //     filter: {
+    //       type: 'none',
+    //       value: 0,
+    //     },
+    //   },
+    // },
     states: {
-      normal: {
-        filter: {
-          type: 'none',
-          value: 0,
-        },
-      },
-      hover: {
-        filter: {
-          type: 'none',
-          value: 0,
-        },
-      },
-      active: {
-        allowMultipleDataPointsSelection: false,
-        filter: {
-          type: 'none',
-          value: 0,
-        },
-      },
-    },
+  hover: {
+    filter: {
+      type: 'none'
+    }
+  },
+  active: {
+    allowMultipleDataPointsSelection: false,
+    filter: {
+      type: 'none'
+    }
+  }
+},
     tooltip: {
       style: {
         fontSize: '12px',

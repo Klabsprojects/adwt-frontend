@@ -11,14 +11,22 @@ export class ReliefService {
   constructor(private http: HttpClient) {}
 
   // Fetch FIR Relief List
-  getFIRReliefList(page: number, pageSize: number,filters: any = {}): Observable<any[]> {
+  getFIRReliefList(page: number, pageSize: number,filters: any = {},sortField?: string,
+  sortOrder?: string): Observable<any[]> {
   let params = new HttpParams()
     .set('page', page.toString())
     .set('pageSize', pageSize.toString());
     Object.keys(filters).forEach(key => {
-        params = params.set(key, filters[key]);
+         if (filters[key] !== null && filters[key] !== undefined && filters[key] !== '') {
+      params = params.set(key, filters[key]);
+    }
       });
-        // Add other filters as needed
+      if (sortField) {
+    params = params
+      .set('sortFlag', 'true')
+      .set('sortField', sortField)
+      .set('sortOrder', sortOrder || 'ASC');
+  }
     return this.http.get<any[]>(this.apiUrl, { params });
   }
 

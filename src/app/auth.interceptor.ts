@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+  HttpInterceptor,
+  HttpErrorResponse
+} from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -11,24 +17,28 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const userDataString = sessionStorage.getItem('user_data');
     const token = userDataString ? JSON.parse(userDataString).token : null;
-
-    // console.log('auth interceptor is working')
-
+    const isSSOLogin = sessionStorage.getItem('isSSOLogin') === 'true';
+    // console.log(isSSOLogin);
     if (token) {
+      let headers: Record<string, string> = {
+        Authorization: `Bearer ${token}`,
+      };
+      if (isSSOLogin) {
+        headers['login-type'] = 'SSO';
+      }
+
       req = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
+        setHeaders: headers,
       });
     }
 
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401 || error.status === 403) {
-          sessionStorage.clear(); // Clear session on unauthorized error
-          this.router.navigate(['/auth/login']); // Redirect to login
+          sessionStorage.clear();
+          this.router.navigate(['/auth/login']);
         }
-        return throwError(error);
+        return throwError(() => error);
       })
     );
   }

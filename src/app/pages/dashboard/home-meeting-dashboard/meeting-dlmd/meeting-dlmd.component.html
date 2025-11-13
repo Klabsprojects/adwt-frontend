@@ -1,37 +1,43 @@
-<div class="table-container card">
+<h2 class="my-5 text-center">DLVMC Table</h2>
+<div class="table-container card mt-0">
   <table class="responsive-table">
     <thead>
       <!-- Top Header -->
       <tr>
-        <th colspan="1" class="blue">Quarter</th>
-        <th colspan="2" class="blue">Q1</th>
-        <th colspan="2" class="blue">Q2</th>
-        <th colspan="2" class="blue">Q3</th>
-        <th colspan="2" class="blue">Q4</th>
-        <th colspan="2" class="blue">Total</th>
+        <th rowspan="2" class="blue text-center align-middle">District</th>
+        <th colspan="2" class="blue text-center">Q1</th>
+        <th colspan="2" class="blue text-center">Q2</th>
+        <th colspan="2" class="blue text-center">Q3</th>
+        <th colspan="2" class="blue text-center">Q4</th>
+        <!-- ✅ Only one Total column -->
+        <th rowspan="2" class="blue text-center align-middle">Total</th>
       </tr>
 
-      <!-- Sub Header -->
+      <!-- Sub Header (only for Q1–Q4) -->
       <tr>
-        <th class="blue">District</th>
-        <ng-container *ngFor="let q of quarters">
-          <th class="green">Completed</th>
-          <th class="red">Pending</th>
-          <!-- <th class="blue">Total Meetings</th> -->
+        <ng-container *ngFor="let q of quarters.slice(0, 4)">
+          <th class="green text-center">Completed</th>
+          <th class="red text-center">Pending</th>
         </ng-container>
       </tr>
     </thead>
 
     <tbody>
       <tr *ngFor="let row of tableData">
+        <!-- District name -->
         <td>{{ row.district }}</td>
-        <ng-container *ngFor="let q of quarters">
-          <td [ngClass]="{'green':row[q]?.completed===1}">{{ row[q]?.completed }}</td>
-          <td [ngClass]="{'red':row[q]?.pending===1}">{{ row[q]?.pending }}</td>
-          <!-- <td>{{ row[q]?.total }}</td> -->
+
+        <!-- Q1–Q4 data -->
+        <ng-container *ngFor="let q of quarters.slice(0, 4)">
+          <td [ngClass]="{ 'green': row[q]?.completed === 1 }">{{ row[q]?.completed }}</td>
+          <td [ngClass]="{ 'red': row[q]?.pending === 1 }">{{ row[q]?.pending }}</td>
         </ng-container>
+
+        <!-- ✅ Single Total column -->
+        <td class="fw-bold text-center">{{ row.total.total }}</td>
       </tr>
     </tbody>
   </table>
-  <app-loading-dash *ngIf="loading" />
+
+  <app-loading-dash *ngIf="loading"></app-loading-dash>
 </div>

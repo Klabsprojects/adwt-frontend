@@ -1,4 +1,45 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: #fff;
+    font-weight: 600;
+}
 #chart{
     height: 300px;
     overflow-y: scroll;
+}
+.cards{
+    margin-top: 1rem;
+    position: relative;
+}
+
+.card-box{
+    display: flex;
+    justify-content: center;
+    gap: 0.2rem;
+    padding: 0.2rem;
+}
+.case{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+.filter{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+.case,.filter{
+    flex: 1;
+    padding: 1rem;
+}
+
+.red{
+    background-color:#ec9770;
+}
+.blue{
+    background-color:#48327a;
 }

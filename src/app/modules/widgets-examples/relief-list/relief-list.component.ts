@@ -208,13 +208,13 @@ nextPage(): void {
   }
 
 
-fetchFIRList(page: number = 1, pageSize: number = this.pageSize): void {
+fetchFIRList(page: number = 1, pageSize: number = this.pageSize,sortField?: string, sortOrder?: string): void {
   this.isLoading = true;
   this.loader = true;
   this.currentPage = page;
   this.pageSize = pageSize;
 
-  this.reliefService.getFIRReliefList(page, pageSize, this.getFilterParams())
+  this.reliefService.getFIRReliefList(page, pageSize, this.getFilterParams(),sortField, sortOrder)
     .subscribe({
       next: (response: any | any[]) => {
         if (Array.isArray(response)) {
@@ -614,20 +614,46 @@ getStatusText(status: number, reliefStatus: number,selectedStatus?: any): string
 
 
   // Sorting logic
-  sortTable(field: string) {
-    if (this.currentSortField === field) {
-      this.isAscending = !this.isAscending;
-    } else {
-      this.currentSortField = field;
-      this.isAscending = true;
-    }
+  // sortTable(field: string) {
+  //   if (this.currentSortField === field) {
+  //     this.isAscending = !this.isAscending;
+  //   } else {
+  //     this.currentSortField = field;
+  //     this.isAscending = true;
+  //   }
 
-    this.firList.sort((a, b) => {
-      const valA = a[field]?.toString().toLowerCase() || '';
-      const valB = b[field]?.toString().toLowerCase() || '';
-      return this.isAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
-    });
+  //   this.firList.sort((a, b) => {
+  //     const valA = a[field]?.toString().toLowerCase() || '';
+  //     const valB = b[field]?.toString().toLowerCase() || '';
+  //     return this.isAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
+  //   });
+  // }
+
+  sortTable(field: string): void {
+  // Map frontend column to backend sort field
+  const sortFieldMap: { [key: string]: string } = {
+    fir_number: 'fir_number',
+    police_city: 'fir_add.police_city',
+    police_station: 'fir_add.police_station',
+    created_by: 'created_by',
+    date_of_registration: 'fir_add.date_of_registration',
+    created_at: 'fir_add.created_at'
+  };
+
+  const backendField = sortFieldMap[field];
+  if (!backendField) return;
+
+  if (this.currentSortField === field) {
+    this.isAscending = !this.isAscending;
+  } else {
+    this.currentSortField = field;
+    this.isAscending = true;
   }
+
+  const sortOrder = this.isAscending ? 'ASC' : 'DESC';
+  this.fetchFIRList(this.currentPage, this.pageSize, backendField, sortOrder);
+}
+
 
   // Get the sort icon class
   getSortIcon(field: string): string {

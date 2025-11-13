@@ -48,6 +48,7 @@ import { LoadingDashComponent } from 'src/app/pages/dashboard/loading-dash/loadi
 import { MatOptionModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { BeforeAdditionalComponent } from 'src/app/pages/dashboard/before-additional/before-additional.component';
 @NgModule({
   declarations: [
     MeetingCardsComponent,
@@ -84,7 +85,8 @@ import { MatSelectModule } from '@angular/material/select';
     ReliefPendingComponent,
     ReliefPensionStatusComponent,
     ReliefReliefStatusComponent,
-    ReliefTableComponent
+    ReliefTableComponent,
+    BeforeAdditionalComponent
   ],
   imports: [
     NgxChartsModule,

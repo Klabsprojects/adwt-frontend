@@ -17,7 +17,8 @@ export class AuthService implements OnDestroy {
 
   private keycloakTokenUrl = 'http://74.208.113.233:8081/realms/klabs/protocol/openid-connect/token';
   private clientId = 'adwt-client';
-  private redirectUri = 'http://localhost:4200/callback'; // must match Keycloak settings
+  //private redirectUri = 'http://localhost:4200/callback';
+  private redirectUri = 'https://adwatrocity.onlinetn.com/callback';
   [x: string]: any;
   // private fields
   private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
@@ -119,25 +120,8 @@ export class AuthService implements OnDestroy {
     );
   }
 
-
-//   logout() {
-//   const logoutUrl = 'http://74.208.113.233:8081/realms/klabs/protocol/openid-connect/logout';
-//   this.http.get(logoutUrl).subscribe({
-//     next: () => {
-//       console.log('Logged out successfully from Keycloak');
-//       sessionStorage.clear();
-//       // this.router.navigate(['/landing'], { replaceUrl: true });
-//     },
-//     error: (err) => {
-//       console.error('Logout failed:', err);
-//       sessionStorage.clear();
-//       this.router.navigate(['/landing'], { replaceUrl: true });
-//     }
-//   });
-// }
-
-  async logout() {
-  const logoutUrl = "http://74.208.113.233:8081/realms/klabs/protocol/openid-connect/logout?redirect_uri=http://localhost:4200/landing";
+logout() {
+  const logoutUrl = "http://74.208.113.233:8081/realms/klabs/protocol/openid-connect/logout?redirect_uri=https://adwatrocity.onlinetn.com/landing";
   window.location.href = logoutUrl;
 }
 

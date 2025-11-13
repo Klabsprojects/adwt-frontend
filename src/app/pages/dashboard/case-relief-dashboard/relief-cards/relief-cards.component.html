@@ -1,6 +1,6 @@
 <section class="cards">
     <div class="row">
-        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 card-box">
             <div class="case red">
                 <img src="assets/images/hammer.png" alt="" height="50px">
                 <div>
@@ -13,11 +13,12 @@
                 <p>{{DynamicCards.Filtered_Total_Reported_Cases}}</p>
             </div>
         </div>
-        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 card-box">
             <div class="case red">
                 <img src="assets/images/hammer.png" alt="" height="50px">
                 <div>
-                    <p>Case Registered Before "14-04-2016"</p>
+                    <!-- <p>Case Registered Before "14-04-2016"</p> -->
+                     <p>Total Disposed Cases</p>
                     <p>{{staticCards.Case_Register_Before_14_04_2026}}</p>
                 </div>
             </div>
@@ -26,11 +27,12 @@
                 <p>{{DynamicCards.Filtered_Case_Register_Before_14_04_2026}}</p>
             </div>
         </div>
-        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 card-box">
             <div class="case red">
                 <img src="assets/images/hammer.png" alt="" height="50px">
                 <div>
-                    <p>Case Registered After "14-04-2016"</p>
+                    <!-- <p>Case Registered After "14-04-2016"</p> -->
+                     <p>Total Eligible Cases</p>
                     <p>{{staticCards.Case_Register_after_14_04_2026}}</p>
                 </div>
             </div>
@@ -39,20 +41,20 @@
                 <p>{{DynamicCards.Filtered_Case_Register_after_14_04_2026}}</p>
             </div>
         </div>
-        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
-            <div class="case blue">
-                <img src="assets/images/firconv.png" alt="" height="50px">
+        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 card-box">
+            <div class="case red">
+                <img src="assets/images/hammer.png" alt="" height="50px">
                 <div>
-                    <p>FIR Stage</p>
+                    <p>FIR Proposal not yet Received</p>
                     <p>{{staticCards.Fir_Stage}}</p>
                 </div>
             </div>
-            <div class="filter blue">
+            <div class="filter red">
                 <p>Filtered Cases</p>
                 <p>{{DynamicCards.Filtered_Fir_Stage}}</p>
             </div>
         </div>
-        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+        <!-- <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 card-box">
             <div class="case blue">
                 <img src="assets/images/firconv.png" alt="" height="50px">
                 <div>
@@ -65,7 +67,7 @@
                 <p>{{DynamicCards.Filtered_Chargesheet_Stage}}</p>
             </div>
         </div>
-        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 card-box">
             <div class="case blue">
                 <img src="assets/images/firconv.png" alt="" height="50px">
                 <div>
@@ -77,7 +79,7 @@
                 <p>Filtered Cases</p>
                 <p>{{DynamicCards.Filtered_Conviction_Stage}}</p>
             </div>
-        </div>
+        </div> -->
     </div>
     <app-loading-dash *ngIf="loading"/>
 </section>

@@ -1,0 +1,77 @@
+<section class="cards my-5">
+    <div class="row">
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+            <div class="case red">
+                <img src="assets/images/hammer.png" alt="" height="50px">
+                <div>
+                    <p>Total Additional Relief Cases</p>
+                    <p>0</p>
+                </div>
+            </div>
+            <div class="filter red">
+                <p>Filtered Cases</p>
+                <p>0</p>
+            </div>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+            <div class="case red">
+                <img src="assets/images/hammer.png" alt="" height="50px">
+                <div>
+                     <p>Total Before 14/04/2016 Cases</p>
+                    <p>0</p>
+                </div>
+            </div>
+            <div class="filter red">
+                <p>Filtered Cases</p>
+                <p>0</p>
+            </div>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+            <div class="case red">
+                <img src="assets/images/hammer.png" alt="" height="50px">
+                <div>
+                     <p>Total After 14/04/2016  Cases</p>
+                    <p>0</p>
+                </div>
+            </div>
+            <div class="filter red">
+                <p>Filtered Cases</p>
+                <p>0</p>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box my-5">
+           <div class="card text-center">
+              <div class="card-header p-2">
+                <h4 class="mb-0">Before Relief Status</h4>
+              </div>
+            <div class="card-body px-10">
+                <canvas #beforeChartCanvas></canvas>
+            </div>
+        </div>
+        </div>
+
+        <div class="col-xl-8 col-lg-8 col-md-6 col-sm-6 card-box my-5">
+             <table class="custom-table">
+      <thead>
+        <tr>
+         <th colspan="4">Before Given Status</th> 
+        </tr>
+        <tr>
+          <th>Job</th>
+          <th>Pension</th>
+          <th>Patta</th>
+          <th>Education Concession</th>
+        </tr>
+      </thead>
+      <tbody>
+         <td>10</td>
+          <td>10</td>
+           <td>10</td>
+           <td>10</td>
+        </tbody>
+        </table>
+        </div>
+      </div>
+    <app-loading-dash *ngIf="loading"/>
+</section>

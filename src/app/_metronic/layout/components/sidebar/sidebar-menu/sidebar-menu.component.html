@@ -136,6 +136,16 @@
             <span class="menu-title">Police Stations</span>
           </a>
         </div>
+
+        <!-- <div class="menu-item" *ngIf="hasPermission('Collectors')">
+          <a class="menu-link without-sub" routerLink="/widgets-examples/collectors" routerLinkActive="active">
+            <span class="menu-bullet">
+              <span class="bullet bullet-dot"></span>
+            </span>
+            <span class="menu-title">Collectors</span>
+          </a>
+        </div> -->
+
         <div class="menu-item" *ngIf="hasPermission('Court')">
           <a class="menu-link without-sub" routerLink="/widgets-examples/court" routerLinkActive="active">
             <span class="menu-bullet">
@@ -416,7 +426,7 @@ data-kt-menu-trigger="click" routerLinkActive="here show">
 </div>
 </div>
 
-<div class="menu-item" *ngIf="hasPermission('whatsapp message')">
+<!-- <div class="menu-item" *ngIf="hasPermission('whatsapp message')">
       <a
         class="menu-link without-sub"
         routerLink="/widgets-examples/whatsapp-message"
@@ -426,7 +436,19 @@ data-kt-menu-trigger="click" routerLinkActive="here show">
         </span>
         <span class="menu-title">Whatsapp Message</span>
       </a>
-    </div>
+    </div> -->
+
+    <!-- <div class="menu-item" *ngIf="hasPermission('Proposal Auto Generation')">
+      <a
+        class="menu-link without-sub"
+        routerLink="/widgets-examples/auto-generation"
+        routerLinkActive="active">
+        <span class="menu-icon">
+          <i class="fa fa-file-alt"></i>
+        </span>
+        <span class="menu-title">Proposal Auto Generation</span>
+      </a>
+    </div> -->
 
 
 

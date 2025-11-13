@@ -95,7 +95,7 @@ ssoRoute() {
 
   const keycloakUrl = 'http://74.208.113.233:8081/realms/klabs';
   const clientId = 'adwt-client';
-  const redirectUri = 'http://localhost:4200/callback';
+  const redirectUri = 'https://adwatrocity.onlinetn.com/callback';
   const codeChallenge = codeVerifier; 
   const codeChallengeMethod = 'plain'; 
 

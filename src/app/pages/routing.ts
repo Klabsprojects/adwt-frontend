@@ -79,7 +79,7 @@ export const Routing: Routes = [
   },
   {
     path: 'fir-edit-module',
-    loadChildren: () => import('../modules/widgets-examples/edit//edit-fir.module').then((m) => m.EditFirModule),
+    loadChildren: () => import('../modules/widgets-examples/edit/edit-fir.module').then((m) => m.EditFirModule),
   },
   {
     path: '',

@@ -41,7 +41,7 @@ export class MeetingFilterComponent implements OnInit {
     else{
       this.subdivs = [];
     }
-    this.get_other_values();
+    // this.get_other_values();
   }
 
   get_other_values(){
@@ -59,10 +59,12 @@ export class MeetingFilterComponent implements OnInit {
       "quarter": this.selectedQuarter,
       "district": this.selectedDistrict,
       "subdivision": this.selectedSubDivision,
-      "year":this.selectedyear
+      "year":this.selectedyear,
+      "committee":this.selectedMeetingType
     };
   }
 
+  
   clear(){
     this.selectedyear = '';
     this.selectedDistrict = '';

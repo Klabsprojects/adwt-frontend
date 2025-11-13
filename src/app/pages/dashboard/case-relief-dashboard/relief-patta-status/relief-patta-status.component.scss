@@ -26,10 +26,13 @@ h2{
     display: flex;
     flex-direction: column;
     gap: 0.7rem;
-    font-size: 1rem;
+    font-size: 12px;
     font-weight: 700;
     font-family: sans-serif;
 
+}
+span{
+    font-size: 12px;
 }
 .num-case{
     background-color: orangered;
@@ -42,16 +45,16 @@ h2{
 
 .red{
     display: inline-block;
-    padding: 0.6rem;
-    background-color: #d64550;
+    padding: 0.3rem;
+    background-color: #2A9D8F;
     border-radius: 50%;
     border: none;
     margin-right: 0.2rem;
 }
 .blue{
     display: inline-block;
-    padding: 0.6rem;
-    background-color: #48327a;
+    padding: 0.3rem;
+    background-color: #E9C46A;
     border-radius: 50%;
     border: none;
     margin-right: 0.2rem;

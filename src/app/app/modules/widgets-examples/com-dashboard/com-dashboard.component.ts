@@ -23,7 +23,7 @@ export class ComDashboardComponent implements AfterViewInit{
     new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: ['Q1', 'Q2', 'Q3', 'Q4'], // Quarters
+        labels: ['Q1dd', 'Q2', 'Q3', 'Q4'], // Quarters
         datasets: [
           {
             label: 'Completed',

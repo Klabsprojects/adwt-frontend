@@ -1,11 +1,27 @@
-<div class="card-header">
-    <h5 class="card-title" style="font-size: 18px;font-weight: 600;">Nature of Offence</h5>
+<div class="card-header d-flex justify-content-between align-items-center">
+  <h5 class="card-title" style="font-size: 18px;font-weight: 600;">Nature of Offence</h5>
+
+  <div class="dropdown">
+    <button
+      class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center"
+      type="button"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+      title="Download"
+      style="width: 36px; height: 36px; border-radius: 50%;"
+    >
+      <i class="fa fa-bars"></i>
+    </button>
+
+    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+      <li><a class="dropdown-item" (click)="downloadPNG()">Download PNG</a></li>
+      <li><a class="dropdown-item" (click)="downloadCSV()">Download CSV</a></li>
+      <li><a class="dropdown-item" (click)="downloadSVG()">Download SVG</a></li>
+    </ul>
+  </div>
+
+<div class="card-body position-relative">
+  <canvas id="pieChartstatus"></canvas>
 </div>
-<div class="card-body">
-        <canvas id="pieChartstatus"></canvas>
-        <!-- <div class="chart-legend mt-2">
-            <span class="legend-item"><span class="dot red"></span> GCR</span>
-            <span class="legend-item"><span class="dot blue"></span> NON GCR</span>
-        </div> -->
-</div>
+
 <app-loading-dash *ngIf="loading"/>

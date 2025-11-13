@@ -431,11 +431,16 @@
                     </option>
                   </select>
                 </div>
-                 <div class="col-md-4 mb-3" *ngIf="victims.at(i).get('showOtherCaste')?.value">
-                  <label for="otherCaste" class="form-label">26a. Others</label>
-                    <input type="text"  class="form-control" />
-
-                </div>
+                 
+                <div class="col-md-4 mb-3" *ngIf="victims.at(i).get('showOtherCaste')?.value">
+                <label for="casteOther{{ i }}" class="form-label">26a. Others</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="casteOther"
+                  placeholder="Specify caste"
+                />
+              </div>
                 <div class="col-md-4 mb-3">
                   <label for="victimGuardian{{ i }}" class="form-label required">27. Name of the Victim's Guardian</label>
                   <input type="text" [id]="'victimGuardian' + i" class="form-control" formControlName="guardianName" placeholder="Enter Guardian's Name" required style="text-transform: capitalize;" />
@@ -536,9 +541,9 @@
               </ng-select>
                 </div>
 
-                <div class="col-md-4 mb-3" *ngIf="victims.at(i).get('showOtherOffence')?.value">
-                  <label for="otherCaste" class="form-label">30a. Others</label>
-                    <input type="text"  class="form-control" />
+                <div class="col-md-12 mb-3" *ngIf="victims.at(i).get('showOtherOffence')?.value">
+                  <label for="offenceOther {{ i }}" class="form-label">30a. Others</label>
+                    <input type="text"  class="form-control" formControlName="offenceOther" />
 
                 </div>
 
@@ -967,10 +972,76 @@
                 <option value="no">No</option>
               </select>
             </div>
-            <div class="mb-4 col-lg-4">
-              <label class="form-label required">53. Name of the Victim</label>
-              <input id="victimName" type="text" class="form-control mb-3" formControlName="victimName" placeholder="Name of the Victim" readonly />
-            </div>
+            <div class="my-4 col-lg-8">
+  <label class="form-label required">53. Name of the Victim</label>
+  <div class="d-flex align-items-center gap-2">
+    <input
+      id="victimName"
+      type="text"
+      class="form-control"
+      formControlName="victimName"
+      placeholder="Name of the Victim"
+      readonly
+    />
+    <!-- <button
+      type="button" style="width: 270px;"
+      class="btn btn-md btn-primary d-flex align-items-center"
+      (click)="addBeneficiary(i)"
+      title="Add Beneficiary"
+    >
+      <i class="fa fa-plus me-1"></i> Add Beneficiary
+    </button> -->
+  </div>
+</div>
+
+
+<div formArrayName="beneficiaries" class="col-12 mt-3" *ngIf="victims.at(i).get('beneficiaries')?.value?.length">
+  <div class="card mb-2" *ngFor="let ben of victims.at(i).get('beneficiaries')['controls']; let j = index" [formGroupName]="j">
+    <div style="align-items: center;" class="card-header bg-primary">
+       <h5 class="text-white mt-3">#{{ j + 1 }} Beneficiary Details</h5>
+       <button
+          type="button"
+          class="btn btn-sm btn-danger"
+          (click)="removeBeneficiary(i, j)"
+        >
+          <i class="fa fa-trash"></i> Remove
+        </button>
+    </div>
+    <div class="card-body row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Beneficiary Name</label>
+        <input type="text" class="form-control" formControlName="name" placeholder="Enter name" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Relationship with Victim</label>
+        <input type="text" class="form-control" formControlName="relationship" placeholder="Enter relationship" />
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Aadhaar Card No</label>
+        <input type="text" class="form-control" formControlName="aadhaar" placeholder="Enter Aadhaar no" />
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">SC/ST Act Amount</label>
+        <input type="number" class="form-control" formControlName="scstAmount" placeholder="Enter amount" />
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Ex-Gratia Amount</label>
+        <input type="number" class="form-control" formControlName="exgratiaAmount" placeholder="Enter amount" />
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Total Amount</label>
+        <input type="number" class="form-control" formControlName="totalAmount" readonly />
+      </div>
+
+      
+    </div>
+  </div>
+  </div>
+
             <div class="row mb-3">
               <div class="col-8">
                 <label for="reliefAmountScst" class="form-label required">54. Eligible 1st stage relief amount for the victim as per SC/ST Act</label>
@@ -1015,7 +1086,6 @@
                     class="form-check-input"
                     [id]="'additionalRelief-' + option.value + '-' + j + '-' + i"
                     [value]="option.value"
-                    disabled
                     [checked]="isChecked(option.value, i)"
                   />
                   <label

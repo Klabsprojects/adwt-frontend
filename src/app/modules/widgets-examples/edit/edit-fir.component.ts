@@ -960,9 +960,7 @@ loadAccusedCommunities(): void {
       (communities: string[]) => {
 
         // console.log('Communities fetched:', communities);
-
-        // this.communitiesOptions = communities;
-        this.communitiesOptions = [...communities, 'Other'];
+        this.communitiesOptions = communities;
         console.log(this.communitiesOptions);
       },
       (error) => {
@@ -1025,25 +1023,35 @@ loadAccusedCommunities(): void {
 
 onOffenceCommittedChange(index: number): void {
   const victimGroup = this.victims.at(index) as FormGroup;
-
-  // Get the selected offence names (array of offence_name)
   const selectedOffences: string[] = victimGroup.get('offenceCommitted')?.value || [];
 
-  // Filter the offence options that match selected offence names
+  // Step 1: Find related act names
   const selectedActs = this.offenceOptions.filter((item: any) =>
     selectedOffences.includes(item.offence_name)
   );
-
-  // Get the offence_act_name of each matched item
   const actNames = selectedActs.map(item => item.offence_act_name).filter(name => !!name);
-
-  // Patch scstSections with comma-separated act names
+  
+  // Step 2: Patch SC/ST sections
   victimGroup.patchValue({
     scstSections: actNames.join(', '),
   });
 
+  // Step 3: Toggle "30a. Others" field visibility
+  const hasOther = selectedOffences.includes('Others');
+  victimGroup.get('showOtherOffence')?.setValue(hasOther);
+
+  // Optionally clear or enable/disable the input
+  const otherCtrl = victimGroup.get('offenceOther');
+  if (hasOther) {
+    otherCtrl?.enable();
+  } else {
+    otherCtrl?.reset();
+    otherCtrl?.disable();
+  }
+
   this.cdr.detectChanges();
 }
+
   
   onOffenceCommittedChangenew(
       selectedOffences: any[],
@@ -2358,46 +2366,75 @@ removeFIRCopy(): void {
     const accusedFormArray = this.firForm.get('accuseds') as FormArray;
     if (response && response.data1 && response.data1.length > 0) {
       this.victimNames = response.data1.map((victim: any) => victim.victim_name);
-      // Resetting the victims array in case of a previous value
       const victimsFormArray = this.firForm.get('victims') as FormArray;
-      victimsFormArray.clear(); // Clear any existing victims data
-      // console.log('arryresp',response.data1);
+      victimsFormArray.clear(); 
 
       response.data1.forEach((victim: any, index: number) => {
 
         const victimGroup = this.createVictimGroup();
         let offence_committed_data: any[] = [];
-        let scst_sections_data: any[] = [];
+       
+  const cleanString = (val: any) => {
+    if (!val) return '';
+    let cleaned = val;
+    try {
+      while (typeof cleaned === 'string' && cleaned.startsWith('"') && cleaned.endsWith('"')) {
+        cleaned = JSON.parse(cleaned);
+      }
+    } catch {
+      // ignore parse errors
+    }
+    return cleaned;
+  };
 
-        if (victim.offence_committed && this.isValidJSON(victim.offence_committed)) {
-          offence_committed_data = JSON.parse(victim.offence_committed);
-        }
-        if (victim.scst_sections && this.isValidJSON(victim.scst_sections)) {
-          scst_sections_data = JSON.parse(victim.scst_sections);
-        }
-    
-        victimGroup.patchValue({
-          victim_id: victim.victim_id,
-          name: victim.victim_name,
-          age: victim.victim_age,
-          gender: victim.victim_gender,
-          mobileNumber: victim.mobile_number,
-          address: victim.address,
-          victimPincode: victim.victim_pincode,
-          community: victim.community,
-          caste: victim.caste,
-          guardianName: victim.guardian_name,
-          isNativeDistrictSame: victim.is_native_district_same,
-          nativeDistrict: victim.native_district,
-          offenceCommitted: offence_committed_data,
-          scstSections: scst_sections_data,
-          sectionsIPC: victim.sectionsIPC
-        });
-    
+
+        let scst_sections_data: any[] = [];
+          const offenceOtherValue = cleanString(victim.offence_other);
+
+       if (victim.offence_committed && this.isValidJSON(victim.offence_committed)) {
+    offence_committed_data = JSON.parse(victim.offence_committed);
+  }
+  if (victim.scst_sections && this.isValidJSON(victim.scst_sections)) {
+    scst_sections_data = JSON.parse(victim.scst_sections);
+  }
+
+  victimGroup.patchValue({
+    victim_id: victim.victim_id,
+    name: victim.victim_name,
+    age: victim.victim_age,
+    gender: victim.victim_gender,
+    mobileNumber: victim.mobile_number,
+    address: victim.address,
+    victimPincode: victim.victim_pincode,
+    community: victim.community,
+    caste: victim.caste,
+    casteOther: victim.caste_other,
+    offenceOther: offenceOtherValue,
+    showOtherCaste: victim.caste === 'Others',
+    guardianName: victim.guardian_name,
+    isNativeDistrictSame: victim.is_native_district_same,
+    nativeDistrict: victim.native_district,
+    offenceCommitted: offence_committed_data,
+    showOtherOffence: offence_committed_data.includes('Others'),
+    scstSections: scst_sections_data,
+    sectionsIPC: victim.sectionsIPC
+  });
+
+  // Enable/disable 'Other' caste field
+  victimGroup.get('casteOther')?.[
+    victim.caste === 'Others' ? 'enable' : 'disable'
+  ]();
+
+  // Enable/disable 'Other' offence field
+  victimGroup.get('offenceOther')?.[
+    offence_committed_data.includes('Others') ? 'enable' : 'disable'
+  ]();
         if(victim.community){
         this.firService.getCastesByCommunity(victim.community).subscribe(
           (castes: string[]) => {
-            const updatedCastes = [...castes, 'Others'];
+            const updatedCastes = castes;
+            // const updatedCastes = [...castes, 'Others'];
+            console.log(updatedCastes);
             victimGroup.get('availableCastes')?.setValue(updatedCastes); // Dynamically update caste options
           },
           (error) => {
@@ -3031,11 +3068,14 @@ removeFIRCopy(): void {
 onCasteChange(event: any, index: number): void {
   const selectedCaste = event.target.value;
   const victimGroup = this.victims.at(index) as FormGroup;
-  console.log(selectedCaste);
-  if (selectedCaste == 'Others') {
-    victimGroup.patchValue({ showOtherCaste: true });
+  console.log(victimGroup,selectedCaste);
+  if (selectedCaste === 'Others') {
+    victimGroup.get('showOtherCaste')?.setValue(true);
+    victimGroup.get('casteOther')?.enable();
   } else {
-    victimGroup.patchValue({ showOtherCaste: false, otherCaste: '' });
+    victimGroup.get('showOtherCaste')?.setValue(false);
+    victimGroup.get('casteOther')?.reset();
+    victimGroup.get('casteOther')?.disable();
   }
 }
 
@@ -3264,6 +3304,8 @@ onCasteChange(event: any, index: number): void {
           victimPincode: victim.victimPincode || null,
           community: victim.community || '',
           caste: victim.caste || '',
+          casteOther:victim.casteOther || '',
+          offenceOther:victim.offenceOther || '',
           guardianName: victim.guardianName || '',
           isNativeDistrictSame: victim.isNativeDistrictSame || '',
           nativeDistrict: victim.nativeDistrict || null,
@@ -4433,8 +4475,9 @@ isChecked(value: string, index: number): boolean {
   const control = this.victimsRelief.controls[index]?.get('additionalRelief');
   const victim = this.victimsRelief.at(index).value;
 
+  console.log(victim);
   if (!control?.value || control.value.length === 0) {
-  return victim.relief_applicable === 1
+  return victim.relief_applicable == 1
          ? true
          : false;
 }
@@ -4999,6 +5042,8 @@ isChecked(value: string, index: number): boolean {
       ],
       community: ['', Validators.required],
       caste: ['', Validators.required],
+      casteOther:[''],
+      offenceOther:[''],
       guardianName: ['', [Validators.required, Validators.pattern('^[A-Za-z\\s]*$')]],
       isNativeDistrictSame: ['', Validators.required],
       nativeDistrict: [''],
@@ -5007,10 +5052,38 @@ isChecked(value: string, index: number): boolean {
       sectionDetails: this.fb.array([this.createSection()]),
       availableCastes: [[]],
       showOtherCaste:[false],
-      showOtherOffence:[false]
+      showOtherOffence:[false],
+      beneficiaries: this.fb.array([]),
     });
   }
 
+  createBeneficiaryGroup(): FormGroup {
+  return this.fb.group({
+    name: [''],
+    relationship: [''],
+    aadhaar: [''],
+    scstAmount: [0],
+    exgratiaAmount: [0],
+    totalAmount: [{ value: 0, disabled: true }]
+  });
+}
+addBeneficiary(victimIndex: number): void {
+  const victims = this.firForm.get('victims') as FormArray;
+  const beneficiaryArray = victims.at(victimIndex).get('beneficiaries') as FormArray;
+  beneficiaryArray.push(this.createBeneficiaryGroup());
+
+  // Auto-calculate total when SC/ST or Ex-Gratia changes
+  beneficiaryArray.at(beneficiaryArray.length - 1).valueChanges.subscribe(value => {
+    const total = (Number(value.scstAmount) || 0) + (Number(value.exgratiaAmount) || 0);
+    beneficiaryArray.at(beneficiaryArray.length - 1).patchValue({ totalAmount: total }, { emitEvent: false });
+  });
+}
+
+removeBeneficiary(victimIndex: number, beneficiaryIndex: number): void {
+  const victims = this.firForm.get('victims') as FormArray;
+  const beneficiaryArray = victims.at(victimIndex).get('beneficiaries') as FormArray;
+  beneficiaryArray.removeAt(beneficiaryIndex);
+}
   isPincodeInvalid(index: number): boolean {
     const pincodeControl = this.accuseds.at(index).get('pincode');
     return (pincodeControl?.touched ?? false) && !(pincodeControl?.valid ?? true);

@@ -23,6 +23,7 @@ import { ReliefListComponent } from './relief-list/relief-list.component';
 import { AlteredCaseComponent } from './altered-case/altered-case.component';
 import { AdditionalReliefComponent } from './additional-relief/additional-relief.component';
 import { AdditionalReliefListComponent } from './additional-relief-list/additional-relief-list.component';
+import { CollectorsComponent } from 'src/app/modules/widgets-examples/collectors/collectors.component';
 
 const routes: Routes = [
   {
@@ -40,6 +41,10 @@ const routes: Routes = [
       {
         path: 'revenue-district',
         component: RevenueDistrictComponent,
+      },
+       {
+        path: 'collectors',
+        component: CollectorsComponent,
       },
 
        {

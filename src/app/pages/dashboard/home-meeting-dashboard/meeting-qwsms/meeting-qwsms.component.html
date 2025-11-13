@@ -7,43 +7,50 @@
 
  <h2 class="mb-3 text-center">VMC Member Details</h2>
         <div class="row justify-content-between">
-             <h4 class="mb-3">DLVMC</h4>
-            <div class="card col-xl-4 col-lg-4 col-md-4">
-                <div class="inner-card">
-                    <p>Total Members</p>
-                    <h3>0</h3>
-                </div>
-            </div>
-            <div class="card col-xl-4 col-lg-4 col-md-4">
-                <div class="inner-card">
-                    <p>Official Members</p>
-                    <h3>0</h3>
-                </div>
-            </div>
-            <div class="card col-xl-4 col-lg-4 col-md-4">
-                <div class="inner-card">
-                    <p>Non Official Members</p>
-                    <h3>0</h3>
-                </div>
-            </div>
+  <h4 class="mb-3">DLVMC</h4>
 
-             <h4 class="mb-3 mt-3">SDLVMC</h4>
-            <div class="card col-xl-4 col-lg-4 col-md-4">
-                <div class="inner-card">
-                    <p>Total Members</p>
-                    <h3>0</h3>
-                </div>
-            </div>
-            <div class="card col-xl-4 col-lg-4 col-md-4">
-                <div class="inner-card">
-                    <p>Official Members</p>
-                    <h3>0</h3>
-                </div>
-            </div>
-            <div class="card col-xl-4 col-lg-4 col-md-4">
-                <div class="inner-card">
-                    <p>Non Official Members</p>
-                    <h3>0</h3>
-                </div>
-            </div>
-        </div>
+  <div class="card col-xl-4 col-lg-4 col-md-4">
+    <div class="inner-card">
+      <p>Total Members</p>
+      <h3>{{ vmcData?.dlvmctotal_members || 0 }}</h3>
+    </div>
+  </div>
+
+  <div class="card col-xl-4 col-lg-4 col-md-4">
+    <div class="inner-card">
+      <p>Official Members</p>
+      <h3>{{ vmcData?.dlvmcofficial_members || 0 }}</h3>
+    </div>
+  </div>
+
+  <div class="card col-xl-4 col-lg-4 col-md-4">
+    <div class="inner-card">
+      <p>Non Official Members</p>
+      <h3>{{ vmcData?.dlvmcnon_official_members}}</h3>
+    </div>
+  </div>
+
+  <h4 class="mb-3 mt-3">SDLVMC</h4>
+
+  <div class="card col-xl-4 col-lg-4 col-md-4">
+    <div class="inner-card">
+      <p>Total Members</p>
+      <h3>{{ vmcData?.sdlvmctotal_members || 0 }}</h3>
+    </div>
+  </div>
+
+  <div class="card col-xl-4 col-lg-4 col-md-4">
+    <div class="inner-card">
+      <p>Official Members</p>
+      <h3>{{ vmcData?.sdlvmcofficial_members || 0 }}</h3>
+    </div>
+  </div>
+
+  <div class="card col-xl-4 col-lg-4 col-md-4">
+    <div class="inner-card">
+      <p>Non Official Members</p>
+      <h3>{{ vmcData?.sdlvmcnon_official_members || 0 }}</h3>
+    </div>
+  </div>
+</div>
+

@@ -1,4 +1,4 @@
-<div id="chart" style="position: relative;">
+<!-- <div id="chart" style="position: relative;">
   <apx-chart
     [series]="chartOptions!.series"
     [chart]="chartOptions!.chart"
@@ -13,4 +13,50 @@
     [legend]="chartOptions!.legend"
   ></apx-chart>
   <app-loading-dash *ngIf="loading"/>
-</div>
+</div> -->
+<section class="cards">
+    <div class="row">
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+            <div class="case red">
+                <img src="assets/images/hammer.png" alt="" height="50px">
+                <div>
+                    <p>Total FIR Relief pending for more than 7 days</p>
+                    <p>0</p>
+                </div>
+            </div>
+            <div class="filter red">
+                <p>Filtered Cases</p>
+                <p>0</p>
+            </div>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+            <div class="case red">
+                <img src="assets/images/hammer.png" alt="" height="50px">
+                <div>
+                     <p>Total Chargesheet Relief pending after it is filed</p>
+                    <p>0</p>
+                </div>
+            </div>
+            <div class="filter red">
+                <p>Filtered Cases</p>
+                <p>0</p>
+            </div>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+            <div class="case red">
+                <img src="assets/images/hammer.png" alt="" height="50px">
+                <div>
+                     <p>Total Convicted Relief Cases Pending</p>
+                    <p>0</p>
+                </div>
+            </div>
+            <div class="filter red">
+                <p>Filtered Cases</p>
+                <p>0</p>
+            </div>
+        </div>
+        
+        
+    </div>
+    <app-loading-dash *ngIf="loading"/>
+</section>

@@ -34,7 +34,7 @@ import { catchError, Observable, of, tap } from 'rxjs';
   ],
 })
 export class AlteredCaseComponent implements OnInit {
-  
+showOtherOffence = false;
 offenceOptions: any[] = [];
 offenceOptionData:any[]=[];
 firDetails : any;
@@ -86,6 +86,7 @@ victim_relif_section_values = ['Rape, etc., or unnatural Offences', 'Gang rape',
       victim_id: [''],
       victimName : [''],
       offenceCommitted: ['', Validators.required],
+      offenceOther:[''],
       scstSections:  ['', Validators.required],
       sectionDetails: this.fb.array([this.createSection()]),
     });
@@ -226,15 +227,32 @@ victim_relif_section_values = ['Rape, etc., or unnatural Offences', 'Gang rape',
                 if (victim.scst_sections && this.isValidJSON(victim.scst_sections)) {
                   scst_sections_data = JSON.parse(victim.scst_sections);
                 }
+                const cleanString = (val: any) => {
+    if (!val) return '';
+    let cleaned = val;
+    try {
+      while (typeof cleaned === 'string' && cleaned.startsWith('"') && cleaned.endsWith('"')) {
+        cleaned = JSON.parse(cleaned);
+      }
+    } catch {
+      // ignore parse errors
+    }
+    return cleaned;
+  };
+const offenceOtherValue = cleanString(victim.offence_other);
             
                 victimGroup.patchValue({
                   victim_id: victim.victim_id,
                   victimName : victim.victim_name,
                   offenceCommitted: offence_committed_data,
+                  showOtherOffence: offence_committed_data.includes('Others'),
+                  offenceOther: offenceOtherValue,
                   scstSections: scst_sections_data,
                   sectionsIPC: victim.sectionsIPC
-                });
-        
+                }); 
+                 victimGroup.get('offenceOther')?.[
+    offence_committed_data.includes('Others') ? 'enable' : 'disable'
+  ]();
                 victimsFormArray.push(victimGroup);
         
               });

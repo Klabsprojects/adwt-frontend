@@ -1,0 +1,17 @@
+.dropdown-toggle {
+  border: none;
+  background: none;
+  color: #007bff;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.dropdown-toggle:hover {
+  color: #0056b3;
+  background: #e7f1ff;
+}
+
+.dropdown-menu a {
+  cursor: pointer;
+  padding: 7px;
+}

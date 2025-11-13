@@ -44,6 +44,10 @@ import { ReliefListComponent } from './relief-list/relief-list.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { RestrictAllFutureDatesDirective } from 'src/app/directives/restrict-all-future-dates.directive';
 import { WhatsappMessageComponent } from 'src/app/modules/widgets-examples/whatsapp-message/whatsapp-message.component'
+import { CollectorsComponent } from './collectors/collectors.component';
+import { AutoGenerationComponent } from 'src/app/app/modules/widgets-examples/auto-generation/auto-generation.component';
+import { ReliefComponent } from './relief/relief.component';
+
 @NgModule({
   declarations: [
     WidgetsExamplesComponent,
@@ -57,6 +61,7 @@ import { WhatsappMessageComponent } from 'src/app/modules/widgets-examples/whats
     PoliceDistrictComponent,
     PoliceStationsComponent,
     CourtComponent,
+    CollectorsComponent,
     RevenueDistrictComponent,
     OffenceComponent,
     OffenceActScStComponent,
@@ -64,11 +69,13 @@ import { WhatsappMessageComponent } from 'src/app/modules/widgets-examples/whats
     CityComponent,
     CasteAndCommunityComponent,
     FirListComponent,
+    ReliefComponent,
     // ReliefListComponent,
     VmcComponent,
     VmcmeetingComponent,
     LegacyFirListComponent,
-    WhatsappMessageComponent
+    WhatsappMessageComponent,
+    AutoGenerationComponent
     // Remove AddFirComponent from here
   ],
   imports: [

@@ -1,5 +1,4 @@
-<div class="table-container" style="position: relative;">
-    <table class="custom-table">
+    <!-- <table class="custom-table">
       <thead>
         <tr>
           <th>FIR NO</th>
@@ -20,7 +19,39 @@
           <td>{{ item.Next_Action_Due }}</td>
         </tr>
       </tbody>
-    </table>
-    <app-loading-dash *ngIf="loading"/>
+    </table> -->
+    
+    <div class="grid-top">
+  <div class="card text-center">
+    <div class="card-header p-2">
+      <h4 class="mb-0">FIR Stage</h4>
+    </div>
+    <div class="card-body px-10">
+      <p class="mt-2 fw-semibold">Total Proposal Sent to DC : 50</p>
+          <canvas #firChartCanvas></canvas>
+      </div>
   </div>
+
+  <div class="card text-center">
+    <div class="card-header p-2">
+      <h4 class="mb-0">Chargesheet Stage</h4>
+    </div>
+    <div class="card-body px-10">
+      <p class="mt-2 fw-semibold">Total Proposal Sent to DC : 60</p>
+          <canvas #chargeChartCanvas></canvas>
+      </div>
+  </div>
+
+  <div class="card text-center">
+    <div class="card-header p-2">
+      <h4 class="mb-0">Trial Stage</h4>
+    </div>
+    <div class="card-body px-10">
+      <p class="mt-2 fw-semibold">Total Proposal Sent to DC : 45</p>
+          <canvas #trialChartCanvas></canvas>
+      </div>
+  </div>
+</div>
+
+    <app-loading-dash *ngIf="loading"/>
   

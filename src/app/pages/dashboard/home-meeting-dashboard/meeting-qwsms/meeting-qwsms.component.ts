@@ -24,6 +24,8 @@ export class MeetingQwsmsComponent implements OnInit,OnDestroy {
   loading:boolean = false;
   @ViewChild("chart") chart: ChartComponent;
   public chartOptions: ChartOptions;
+  vmcData: any = {}; // declare variable
+
   ngOnInit(): void {
     this.subscription.add(
       this.hms.qwsms$.subscribe((res: any) => {
@@ -44,7 +46,16 @@ export class MeetingQwsmsComponent implements OnInit,OnDestroy {
         }
         this.cdr.detectChanges();
       })
+     
     )
+       this.hms.vmcmemeber$.subscribe((data: any) => {
+    if (data && data.length > 0) {
+      this.vmcData = data[0];
+      console.log('VMC Data Object:', this.vmcData);
+      this.cdr.detectChanges();
+    }
+  });
+
   }
 
   constructor(private hms: homeMeetingService, private cdr: ChangeDetectorRef) {

@@ -36,6 +36,7 @@ export class FirListComponent implements OnInit {
   complaintReceiverName: string = '';
   officerDesignation: string = '';
   showOtherDesignation = false;
+  showOtherCaste = false;
   otherDesignationValue: string = '';
   officerPhone: string = '';
 
@@ -309,6 +310,7 @@ export class FirListComponent implements OnInit {
   filedAppeal_3rdAccquitted: string = ''; // Default: Who has filed the appeal
 
   filteredList: any[] = [];
+  paginatedList:any[]=[];
   policeStations: string[] = [];
   communitiesOptions: string[] = [];
   casteOptions:string[]=[];
@@ -406,6 +408,7 @@ export class FirListComponent implements OnInit {
   selectedPoliceStation:string='';
   selectedCommunity:string='';
   selectedCaste:string='';
+  selectedCasteOther:string='';
   selectedComplaintReceivedType: string = '';
   startDate: string = '';
   endDate: string = '';
@@ -730,6 +733,7 @@ activeFilters: string[] = ['city', 'zone', 'range', 'revenueDistrict', 'station'
   
 ngOnInit(): void {
   const userInfo: any = sessionStorage.getItem('user_data');
+  console.log(userInfo);
   this.Parsed_UserInfo = userInfo ? JSON.parse(userInfo) : null;
   const savedFilters = this.firFilter.getFIRFilters();
 
@@ -1035,10 +1039,14 @@ loadOptions() {
         this.victimsdata = this.victimsdata.map((victim) => {
           const age = Number(victim.victim_age);
           const name = !isNaN(age) && age < 18 ? 'Minor' : victim.victim_name;
+          console.log(this.victimsdata);
+          
 
           return {
             ...victim,
             victim_name: name,
+            caste_other:victim.caste_other,
+            offence_other:victim.offence_other,
             scst_sections: victim.scst_sections ? this.formatedata(victim.scst_sections) : victim.scst_sections,
             offence_committed: victim.offence_committed ? this.formatedata(victim.offence_committed) : victim.offence_committed,
             sectionsIPC: victim.sectionsIPC_JSON ? JSON.parse(victim.sectionsIPC_JSON) : []
@@ -1890,13 +1898,13 @@ loadOptions() {
   // }
 
 
-  loadFirList(page: number = 1, pageSize: number = this.pageSize) {
+  loadFirList(page: number = 1, pageSize: number = this.pageSize,sortField?: string, sortOrder?: string) {
     this.isLoading = true;
     this.currentPage = page;
     this.pageSize = pageSize;
     this.loader = true;
 
-    this.firService.getPaginatedFirList(page, pageSize, this.getFilterParams()).subscribe(
+    this.firService.getPaginatedFirList(page, pageSize, this.getFilterParams(),sortField, sortOrder).subscribe(
       (response: any) => {
         this.firList = response.data;
         // console.log(response.data,response.data.status);
@@ -2195,24 +2203,61 @@ loadOptions() {
   }
 
 
+// sortTable(field: string): void {
+//   if (this.currentSortField === field) {
+//     this.isAscending = !this.isAscending;
+//   } else {
+//     this.currentSortField = field;
+//     this.isAscending = true;
+//   }
+//   this.filteredList.sort((a, b) => {
+//     let valA = a[field] || '';
+//     let valB = b[field] || '';
+//     const dateA = this.parseCustomDate(valA);
+//     const dateB = this.parseCustomDate(valB);
+//     if (dateA && dateB) {
+//       return this.isAscending
+//         ? dateA.getTime() - dateB.getTime()
+//         : dateB.getTime() - dateA.getTime();
+//     }
+//     return this.isAscending
+//       ? valA.toString().localeCompare(valB.toString())
+//       : valB.toString().localeCompare(valA.toString());
+//   });
 
-  // Sorting logic
-  // sortTable(field: string) {
-  //   if (this.currentSortField === field) {
-  //     this.isAscending = !this.isAscending;
-  //   } else {
-  //     this.currentSortField = field;
-  //     this.isAscending = true;
-  //   }
+//   this.updatePaginatedFirList();
+// }
 
-  //   this.firList.sort((a, b) => {
-  //     const valA = a[field]?.toString().toLowerCase() || '';
-  //     const valB = b[field]?.toString().toLowerCase() || '';
-  //     return this.isAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
-  //   });
-  // }
+// updatePaginatedFirList(): void {
+//   const startIndex = (this.page - 1) * this.itemsPerPage;
+//   const endIndex = startIndex + this.itemsPerPage;
+//   this.paginatedList = this.filteredList.slice(startIndex, endIndex);
+//   console.log(this.paginatedList);
+// }
+
+sortFieldMap: any = {
+  fir_number: 'fir_number',
+  police_city: 'fir_add.police_city',
+  police_zone: 'fir_add.police_zone',
+  police_range: 'fir_add.police_range',
+  revenue_district: 'fir_add.revenue_district',
+  police_station: 'fir_add.police_station',
+  date_of_registration: 'fir_add.date_of_registration',
+  year_of_registration: 'YEAR(fir_add.date_of_registration)',
+  created_by: 'created_by',
+  created_at: 'fir_add.created_at',
+  updated_at: 'fir_add.updated_at'
+};
 
 sortTable(field: string): void {
+  // Map UI field to backend field
+  const mappedField = this.sortFieldMap[field];
+  if (!mappedField) {
+    console.warn(`Sorting not allowed for field: ${field}`);
+    return;
+  }
+
+  // Toggle sort direction
   if (this.currentSortField === field) {
     this.isAscending = !this.isAscending;
   } else {
@@ -2220,28 +2265,12 @@ sortTable(field: string): void {
     this.isAscending = true;
   }
 
-  this.firList.sort((a, b) => {
-    let valA = a[field] || '';
-    let valB = b[field] || '';
+  const sortOrder = this.isAscending ? 'ASC' : 'DESC';
 
-    // Detect dd/MM/yyyy format
-    const dateA = this.parseCustomDate(valA);
-    const dateB = this.parseCustomDate(valB);
-    if (dateA && dateB) {
-      return this.isAscending
-        ? dateA.getTime() - dateB.getTime()
-        : dateB.getTime() - dateA.getTime();
-    }
-
-    // Default string comparison
-    return this.isAscending
-      ? valA.toString().localeCompare(valB.toString())
-      : valB.toString().localeCompare(valA.toString());
-  });
-
-  // console.log(`Sorted by "${field}" in ${this.isAscending ? 'Ascending' : 'Descending'} order`);
-  // console.log(this.firList.map(f => f[field]));
+  // ✅ Call backend with mapped sort field
+  this.loadFirList(this.currentPage, this.pageSize, mappedField, sortOrder);
 }
+
 
 parseCustomDate(dateStr: string): Date | null {
   if (!dateStr) return null;

@@ -20,11 +20,15 @@ export class homeMeetingService {
     public qwsms = new BehaviorSubject<any>(null);
     qwsms$ = this.qwsms.asObservable();
 
+     public vmcmemeber = new BehaviorSubject<any>(null);
+    vmcmemeber$ = this.vmcmemeber.asObservable();
+
     setFilterJson(data: any) {
         this.setCardDetails(data);
         this.setDlmdDetails(data);
         this.setSblmdDetails(data);
         this.setQwsms(data);
+        this.getVMCMemberCount(data);
     }
 
     setCardDetails(data: any) {
@@ -53,4 +57,11 @@ export class homeMeetingService {
             this.qwsms.next(res.data);
           })
     }
+    getVMCMemberCount(payload: any) {
+  this.ds.userPostMethod('vmc-members-count', payload).subscribe((res: any) => {
+    this.vmcmemeber.next(res.data);
+  });
+}
+
+
 }

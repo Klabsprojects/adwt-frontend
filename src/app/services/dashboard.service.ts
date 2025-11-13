@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.prod';
 @Injectable({
@@ -41,6 +41,10 @@ export class DashboardService {
   userGetMethod(url:string):Observable<any>{
     return this.http.get(`${this.backendUrl}${url}`);
   }
+
+  
+
+
 
   applyFilters(filters: any): Observable<any> {
     return this.http.post(`${this.backendUrl}/apply-filters`, filters);
