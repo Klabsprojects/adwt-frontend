@@ -5,7 +5,8 @@
 }
 
 .filter-nav{
-    background-color: rgba(24, 108, 189,0.7);
+    /* background-color: rgba(24, 108, 189,0.7); */
+    background-color: #186CBD;
     padding: 1rem;
     color: #fff;
 }

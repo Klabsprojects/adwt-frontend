@@ -35,7 +35,7 @@
     </div> -->
     <div class="col-xl-6 col-lg-6 col-md-12" style="margin-top:30px;">
         <div class="card">
-            <div class="card-header" style="min-height: 0px;"><h2>Before Cases Districtwise Pendency</h2></div>
+            <div class="card-header p-4" style="min-height: 0px;"><h2>Before Cases Districtwise Pendency</h2></div>
         <div id="chart" style="position: relative;">
   <apx-chart
     [series]="chartOptions!.series"
@@ -57,21 +57,22 @@
 
     <div class="col-xl-6 col-lg-6 col-md-12" style="margin-top:30px;">
         <div class="card">
-            <div class="card-header" style="min-height: 0px;"><h2>After Cases Districtwise Pendency</h2></div>
+            <div class="card-header p-4" style="min-height: 0px;"><h2>After Cases Districtwise Pendency</h2></div>
         <div id="chart" style="position: relative;">
-        <apx-chart
-            [series]="pendingChartOptions!.series"
-            [chart]="pendingChartOptions!.chart"
-            [dataLabels]="pendingChartOptions!.dataLabels"
-            [plotOptions]="pendingChartOptions!.plotOptions"
-            [xaxis]="pendingChartOptions!.xaxis"
-            [stroke]="pendingChartOptions!.stroke"
-            [fill]="pendingChartOptions!.fill"
-            [yaxis]="pendingChartOptions!.yaxis"
-            [title]="pendingChartOptions!.title"
-            [tooltip]="pendingChartOptions!.tooltip"
-            [legend]="pendingChartOptions!.legend"
-        ></apx-chart>
+       <apx-chart
+    *ngIf="pendingChartOptions && pendingChartOptions.series?.length"
+    [series]="pendingChartOptions.series"
+    [chart]="pendingChartOptions.chart"
+    [xaxis]="pendingChartOptions.xaxis"
+    [plotOptions]="pendingChartOptions.plotOptions"
+    [dataLabels]="pendingChartOptions.dataLabels"
+    [stroke]="pendingChartOptions.stroke"
+    [fill]="pendingChartOptions.fill"
+    [yaxis]="pendingChartOptions.yaxis"
+    [title]="pendingChartOptions.title"
+    [legend]="pendingChartOptions.legend"
+></apx-chart>
+
         <app-loading-dash *ngIf="loading"/>
         </div> 
 </div>

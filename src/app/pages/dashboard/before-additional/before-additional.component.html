@@ -5,12 +5,12 @@
                 <img src="assets/images/hammer.png" alt="" height="50px">
                 <div>
                     <p>Total Additional Relief Cases</p>
-                    <p>0</p>
+                    <p>{{ total_records }}</p>
                 </div>
             </div>
             <div class="filter red">
                 <p>Filtered Cases</p>
-                <p>0</p>
+                <p>{{additional_filter}}</p>
             </div>
         </div>
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
@@ -18,12 +18,12 @@
                 <img src="assets/images/hammer.png" alt="" height="50px">
                 <div>
                      <p>Total Before 14/04/2016 Cases</p>
-                    <p>0</p>
+                    <p>{{ before_2016 }}</p>
                 </div>
             </div>
             <div class="filter red">
                 <p>Filtered Cases</p>
-                <p>0</p>
+                <p>{{before_filter}}</p>
             </div>
         </div>
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
@@ -31,18 +31,18 @@
                 <img src="assets/images/hammer.png" alt="" height="50px">
                 <div>
                      <p>Total After 14/04/2016  Cases</p>
-                    <p>0</p>
+                    <p>{{after_2016}}</p>
                 </div>
             </div>
             <div class="filter red">
                 <p>Filtered Cases</p>
-                <p>0</p>
+                <p>{{after_filter}}</p>
             </div>
         </div>
 
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box my-5">
            <div class="card text-center">
-              <div class="card-header p-2">
+              <div class="card-header p-4">
                 <h4 class="mb-0">Before Relief Status</h4>
               </div>
             <div class="card-body px-10">
@@ -65,11 +65,14 @@
         </tr>
       </thead>
       <tbody>
-         <td>10</td>
-          <td>10</td>
-           <td>10</td>
-           <td>10</td>
+        <tr>
+            <td>{{ reliefJob }}</td>
+            <td>{{ reliefPension }}</td>
+            <td>{{ reliefPatta }}</td>
+            <td>{{ reliefEducation }}</td>
+        </tr>
         </tbody>
+
         </table>
         </div>
       </div>

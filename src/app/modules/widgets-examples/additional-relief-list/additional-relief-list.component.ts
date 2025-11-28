@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdditionalReliefService } from 'src/app/services/additional-relief.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
@@ -12,6 +12,7 @@ import { PoliceDivisionService } from 'src/app/services/police-division.service'
 import { VmcMeetingService } from 'src/app/services/vmc-meeting.service';
 import { FirService } from 'src/app/services/fir.service';
 import { FilterStateService } from 'src/app/services/filter-state-service';
+import { SharedFilterService } from 'src/app/services/shared-filter.service';
 
 @Component({
   selector: 'app-additional-relief-list',
@@ -38,7 +39,9 @@ export class AdditionalReliefListComponent implements OnInit {
     private policeDivisionService :PoliceDivisionService,
     private vmcMeeting: VmcMeetingService,
     private firService: FirService,
-    private filterState: FilterStateService
+    private filterState: FilterStateService,
+    private route: ActivatedRoute,
+    private sharedFilter:SharedFilterService
   ) {
     const UserInfo : any = sessionStorage.getItem('user_data');
     this.Parsed_UserInfo = JSON.parse(UserInfo)
@@ -127,30 +130,69 @@ export class AdditionalReliefListComponent implements OnInit {
   // Sorting variables
   currentSortField: string = '';
   isAscending: boolean = true;
+  currentDashboard:any;
 
+ ngOnInit(): void {
+  const last = localStorage.getItem('fromRelief');
+  console.log(last);
+  if (last) {
+    this.currentDashboard = last as any;
+  } else {
+    this.currentDashboard = 'case';
+  }
+  // 1️⃣ Priority 1 → Shared filter (chart click via service, no URL)
+  const chartFilter = this.sharedFilter.getChartFilter();
+  if (chartFilter) {
+    this.selectedType = chartFilter.type;
+    this.selectedStatus = chartFilter.status;
+    this.selectedDistrict = chartFilter.district;
 
-  ngOnInit(): void {
+    this.sharedFilter.clearFilter();
+    this.applyFilters();
+    return; // Stop here (highest priority)
+  }
+
+  // 2️⃣ Priority 2 → URL params (dashboard → list navigation)
+  this.route.queryParams.subscribe(params => {
+    const typeFromChart = params['type'];
+    const statusFromChart = params['status'];
+    const districtFromChart = params['district'];
+
+    if (typeFromChart && statusFromChart) {
+      this.selectedType = typeFromChart;
+      this.selectedStatus = statusFromChart;
+      this.selectedDistrict = districtFromChart || '';
+
+      this.applyFilters();
+      return; // Stop here
+    }
+
+    // 3️⃣ Priority 3 → Saved filters (page refresh or back navigation)
+    const savedFilters = this.filterState.getFilters();
+    if (savedFilters) {
+      this.selectedDistrict = savedFilters.revenue_district;
+      this.selectedPoliceCity = savedFilters.district;
+      this.selectedPoliceStation = savedFilters.policeStationName;
+      this.start_date = savedFilters.start_date;
+      this.end_date = savedFilters.end_date;
+
+      this.selectedType = savedFilters.additionalReliefType;
+      this.selectedStatus = savedFilters.reliefStatus;
+
+      this.applyFilters();
+      return;
+    }
+
+    // 4️⃣ Priority 4 → Fresh visit
+    this.fetchFIRList();
+  });
+
+  // Load dropdowns etc.
   this.updateSelectedColumns();
   this.loadPolicecity();
-
-  // Restore saved filters first
-  const savedFilters = this.filterState.getFilters();
-  if (savedFilters) {
-    this.selectedDistrict = savedFilters.revenue_district;
-    this.selectedPoliceCity = savedFilters.district;
-    this.selectedPoliceStation = savedFilters.policeStationName;
-    this.start_date = savedFilters.start_date;
-    this.end_date = savedFilters.end_date;
-    this.selectedType = savedFilters.additionalReliefType;
-    this.selectedStatus = savedFilters.reliefStatus;
-
-    // ✅ Now call API with filters
-    this.applyFilters();
-  } else {
-    // ✅ If no filters saved, call normally (all data)
-    this.fetchFIRList();
-  }
 }
+
+
 
 
   getStatusText(status: number,HascaseMF:any): string {
@@ -208,10 +250,10 @@ export class AdditionalReliefListComponent implements OnInit {
   }
 
   // Fetch FIR data from the service
-  fetchFIRList(): void {
+  fetchFIRList(sortField?: string, sortOrder?: string): void {
     this.isLoading = true;
     
-    this.additionalreliefService.getFIRAdditionalReliefList_By_Victim(this.getFilterParams()).subscribe(
+    this.additionalreliefService.getFIRAdditionalReliefList_By_Victim(this.getFilterParams(),sortField, sortOrder).subscribe(
       (data) => {
         this.firList = data;
         this.totalRecords = data.length;
@@ -440,7 +482,59 @@ getFilterParams() {
       : 'fa-sort';
   }
 
-  sortTable(field: string): void {
+//   sortTable(field: string): void {
+//   if (this.currentSortField === field) {
+//     this.isAscending = !this.isAscending;
+//   } else {
+//     this.currentSortField = field;
+//     this.isAscending = true;
+//   }
+
+//   this.displayedFirList.sort((a, b) => {
+//     let valA = a[field] ?? '';
+//     let valB = b[field] ?? '';
+
+//     // Detect dd/MM/yyyy format
+//     const dateA = this.parseCustomDate(valA);
+//     const dateB = this.parseCustomDate(valB);
+//     if (dateA && dateB) {
+//       return this.isAscending
+//         ? dateA.getTime() - dateB.getTime()
+//         : dateB.getTime() - dateA.getTime();
+//     }
+
+//     // Detect numbers
+//     const numA = parseFloat(valA);
+//     const numB = parseFloat(valB);
+//     if (!isNaN(numA) && !isNaN(numB)) {
+//       return this.isAscending ? numA - numB : numB - numA;
+//     }
+
+//     // Default string comparison
+//     return this.isAscending
+//       ? valA.toString().localeCompare(valB.toString())
+//       : valB.toString().localeCompare(valA.toString());
+//   });
+
+//   console.log(`Sorted by "${field}" in ${this.isAscending ? 'Ascending' : 'Descending'} order`);
+// }
+
+sortFieldMap: any = {
+  fir_number: 'fir_number',                          // OK
+  date_of_registration: 'date_of_registration', 
+  victim_name: 'v.victim_name',                      // NEW
+  revenue_district: 'f.revenue_district',            // FIXED
+  police_station: 'f.police_station',                // FIXED
+  police_city: 'f.police_city',                      // FIXED
+};
+sortTable(field: string): void {
+  const mappedField = this.sortFieldMap[field];
+
+  if (!mappedField) {
+    console.warn(`Sorting not allowed for field: ${field}`);
+    return;
+  }
+
   if (this.currentSortField === field) {
     this.isAscending = !this.isAscending;
   } else {
@@ -448,33 +542,10 @@ getFilterParams() {
     this.isAscending = true;
   }
 
-  this.displayedFirList.sort((a, b) => {
-    let valA = a[field] ?? '';
-    let valB = b[field] ?? '';
+  const sortOrder = this.isAscending ? 'ASC' : 'DESC';
 
-    // Detect dd/MM/yyyy format
-    const dateA = this.parseCustomDate(valA);
-    const dateB = this.parseCustomDate(valB);
-    if (dateA && dateB) {
-      return this.isAscending
-        ? dateA.getTime() - dateB.getTime()
-        : dateB.getTime() - dateA.getTime();
-    }
-
-    // Detect numbers
-    const numA = parseFloat(valA);
-    const numB = parseFloat(valB);
-    if (!isNaN(numA) && !isNaN(numB)) {
-      return this.isAscending ? numA - numB : numB - numA;
-    }
-
-    // Default string comparison
-    return this.isAscending
-      ? valA.toString().localeCompare(valB.toString())
-      : valB.toString().localeCompare(valA.toString());
-  });
-
-  console.log(`Sorted by "${field}" in ${this.isAscending ? 'Ascending' : 'Descending'} order`);
+  // Call API
+  this.fetchFIRList(mappedField, sortOrder);
 }
 
 // Helper to parse dd/MM/yyyy

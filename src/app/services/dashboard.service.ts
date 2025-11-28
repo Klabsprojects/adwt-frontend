@@ -7,13 +7,14 @@ import { environment } from 'src/environments/environment.prod';
 })
 export class DashboardService {
   private baseUrl = environment.apiUrl;
-
+  
   private filterapiUrl = environment.apiUrl+'filter-options';
 
   private backendUrl = environment.apiUrl;
 
   private apiUrl = environment.apiUrl+'dashboard-data';
   private dadtwoapiUrl = environment.apiUrl+'dadtwo-dashboard-data';
+  private additionalReliefUrl = environment.apiUrl+'additionalRelief';
 
   // private apiUrl1 = 'http://localhost:3000/getPTCases';
 
@@ -37,6 +38,10 @@ export class DashboardService {
 
   userPostMethod(url:string,body:any): Observable<any>{
     return this.http.post(`${this.backendUrl}${url}`, body);
+  }
+
+  userPostMethodForAdditional(url:string,body:any): Observable<any>{
+    return this.http.post(`${this.additionalReliefUrl}${url}`, body);
   }
   userGetMethod(url:string):Observable<any>{
     return this.http.get(`${this.backendUrl}${url}`);

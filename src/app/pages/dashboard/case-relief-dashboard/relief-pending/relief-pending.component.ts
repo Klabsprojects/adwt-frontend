@@ -43,6 +43,10 @@ export type ChartOptions = {
 })
 export class ReliefPendingComponent implements OnInit, OnDestroy {
   loading:boolean=false;
+  totalExpenditure:any;
+  totalFir:any;
+  totalChargeSheet:any;
+  totalTrial:any;
   private subscription: Subscription = new Subscription();
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: ChartOptions;
@@ -109,40 +113,56 @@ export class ReliefPendingComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscription.add(
-      this.csr.pending$.subscribe((res: any[]) => {
-        this.loading = res.length === 0 ? true : false;
-        if (!res) return;
-
-        const districts = res.map(item => item.revenue_district);
-        const job = res.map(item => item.Job_Pending);
-        const pension = res.map(item => item.Pension_Pending);
-        const patta = res.map(item => item.Patta_Pending);
-        const scholarship = res.map(item => item.Education_Pending);
-
-        // Set dynamic height with minimum threshold
-        const dynamicHeight = Math.max(districts.length * 25, 150);
-
-        this.chartOptions = {
-          ...this.chartOptions,
-          chart: {
-            ...this.chartOptions.chart,
-            height: dynamicHeight
-          },
-          series: [
-            { name: 'Job Pending', data: job },
-            { name: 'Pension Pending', data: pension },
-            { name: 'Patta Pending', data: patta },
-            { name: 'Scholarship Pending', data: scholarship }
-          ],
-          xaxis: {
-            ...this.chartOptions.xaxis,
-            categories: districts
-          }
-        };
-
+      this.csr.pending$.subscribe((res: any) => {
+    
+        const data = res;
+        const toCr = (val: any) =>
+          val ? (Number(val) / 10000000).toFixed(2) : '0.00';
+    
+        this.totalExpenditure = toCr(data.total_expenditure);
+        this.totalFir = toCr(data.total_firReliefAmount);
+        this.totalChargeSheet = toCr(data.total_chargesheetReliefAmount);
+        this.totalTrial = toCr(data.total_trialReliefAmount);
         this.cdr.detectChanges();
       })
     );
+    
+    
+    // this.subscription.add(
+    //   this.csr.pending$.subscribe((res: any[]) => {
+    //     this.loading = res.length === 0 ? true : false;
+    //     if (!res) return;
+
+    //     const districts = res.map(item => item.revenue_district);
+    //     const job = res.map(item => item.Job_Pending);
+    //     const pension = res.map(item => item.Pension_Pending);
+    //     const patta = res.map(item => item.Patta_Pending);
+    //     const scholarship = res.map(item => item.Education_Pending);
+
+    //     // Set dynamic height with minimum threshold
+    //     const dynamicHeight = Math.max(districts.length * 25, 150);
+
+    //     this.chartOptions = {
+    //       ...this.chartOptions,
+    //       chart: {
+    //         ...this.chartOptions.chart,
+    //         height: dynamicHeight
+    //       },
+    //       series: [
+    //         { name: 'Job Pending', data: job },
+    //         { name: 'Pension Pending', data: pension },
+    //         { name: 'Patta Pending', data: patta },
+    //         { name: 'Scholarship Pending', data: scholarship }
+    //       ],
+    //       xaxis: {
+    //         ...this.chartOptions.xaxis,
+    //         categories: districts
+    //       }
+    //     };
+
+    //     this.cdr.detectChanges();
+    //   })
+    // );
   }
 
   ngOnDestroy(): void {

@@ -333,8 +333,8 @@
               <span *ngSwitchCase="'created_by'">{{ fir.created_by || '' }}</span>
               <span *ngSwitchCase="'created_at'">{{ fir.created_at | date: 'dd-MM-yyyy' }}</span>
               <span *ngSwitchCase="'status'">
-                <span class="badge" [ngClass]="getStatusBadgeClass(fir.status,fir.HascaseMF)">
-                  {{ getStatusText(fir.status, fir.relief_status, fir.HascaseMF) }}
+                <span class="badge" [ngClass]="getStatusBadgeClass(fir.status,fir.HascaseMF,fir.caseType)">
+                  {{ getStatusText(fir.status, fir.relief_status, fir.HascaseMF, fir.caseType) }}
                 </span>
               </span>
              

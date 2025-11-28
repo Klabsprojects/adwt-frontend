@@ -24,7 +24,7 @@ export class CasePiechartComponent implements OnInit,OnDestroy {
         if(res){
           this.pieChartDatasets = [{
             data: [res],
-            backgroundColor: ['#3357FF']
+            backgroundColor: ['#008ffb']
           }];
         }
         this.cdr.detectChanges();
@@ -44,7 +44,7 @@ export class CasePiechartComponent implements OnInit,OnDestroy {
   public pieChartLabels = [''];
   public pieChartDatasets = [ {
     data: [0],
-    backgroundColor: ['#3357FF']
+    backgroundColor: ['#008ffb']
   } ];
   public pieChartLegend = false;
   public pieChartPlugins = [];

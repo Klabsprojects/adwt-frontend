@@ -1223,6 +1223,7 @@ async onBtnExport(): Promise<void> {
       item.trial_proceeding_date ? formatDate(item.trial_proceeding_date, 'yyyy-MM-dd', 'en') : '',
       numberValue(item.trial_reliefScst),
       numberValue(item.trial_reliefExGratia),
+      numberValue(item.trial_reliefScst) + numberValue(item.trial_reliefExGratia),
       item.trial_disbursement_date ? formatDate(item.trial_disbursement_date, 'yyyy-MM-dd', 'en') : '',
       numberValue(item.trial_reliefScst) + numberValue(item.trial_reliefExGratia),
 
@@ -1231,7 +1232,7 @@ async onBtnExport(): Promise<void> {
       // cleanValue(item.days_since_second_relief),
       // cleanValue(item.days_since_trial_relief),
 
-      cleanValue(item.report_reason)
+      item.report_reason
     ]));
     // console.log(exportData);
     // ✅ Combine header + data

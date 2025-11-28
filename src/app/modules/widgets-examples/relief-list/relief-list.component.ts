@@ -252,9 +252,9 @@ fetchFIRList(page: number = 1, pageSize: number = this.pageSize,sortField?: stri
 
 
 
-getStatusBadgeClass(status: any,selectedStatus?: any): string {
-  if (selectedStatus === '1') {
-    return 'badge bg-danger text-white'; // Mistake of Fact
+getStatusBadgeClass(status: any,selectedStatus?: any, caseType?:any): string {
+  if (selectedStatus === '1' || caseType === 'referredChargeSheet') {
+    return 'badge bg-danger text-white'; 
   }
   const badgeClassMap = {
     0: 'badge bg-warning text-dark',
@@ -273,9 +273,58 @@ getStatusBadgeClass(status: any,selectedStatus?: any): string {
   return badgeClassMap[status] ?? 'badge bg-danger text-white';
 }
 
-getStatusText(status: number, reliefStatus: number,selectedStatus?: any): string {
-  // console.log(selectedStatus);
-  // Handle frontend-only statuses
+// getStatusText(status: number, reliefStatus: number,selectedStatus?: any, caseType?:any): string {
+//   if (selectedStatus) {
+//     const customStatusMap: { [key: string]: string } = {
+//       mistakeOfFact: 'Mistake of Fact',
+//       sectionDeleted: 'Section Deleted',
+//       firQuashed: 'FIR Quashed',
+//       acquitted: 'Acquitted',
+//       chargeAbated: 'Charge Abated',
+//       quashed: 'Quashed'
+//     };
+//     if (customStatusMap[selectedStatus]) {
+//       return customStatusMap[selectedStatus];
+//     }
+//   }
+//   if (status <= 4) {
+//     return 'FIR Proposal Not Yet Received';
+//   }
+//   const statusTextMap: { [key: number]: string } = {
+//     0: 'Just Starting',
+//     1: 'Pending | FIR Stage | Step 1 Completed',
+//     2: 'Pending | FIR Stage | Step 2 Completed',
+//     3: 'Pending | FIR Stage | Step 3 Completed',
+//     4: 'FIR Stage pending',
+//     5: 'FIR Stage pending',
+//     6: 'Chargesheet Stage pending',
+//     7: 'Trial Stage pending',
+//     11: 'FIR Stage Completed',
+//     12: 'Chargesheet Stage completed',
+//     13: 'Trial Completed',
+//   };
+
+//   if (selectedStatus === "1") return 'Mistake of Fact';
+//   if (status === 5 && reliefStatus === 0) return 'FIR Relief Stage Pending';
+//   if (status === 5 && reliefStatus === 1) return 'FIR Relief Stage Completed';
+//   if (status === 6 && reliefStatus === 1) return 'Chargesheet Stage Pending';
+//   if (status === 6 && reliefStatus === 2) return 'Chargesheet Stage Completed';
+//   if (status === 7 && reliefStatus === 3) return 'Appeal';
+//   if ((status === 5 || status === 6) && reliefStatus === 0) return 'FIR Stage pending | Chargesheet Stage Pending';
+//   if (status === 7 && (reliefStatus === 1 || reliefStatus === 2)) return 'Trial Stage pending';
+//   if ((status === 6 || status === 7) && reliefStatus === 1) return 'Chargesheet Stage Pending | Trial Stage Pending';
+//   if ((status === 5 || status === 6 || status === 7) && reliefStatus === 0) return 'FIR Stage pending | Charge sheet Stage Pending | Trial stage pending';
+//   if ((status === 5 || status === 6 || status === 7) && reliefStatus === 3) return 'Completed';
+
+//   if (status >= 4) return 'Proposal Not yet Received';
+
+//   return statusTextMap[status] || 'Unknown';
+// }
+
+getStatusText(status: number,reliefStatus: number,selectedStatus?: any,caseType?: any): string {
+  if (caseType === 'referredChargeSheet') {
+    return 'Chargesheet - MF';
+  }
   if (selectedStatus) {
     const customStatusMap: { [key: string]: string } = {
       mistakeOfFact: 'Mistake of Fact',
@@ -290,7 +339,7 @@ getStatusText(status: number, reliefStatus: number,selectedStatus?: any): string
     }
   }
 
-  // Normal flow (from API)
+  // 4️⃣ Remaining original logic...
   if (status <= 4) {
     return 'FIR Proposal Not Yet Received';
   }
@@ -309,10 +358,7 @@ getStatusText(status: number, reliefStatus: number,selectedStatus?: any): string
     13: 'Trial Completed',
   };
 
-  
-
-  // Custom rules
-  if (selectedStatus === "1") return 'Mistake of Fact';
+  if (selectedStatus === "1" && caseType!=='referredChargeSheet') return 'Mistake of Fact';
   if (status === 5 && reliefStatus === 0) return 'FIR Relief Stage Pending';
   if (status === 5 && reliefStatus === 1) return 'FIR Relief Stage Completed';
   if (status === 6 && reliefStatus === 1) return 'Chargesheet Stage Pending';
@@ -329,7 +375,6 @@ getStatusText(status: number, reliefStatus: number,selectedStatus?: any): string
   return statusTextMap[status] || 'Unknown';
 }
 
-
   navigateToRelief(firId: string): void {
   const filters = {
     selectedDistrict: this.selectedDistrict,
@@ -338,14 +383,10 @@ getStatusText(status: number, reliefStatus: number,selectedStatus?: any): string
     dort: this.dort
   };
   localStorage.setItem('firFilters', JSON.stringify(filters));
-
-  // Navigate with query param
   this.router.navigate(['widgets-examples/relief'], {
     queryParams: { fir_id: firId }
   });
 }
-
-// Filters
   selectedDistrict: string = '';
   selectedPoliceZone:string='';
   selectedPoliceRange: string = '';
@@ -629,18 +670,20 @@ getStatusText(status: number, reliefStatus: number,selectedStatus?: any): string
   //   });
   // }
 
-  sortTable(field: string): void {
-  // Map frontend column to backend sort field
-  const sortFieldMap: { [key: string]: string } = {
+  sortFieldMap: any = {
     fir_number: 'fir_number',
     police_city: 'fir_add.police_city',
     police_station: 'fir_add.police_station',
     created_by: 'created_by',
-    date_of_registration: 'fir_add.date_of_registration',
+    date_of_reporting: 'fir_add.date_of_reporting',
     created_at: 'fir_add.created_at'
   };
 
-  const backendField = sortFieldMap[field];
+
+  sortTable(field: string): void {
+  // Map frontend column to backend sort field
+  
+  const backendField = this.sortFieldMap[field];
   if (!backendField) return;
 
   if (this.currentSortField === field) {

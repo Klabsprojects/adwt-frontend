@@ -23,7 +23,7 @@ export class MeetingSblmdComponent implements OnInit,OnDestroy {
             if (typeof data === 'object' && data !== null) {
               return { location, ...data };
             } else {
-              return { location, q1: 0, q2: 0, q3: 0, q4: 0, total: 0 }; // fallback or error shape
+              return { location, q1: 0, q2: 0, q3: 0, q4: 0, total_member_count: 0 }; // fallback or error shape
             }
           });
           this.cdr.detectChanges();

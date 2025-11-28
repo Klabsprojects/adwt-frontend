@@ -23,11 +23,11 @@ export class ReliefEducationStatusComponent {
 
   ngOnInit(): void {
     this.subscription.add(
-      this.csr.educationStatus$.subscribe((res: any) => {
+      this.csr.additionalReliefAfterData$.subscribe((res: any) => {
         if(res){
           this.loading = Object.keys(res).length === 0 ? true:false;
           this.pieChartDatasets = [{
-            data: [res.Given, res.Pending],
+            data: [res.reliefAfterEducationGiven, res.reliefAfterEducationPending],
             backgroundColor: ['#2A9D8F', '#E9C46A'],
           }];
           this.cdr.detectChanges();

@@ -10,6 +10,9 @@ import Swal from 'sweetalert2';
 })
 export class ReliefFilterComponent implements OnInit {
   before_after: string[] = [];
+  reliefPending:string[]=[];
+  expenditure:string[]=[];
+  reliefData:string[]=[];
   districts: any[] = [];
   communities: any[] = [];
   castes: any[] = [];
@@ -128,12 +131,17 @@ onCityChange(event: any)
 
   get filterJson() {
     return {
-      "Two_thousand_sixteen": this.selectedBeforeAfter,
+      // "Two_thousand_sixteen": this.selectedBeforeAfter,
+      // "district": this.selectedDistrict,
+      // "community": this.selectedCommunity,
+      // "caste": this.selectedCaste,
+      // "offence": this.selectedNatureOfOffence,
+      // "relief_status": this.selectedReliefStatus
+      "police_city":this.selectedPoliceCity,
+      "police_station":this.selectedPoliceStation,
       "district": this.selectedDistrict,
-      "community": this.selectedCommunity,
-      "caste": this.selectedCaste,
-      "offence": this.selectedNatureOfOffence,
-      "relief_status": this.selectedReliefStatus
+      "Filter_From_Date":this.selectedFromDate,
+      "Filter_To_Date":this.selectedToDate
     };
   }
 
@@ -161,7 +169,7 @@ onCityChange(event: any)
   
 
   callAllFunction(body: any) {
-    this.get_before_after();
+    // this.get_before_after();
     this.get_disctrcits();
     this.get_communities();
     this.get_offence_nature();
@@ -169,11 +177,13 @@ onCityChange(event: any)
     this.get_other_details();
   }
 
-  get_before_after() {
-    this.ds.userGetMethod('Get_Two_thousand_sixteen_Status').subscribe((res: any) => {
-      this.before_after = res.data;
-    })
-  }
+  // get_before_after() {
+  //   this.ds.userGetMethod('Get_Two_thousand_sixteen_Status').subscribe((res: any) => {
+  //     this.before_after = res.data;
+  //   })
+  // }
+ 
+  
   get_disctrcits() {
     this.ds.userGetMethod('districts').subscribe((res: any) => {
       this.districts = res;

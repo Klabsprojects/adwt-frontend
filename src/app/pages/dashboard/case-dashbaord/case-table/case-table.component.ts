@@ -17,7 +17,7 @@ export class CaseTableComponent implements OnInit,OnDestroy {
     this.subscription.add(
       this.hcs.table$.subscribe((res:any)=>{
         if(res){
-          this.zonewise = res.filter((item: any) => {return item.sz !== 0 || item.cz !== 0 || item.nz !== 0 || item.wz !== 0;});
+          this.zonewise = res.filter((item: any) => {return item.sz !== 0 || item.cz !== 0 || item.nz !== 0 || item.wz !== 0 || item.com !==0;});
           this.loading = false;
         }
         this.cdr.detectChanges();

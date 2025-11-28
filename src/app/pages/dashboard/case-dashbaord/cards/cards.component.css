@@ -32,10 +32,12 @@
 
 /* helper class */
 .red{
-    background-color:#74afcb;
+    /* background-color:#74afcb; */
+    background-color: #d64550;
 }
 .blue{
-    background-color:#74afcb;
+    /* background-color:#74afcb; */
+    background-color:#48327a;
 }
 .orange{
     background-color: #ec9770;

@@ -36,7 +36,7 @@ export class FilterNavComponent implements OnInit, OnDestroy {
   selectedDataEntryStatus:string='';
   selectedChargeSheetToDate:string='';
   selectedChargeSheetFromDate:string='';
-  selectedDistricts:string='';
+  selectedDistricts:string = '';
   selectedDistrict:string = '';
   selectedPoliceZone:string='';
   selectedCommunity:string='';

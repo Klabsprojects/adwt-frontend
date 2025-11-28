@@ -47,6 +47,14 @@ export class ReliefGivenComponent implements OnInit, OnDestroy {
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: ChartOptions;
 
+  moreThan7days: number = 0;
+  chargesheetPending: number = 0;
+  convictionPending: number = 0;
+  firFilter: number = 0;
+  chargesheetFilter: number = 0;
+  convictedFilter: number = 0;
+
+
   constructor(
     private csr: caseReliefService,
     private cdr: ChangeDetectorRef
@@ -108,40 +116,50 @@ export class ReliefGivenComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscription.add(
-      this.csr.given$.subscribe((res: any[]) => {
-        this.loading = res.length === 0 ? true : false;
-        if (!res) return;
-        const districts = res.map(item => item.revenue_district);
-        const job = res.map(item => item.job_Given);
-        const pension = res.map(item => item.Pension_Given);
-        const patta = res.map(item => item.Patta_Given);
-        const scholarship = res.map(item => item.Education_Given);
-
-        // ✅ Use minimum height to avoid collapse
-        const dynamicHeight = Math.max(districts.length * 25, 150);
-
-        this.chartOptions = {
-          ...this.chartOptions,
-          chart: {
-            ...this.chartOptions.chart,
-            height: dynamicHeight
-          },
-          series: [
-            { name: 'Job Given', data: job },
-            { name: 'Pension Given', data: pension },
-            { name: 'Patta Given', data: patta },
-            { name: 'Scholarship Given', data: scholarship }
-          ],
-          xaxis: {
-            ...this.chartOptions.xaxis,
-            categories: districts
-          }
-        };
-
+      this.subscription.add(
+      this.csr.given$.subscribe((res: any) => {
+        this.moreThan7days = res.morethan7days;
+        this.chargesheetPending = res.chargesheet_relief_pending;
+        this.convictionPending = res.convictionPending;
+        this.firFilter = res.fir_more_than_7_days_filter_case;
+        this.chargesheetFilter = res.chargesheet_filter_case;
+        this.convictedFilter = res.convicted_filter_case;
         this.cdr.detectChanges();
-      })
-    );
+  }));
+    // this.subscription.add(
+    //   this.csr.given$.subscribe((res: any[]) => {
+    //     this.loading = res.length === 0 ? true : false;
+    //     if (!res) return;
+    //     const districts = res.map(item => item.revenue_district);
+    //     const job = res.map(item => item.job_Given);
+    //     const pension = res.map(item => item.Pension_Given);
+    //     const patta = res.map(item => item.Patta_Given);
+    //     const scholarship = res.map(item => item.Education_Given);
+
+    //     // ✅ Use minimum height to avoid collapse
+    //     const dynamicHeight = Math.max(districts.length * 25, 150);
+
+    //     this.chartOptions = {
+    //       ...this.chartOptions,
+    //       chart: {
+    //         ...this.chartOptions.chart,
+    //         height: dynamicHeight
+    //       },
+    //       series: [
+    //         { name: 'Job Given', data: job },
+    //         { name: 'Pension Given', data: pension },
+    //         { name: 'Patta Given', data: patta },
+    //         { name: 'Scholarship Given', data: scholarship }
+    //       ],
+    //       xaxis: {
+    //         ...this.chartOptions.xaxis,
+    //         categories: districts
+    //       }
+    //     };
+
+    //     this.cdr.detectChanges();
+    //   })
+    // );
   }
 
   ngOnDestroy(): void {

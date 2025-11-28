@@ -1305,6 +1305,10 @@ loadOptions() {
   hearingDetails: any[] = [];
   hearingDetails_one: any[] = [];
   hearingDetails_two: any[] = [];
+  lastSortField: string | null = null;
+  lastSortOrder: string | null = null;
+  forceRefresh = 0;
+
 
 
   viewuploadJudgement(path: any) {
@@ -1910,7 +1914,9 @@ loadOptions() {
         // console.log(response.data,response.data.status);
         this.totalRecords = response.total;
         this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
-        this.filteredList = [...this.firList];
+        // this.filteredList = [...this.firList];
+        this.filteredList = JSON.parse(JSON.stringify(this.firList));
+
         // this.policeRanges = response.data.map((item: any) => item.police_range);
         // this.policeRanges = [...new Set(this.policeRanges)];
         // this.revenueDistricts = response.data.map((item: any) => item.revenue_district_name);
@@ -1967,37 +1973,58 @@ loadOptions() {
   // Change page size
   changePageSize(newSize: number) {
     this.pageSize = newSize;
-    this.loadFirList(1, newSize); // Reset to first page with new size
+    this.loadFirList(1, newSize,this.lastSortField, this.lastSortOrder); // Reset to first page with new size
   }
 
   // Navigation methods
   goToFirstPage() {
     if (this.currentPage !== 1) {
-      this.loadFirList(1);
+      // this.loadFirList(1);
+        this.loadFirList(1, this.pageSize, this.lastSortField, this.lastSortOrder);
     }
   }
 
   goToLastPage() {
     if (this.currentPage !== this.totalPages) {
-      this.loadFirList(this.totalPages);
+      // this.loadFirList(this.totalPages);
+      this.loadFirList(this.totalPages, this.pageSize, this.lastSortField, this.lastSortOrder);
+
     }
   }
 
   previousPage() {
     if (this.currentPage > 1) {
-      this.loadFirList(this.currentPage - 1);
+      // this.loadFirList(this.currentPage - 1);
+      this.loadFirList(
+      this.currentPage - 1,
+      this.pageSize,
+      this.lastSortField,
+      this.lastSortOrder
+    );
     }
   }
 
+  // nextPage() {
+  //   if (this.currentPage < this.totalPages) {
+  //     this.loadFirList(this.currentPage + 1);
+  //   }
+  // }
   nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.loadFirList(this.currentPage + 1);
-    }
+  if (this.currentPage < this.totalPages) {
+    this.loadFirList(
+      this.currentPage + 1,
+      this.pageSize,
+      this.lastSortField,
+      this.lastSortOrder
+    );
   }
+}
+
 
   goToPage(pageNum: number) {
     if (pageNum >= 1 && pageNum <= this.totalPages) {
-      this.loadFirList(pageNum);
+      // this.loadFirList(pageNum);
+      this.loadFirList(pageNum, this.pageSize, this.lastSortField, this.lastSortOrder);
     }
   }
 
@@ -2266,11 +2293,16 @@ sortTable(field: string): void {
   }
 
   const sortOrder = this.isAscending ? 'ASC' : 'DESC';
+   this.lastSortField = mappedField;
+  this.lastSortOrder = sortOrder;
+
 
   // ✅ Call backend with mapped sort field
   this.loadFirList(this.currentPage, this.pageSize, mappedField, sortOrder);
 }
-
+trackByRefresh() {
+  return this.forceRefresh;
+}
 
 parseCustomDate(dateStr: string): Date | null {
   if (!dateStr) return null;

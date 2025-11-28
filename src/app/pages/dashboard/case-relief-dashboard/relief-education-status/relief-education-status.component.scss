@@ -4,9 +4,16 @@
     justify-content: space-around;
     gap: 1.5rem;
     position: relative;
+    border: 1px solid #000;
+    padding: 10px 0px;
+    border-radius: 10px;
+}
+.text-left{
+    border-bottom: 1px solid var(--bs-card-border-color);
+    padding:0px 0px 10px 10px;
 }
 .pie-div,h2{
-    width: 90%;
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -47,6 +54,7 @@ span{
     display: inline-block;
     padding: 0.3rem;
     background-color: #2A9D8F;
+    // background-color: #d64550;
     border-radius: 50%;
     border: none;
     margin-right: 0.2rem;

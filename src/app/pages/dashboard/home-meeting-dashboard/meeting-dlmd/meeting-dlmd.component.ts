@@ -46,10 +46,14 @@ export class MeetingDlmdComponent implements OnInit, OnDestroy {
               totalPending += pending;
             });
 
+            const memberCount = districtData.total?.total_member_count || 0;
+
+
             result.total = {
               completed: totalCompleted,
               pending: totalPending,
-              total: totalCompleted + totalPending
+              // total: totalCompleted + totalPending
+              total:memberCount
             };
 
             return result;

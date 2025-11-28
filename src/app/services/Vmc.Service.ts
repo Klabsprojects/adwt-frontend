@@ -12,8 +12,18 @@ export class Vmcservice {
 
   constructor(private http: HttpClient) {}
 
-  getAllMembers(): Observable<any> {
-    return this.http.get(this.baseUrl);
+  // getAllMembers(): Observable<any> {
+  //   return this.http.get(this.baseUrl);
+  // }
+
+  
+
+  getAllMembers( filters: any = {}): Observable<any> {
+    let params = new HttpParams()
+    Object.keys(filters).forEach(key => {
+      params = params.set(key, filters[key]);
+    });
+     return this.http.get(`${this.baseUrl}/getAllMembersV1`, { params });
   }
 
   getDistrictLevelMember(district : any): Observable<any> {

@@ -20,11 +20,18 @@ export class AdditionalReliefService {
     return this.http.get<any[]>(this.apiUrl);
   }
 
-  getFIRAdditionalReliefList_By_Victim(filters: any = {}): Observable<any[]> {
+  getFIRAdditionalReliefList_By_Victim(filters: any = {},sortField?: string,
+    sortOrder?: string): Observable<any[]> {
       let params = new HttpParams()
       Object.keys(filters).forEach(key => {
       params = params.set(key, filters[key]);
     });
+    if (sortField) {
+      params = params
+        .set('sortFlag', 'true')
+        .set('sortField', sortField)
+        .set('sortOrder', sortOrder || 'ASC');
+    }
     return this.http.get<any[]>(this.baseUrl+`fir-additional-relief-ByVictim`, { params });
   }
 

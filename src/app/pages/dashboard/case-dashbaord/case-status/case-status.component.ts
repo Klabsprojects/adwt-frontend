@@ -72,16 +72,17 @@ createPieChartForOffence(): void {
 
 
   // Step 2: Generate blue gradient tones
-  const blueColors = [
-    '#0d47a1', // Dark Blue
-    '#1565c0',
-    '#1976d2',
-    '#1e88e5',
-    '#2196f3',
-    '#42a5f5',
-    '#64b5f6',
-    '#90caf9'
-  ];
+  // const blueColors = [
+  //   '#0d47a1', // Dark Blue
+  //   '#1565c0',
+  //   '#1976d2',
+  //   '#1e88e5',
+  //   '#2196f3',
+  //   '#42a5f5',
+  //   '#64b5f6',
+  //   '#90caf9'
+  // ];
+   const blueColors = ['#008ffb'];
   const backgroundColors = values.map((_, i) => blueColors[i % blueColors.length]);
   const hoverColors = backgroundColors.map(c => c); // same for hover
 

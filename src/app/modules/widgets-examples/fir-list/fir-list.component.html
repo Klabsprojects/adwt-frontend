@@ -298,7 +298,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let fir of paginatedFirList(); let i = index">
+         
+            <tr *ngFor="let fir of paginatedFirList(); let i = index; trackBy: trackByRefresh">
+
             <td *ngFor="let column of displayedColumns" [hidden]="!column.visible">
               <ng-container [ngSwitch]="column.field">
                 <span *ngSwitchCase="'sl_no'">{{ (currentPage - 1) * pageSize + i + 1 }}</span>

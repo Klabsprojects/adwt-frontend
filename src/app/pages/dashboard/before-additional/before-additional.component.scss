@@ -36,7 +36,8 @@ p{
 }
 
 .red{
-    background-color:#e380a8;
+    // background-color:#e380a8;
+    background-color: #d64550;
 }
 .blue{
     background-color:#48327a;
@@ -63,6 +64,9 @@ p{
 
 .card-header{
   min-height: 0px;
+}
+.card{
+  border:1px solid #000;
 }
   .custom-table {
     width: 100%;

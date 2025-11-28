@@ -47,12 +47,17 @@ import { WhatsappMessageComponent } from 'src/app/modules/widgets-examples/whats
 import { CollectorsComponent } from './collectors/collectors.component';
 import { AutoGenerationComponent } from 'src/app/app/modules/widgets-examples/auto-generation/auto-generation.component';
 import { ReliefComponent } from './relief/relief.component';
+import { MatRadioModule } from '@angular/material/radio';
+import { NgxDropzoneModule } from 'ngx-dropzone';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { EditFirComponent } from './edit/edit-fir.component';
 
 @NgModule({
   declarations: [
     WidgetsExamplesComponent,
     RestrictAllFutureDatesDirective,
     ListsComponent,
+    EditFirComponent,
     StatisticsComponent,
     ChartsComponent,
     MixedComponent,
@@ -89,6 +94,9 @@ import { ReliefComponent } from './relief/relief.component';
     NgbDropdownModule, DragDropModule,
     MatFormFieldModule, // Add Material Modules
     MatSelectModule,
+    MatRadioModule,
+    NgxDropzoneModule,
+    NgSelectModule,
     MatCheckboxModule,
     MatOptionModule,
     SweetAlert2Module,

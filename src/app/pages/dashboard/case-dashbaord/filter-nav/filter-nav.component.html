@@ -16,6 +16,15 @@
 
     
     <div class="filters px-0 pt-0 pt-3">
+      <div class="filter"  *ngIf="isVisible('revenueDistrict')">
+            <p>Revenue District</p>
+            <select class="filter-select" [(ngModel)]="selectedDistricts" (change)="onDistrictChange($event)">
+                <option value="">Select</option>
+                <option *ngFor="let option of districts" [value]="option.district_name">
+                    {{ option.district_name }}
+                </option>
+            </select>
+        </div>
         <div class="filter" *ngIf="isVisible('city')">
             <p>Police City</p>
             <select name="" id="" [(ngModel)]="selectedPoliceCity" (change)="onCityChange($event)" [disabled]="isPolicecityDisabled">
@@ -40,15 +49,7 @@
             </select>
         </div>
 
-        <div class="filter"  *ngIf="isVisible('revenueDistrict')">
-            <p>Revenue District</p>
-            <select class="filter-select" [(ngModel)]="selectedDistricts" (change)="onDistrictChange($event)">
-                <option value="">Select</option>
-                <option *ngFor="let option of districts" [value]="option.district_name">
-                    {{ option.district_name }}
-                </option>
-            </select>
-        </div>
+        
 
         <div class="filter"  *ngIf="isVisible('station')">
             <p>Police Station</p>

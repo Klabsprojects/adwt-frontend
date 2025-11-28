@@ -170,10 +170,9 @@ export class homeCaseService {
         this.isHorizontalLoading.next(true);
         this.dashboardService.userPostMethod('GetPendingCaseZoneWise', data).subscribe((res: any) => {
             const data = res.data;
-            let values = [0, 0, 0, 0];
+            let values = [0, 0, 0, 0, 0];
             const yearWiseData: any = [];
             for (let i = 0; i < data.length; i++) {
-                // 'South Zone', 'Central Zone', 'North Zone', 'West Zone'
                 if (data[i].zone === 'South Zone') {
                     values[0] += data[i].total_cases;
                 }
@@ -186,17 +185,22 @@ export class homeCaseService {
                 else if (data[i].zone === 'West Zone') {
                     values[3] += data[i].total_cases;
                 }
+                else if (data[i].zone === 'Commissionerates') {
+                    values[4] += data[i].total_cases;
+                }
+
             }
             data.forEach((entry: any) => {
                 let yearData = yearWiseData.find((y: any) => y.year === entry.year);
                 if (!yearData) {
-                    yearData = { year: entry.year, sz: 0, cz: 0, nz: 0, wz: 0 };
+                    yearData = { year: entry.year, sz: 0, cz: 0, nz: 0, wz: 0, com: 0 };
                     yearWiseData.push(yearData);
                 }
                 if (entry.zone === 'South Zone') yearData.sz += entry.total_cases;
                 else if (entry.zone === 'Central Zone') yearData.cz += entry.total_cases;
                 else if (entry.zone === 'North Zone') yearData.nz += entry.total_cases;
                 else if (entry.zone === 'West Zone') yearData.wz += entry.total_cases;
+                else if (entry.zone === 'Commissionerates') yearData.com += entry.total_cases;
             });
             this.horizontal.next(values);
             this.table.next(yearWiseData);

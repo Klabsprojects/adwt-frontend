@@ -38,19 +38,66 @@ export class caseReliefService{
     public given = new BehaviorSubject<any>(null);
     given$ = this.given.asObservable();
 
+    public reliefData = new BehaviorSubject<any>(null);
+    reliefData$ = this.reliefData.asObservable();
+
+    public additionalReliefData = new BehaviorSubject<any>(null);
+    additionalReliefData$ = this.additionalReliefData.asObservable();
+
+    public additionalReliefBeforeData = new BehaviorSubject<any>(null);
+    additionalReliefBeforeData$ = this.additionalReliefBeforeData.asObservable();
+
+    public additionalReliefAfterData = new BehaviorSubject<any>(null);
+    additionalReliefAfterData$ = this.additionalReliefAfterData.asObservable();
+
+    public additionalReliefBeforePendency = new BehaviorSubject<any>(null);
+    additionalReliefBeforePendency$ = this.additionalReliefBeforePendency.asObservable();
+
+    public additionalReliefAfterPendency = new BehaviorSubject<any>(null);
+    additionalReliefAfterPendency$ = this.additionalReliefAfterPendency.asObservable();
+
     setFilterJson(data:any){
         this.setStaticValues(data);
         this.setDynamicValues(data);
-        this.setTableValues(data);
-        this.setJobStatus(data);
-        this.setPensionStatus(data);
-        this.setPattaStatus(data);
-        this.setEducationStatus(data);
-        this.setReliefStatus(data);
-        this.setPending(data);
-        this.setGiven(data);
+        // this.setTableValues(data);
+        // this.setJobStatus(data);
+        // this.setPensionStatus(data);
+        // this.setPattaStatus(data);
+        // this.setEducationStatus(data);
+        // this.setReliefStatus(data);
+        // this.setPending(data);
+        // this.setGiven(data);
+        this.setExpenditure(data);
+        this.setReliefPendingData(data);
+        this.setReliefData(data);
+        this.getAdditionalReliefCase(data);
+        this.getAdditionalReliefBeforeCase(data);
+        this.getAdditionalReliefAfterCase(data);
+        this.getAdditionalReliefAfterPendency(data);
+        this.getAdditionalReliefBeforePendency(data);
     }
 
+    setExpenditure(data){
+        this.pending.next([]);
+            this.ds.userPostMethod('reliefExpenditure',data).subscribe((res:any)=>{
+                this.pending.next(res);
+            })
+    }
+
+    setReliefPendingData(data){
+        this.given.next([]);
+            this.ds.userPostMethod('GetReliefPending',data).subscribe((res:any)=>{
+                this.given.next(res);
+            })
+    }
+
+    setReliefData(data){
+        this.reliefData.next([]);
+            this.ds.userPostMethod('GetReliefData',data).subscribe((res:any)=>{
+                this.reliefData.next(res.data);
+                this.tabledata.next(res.data);
+            })
+    }
     setStaticValues(data:any){
         // const district = data.district? {district:data.district} : {};
         this.staticCards.next({});
@@ -67,12 +114,12 @@ export class caseReliefService{
         })
     }
 
-    setTableValues(data:any){
-        this.tabledata.next([]);
-        this.ds.userPostMethod('ReliefDashboarTableData',data).subscribe((res:any)=>{
-            this.tabledata.next(res.data);
-        })
-    }
+    // setTableValues(data:any){
+    //     this.tabledata.next([]);
+    //     this.ds.userPostMethod('ReliefDashboarTableData',data).subscribe((res:any)=>{
+    //         this.tabledata.next(res.data);
+    //     })
+    // }
     
     setJobStatus(data:any){
         this.jobstatus.next({});
@@ -109,17 +156,52 @@ export class caseReliefService{
         })
     }
 
-    setPending(data:any){
-        this.pending.next([]);
-        this.ds.userPostMethod('DistrictWisePedingStatus',data).subscribe((res:any)=>{
-            this.pending.next(res.data);
-        })
-    }
+    // setPending(data:any){
+    //     this.pending.next([]);
+    //     this.ds.userPostMethod('DistrictWisePedingStatus',data).subscribe((res:any)=>{
+    //         this.pending.next(res.data);
+    //     })
+    // }
 
     setGiven(data:any){
         this.given.next([]);
         this.ds.userPostMethod('DistrictWiseGivenStatus',data).subscribe((res:any)=>{
             this.given.next(res.data);
         })
+    }
+
+    getAdditionalReliefCase(data:any){
+       this.additionalReliefData.next([]);
+        this.ds.userPostMethodForAdditional('/cases',data).subscribe((res:any)=>{
+            this.additionalReliefData.next(res);
+        }) 
+    }
+
+    getAdditionalReliefBeforeCase(data:any){
+       this.additionalReliefBeforeData.next([]);
+        this.ds.userPostMethodForAdditional('/before',data).subscribe((res:any)=>{
+            this.additionalReliefBeforeData.next(res);
+        }) 
+    }
+
+    getAdditionalReliefAfterCase(data:any){
+       this.additionalReliefAfterData.next([]);
+        this.ds.userPostMethodForAdditional('/after',data).subscribe((res:any)=>{
+            this.additionalReliefAfterData.next(res);
+        }) 
+    }
+
+    getAdditionalReliefBeforePendency(data:any){
+       this.additionalReliefBeforePendency.next([]);
+        this.ds.userPostMethodForAdditional('/bf/pendency',data).subscribe((res:any)=>{
+            this.additionalReliefBeforePendency.next(res.data);
+        }) 
+    }
+
+    getAdditionalReliefAfterPendency(data:any){
+       this.additionalReliefAfterPendency.next([]);
+        this.ds.userPostMethodForAdditional('/af/pendency',data).subscribe((res:any)=>{
+            this.additionalReliefAfterPendency.next(res.data);
+        }) 
     }
 }

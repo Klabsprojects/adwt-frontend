@@ -22,11 +22,11 @@ export class ReliefJobStatusComponent implements OnInit,OnDestroy {
 
   ngOnInit(): void {
     this.subscription.add(
-      this.csr.jobstatus$.subscribe((res: any) => {
+      this.csr.additionalReliefAfterData$.subscribe((res: any) => {
         if(res){
           this.loading = Object.keys(res).length === 0 ? true:false;
           this.pieChartDatasets = [{
-            data: [res.Given, res.Pending],
+            data: [res.reliefAfterJobGiven, res.reliefAfterJobPending],
             backgroundColor: ['#2A9D8F', '#E9C46A'],
           }];
           this.cdr.detectChanges();
@@ -56,9 +56,6 @@ export class ReliefJobStatusComponent implements OnInit,OnDestroy {
     data: [5, 5],
     backgroundColor: ['#2A9D8F', '#E9C46A'],
   }];
-
-  // 👇 Cast plugin array to correct type
-  // public pieChartPlugins: Plugin<'doughnut'>[] = [ChartDataLabels];
   public pieChartPlugins = [ChartDataLabels as Plugin<'doughnut'>];
   public pieChartLegend = false;
 }

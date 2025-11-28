@@ -17,7 +17,7 @@ export class VmcComponent implements OnInit {
   @ViewChild('memberModalAdd', { static: true }) memberModalAdd: any;
   modalRef: NgbModalRef | undefined;
   editIndex: number | null = null;
-
+  loader : boolean = false;
   // Properties
   members: any[] = [];
   filteredMembers: any[] = [];
@@ -131,16 +131,69 @@ export class VmcComponent implements OnInit {
     }
   }
 
-  get_filter_json(){
-    return this.filteredJson = {
-      member_type: this.selectedMemberType,
-      name: this.searchText,
-      level_of_member: this.selectedMemberLevel,
-      district: this.selectedDistrict,
-      subdivision: this.selectedSubDivision,
-      designation: this.selectedDesignationMember,
-      appointment_date: this.doa
+  getFilterParams() {
+      const params: any = {};
+      
+      if(this.selectedDistrict){
+        params.district = this.selectedDistrict;
+      }
+      
+      if (this.selectedSubDivision) {
+        params.subdivision = this.selectedSubDivision;
+      }
+
+      if (this.selectedStatus) {
+        params.status = this.selectedStatus;
+      }
+
+      if (this.selectedMemberType) {
+        params.member_type = this.selectedMemberType;
+      }
+
+      if(this.selectedDesignationMember){
+        params.designation = this.selectedDesignationMember;
+      }
+      if(this.doa){
+        params.appointment_date = this.doa;
+      }
+
+      if(this.selectedMemberLevel){
+        params.level_of_member = this.selectedMemberLevel;
+      }
+        
+      return params;
     }
+
+
+  get_filter_json(){
+    this.vmcService.getAllMembers(this.getFilterParams()).subscribe(
+        (results: any[]) => {
+          this.members = results;
+          this.filteredMembers = this.members;
+           this.totalRecords = this.filteredMembers.length;
+          console.log('filteredMembers', this.filteredMembers);
+          this.loader = false;
+          this.cdr.detectChanges();
+        },
+        () => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load members. Please try again later.',
+            confirmButtonColor: '#d33',
+          });
+        }
+      );
+    // console.log(this.filteredJson);
+    // return this.filteredJson = {
+    //   member_type: this.selectedMemberType,
+    //   name: this.searchText,
+    //   level_of_member: this.selectedMemberLevel,
+    //   district: this.selectedDistrict,
+    //   subdivision: this.selectedSubDivision,
+    //   designation: this.selectedDesignationMember,
+    //   appointment_date: this.doa
+    // }
   
   }
 
@@ -196,6 +249,7 @@ export class VmcComponent implements OnInit {
 
   // Load all members
   loadMembers() {
+    this.loader = true;
     if (this.Parsed_UserInfo.role == '4') {
       this.vmcService.getDistrictLevelMember(this.Parsed_UserInfo.district).subscribe(
         (results: any[]) => {

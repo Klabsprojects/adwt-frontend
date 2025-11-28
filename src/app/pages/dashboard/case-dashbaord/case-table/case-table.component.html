@@ -9,6 +9,7 @@
                 <th *ngIf="zone=='West Zone' || !zone">West Zone</th>
                 <th *ngIf="zone=='North Zone' || !zone">North Zone</th>
                 <th *ngIf="zone=='South Zone' || !zone">South Zone</th>
+                <th *ngIf="zone=='Commissionerates' || !zone">Commissionerates</th>
                 <th>Total</th>
             </tr>
         </thead>
@@ -19,7 +20,8 @@
                 <td *ngIf="zone=='West Zone' || !zone">{{item.wz}}</td>
                 <td *ngIf="zone=='North Zone' || !zone">{{item.nz}}</td>
                 <td *ngIf="zone=='South Zone' || !zone">{{item.sz}}</td>
-                <td>{{item.cz + item.wz + item.nz + item.sz}}</td>
+                <td *ngIf="zone=='Commissionerates' || !zone">{{item.com}}</td>
+                <td>{{item.cz + item.wz + item.nz + item.sz + item.com}}</td>
             </tr>
         </tbody>
     </table>

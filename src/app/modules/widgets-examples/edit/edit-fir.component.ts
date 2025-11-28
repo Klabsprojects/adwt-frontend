@@ -69,18 +69,18 @@ interface ImagePreview {
 
 @Component({
   selector: 'app-edit-fir',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    MatRadioModule,
-    NgxDropzoneModule,
-    NgSelectModule,
-    MatProgressSpinnerModule
-  ],
+  // standalone: true,
+  // imports: [
+  //   CommonModule,
+  //   FormsModule,
+  //   ReactiveFormsModule,
+  //   MatSelectModule,
+  //   MatFormFieldModule,
+  //   MatRadioModule,
+  //   NgxDropzoneModule,
+  //   NgSelectModule,
+  //   MatProgressSpinnerModule,
+  // ],
   templateUrl: './edit-fir.component.html',
   styleUrl: './edit-fir.component.scss'
 })

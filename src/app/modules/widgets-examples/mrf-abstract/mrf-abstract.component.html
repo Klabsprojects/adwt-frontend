@@ -309,12 +309,14 @@
       <th rowspan="2">Date of Registration</th>
       
 
-      <!-- <th *ngIf="showFIR" colspan="4" class="text-center">FIR</th>
-      <th *ngIf="showChargesheet" colspan="4" class="text-center">Chargesheet</th>
-      <th *ngIf="showTrial" colspan="4" class="text-center">Trial</th> -->
-      <th *ngIf="showFIR" [attr.colspan]="Colspan" class="text-center">FIR</th>
+     
+      <!-- <th *ngIf="showFIR" [attr.colspan]="Colspan" class="text-center">FIR</th>
       <th *ngIf="showChargesheet" [attr.colspan]="Colspan" class="text-center">Chargesheet</th>
-      <th *ngIf="showTrial" [attr.colspan]="Colspan" class="text-center">Trial</th>
+      <th *ngIf="showTrial" [attr.colspan]="Colspan" class="text-center">Trial</th> -->
+      <th *ngIf="showFIR" [attr.colspan]="showFirProposal ? 4 : 3" class="text-center">FIR</th>
+<th *ngIf="showChargesheet" [attr.colspan]="showChargesheetProposal ? 4 : 3" class="text-center">Chargesheet</th>
+<th *ngIf="showTrial" [attr.colspan]="showTrialProposal ? 4 : 3" class="text-center">Trial</th>
+
 
     </tr>
     <tr>

@@ -85,7 +85,7 @@ export class CaseHorizontalBarComponent implements OnInit,OnDestroy {
           events: {
             dataPointSelection: (event, chartContext, config) => {
               const index = config.dataPointIndex;
-              const zones = ['South Zone', 'Central Zone', 'North Zone', 'West Zone'];
+              const zones = ['South Zone', 'Central Zone', 'North Zone', 'West Zone', 'Commissionerates'];
               const selectedZone = zones[index];
               this.hcs.setZone(selectedZone);
               // this.zoneClicked.emit(selectedZone); // 🚀 Emit zone
@@ -109,7 +109,7 @@ export class CaseHorizontalBarComponent implements OnInit,OnDestroy {
           }
         },
         xaxis: {
-          categories: ['South Zone', 'Central Zone', 'North Zone', 'West Zone']
+          categories: ['South Zone', 'Central Zone', 'North Zone', 'West Zone','Commissionerates']
         }
       };
     }

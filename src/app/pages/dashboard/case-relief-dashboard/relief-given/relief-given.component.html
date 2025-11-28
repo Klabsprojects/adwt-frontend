@@ -15,48 +15,55 @@
   <app-loading-dash *ngIf="loading"/>
 </div> -->
 <section class="cards">
-    <div class="row">
-        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
-            <div class="case red">
-                <img src="assets/images/hammer.png" alt="" height="50px">
-                <div>
-                    <p>Total FIR Relief pending for more than 7 days</p>
-                    <p>0</p>
-                </div>
-            </div>
-            <div class="filter red">
-                <p>Filtered Cases</p>
-                <p>0</p>
-            </div>
+  <div class="row">
+
+    <!-- FIR Pending -->
+    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+      <div class="case red">
+        <img src="assets/images/hammer.png" alt="" height="50px">
+        <div>
+          <p>Total FIR Relief pending for more than 7 days</p>
+          <p>{{ moreThan7days }}</p>
         </div>
-        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
-            <div class="case red">
-                <img src="assets/images/hammer.png" alt="" height="50px">
-                <div>
-                     <p>Total Chargesheet Relief pending after it is filed</p>
-                    <p>0</p>
-                </div>
-            </div>
-            <div class="filter red">
-                <p>Filtered Cases</p>
-                <p>0</p>
-            </div>
-        </div>
-        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
-            <div class="case red">
-                <img src="assets/images/hammer.png" alt="" height="50px">
-                <div>
-                     <p>Total Convicted Relief Cases Pending</p>
-                    <p>0</p>
-                </div>
-            </div>
-            <div class="filter red">
-                <p>Filtered Cases</p>
-                <p>0</p>
-            </div>
-        </div>
-        
-        
+      </div>
+      <div class="filter red">
+        <p>Filtered Cases</p>
+        <p>{{ firFilter }}</p>
+      </div>
     </div>
-    <app-loading-dash *ngIf="loading"/>
+
+    <!-- Charge Sheet Pending -->
+    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+      <div class="case red">
+        <img src="assets/images/hammer.png" alt="" height="50px">
+        <div>
+          <p>Total Chargesheet Relief pending after it is filed</p>
+          <p>{{ chargesheetPending }}</p>
+        </div>
+      </div>
+      <div class="filter red">
+        <p>Filtered Cases</p>
+        <p>{{ chargesheetFilter }}</p>
+      </div>
+    </div>
+
+    <!-- Conviction Pending -->
+    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 card-box">
+      <div class="case red">
+        <img src="assets/images/hammer.png" alt="" height="50px">
+        <div>
+          <p>Total Convicted Relief Cases Pending</p>
+          <p>{{ convictionPending }}</p>
+        </div>
+      </div>
+      <div class="filter red">
+        <p>Filtered Cases</p>
+        <p>{{ convictedFilter }}</p>
+      </div>
+    </div>
+
+  </div>
+
+  <app-loading-dash *ngIf="loading"></app-loading-dash>
 </section>
+
